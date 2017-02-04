@@ -5,8 +5,8 @@ Alpine
 
 An opinionated scaffolding library that jumpstarts Java projects with an 
 API-first design, secure defaults, and minimal dependencies. Alpine came 
-about due to many commonalities that many of my personal and professional
-projects share. 
+about due to many commonalities between several of my personal and 
+professional projects.
 
 Design Features
 -
@@ -26,8 +26,9 @@ Alpine supports multiple types of principals including LDAP users and
 API keys, both of which can be integrated into teams for access control.
 
 * **Simplified Event System** - 
-Alpine can perform parallel processing of tasks using a pub/sub model.
-It can easily scale to consume as much or as little of the hosts hardware.
+Alpine can perform parallel processing of tasks using an asynchronous
+pub/sub model. It can easily scale to consume as much or as little of 
+available resources as necessary.
 
 * **Secure By Default** - 
 All REST resources are secure by default, requiring authentication to 
@@ -40,9 +41,9 @@ It's not.
 
 * **Minimal Dependencies** - 
 Too many frameworks unnecessary increase the attack surface of applications 
-built using them. Even a simple Hello World application can be susceptible 
-to attack from vulnerable or poorly configured frameworks. Alpine includes
-what is necessary for a modern app, nothing more.
+built using them. Even a simple Hello World application is often susceptible 
+to attack from the use of vulnerable components or poorly configured 
+frameworks. Alpine includes what is necessary for a modern app, nothing more.
 
 * **Control** - 
 Frameworks often force developers higher up the stack, freeing them from
@@ -51,6 +52,35 @@ developers often don't understand how their app actually works. Alpine
 does not do this. It provides standards-based APIs in a pre-packaged 
 library giving developers both full control over their app, as well as a
 productivity jumpstart.
+
+Why 'Alpine'
+-
+Alt-right American politics has devised many insults against liberal thought
+and the people who practice it. The term 'snowflake' is often applied to 
+such people as a derogatory insult in the absence of their own critical 
+thinking ability. Although a creative term, it's highly ineffective and
+does nothing to address global concerns. So 'Alpine' is the public celebration
+of being a 'snowflake', named after the blankets of snow that cover the French
+Alps. Besides, 'Alpine' has a certain je ne sais quoi to it.
+
+Open source is truly one of the great liberal ideals. So Alpine is released
+with an equally liberal Apache 2.0 license.
+
+Alpine is also the brand name of high-end car audio equipment, a hobby I was
+passionate about in my teens and twenties when I built many systems and often
+competed in various sound-offs in Illinois and Wisconsin. The name is nostalgic
+and brings to me a certain joy.
+
+Alpine is not affiliated to the Docker container image by the same name. It's
+interesting that both projects have minimalism as a goal, but this is merely
+coincidence.
+
+Is Alpine For You
+-
+My opinions are just that, mine. They will evolve over time. However, my belief
+in sticking with open standards and not having to conform to the conventions of
+a specific framework will likely never change. Alpine is lightweight, standards-
+based, and framework-free. If this appeals to you, give Alpine a try. 
 
 
 Copyright & License
