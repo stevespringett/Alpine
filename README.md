@@ -82,6 +82,13 @@ in sticking with open standards and not having to conform to the conventions of
 a specific framework will likely never change. Alpine is lightweight, 
 standards-based, and framework-free. If this appeals to you, give Alpine a try. 
 
+Projects Using Alpine
+-
+If your open source or commercial project is using Alpine, feel free to add its
+name:
+
+* [Hakbot Origin Controller](https://github.com/hakbot/hakbot-origin-controller)
+* [OWASP Dependency-Track](https://www.owasp.org/index.php/OWASP_Dependency_Track_Project)
 
 Copyright & License
 -
