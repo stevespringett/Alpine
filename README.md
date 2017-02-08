@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/stevespringett/alpine.svg?branch=3.0-dev)](https://travis-ci.org/stevespringett/alpine)
+[![Build Status](https://travis-ci.org/stevespringett/Alpine.svg)](https://travis-ci.org/stevespringett/Alpine)
 
 Alpine
 =========
