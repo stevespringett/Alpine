@@ -1,0 +1,492 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>us.springett</groupId>
+    <artifactId>alpine-parent</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0.0-SNAPSHOT</version>
+
+    <modules>
+        <module>alpine</module>
+    </modules>
+
+    <name>Alpine Parent POM</name>
+    <description>
+        An opinionated scaffolding library that jumpstarts Java projects with an API-first design,
+        secure defaults, and minimal dependencies.
+    </description>
+    <inceptionYear>2016</inceptionYear>
+
+    <developers>
+        <developer>
+            <name>Steve Springett</name>
+            <organizationUrl>http://stevespringett.com/</organizationUrl>
+            <roles>
+                <role>Architect</role>
+                <role>Developer</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <properties>
+        <!-- Maven Build Properties -->
+        <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <timestamp>${maven.build.timestamp}</timestamp>
+
+        <!-- Maven Plugin Versions -->
+        <maven.compiler.plugin.version>3.1</maven.compiler.plugin.version>
+        <maven.dependency.plugin.version>3.0.0</maven.dependency.plugin.version>
+        <maven.site.plugin.version>3.5.1</maven.site.plugin.version>
+        <maven.surefire.plugin.version>2.18.1</maven.surefire.plugin.version>
+        <maven.war.plugin.version>2.4</maven.war.plugin.version>
+        <maven.datanucleus.plugin.version>4.0.5</maven.datanucleus.plugin.version>
+
+        <!-- Software Security: HPE Fortify SCA -->
+        <maven.fortify.plugin.version>16.20</maven.fortify.plugin.version>
+        <plugin.fortify.sca.debug>false</plugin.fortify.sca.debug>
+        <plugin.fortify.sca.verbose>false</plugin.fortify.sca.verbose>
+        <plugin.fortify.sca.sourcePath>${project.build.directory}/dependency-sources</plugin.fortify.sca.sourcePath>
+        <plugin.fortify.sca.buildId>${project.artifactId}</plugin.fortify.sca.buildId>
+        <plugin.fortify.sca.source.version>${maven.compiler.source}</plugin.fortify.sca.source.version>
+
+        <!-- Software Security: OWASP Dependency-Check -->
+        <maven.dependency-check.plugin.version>1.4.5</maven.dependency-check.plugin.version>
+        <plugin.dependency-check.autoUpdate>true</plugin.dependency-check.autoUpdate>
+        <plugin.dependency-check.format>ALL</plugin.dependency-check.format>
+        <plugin.dependency-check.skipTestScope>true</plugin.dependency-check.skipTestScope>
+        <plugin.dependency-check.suppressionFile>${env.DEPENDENCY-CHECK_SUPPRESSION}</plugin.dependency-check.suppressionFile>
+        <plugin.dependency-check.centralAnalyzerEnabled>true</plugin.dependency-check.centralAnalyzerEnabled>
+        <plugin.dependency-check.externalReport>true</plugin.dependency-check.externalReport>
+
+        <!-- Dependency Versions -->
+        <lib.commons.collections4.version>4.1</lib.commons.collections4.version>
+        <lib.commons.dbcp.version>1.4</lib.commons.dbcp.version>
+        <lib.commons.io.version>2.5</lib.commons.io.version>
+        <lib.commons.lang3.version>3.5</lib.commons.lang3.version>
+        <lib.datanucleus-api-jdo.version>4.1.4</lib.datanucleus-api-jdo.version>
+        <lib.datanucleus.version>4.1.16</lib.datanucleus.version>
+        <lib.h2.version>1.3.176</lib.h2.version>
+        <lib.jackson.version>2.8.6</lib.jackson.version>
+        <lib.jdo.api.version>3.1</lib.jdo.api.version>
+        <lib.jersey.version>2.22.4</lib.jersey.version>
+        <lib.jsp.api.version>2.2</lib.jsp.api.version>
+        <lib.jsonwebtoken.version>0.7.0</lib.jsonwebtoken.version>
+        <lib.jsr353-impl.version>1.0.4</lib.jsr353-impl.version>
+        <lib.jsr353-spec.version>1.0</lib.jsr353-spec.version>
+        <lib.jstl.version>1.2</lib.jstl.version>
+        <lib.logback.version>1.1.9</lib.logback.version>
+        <lib.owasp.encoder.version>1.2</lib.owasp.encoder.version>
+        <lib.slf4j.version>1.7.22</lib.slf4j.version>
+        <lib.swagger.jersey.version>1.5.12</lib.swagger.jersey.version>
+    </properties>
+
+    <dependencies>
+        <!-- Misc helper libraries -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${lib.commons.io.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${lib.commons.lang3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>${lib.commons.collections4.version}</version>
+        </dependency>
+        <!-- Server architecture -->
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <version>7.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-servlet</artifactId>
+            <version>${lib.jersey.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-json-jackson</artifactId>
+            <version>${lib.jersey.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-multipart</artifactId>
+            <version>${lib.jersey.version}</version>
+        </dependency>
+        <!-- JSON API specification and default implementation of JSR 353 -->
+        <dependency>
+            <groupId>javax.json</groupId>
+            <artifactId>javax.json-api</artifactId>
+            <version>${lib.jsr353-spec.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.json</artifactId>
+            <version>${lib.jsr353-impl.version}</version>
+        </dependency>
+        <!-- JSP API's -->
+        <dependency>
+            <groupId>javax.servlet.jsp</groupId>
+            <artifactId>jsp-api</artifactId>
+            <version>${lib.jsp.api.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+            <version>${lib.jstl.version}</version>
+        </dependency>
+        <!-- todo: update swagger when available -->
+        <!-- https://github.com/swagger-api/swagger-core/issues/1594 -->
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-jersey2-jaxrs</artifactId>
+            <version>${lib.swagger.jersey.version}</version>
+        </dependency>
+        <!-- Persistence -->
+        <dependency>
+            <groupId>javax.jdo</groupId>
+            <artifactId>jdo-api</artifactId>
+            <version>${lib.jdo.api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.datanucleus</groupId>
+            <artifactId>datanucleus-api-jdo</artifactId>
+            <version>${lib.datanucleus-api-jdo.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.datanucleus</groupId>
+            <artifactId>datanucleus-core</artifactId>
+            <version>${lib.datanucleus.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.datanucleus</groupId>
+            <artifactId>datanucleus-rdbms</artifactId>
+            <version>${lib.datanucleus.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-dbcp</groupId>
+            <artifactId>commons-dbcp</artifactId>
+            <version>${lib.commons.dbcp.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${lib.h2.version}</version>
+        </dependency>
+        <!-- Authentication and Authorization -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>${lib.jsonwebtoken.version}</version>
+        </dependency>
+        <!-- JAX-RS JSON -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${lib.jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${lib.jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.jaxrs</groupId>
+            <artifactId>jackson-jaxrs-base</artifactId>
+            <version>${lib.jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.jaxrs</groupId>
+            <artifactId>jackson-jaxrs-json-provider</artifactId>
+            <version>${lib.jackson.version}</version>
+        </dependency>
+        <!-- Logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${lib.slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${lib.logback.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>${lib.logback.version}</version>
+        </dependency>
+        <!-- XSS prevention -->
+        <dependency>
+            <groupId>org.owasp.encoder</groupId>
+            <artifactId>encoder</artifactId>
+            <version>${lib.owasp.encoder.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.owasp.encoder</groupId>
+            <artifactId>encoder-jsp</artifactId>
+            <version>${lib.owasp.encoder.version}</version>
+        </dependency>
+        <!-- Unit Tests -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.test-framework.providers</groupId>
+            <artifactId>jersey-test-framework-provider-grizzly2</artifactId>
+            <version>2.22.1</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire.plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.datanucleus</groupId>
+                <artifactId>datanucleus-maven-plugin</artifactId>
+                <version>${maven.datanucleus.plugin.version}</version>
+                <configuration>
+                    <api>JDO</api>
+                    <persistenceUnitName>Alpine</persistenceUnitName>
+                    <verbose>true</verbose>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>enhance</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>application.properties</include>
+                </includes>
+            </resource>
+        </resources>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>fortify</id>
+            <!-- Only activate this profile if you're a Fortify customer, have the required
+                 Fortify Maven plugin installed, and SCA installed and configured. -->
+            <activation>
+                <property>
+                    <name>env.ACTIVATE_FORTIFY</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <defaultGoal>process-classes</defaultGoal>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>${maven.dependency.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>src-dependencies</id>
+                                <phase>process-sources</phase>
+                                <goals>
+                                    <goal>unpack-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                    <classifier>sources</classifier>
+                                    <includeScope>compile</includeScope>
+                                    <failOnMissingClassifierArtifact>false</failOnMissingClassifierArtifact>
+                                    <outputDirectory>${plugin.fortify.sca.sourcePath}</outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.hpe.security.fortify.maven.plugin</groupId>
+                        <artifactId>sca-maven-plugin</artifactId>
+                        <version>${maven.fortify.plugin.version}</version>
+                        <configuration>
+                            <buildId>${plugin.fortify.sca.buildId}</buildId>
+                            <sourcePath>${plugin.fortify.sca.sourcePath}</sourcePath>
+                            <debug>${plugin.fortify.sca.debug}</debug>
+                            <verbose>${plugin.fortify.sca.verbose}</verbose>
+                            <source>${plugin.fortify.sca.source.version}</source>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>sca-clean</id>
+                                <phase>clean</phase>
+                                <goals>
+                                    <goal>clean</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>sca-translate</id>
+                                <phase>process-classes</phase>
+                                <goals>
+                                    <goal>translate</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>sca-scan</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>scan</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>dependency-check</id>
+            <activation>
+                <property>
+                    <name>env.ACTIVATE_DEPENDENCY_CHECK</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <defaultGoal>package</defaultGoal>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.owasp</groupId>
+                            <artifactId>dependency-check-maven</artifactId>
+                            <version>${maven.dependency-check.plugin.version}</version>
+                            <configuration>
+                                <autoUpdate>${plugin.dependency-check.autoUpdate}</autoUpdate>
+                                <format>${plugin.dependency-check.format}</format>
+                                <skipTestScope>${plugin.dependency-check.skipTestScope}</skipTestScope>
+                                <suppressionFile>${plugin.dependency-check.suppressionFile}</suppressionFile>
+                                <centralAnalyzerEnabled>${plugin.dependency-check.centralAnalyzerEnabled}</centralAnalyzerEnabled>
+                                <externalReport>${plugin.dependency-check.externalReport}</externalReport>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+                <plugins>
+                    <plugin>
+                        <groupId>org.owasp</groupId>
+                        <artifactId>dependency-check-maven</artifactId>
+                        <version>${maven.dependency-check.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>dependency-check</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-site-plugin</artifactId>
+                        <version>${maven.site.plugin.version}</version>
+                        <configuration>
+                            <reportPlugins combine.children="override">
+                                <plugin>
+                                    <groupId>org.owasp</groupId>
+                                    <artifactId>dependency-check-maven</artifactId>
+                                    <version>${maven.dependency-check.plugin.version}</version>
+                                    <configuration>
+                                        <autoUpdate>${plugin.dependency-check.autoUpdate}</autoUpdate>
+                                        <format>${plugin.dependency-check.format}</format>
+                                        <skipTestScope>${plugin.dependency-check.skipTestScope}</skipTestScope>
+                                        <suppressionFile>${plugin.dependency-check.suppressionFile}</suppressionFile>
+                                        <centralAnalyzerEnabled>${plugin.dependency-check.centralAnalyzerEnabled}</centralAnalyzerEnabled>
+                                        <externalReport>${plugin.dependency-check.externalReport}</externalReport>
+                                    </configuration>
+                                    <reportSets>
+                                        <reportSet>
+                                            <reports>
+                                                <report>aggregate</report>
+                                            </reports>
+                                        </reportSet>
+                                    </reportSets>
+                                </plugin>
+                            </reportPlugins>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>dependency-check</id>
+                                <phase>site</phase>
+                                <goals>
+                                    <goal>site</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+</project>
