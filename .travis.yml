@@ -1,3 +1,3 @@
 language: java
 jdk: oraclejdk8
-script: mvn install -DreleaseTesting
+script: mvn clean deploy
