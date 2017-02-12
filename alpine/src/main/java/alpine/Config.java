@@ -46,6 +46,7 @@ public class Config {
         DATABASE_PORT            ("alpine.database.port"),
         ENFORCE_AUTHENTICATION   ("alpine.enforce.authentication"),
         ENFORCE_AUTHORIZATION    ("alpine.enforce.authorization"),
+        BCRYPT_ROUNDS            ("alpine.bcrypt.rounds"),
         LDAP_SERVER_URL          ("alpine.ldap.server.url"),
         LDAP_DOMAIN              ("alpine.ldap.domain"),
         LDAP_BASEDN              ("alpine.ldap.basedn"),
