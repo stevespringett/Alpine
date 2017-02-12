@@ -36,7 +36,7 @@ import java.util.Hashtable;
 import java.util.List;
 
 /**
- * A task to synchronize LDAP users. This should be added a a concreate class that
+ * A task to synchronize LDAP users. This should be added a a concrete class that
  * extends {@link AlpineTaskScheduler}.
  *
  * @since 1.0.0
