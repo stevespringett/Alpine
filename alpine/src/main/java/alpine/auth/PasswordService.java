@@ -20,22 +20,43 @@ import alpine.Config;
 import alpine.model.ManagedUser;
 import org.mindrot.jbcrypt.BCrypt;
 
+/**
+ * A wrapper around BCrypt used to hash and check password validity.
+ *
+ * @since 1.0.0
+ */
 public class PasswordService {
 
     private static final int ROUNDS = Config.getInstance().getPropertyAsInt(Config.Key.BCRYPT_ROUNDS);
 
     private PasswordService() { }
 
+    /**
+     * Generates a salt using the configured number of rounds (determined by {@link Config.Key#BCRYPT_ROUNDS)
+     * and hashes the password.
+     *
+     * @since 1.0.0
+     */
     public static char[] createHash(char[] password) {
         // Todo: remove String when Jbcrypt supports char[]
         return BCrypt.hashpw(new String(password), BCrypt.gensalt(ROUNDS)).toCharArray();
     }
 
+    /**
+     * Hashes the specified password using the specified salt.
+     *
+     * @since 1.0.0
+     */
     public static char[] createHash(char[] password, char[] salt) {
         // Todo: remove String when Jbcrypt supports char[]
         return BCrypt.hashpw(new String(password), new String(salt)).toCharArray();
     }
 
+    /**
+     * Checks the validity of the asserted password against a ManagedUsers actual hashed password.
+     *
+     * @since 1.0.0
+     */
     public static boolean matches(char[] assertedPassword, ManagedUser user) {
         // Todo: remove String when Jbcrypt supports char[]
         return BCrypt.checkpw(new String(assertedPassword), new String(user.getPassword()));
