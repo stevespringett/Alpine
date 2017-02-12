@@ -37,7 +37,9 @@ import java.util.List;
                 @Persistent(name="uuid"),
                 @Persistent(name="name"),
                 @Persistent(name="apiKeys"),
-                @Persistent(name="ldapUsers")})
+                @Persistent(name="ldapUsers"),
+                @Persistent(name="managedUsers")
+        })
 })
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Team implements Serializable {
@@ -79,6 +81,10 @@ public class Team implements Serializable {
     @Order(extensions=@Extension(vendorName="datanucleus", key="list-ordering", value="username ASC"))
     private List<LdapUser> ldapUsers;
 
+    @Persistent(mappedBy="teams")
+    @Order(extensions=@Extension(vendorName="datanucleus", key="list-ordering", value="username ASC"))
+    private List<ManagedUser> managedUsers;
+
     public long getId() {
         return id;
     }
@@ -117,5 +123,13 @@ public class Team implements Serializable {
 
     public void setLdapUsers(List<LdapUser> ldapUsers) {
         this.ldapUsers = ldapUsers;
+    }
+
+    public List<ManagedUser> getManagedUsers() {
+        return managedUsers;
+    }
+
+    public void setManagedUsers(List<ManagedUser> managedUsers) {
+        this.managedUsers = managedUsers;
     }
 }
