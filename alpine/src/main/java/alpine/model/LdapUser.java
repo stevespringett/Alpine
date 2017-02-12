@@ -49,8 +49,7 @@ public class LdapUser implements Serializable, Principal {
     private String username;
 
     @Persistent
-    @Unique(name="DN_IDX")
-    @Column(name="DN", jdbcType="VARCHAR", length=255, allowsNull="false")
+    @Column(name="DN", allowsNull="false")
     private String dn;
 
     @Persistent(table="LDAPUSERS_TEAMS", defaultFetchGroup="true")
