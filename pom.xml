@@ -215,6 +215,11 @@
             <artifactId>jjwt</artifactId>
             <version>${lib.jsonwebtoken.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>0.4-atlassian-1</version>
+        </dependency>
         <!-- JAX-RS JSON -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -288,6 +293,13 @@
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
+
+    <repositories>
+        <repository>
+            <id>atlassian-repo</id>
+            <url>https://maven.atlassian.com/3rdparty/</url>
+        </repository>
+    </repositories>
 
     <build>
         <plugins>
