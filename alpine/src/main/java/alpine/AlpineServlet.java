@@ -24,6 +24,9 @@ import io.swagger.models.Swagger;
 import io.swagger.models.auth.ApiKeyAuthDefinition;
 import io.swagger.models.auth.In;
 import org.glassfish.jersey.servlet.ServletContainer;
+import org.owasp.security.logging.util.IntervalLoggerController;
+import org.owasp.security.logging.util.SecurityLoggingFactory;
+import org.owasp.security.logging.util.SecurityUtil;
 import javax.crypto.SecretKey;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -87,6 +90,16 @@ public class AlpineServlet extends ServletContainer {
                 logger.error("An error occurred saving newly generated secret key");
                 logger.error(e.getMessage());
             }
+        }
+
+        // Log all Java System Properties
+        SecurityUtil.logJavaSystemProperties();
+
+        // Determine if Watchdog logging is enabled and if so, start interval logging
+        int interval = Config.getInstance().getPropertyAsInt(Config.Key.WATCHDOG_LOGGING_INTERVAL);
+        if (interval > 0) {
+            IntervalLoggerController wd = SecurityLoggingFactory.getControllerInstance();
+            wd.start(interval * 1000); // Interval is defined in seconds
         }
     }
 

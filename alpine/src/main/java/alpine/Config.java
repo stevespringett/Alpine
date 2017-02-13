@@ -18,7 +18,6 @@ package alpine;
 
 import alpine.logging.Logger;
 import alpine.util.SystemUtil;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,7 +53,8 @@ public class Config {
         LDAP_BIND_PASSWORD       ("alpine.ldap.bind.password"),
         LDAP_ATTRIBUTE_MAIL      ("alpine.ldap.attribute.mail"),
         HTTP_PROXY_ADDRESS       ("alpine.http.proxy.address"),
-        HTTP_PROXY_PORT          ("alpine.http.proxy.port");
+        HTTP_PROXY_PORT          ("alpine.http.proxy.port"),
+        WATCHDOG_LOGGING_INTERVAL("alpine.watchdog.logging.interval");
 
         String propertyName;
         private Key(String item) {
