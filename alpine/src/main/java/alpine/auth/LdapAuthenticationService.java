@@ -33,7 +33,7 @@ import java.util.Hashtable;
  *
  * @since 1.0.0
  */
-public class LdapAuthenticator implements AuthenticationService {
+public class LdapAuthenticationService implements AuthenticationService {
 
     private static final String ldapUrl = Config.getInstance().getProperty(Config.Key.LDAP_SERVER_URL);
     private static final String domainName = Config.getInstance().getProperty(Config.Key.LDAP_DOMAIN);
@@ -46,7 +46,7 @@ public class LdapAuthenticator implements AuthenticationService {
      *
      * @since 1.0.0
      */
-    public LdapAuthenticator(String username, String password) {
+    public LdapAuthenticationService(String username, String password) {
         this.username = username;
         this.password = password;
     }
