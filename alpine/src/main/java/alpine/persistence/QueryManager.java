@@ -21,6 +21,7 @@ import alpine.event.LdapSyncEvent;
 import alpine.event.framework.EventService;
 import alpine.model.ApiKey;
 import alpine.model.LdapUser;
+import alpine.model.ManagedUser;
 import alpine.model.Team;
 import alpine.util.UuidUtil;
 import javax.jdo.Query;
@@ -86,13 +87,28 @@ public class QueryManager extends AlpineQueryManager {
         return getObjectById(LdapUser.class, user.getId());
     }
 
-    public LdapUser updateUser(LdapUser transientUser) {
+    public LdapUser updateLdapUser(LdapUser transientUser) {
         LdapUser user = getObjectById(LdapUser.class, transientUser.getId());
         pm.currentTransaction().begin();
         user.setDN(transientUser.getDN());
         pm.currentTransaction().commit();
         return pm.getObjectById(LdapUser.class, user.getId());
     }
+
+    @SuppressWarnings("unchecked")
+    public ManagedUser getManagedUser(String username) {
+        Query query = pm.newQuery(ManagedUser.class, "username == :username");
+        List<ManagedUser> result = (List<ManagedUser>)query.execute(username);
+        return result.size() == 0 ? null : result.get(0);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<ManagedUser> getManagedUsers() {
+        Query query = pm.newQuery(ManagedUser.class);
+        query.setOrdering("username asc");
+        return (List<ManagedUser>)query.execute();
+    }
+
 
     public Team createTeam(String name, boolean createApiKey) {
         pm.currentTransaction().begin();
