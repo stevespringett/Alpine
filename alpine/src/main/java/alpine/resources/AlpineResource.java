@@ -18,9 +18,8 @@ package alpine.resources;
 
 import alpine.model.ApiKey;
 import alpine.model.LdapUser;
-import alpine.resources.OrderBy;
-import alpine.resources.Pagination;
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
@@ -31,6 +30,9 @@ public abstract class AlpineResource {
 
     @Context
     private ContainerRequestContext requestContext;
+
+    @Context
+    private HttpServletRequest request;
 
     @Context
     private UriInfo uriInfo;
@@ -56,6 +58,18 @@ public abstract class AlpineResource {
 
     protected String getFilter() {
         return filter;
+    }
+
+    protected String getRemoteAddress() {
+        return request.getRemoteAddr();
+    }
+
+    protected String getRemoteHost() {
+        return request.getRemoteHost();
+    }
+
+    protected String getUserAgent() {
+        return requestContext.getHeaderString("USER_AGENT");
     }
 
     @PostConstruct
