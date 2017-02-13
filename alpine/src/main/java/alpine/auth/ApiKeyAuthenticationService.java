@@ -27,7 +27,7 @@ import java.security.Principal;
  *
  * @since 1.0.0
  */
-public class ApiKeyAuthService implements AuthService {
+public class ApiKeyAuthenticationService implements AuthenticationService {
 
     private String assertedApiKey = null;
 
@@ -37,7 +37,7 @@ public class ApiKeyAuthService implements AuthService {
      *
      * @since 1.0.0
      */
-    public ApiKeyAuthService(ContainerRequest request) {
+    public ApiKeyAuthenticationService(ContainerRequest request) {
         this.assertedApiKey = request.getHeaderString("X-Api-Key");
     }
 

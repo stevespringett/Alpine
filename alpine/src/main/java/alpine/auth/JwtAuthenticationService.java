@@ -24,20 +24,19 @@ import java.security.Principal;
 import java.util.List;
 
 /**
- * An AuthService implementation for JWTs that authenticates users
+ * An AuthenticationService implementation for JWTs that authenticates users
  * based on a token presented in the request. Tokens must be presented
  * using the Authorization Bearer header.
  *
  * @since 1.0.0
  */
-public class JwtAuthService implements AuthService {
+public class JwtAuthenticationService implements AuthenticationService {
 
     private String bearer = null;
 
-    public JwtAuthService(ContainerRequest request) {
+    public JwtAuthenticationService(ContainerRequest request) {
         this.bearer = getAuthorizationToken(request);
     }
-
 
     /**
      * {@inheritDoc}

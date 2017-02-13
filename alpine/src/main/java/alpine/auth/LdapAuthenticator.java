@@ -17,11 +17,15 @@
 package alpine.auth;
 
 import alpine.Config;
+import alpine.model.LdapUser;
+import alpine.persistence.QueryManager;
 import org.apache.commons.lang3.StringUtils;
+import javax.naming.AuthenticationException;
 import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
+import java.security.Principal;
 import java.util.Hashtable;
 
 /**
@@ -29,10 +33,53 @@ import java.util.Hashtable;
  *
  * @since 1.0.0
  */
-public class LdapAuthenticator {
+public class LdapAuthenticator implements AuthenticationService {
 
     private static final String ldapUrl = Config.getInstance().getProperty(Config.Key.LDAP_SERVER_URL);
     private static final String domainName = Config.getInstance().getProperty(Config.Key.LDAP_DOMAIN);
+
+    private String username;
+    private String password;
+
+    /**
+     * Authentication service validates credentials against a directory service (LDAP)
+     *
+     * @since 1.0.0
+     */
+    public LdapAuthenticator(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+
+    /**
+     * Returns whether the username/password combo was specified or not. In
+     * this case, since the constructor requires it, this method will always
+     * return true.
+     *
+     * @since 1.0.0
+     */
+    public boolean isSpecified() {
+        return true;
+    }
+
+    /**
+     * Authenticates the username/password combo against the directory service
+     * and returns a Principal if authentication is successful. Otherwise,
+     * returns an AuthenticationException.
+     *
+     * @since 1.0.0
+     */
+    public Principal authenticate() throws AuthenticationException {
+        if (validateCredentials()) {
+            try (QueryManager qm = new QueryManager()) {
+                LdapUser user = qm.getLdapUser(username);
+                if (user != null) {
+                    return user;
+                }
+            }
+        }
+        throw new AuthenticationException();
+    }
 
     /**
      * Asserts a users credentials. Returns an LdapContext if assertion is successful
@@ -66,7 +113,7 @@ public class LdapAuthenticator {
      *
      * @since 1.0.0
      */
-    public boolean validateCredentials(String username, String password) {
+    private boolean validateCredentials() {
         LdapContext ldapContext = null;
         try {
             ldapContext = getConnection(username, password);

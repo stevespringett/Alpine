@@ -16,8 +16,8 @@
  */
 package alpine.filters;
 
-import alpine.auth.ApiKeyAuthService;
-import alpine.auth.JwtAuthService;
+import alpine.auth.ApiKeyAuthenticationService;
+import alpine.auth.JwtAuthenticationService;
 import alpine.logging.Logger;
 import org.glassfish.jersey.server.ContainerRequest;
 import javax.annotation.Priority;
@@ -53,7 +53,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
             Principal principal = null;
 
-            ApiKeyAuthService apiKeyAuthService = new ApiKeyAuthService(request);
+            ApiKeyAuthenticationService apiKeyAuthService = new ApiKeyAuthenticationService(request);
             if (apiKeyAuthService.isSpecified()) {
                 try {
                     principal = apiKeyAuthService.authenticate();
@@ -64,7 +64,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
                 }
             }
 
-            JwtAuthService jwtAuthService = new JwtAuthService(request);
+            JwtAuthenticationService jwtAuthService = new JwtAuthenticationService(request);
             if (jwtAuthService.isSpecified()) {
                 try {
                     principal = jwtAuthService.authenticate();

@@ -16,6 +16,7 @@
  */
 package alpine.auth;
 
+import javax.annotation.Nullable;
 import javax.naming.AuthenticationException;
 import java.security.Principal;
 
@@ -24,7 +25,7 @@ import java.security.Principal;
  *
  * @since 1.0.0
  */
-public interface AuthService {
+public interface AuthenticationService {
 
     /**
      * Defines a method which returns if the specified piece of
@@ -41,6 +42,7 @@ public interface AuthService {
      *
      * @since 1.0.0
      */
+    @Nullable
     Principal authenticate() throws AuthenticationException;
 
 }
