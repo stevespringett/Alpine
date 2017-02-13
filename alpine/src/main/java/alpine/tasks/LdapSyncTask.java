@@ -130,7 +130,7 @@ public class LdapSyncTask implements Subscriber {
             user.setDN("INVALID");
             // user.setMail(null); //todo
         }
-        qm.updateUser(user);
+        qm.updateLdapUser(user);
     }
 
     private String formatPrincipal(String username) {
