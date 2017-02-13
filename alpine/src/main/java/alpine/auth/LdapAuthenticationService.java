@@ -83,11 +83,11 @@ public class LdapAuthenticationService implements AuthenticationService {
 
     /**
      * Asserts a users credentials. Returns an LdapContext if assertion is successful
-     * or an excpetion for any other reason.
+     * or an exception for any other reason.
      *
      * @since 1.0.0
      */
-    public LdapContext getConnection(String username, String password) throws NamingException {
+    private LdapContext getConnection(String username, String password) throws NamingException {
         if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
             throw new NamingException("Username or password cannot be empty or null");
         }
