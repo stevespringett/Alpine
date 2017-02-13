@@ -99,6 +99,7 @@
         <lib.jstl.version>1.2</lib.jstl.version>
         <lib.logback.version>1.1.9</lib.logback.version>
         <lib.owasp.encoder.version>1.2</lib.owasp.encoder.version>
+        <lib.owasp.security-logging.version>1.1.2</lib.owasp.security-logging.version>
         <lib.slf4j.version>1.7.22</lib.slf4j.version>
         <lib.swagger.jersey.version>1.5.12</lib.swagger.jersey.version>
     </properties>
@@ -242,6 +243,7 @@
             <version>${lib.jackson.version}</version>
         </dependency>
         <!-- Logging -->
+        <!-- Overriding OWASP Security Logging dependencies with newer versions -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -256,6 +258,11 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
             <version>${lib.logback.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.owasp</groupId>
+            <artifactId>security-logging-logback</artifactId>
+            <version>${lib.owasp.security-logging.version}</version>
         </dependency>
         <!-- XSS prevention -->
         <dependency>
