@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/stevespringett/Alpine.svg?branch=master)](https://travis-ci.org/stevespringett/Alpine)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/690/badge)](https://bestpractices.coreinfrastructure.org/projects/690)
 [![Coverity Scan Status](https://scan.coverity.com/projects/11764/badge.svg)](https://scan.coverity.com/projects/11764)
-[![Dependency Status](https://www.versioneye.com/user/projects/58a28c0c6a7781003a57a21e/badge.svg?style=flat)](https://www.versioneye.com/user/projects/58a28c0c6a7781003a57a21e)
+[![Dependency Status](https://www.versioneye.com/user/projects/58a2a49a0f3d4f003ce97f07/badge.svg?style=flat)](https://www.versioneye.com/user/projects/58a2a49a0f3d4f003ce97f07)
 [![License][license-image]][license-url]
 
 Alpine
