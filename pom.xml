@@ -277,6 +277,13 @@
             <artifactId>encoder-jsp</artifactId>
             <version>${lib.owasp.encoder.version}</version>
         </dependency>
+        <!-- Executable WAR with embedded Jetty -->
+        <dependency>
+            <groupId>com.vast.common</groupId>
+            <artifactId>executable-war</artifactId>
+            <version>1.0.0</version>
+            <scope>provided</scope>
+        </dependency>
         <!-- Unit Tests -->
         <dependency>
             <groupId>junit</groupId>
@@ -309,6 +316,10 @@
             <url>https://maven.atlassian.com/3rdparty/</url>
         </repository>
     </repositories>
+
+    <prerequisites>
+        <maven>3.1</maven>
+    </prerequisites>
 
     <build>
         <plugins>
@@ -504,6 +515,42 @@
                                 </goals>
                             </execution>
                         </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>embedded-jetty</id>
+            <activation>
+                <property>
+                    <name>env.ACTIVATE_EMBEDDED_JETTY</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <defaultGoal>package</defaultGoal>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-war-plugin</artifactId>
+                        <version>2.4</version>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.vast.util.EmbeddedJettyServer</mainClass>
+                                </manifest>
+                            </archive>
+                            <packagingExcludes>WEB-INF/lib/executable-war-*.jar</packagingExcludes>
+                            <dependentWarExcludes>WEB-INF/lib/*log4j*.jar,WEB-INF/lib/*slf4j*.jar</dependentWarExcludes>
+                            <overlays>
+                                <overlay>
+                                    <groupId>com.vast.common</groupId>
+                                    <artifactId>executable-war</artifactId>
+                                    <type>jar</type>
+                                </overlay>
+                            </overlays>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
