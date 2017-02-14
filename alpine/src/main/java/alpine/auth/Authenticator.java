@@ -24,6 +24,10 @@ import java.security.Principal;
  * Class is responsible for authenticating managed users against the internal user
  * database and optionally against a configured directory service (LDAP).
  *
+ * @see AuthenticationService
+ * @see ManagedUserAuthenticationService
+ * @see LdapAuthenticationService
+ *
  * @since 1.0.0
  */
 public class Authenticator {
