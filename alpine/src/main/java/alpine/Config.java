@@ -46,6 +46,7 @@ public class Config {
         ENFORCE_AUTHENTICATION   ("alpine.enforce.authentication",    true),
         ENFORCE_AUTHORIZATION    ("alpine.enforce.authorization",     true),
         BCRYPT_ROUNDS            ("alpine.bcrypt.rounds",             14),
+        LDAP_ENABLED             ("alpine.ldap.enabled",              false),
         LDAP_SERVER_URL          ("alpine.ldap.server.url",           null),
         LDAP_DOMAIN              ("alpine.ldap.domain",               null),
         LDAP_BASEDN              ("alpine.ldap.basedn",               null),

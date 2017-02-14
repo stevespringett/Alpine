@@ -44,6 +44,7 @@ import java.util.List;
 public class LdapSyncTask implements Subscriber {
 
     private static final Logger logger = Logger.getLogger(LdapSyncTask.class);
+    private static final boolean ldapEnabled = Config.getInstance().getPropertyAsBoolean(Config.Key.LDAP_ENABLED);
     private static final String ldapUrl = Config.getInstance().getProperty(Config.Key.LDAP_SERVER_URL);
     private static final String domainName = Config.getInstance().getProperty(Config.Key.LDAP_DOMAIN);
     private static final String baseDn = Config.getInstance().getProperty(Config.Key.LDAP_SERVER_URL);
@@ -53,7 +54,7 @@ public class LdapSyncTask implements Subscriber {
 
     public void inform(Event e) {
 
-        if (StringUtils.isBlank(ldapUrl)) {
+        if (!ldapEnabled || StringUtils.isBlank(ldapUrl)) {
             return;
         }
 
