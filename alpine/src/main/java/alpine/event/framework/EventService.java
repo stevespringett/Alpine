@@ -36,7 +36,7 @@ public class EventService {
     private static final Logger logger = Logger.getLogger(EventService.class);
     private Map<Class<? extends Event>, ArrayList<Class<? extends Subscriber>>> subscriptionMap = new ConcurrentHashMap<>();
     private static final ExecutorService executor =
-            Executors.newFixedThreadPool(Config.getInstance().getPropertyAsInt(Config.Key.SERVER_EVENT_THREADS));
+            Executors.newFixedThreadPool(Config.getInstance().getPropertyAsInt(Config.Key.EVENT_THREADS));
 
     private EventService() { }
 

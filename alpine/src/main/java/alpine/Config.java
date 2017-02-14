@@ -36,29 +36,31 @@ public class Config {
     private static Properties properties;
 
     public enum Key {
-        APPLICATION_NAME         ("application.name"),
-        APPLICATION_VERSION      ("application.version"),
-        APPLICATION_TIMESTAMP    ("application.timestamp"),
-        SERVER_EVENT_THREADS     ("alpine.server.event.threads"),
-        DATA_DIRECTORY           ("alpine.data.directory"),
-        DATABASE_MODE            ("alpine.database.mode"),
-        DATABASE_PORT            ("alpine.database.port"),
-        ENFORCE_AUTHENTICATION   ("alpine.enforce.authentication"),
-        ENFORCE_AUTHORIZATION    ("alpine.enforce.authorization"),
-        BCRYPT_ROUNDS            ("alpine.bcrypt.rounds"),
-        LDAP_SERVER_URL          ("alpine.ldap.server.url"),
-        LDAP_DOMAIN              ("alpine.ldap.domain"),
-        LDAP_BASEDN              ("alpine.ldap.basedn"),
-        LDAP_BIND_USERNAME       ("alpine.ldap.bind.username"),
-        LDAP_BIND_PASSWORD       ("alpine.ldap.bind.password"),
-        LDAP_ATTRIBUTE_MAIL      ("alpine.ldap.attribute.mail"),
-        HTTP_PROXY_ADDRESS       ("alpine.http.proxy.address"),
-        HTTP_PROXY_PORT          ("alpine.http.proxy.port"),
-        WATCHDOG_LOGGING_INTERVAL("alpine.watchdog.logging.interval");
+        APPLICATION_NAME         ("application.name",                 "Unknown Alpine Application"),
+        APPLICATION_VERSION      ("application.version",              "0.0.0"),
+        APPLICATION_TIMESTAMP    ("application.timestamp",            "1970-01-01 00:00:00"),
+        EVENT_THREADS            ("alpine.event.threads",             4),
+        DATA_DIRECTORY           ("alpine.data.directory",            "~/.alpine"),
+        DATABASE_MODE            ("alpine.database.mode",             "embedded"),
+        DATABASE_PORT            ("alpine.database.port",             9092),
+        ENFORCE_AUTHENTICATION   ("alpine.enforce.authentication",    true),
+        ENFORCE_AUTHORIZATION    ("alpine.enforce.authorization",     true),
+        BCRYPT_ROUNDS            ("alpine.bcrypt.rounds",             14),
+        LDAP_SERVER_URL          ("alpine.ldap.server.url",           null),
+        LDAP_DOMAIN              ("alpine.ldap.domain",               null),
+        LDAP_BASEDN              ("alpine.ldap.basedn",               null),
+        LDAP_BIND_USERNAME       ("alpine.ldap.bind.username",        null),
+        LDAP_BIND_PASSWORD       ("alpine.ldap.bind.password",        null),
+        LDAP_ATTRIBUTE_MAIL      ("alpine.ldap.attribute.mail",       "mail"),
+        HTTP_PROXY_ADDRESS       ("alpine.http.proxy.address",        null),
+        HTTP_PROXY_PORT          ("alpine.http.proxy.port",           null),
+        WATCHDOG_LOGGING_INTERVAL("alpine.watchdog.logging.interval", 0);
 
         String propertyName;
-        private Key(String item) {
+        Object defaultValue;
+        private Key(String item, Object defaultValue) {
             this.propertyName = item;
+            this.defaultValue = defaultValue;
         }
     }
 
@@ -98,6 +100,8 @@ public class Config {
      * Returns the fully qualified path to the configured data directory.
      * Expects a fully qualified path or a path starting with ~/
      *
+     * Defaults to ~/.alpine if data directory is not specified.
+     *
      * @since 1.0.0
      */
     public File getDataDirectorty() {
@@ -115,7 +119,11 @@ public class Config {
      * @since 1.0.0
      */
     public String getProperty(Key key) {
-        return properties.getProperty(key.propertyName);
+        if (key.defaultValue == null) {
+            return properties.getProperty(key.propertyName);
+        } else {
+            return properties.getProperty(key.propertyName, (String)key.defaultValue);
+        }
     }
 
     /**
@@ -152,8 +160,8 @@ public class Config {
     /**
      * @since 1.0.0
      */
-    public String getProperty(String key) {
-        return properties.getProperty(key);
+    public String getProperty(String key, String defaultValue) {
+        return properties.getProperty(key, defaultValue);
     }
 
     /**
