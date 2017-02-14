@@ -1,4 +1,8 @@
-[![Build Status](https://travis-ci.org/stevespringett/Alpine.svg)](https://travis-ci.org/stevespringett/Alpine)
+[![Build Status](https://travis-ci.org/stevespringett/Alpine.svg?branch=master)](https://travis-ci.org/stevespringett/Alpine)
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/690/badge)](https://bestpractices.coreinfrastructure.org/projects/690)
+[![Coverity Scan Status](https://scan.coverity.com/projects/11764/badge.svg)](https://scan.coverity.com/projects/11764)
+[![Dependency Status](https://www.versioneye.com/user/projects/58a28c0c6a7781003a57a21e/badge.svg?style=flat)](https://www.versioneye.com/user/projects/58a28c0c6a7781003a57a21e)
+[![License][license-image]][license-url]
 
 Alpine
 =========
@@ -44,7 +48,6 @@ Too many frameworks unnecessary increase the attack surface of applications
 built using them. Even a simple Hello World application is often susceptible 
 to attack from the use of vulnerable components or poorly configured 
 frameworks. Alpine includes what is necessary for a modern app, nothing more.
-
 * **Control** - 
 Frameworks often force developers higher up the stack, freeing them from
 low-level details. While this is certainly a huge win for productivity, 
@@ -96,11 +99,12 @@ Copyright & License
 Alpine is Copyright (c) Steve Springett. All Rights Reserved.
 
 Permission to modify and redistribute is granted under the terms of the 
-[Apache License 2.0] [license]
+[Apache License 2.0] [license-url]
 
 Alpine makes use of several other open source libraries. Please see
 the [NOTICE.txt] [notice] file for more information.
 
   [GitHub Wiki]: https://github.com/stevespringett/alpine/wiki
-  [license]: https://github.com/stevespringett/alpine/blob/master/LICENSE.txt
+  [license-image]: https://img.shields.io/badge/license-apache%20v2-brightgreen.svg
+  [license-url]: https://github.com/stevespringett/alpine/blob/master/LICENSE.txt
   [notice]: https://github.com/stevespringett/alpine/blob/master/NOTICE.txt
