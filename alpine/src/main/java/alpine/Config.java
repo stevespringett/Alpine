@@ -126,7 +126,7 @@ public class Config {
             return Integer.parseInt(getProperty(key));
         } catch (NumberFormatException e) {
             logger.error("Error parsing number from property: " + key.name());
-            throw e;
+            return -1;
         }
     }
 
@@ -138,7 +138,7 @@ public class Config {
             return Long.parseLong(getProperty(key));
         } catch (NumberFormatException e) {
             logger.error("Error parsing number from property: " + key.name());
-            throw e;
+            return -1;
         }
     }
 
