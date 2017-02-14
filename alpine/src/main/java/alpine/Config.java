@@ -123,7 +123,7 @@ public class Config {
         if (key.defaultValue == null) {
             return properties.getProperty(key.propertyName);
         } else {
-            return properties.getProperty(key.propertyName, (String)key.defaultValue);
+            return properties.getProperty(key.propertyName, String.valueOf(key.defaultValue));
         }
     }
 
