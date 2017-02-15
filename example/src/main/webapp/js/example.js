@@ -13,7 +13,7 @@ function getSwagger() {
         type: "GET",
         url: "api/swagger.json",
         success: function (data) {
-            $('#swagger-content').val(JSON.stringify(data));
+            $('#swagger-content').val(JSON.stringify(data, null, 4));
         }
     });
 }
@@ -23,7 +23,7 @@ function getVersion() {
         type: "GET",
         url: "api/version",
         success: function (data) {
-            $('#version-content').val(JSON.stringify(data));
+            $('#version-content').val(JSON.stringify(data, null, 4));
         }
     });
 }
