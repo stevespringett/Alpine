@@ -17,12 +17,14 @@
 package alpine.persistence;
 
 import alpine.Config;
+import alpine.auth.ApiKeyGenerator;
 import alpine.event.LdapSyncEvent;
 import alpine.event.framework.EventService;
 import alpine.model.ApiKey;
 import alpine.model.LdapUser;
 import alpine.model.ManagedUser;
 import alpine.model.Team;
+import alpine.model.UserPrincipal;
 import alpine.util.UuidUtil;
 import javax.jdo.Query;
 import java.util.HashSet;
@@ -54,7 +56,7 @@ public class QueryManager extends AlpineQueryManager {
         teams.add(team);
         pm.currentTransaction().begin();
         ApiKey apiKey = new ApiKey();
-        apiKey.setKey(UuidUtil.stripHyphens(UUID.randomUUID().toString()));
+        apiKey.setKey(ApiKeyGenerator.generate());
         apiKey.setTeams(teams);
         pm.makePersistent(apiKey);
         pm.currentTransaction().commit();
@@ -93,6 +95,17 @@ public class QueryManager extends AlpineQueryManager {
         user.setDN(transientUser.getDN());
         pm.currentTransaction().commit();
         return pm.getObjectById(LdapUser.class, user.getId());
+    }
+
+    public ManagedUser createManagedUser(String username, String password) {
+        pm.currentTransaction().begin();
+        ManagedUser user = new ManagedUser();
+        user.setUsername(username);
+        user.setPassword(password);
+        user.setSuspended(false);
+        pm.makePersistent(user);
+        pm.currentTransaction().commit();
+        return getObjectById(ManagedUser.class, user.getId());
     }
 
     @SuppressWarnings("unchecked")
@@ -141,7 +154,7 @@ public class QueryManager extends AlpineQueryManager {
         return pm.getObjectById(Team.class, team.getId());
     }
 
-    public boolean addUserToTeam(LdapUser user, Team team) {
+    public boolean addUserToTeam(UserPrincipal user, Team team) {
         List<Team> teams = user.getTeams();
         boolean found = false;
         for (Team t: teams) {
@@ -159,7 +172,7 @@ public class QueryManager extends AlpineQueryManager {
         return false;
     }
 
-    public boolean removeUserFromTeam(LdapUser user, Team team) {
+    public boolean removeUserFromTeam(UserPrincipal user, Team team) {
         List<Team> teams = user.getTeams();
         boolean found = false;
         for (Team t: teams) {
