@@ -1,0 +1,6 @@
+/*
+ Overrides the default values in skeleton.css
+ */
+.container {
+    max-width: 99%;
+}
