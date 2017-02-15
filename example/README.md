@@ -14,4 +14,4 @@ cd target
 java -jar example.war
 ```
 
-Finally, open your web browser to [http://localhost:8080] http://localhost:8080
+Finally, open your web browser to http://localhost:8080
