@@ -52,7 +52,10 @@ public class Authenticator {
     public Principal authenticate() throws AuthenticationException {
         ManagedUserAuthenticationService userService = new ManagedUserAuthenticationService(username, password);
         try {
-            userService.authenticate();
+            Principal principal = userService.authenticate();
+            if (principal != null) {
+                return principal;
+            }
         } catch (AuthenticationException e) { }
         if (LDAP_ENABLED) {
             LdapAuthenticationService ldapService = new LdapAuthenticationService(username, password);
