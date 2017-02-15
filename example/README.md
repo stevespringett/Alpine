@@ -2,7 +2,7 @@ Example Alpine Application
 =========
 
 This application highlights and demonstrates some of the features of 
-Alpine by letting you run Alpine in your local environment.
+Alpine by letting you run an example Alpine application in your local environment.
 
 Getting Started
 -
