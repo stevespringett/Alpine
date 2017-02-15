@@ -34,7 +34,7 @@ import java.util.List;
 
 @PersistenceCapable
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class LdapUser implements Serializable, Principal {
+public class LdapUser implements Serializable, Principal, UserPrincipal {
 
     private static final long serialVersionUID = 261924579887470488L;
 

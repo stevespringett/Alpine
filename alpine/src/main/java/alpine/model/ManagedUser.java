@@ -34,7 +34,7 @@ import java.util.List;
 
 @PersistenceCapable
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ManagedUser implements Serializable, Principal {
+public class ManagedUser implements Serializable, Principal, UserPrincipal {
 
     private static final long serialVersionUID = 7944779964068911025L;
 
@@ -49,8 +49,8 @@ public class ManagedUser implements Serializable, Principal {
     private String username;
 
     @Persistent
-    @Column(name="PASSWORD", jdbcType="VARBINARY", allowsNull="false")
-    private char[] password;
+    @Column(name="PASSWORD", allowsNull="false")
+    private String password;
 
     @Persistent
     @Column(name="SUSPENDED")
@@ -78,11 +78,11 @@ public class ManagedUser implements Serializable, Principal {
         this.username = username;
     }
 
-    public char[] getPassword() {
+    public String getPassword() {
         return password;
     }
 
-    public void setPassword(char[] password) {
+    public void setPassword(String password) {
         this.password = password;
     }
 
