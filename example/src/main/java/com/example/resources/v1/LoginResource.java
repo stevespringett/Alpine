@@ -36,14 +36,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.security.Principal;
 
-@Path("/v1/user")
-@Api(value = "user")
-public class UserResource extends AlpineResource {
+@Path("/v1/login")
+@Api(value = "login")
+public class LoginResource extends AlpineResource {
 
-    private static final Logger logger = Logger.getLogger(UserResource.class);
+    private static final Logger logger = Logger.getLogger(LoginResource.class);
 
     @POST
-    @Path("login")
     @Produces(MediaType.TEXT_PLAIN)
     @ApiOperation(
             value = "Assert login credentials",

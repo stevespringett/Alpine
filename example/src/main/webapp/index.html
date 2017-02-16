@@ -80,17 +80,41 @@
                     <h5>Swagger Definition</h5>
                     <p>Alpine applications have Swagger support built-in. Simply annotate your REST resources to extend the definition.</p>
                     <button id="swagger-button" class="button-primary">Get Swagger</button>
-                    <label for="swagger-content">Swagger Content</label>
-                    <textarea id="swagger-content" class="u-full-width" style="height:150px;"></textarea>
+                    <label for="swagger-content">Response</label>
+                    <textarea id="swagger-content" readonly class="u-full-width" style="height:150px;"></textarea>
 
                     <hr/>
 
                     <h5>Version Resource</h5>
                     <p>Alpine includes a default version resource that outputs basic application and version information.</p>
                     <button id="version-button" class="button-primary">Get Version</button>
-                    <label for="version-content">Version Content</label>
-                    <textarea id="version-content" class="u-full-width" style="height:150px;"></textarea>
+                    <label for="version-content">Response</label>
+                    <textarea id="version-content" readonly class="u-full-width" style="height:150px;"></textarea>
 
+                    <hr/>
+
+                    <h5>Authentication Example</h5>
+                    <p>This example supports internally managed users and, if configued, LDAP users. It not only illustrates
+                    how the built-in support for authentication, but displays the JSON Web Token that results from a successful
+                    attempt, as well as the logging of authentication to a seperate audit log.</p>
+                    <form id="login-form">
+                        <div class="row">
+                            <div class="five columns">
+                                <label for="usernameInput">Username</label>
+                                <input class="u-full-width" type="text" placeholder="admin" id="usernameInput">
+                            </div>
+                            <div class="five columns">
+                                <label for="passwordInput">Password</label>
+                                <input class="u-full-width" type="password" placeholder="admin" id="passwordInput">
+                            </div>
+                            <div class="two columns">
+                                <label for="login-button">&nbsp;</label>
+                                <button id="login-button" class="button-primary">Login</button>
+                            </div>
+                        </div>
+                        <label for="login-content">Response</label>
+                        <textarea id="login-content" readonly class="u-full-width" style="height:150px;"></textarea>
+                    </form>
                 </div>
             </div>
         </div>
