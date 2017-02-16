@@ -13,6 +13,9 @@
     <listener>
         <listener-class>com.example.event.EventSubsystemInitializer</listener-class>
     </listener>
+    <listener>
+        <listener-class>com.example.persistence.DefaultObjectCreator</listener-class>
+    </listener>
 
     <servlet>
         <servlet-name>HelloWorld</servlet-name>
