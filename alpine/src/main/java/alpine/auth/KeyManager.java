@@ -18,8 +18,6 @@ package alpine.auth;
 
 import alpine.Config;
 import alpine.logging.Logger;
-import alpine.util.SystemUtil;
-import org.apache.commons.io.serialization.ValidatingObjectInputStream;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import java.io.File;
@@ -211,11 +209,9 @@ public class KeyManager {
         File file = getKeyPath(KeyType.SECRET);
         SecretKey key;
         try (FileInputStream fis = new FileInputStream(file);
-             ObjectInputStream oin = new ObjectInputStream(fis)) {
+             ObjectInputStream ois = new ObjectInputStream(fis)) {
 
-            ValidatingObjectInputStream vois = new ValidatingObjectInputStream(oin);
-            vois.accept(SecretKey.class);
-            key = (SecretKey) vois.readObject();
+            key = (SecretKey) ois.readObject();
         }
         return this.secretKey = key;
     }
