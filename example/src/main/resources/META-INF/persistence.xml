@@ -11,7 +11,12 @@
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
 
         <properties>
+            <!--
             <property name="javax.jdo.option.ConnectionURL" value="jdbc:h2:~/.alpine-example/db;MVCC=TRUE"/>
+            -->
+
+            <!--For the example, we will create an in-memory database instead of one on the filesystem -->
+            <property name="javax.jdo.option.ConnectionURL" value="jdbc:h2:mem:example"/>
             <property name="javax.jdo.option.ConnectionDriverName" value="org.h2.Driver"/>
             <property name="javax.jdo.option.ConnectionUserName" value="sa"/>
             <property name="javax.jdo.option.ConnectionPassword" value=""/>
