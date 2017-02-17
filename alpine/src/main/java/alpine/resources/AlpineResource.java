@@ -75,8 +75,8 @@ public abstract class AlpineResource {
     @PostConstruct
     private void initialize() {
         MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
-        String top = queryParams.getFirst("top");
-        String skip = queryParams.getFirst("skip");
+        String page = queryParams.getFirst("page");
+        String size = queryParams.getFirst("size");
         String filter = queryParams.getFirst("filter");
         String orderBy = queryParams.getFirst("orderBy");
 
@@ -88,7 +88,7 @@ public abstract class AlpineResource {
             this.orderBy = OrderBy.UNSPECIFIED;
 
         this.filter = filter;
-        this.pagination = new Pagination(top, skip);
+        this.pagination = new Pagination(page, size);
     }
 
     /**

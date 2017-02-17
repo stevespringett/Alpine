@@ -18,32 +18,36 @@ package alpine.resources;
 
 public class Pagination {
 
-    private Integer top;
-    private Integer skip;
+    private int page;
+    private int size;
 
-    public Pagination(Integer top, Integer skip) {
-        this.top = top;
-        this.skip = skip;
+    public Pagination(int page, int size) {
+        this.page = this.page;
+        this.size = this.size;
     }
 
-    public Pagination(String top, String skip) {
-        this.top = parseIntegerFromParam(top);
-        this.skip = parseIntegerFromParam(skip);
+    public Pagination(String page, String size) {
+        this.page = parseIntegerFromParam(page);
+        this.size = parseIntegerFromParam(size);
     }
 
-    public Integer getTop() {
-        return top;
+    public int getPage() {
+        return page;
     }
 
-    public Integer getSkip() {
-        return skip;
+    public int getSize() {
+        return size;
+    }
+
+    public boolean isPaginated() {
+        return page > 0 && size > 0;
     }
 
     private Integer parseIntegerFromParam(String value) {
         try {
             return new Integer(value);
         } catch (NumberFormatException | NullPointerException e) {
-            return -1;
+            return 0;
         }
     }
 
