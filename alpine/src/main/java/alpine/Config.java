@@ -175,6 +175,13 @@ public class Config {
     /**
      * @since 1.0.0
      */
+    public String getProperty(String key) {
+        return properties.getProperty(key);
+    }
+
+    /**
+     * @since 1.0.0
+     */
     public String getProperty(String key, String defaultValue) {
         return properties.getProperty(key, defaultValue);
     }
