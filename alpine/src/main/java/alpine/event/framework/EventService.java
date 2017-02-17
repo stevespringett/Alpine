@@ -16,8 +16,8 @@
  */
 package alpine.event.framework;
 
-import alpine.Config;
 import alpine.logging.Logger;
+import alpine.util.ThreadUtil;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,8 +35,7 @@ public class EventService {
     private static final EventService instance = new EventService();
     private static final Logger logger = Logger.getLogger(EventService.class);
     private Map<Class<? extends Event>, ArrayList<Class<? extends Subscriber>>> subscriptionMap = new ConcurrentHashMap<>();
-    private static final ExecutorService executor =
-            Executors.newFixedThreadPool(Config.getInstance().getPropertyAsInt(Config.Key.EVENT_THREADS));
+    private static final ExecutorService executor = Executors.newFixedThreadPool(ThreadUtil.determineNumberOfWorkerThreads());
 
     private EventService() { }
 

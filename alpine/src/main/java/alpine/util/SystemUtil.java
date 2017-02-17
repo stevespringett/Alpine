@@ -262,6 +262,10 @@ public class SystemUtil {
             return BIT_BUCKET_UNIX;
     }
 
+    public static int getCpuCores() {
+        return Runtime.getRuntime().availableProcessors();
+    }
+
     /**
      * Initialize static variables
      */
