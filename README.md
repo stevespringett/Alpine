@@ -87,6 +87,25 @@ These build-time features are inherited simply by using the Alpine pom
 * Alpine apps are automatically built as WARs
 * Optional packaging as an executable WAR containing an embedded Jetty container
 
+Compiling
+-------------------
+
+> $ mvn clean install
+
+Maven Usage
+-------------------
+Alpine is currently pre-release software but snapshot builds can be used and 
+are available on the Maven Central Repository. These can be used without having
+to compile Alpine yourself.
+
+```xml
+<dependency>
+    <groupId>us.springett</groupId>
+    <artifactId>threatmodel-sdk</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+</dependency>
+```
+
 Why 'Alpine'
 -
 Alt-right American politics has devised many insults against liberal thought
