@@ -19,7 +19,7 @@ package com.example.persistence;
 import alpine.auth.PasswordService;
 import alpine.model.ManagedUser;
 import alpine.model.Team;
-
+import alpine.persistence.AlpineQueryManager;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -31,7 +31,7 @@ import javax.servlet.ServletContextListener;
 public class DefaultObjectCreator implements ServletContextListener {
 
     public void contextInitialized(ServletContextEvent event) {
-        try (QueryManager qm = new QueryManager()) {
+        try (AlpineQueryManager qm = new AlpineQueryManager()) {
             ManagedUser admin = qm.createManagedUser("admin", new String(PasswordService.createHash("admin".toCharArray())));
             Team defaultTeam = qm.createTeam("Default Team", true);
             qm.addUserToTeam(admin, defaultTeam);
