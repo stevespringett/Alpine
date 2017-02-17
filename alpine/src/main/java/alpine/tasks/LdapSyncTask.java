@@ -22,7 +22,7 @@ import alpine.event.framework.Event;
 import alpine.event.framework.Subscriber;
 import alpine.logging.Logger;
 import alpine.model.LdapUser;
-import alpine.persistence.QueryManager;
+import alpine.persistence.AlpineQueryManager;
 import org.apache.commons.lang3.StringUtils;
 import javax.naming.Context;
 import javax.naming.NamingException;
@@ -75,10 +75,10 @@ public class LdapSyncTask implements Subscriber {
             sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
             DirContext ctx = null;
-            QueryManager qm = null;
+            AlpineQueryManager qm = null;
             try {
                 ctx = new InitialDirContext(props);
-                qm = new QueryManager();
+                qm = new AlpineQueryManager();
 
                 if (event.getUsername() == null) {
                     // If username was null, we are going to sync all users
@@ -111,7 +111,7 @@ public class LdapSyncTask implements Subscriber {
         }
     }
 
-    private void sync(DirContext ctx, QueryManager qm, SearchControls sc, LdapUser user) throws NamingException {
+    private void sync(DirContext ctx, AlpineQueryManager qm, SearchControls sc, LdapUser user) throws NamingException {
         String searchFor = "userPrincipalName=" + formatPrincipal(user.getUsername());
 
         logger.debug("Syncing: " + user.getUsername());

@@ -18,7 +18,7 @@ package alpine.auth;
 
 import alpine.Config;
 import alpine.model.LdapUser;
-import alpine.persistence.QueryManager;
+import alpine.persistence.AlpineQueryManager;
 import org.apache.commons.lang3.StringUtils;
 import javax.naming.AuthenticationException;
 import javax.naming.Context;
@@ -71,7 +71,7 @@ public class LdapAuthenticationService implements AuthenticationService {
      */
     public Principal authenticate() throws AuthenticationException {
         if (validateCredentials()) {
-            try (QueryManager qm = new QueryManager()) {
+            try (AlpineQueryManager qm = new AlpineQueryManager()) {
                 LdapUser user = qm.getLdapUser(username);
                 if (user != null) {
                     return user;

@@ -17,7 +17,7 @@
 package alpine.auth;
 
 import alpine.model.ManagedUser;
-import alpine.persistence.QueryManager;
+import alpine.persistence.AlpineQueryManager;
 import javax.naming.AuthenticationException;
 import java.security.Principal;
 
@@ -60,7 +60,7 @@ public class ManagedUserAuthenticationService implements AuthenticationService {
      * @since 1.0.0
      */
     public Principal authenticate() throws AuthenticationException {
-        try (QueryManager qm = new QueryManager()) {
+        try (AlpineQueryManager qm = new AlpineQueryManager()) {
             ManagedUser user = qm.getManagedUser(username);
             if (user != null && !user.isSuspended()) {
                 if (PasswordService.matches(password.toCharArray(), user)) {

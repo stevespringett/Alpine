@@ -17,7 +17,7 @@
 package alpine.auth;
 
 import alpine.model.ApiKey;
-import alpine.persistence.QueryManager;
+import alpine.persistence.AlpineQueryManager;
 import org.glassfish.jersey.server.ContainerRequest;
 import javax.naming.AuthenticationException;
 import java.security.Principal;
@@ -58,7 +58,7 @@ public class ApiKeyAuthenticationService implements AuthenticationService {
      * @since 1.0.0
      */
     public Principal authenticate() throws AuthenticationException {
-        try (QueryManager qm = new QueryManager()) {
+        try (AlpineQueryManager qm = new AlpineQueryManager()) {
             ApiKey apiKey = qm.getApiKey(assertedApiKey);
             if (apiKey == null) {
                 throw new AuthenticationException();

@@ -19,7 +19,7 @@ package alpine.filters;
 import alpine.auth.PermissionRequired;
 import alpine.logging.Logger;
 import alpine.model.LdapUser;
-import alpine.persistence.QueryManager;
+import alpine.persistence.AlpineQueryManager;
 import org.glassfish.jersey.server.ContainerRequest;
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
@@ -58,7 +58,7 @@ public class AuthorizationFilter implements ContainerRequestFilter {
 
             PermissionRequired annotation = resourceInfo.getResourceMethod().getDeclaredAnnotation(PermissionRequired.class);
 
-            try (QueryManager qm = new QueryManager()) {
+            try (AlpineQueryManager qm = new AlpineQueryManager()) {
                 if (principal instanceof LdapUser) {
                     LdapUser user = qm.getLdapUser(((LdapUser) principal).getUsername());
 

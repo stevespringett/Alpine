@@ -19,7 +19,7 @@ package com.example.persistence;
 import alpine.auth.PasswordService;
 import alpine.model.ManagedUser;
 import alpine.model.Team;
-import alpine.persistence.QueryManager;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 

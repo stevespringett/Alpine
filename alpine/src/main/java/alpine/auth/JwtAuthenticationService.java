@@ -16,7 +16,7 @@
  */
 package alpine.auth;
 
-import alpine.persistence.QueryManager;
+import alpine.persistence.AlpineQueryManager;
 import org.glassfish.jersey.server.ContainerRequest;
 import javax.naming.AuthenticationException;
 import javax.ws.rs.core.HttpHeaders;
@@ -54,7 +54,7 @@ public class JwtAuthenticationService implements AuthenticationService {
             JsonWebToken jwt = new JsonWebToken(keyManager.getSecretKey());
             boolean isValid = jwt.validateToken(bearer);
             if (isValid) {
-                try (QueryManager queryManager = new QueryManager()) {
+                try (AlpineQueryManager queryManager = new AlpineQueryManager()) {
                     if (jwt.getSubject() == null || jwt.getExpiration() == null) return null;
                     return queryManager.getLdapUser(jwt.getSubject().toString());
                 }
