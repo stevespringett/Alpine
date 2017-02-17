@@ -69,8 +69,8 @@ The following features are free and require little or no coding just for using A
 * REST resources are locked down by default (requires authentication)
 * Configurable enforcement of authentication and authorization
 * Built-in support for BCrypt for the hashing and salting of passwords for managed users
-* Build-in models for managed users, LDAP users, API keys, and groups (called teams in Alpine)
-* Build-in and consistent support for pagination and ordering via REST
+* Built-in models for managed users, LDAP users, API keys, and groups (called teams in Alpine)
+* Built-in and consistent support for pagination and ordering via REST
 * Embedded database
 * Flexible persistence supporting RDBMS and non-RDBMS datastores (via Datanucleus JDO)
 * Separate application and audit logs
