@@ -16,6 +16,8 @@
  */
 package alpine.auth;
 
+import alpine.model.LdapUser;
+import alpine.model.ManagedUser;
 import alpine.persistence.AlpineQueryManager;
 import org.glassfish.jersey.server.ContainerRequest;
 import javax.naming.AuthenticationException;
@@ -54,9 +56,18 @@ public class JwtAuthenticationService implements AuthenticationService {
             JsonWebToken jwt = new JsonWebToken(keyManager.getSecretKey());
             boolean isValid = jwt.validateToken(bearer);
             if (isValid) {
-                try (AlpineQueryManager queryManager = new AlpineQueryManager()) {
-                    if (jwt.getSubject() == null || jwt.getExpiration() == null) return null;
-                    return queryManager.getLdapUser(jwt.getSubject().toString());
+                try (AlpineQueryManager qm = new AlpineQueryManager()) {
+                    if (jwt.getSubject() == null || jwt.getExpiration() == null) {
+                        throw new AuthenticationException("Token does not contain a valid subject or expiration");
+                    }
+                    ManagedUser managedUser = qm.getManagedUser(jwt.getSubject());
+                    if (managedUser != null) {
+                        return managedUser;
+                    }
+                    LdapUser ldapUser =  qm.getLdapUser(jwt.getSubject());
+                    if (ldapUser != null) {
+                        return ldapUser;
+                    }
                 }
             }
         }
