@@ -90,7 +90,9 @@ These build-time features are inherited simply by using the Alpine pom
 Compiling
 -------------------
 
-> $ mvn clean install
+```bash
+mvn clean install
+````
 
 Maven Usage
 -------------------
@@ -99,11 +101,22 @@ are available on the Maven Central Repository. These can be used without having
 to compile Alpine yourself.
 
 ```xml
-<dependency>
+<!-- Place the parent right after the <project> root node
+     to inherit all the goodies from alpine-parent pom -->
+<parent>
     <groupId>us.springett</groupId>
-    <artifactId>threatmodel-sdk</artifactId>
+    <artifactId>alpine-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-</dependency>
+</parent>
+
+<dependencies>
+    <!-- Add the alpine dependency -->
+    <dependency>
+        <groupId>us.springett</groupId>
+        <artifactId>alpine</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </dependency>
+</dependencies>
 ```
 
 Why 'Alpine'
