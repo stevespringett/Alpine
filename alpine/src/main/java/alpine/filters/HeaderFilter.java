@@ -37,10 +37,10 @@ public class HeaderFilter implements ContainerResponseFilter {
 
     private void init() {
         if (appName == null) {
-            appName = Config.getInstance().getProperty(Config.Key.APPLICATION_NAME);
+            appName = Config.getInstance().getProperty(Config.AlpineKey.APPLICATION_NAME);
         }
         if (appVersion == null) {
-            appVersion = Config.getInstance().getProperty(Config.Key.APPLICATION_VERSION);
+            appVersion = Config.getInstance().getProperty(Config.AlpineKey.APPLICATION_VERSION);
         }
     }
 

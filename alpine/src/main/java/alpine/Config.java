@@ -35,7 +35,12 @@ public class Config {
     private static Config instance;
     private static Properties properties;
 
-    public enum Key {
+    public interface Key {
+        String getPropertyName();
+        Object getDefaultValue();
+    }
+
+    public enum AlpineKey implements Key {
         APPLICATION_NAME         ("application.name",                 "Unknown Alpine Application"),
         APPLICATION_VERSION      ("application.version",              "0.0.0"),
         APPLICATION_TIMESTAMP    ("application.timestamp",            "1970-01-01 00:00:00"),
@@ -58,11 +63,19 @@ public class Config {
         HTTP_PROXY_PORT          ("alpine.http.proxy.port",           null),
         WATCHDOG_LOGGING_INTERVAL("alpine.watchdog.logging.interval", 0);
 
-        String propertyName;
-        Object defaultValue;
-        private Key(String item, Object defaultValue) {
+        private String propertyName;
+        private Object defaultValue;
+        AlpineKey(String item, Object defaultValue) {
             this.propertyName = item;
             this.defaultValue = defaultValue;
+        }
+
+        public String getPropertyName() {
+            return propertyName;
+        }
+
+        public Object getDefaultValue() {
+            return defaultValue;
         }
     }
 
@@ -107,7 +120,7 @@ public class Config {
      * @since 1.0.0
      */
     public File getDataDirectorty() {
-        String prop = getProperty(Key.DATA_DIRECTORY);
+        String prop = getProperty(AlpineKey.DATA_DIRECTORY);
         if (prop.startsWith("~" + File.separator)) {
             prop = SystemUtil.getUserHome() + prop.substring(1);
         }
@@ -121,10 +134,10 @@ public class Config {
      * @since 1.0.0
      */
     public String getProperty(Key key) {
-        if (key.defaultValue == null) {
-            return properties.getProperty(key.propertyName);
+        if (key.getDefaultValue() == null) {
+            return properties.getProperty(key.getPropertyName());
         } else {
-            return properties.getProperty(key.propertyName, String.valueOf(key.defaultValue));
+            return properties.getProperty(key.getPropertyName(), String.valueOf(key.getDefaultValue()));
         }
     }
 
@@ -135,7 +148,7 @@ public class Config {
         try {
             return Integer.parseInt(getProperty(key));
         } catch (NumberFormatException e) {
-            logger.error("Error parsing number from property: " + key.name());
+            logger.error("Error parsing number from property: " + key.getPropertyName());
             return -1;
         }
     }
@@ -147,7 +160,7 @@ public class Config {
         try {
             return Long.parseLong(getProperty(key));
         } catch (NumberFormatException e) {
-            logger.error("Error parsing number from property: " + key.name());
+            logger.error("Error parsing number from property: " + key.getPropertyName());
             return -1;
         }
     }

@@ -27,12 +27,12 @@ import org.mindrot.jbcrypt.BCrypt;
  */
 public class PasswordService {
 
-    private static final int ROUNDS = Config.getInstance().getPropertyAsInt(Config.Key.BCRYPT_ROUNDS);
+    private static final int ROUNDS = Config.getInstance().getPropertyAsInt(Config.AlpineKey.BCRYPT_ROUNDS);
 
     private PasswordService() { }
 
     /**
-     * Generates a salt using the configured number of rounds (determined by {@link Config.Key#BCRYPT_ROUNDS)
+     * Generates a salt using the configured number of rounds (determined by {@link Config.AlpineKey#BCRYPT_ROUNDS)
      * and hashes the password.
      *
      * @since 1.0.0

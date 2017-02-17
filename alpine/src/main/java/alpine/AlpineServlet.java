@@ -55,12 +55,12 @@ public class AlpineServlet extends ServletContainer {
      */
     @Override
     public void init(ServletConfig config) throws ServletException {
-        logger.info("Starting " + Config.getInstance().getProperty(Config.Key.APPLICATION_NAME));
+        logger.info("Starting " + Config.getInstance().getProperty(Config.AlpineKey.APPLICATION_NAME));
         super.init(config);
 
         Info info = new Info()
-                .title(Config.getInstance().getProperty(Config.Key.APPLICATION_NAME) + " API")
-                .version(Config.getInstance().getProperty(Config.Key.APPLICATION_VERSION));
+                .title(Config.getInstance().getProperty(Config.AlpineKey.APPLICATION_NAME) + " API")
+                .version(Config.getInstance().getProperty(Config.AlpineKey.APPLICATION_VERSION));
 
         Swagger swagger = new Swagger().info(info);
         swagger.securityDefinition("X-Api-Key", new ApiKeyAuthDefinition("X-Api-Key", In.HEADER));
@@ -96,7 +96,7 @@ public class AlpineServlet extends ServletContainer {
         SecurityUtil.logJavaSystemProperties();
 
         // Determine if Watchdog logging is enabled and if so, start interval logging
-        int interval = Config.getInstance().getPropertyAsInt(Config.Key.WATCHDOG_LOGGING_INTERVAL);
+        int interval = Config.getInstance().getPropertyAsInt(Config.AlpineKey.WATCHDOG_LOGGING_INTERVAL);
         if (interval > 0) {
             IntervalLoggerController wd = SecurityLoggingFactory.getControllerInstance();
             wd.start(interval * 1000); // Interval is defined in seconds
@@ -108,7 +108,7 @@ public class AlpineServlet extends ServletContainer {
      */
     @Override
     public void destroy() {
-        logger.info("Stopping " + Config.getInstance().getProperty(Config.Key.APPLICATION_NAME));
+        logger.info("Stopping " + Config.getInstance().getProperty(Config.AlpineKey.APPLICATION_NAME));
         super.destroy();
     }
 

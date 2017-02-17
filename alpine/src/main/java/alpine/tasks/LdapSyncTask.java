@@ -44,13 +44,13 @@ import java.util.List;
 public class LdapSyncTask implements Subscriber {
 
     private static final Logger logger = Logger.getLogger(LdapSyncTask.class);
-    private static final boolean ldapEnabled = Config.getInstance().getPropertyAsBoolean(Config.Key.LDAP_ENABLED);
-    private static final String ldapUrl = Config.getInstance().getProperty(Config.Key.LDAP_SERVER_URL);
-    private static final String domainName = Config.getInstance().getProperty(Config.Key.LDAP_DOMAIN);
-    private static final String baseDn = Config.getInstance().getProperty(Config.Key.LDAP_SERVER_URL);
-    private static final String bindUsername = Config.getInstance().getProperty(Config.Key.LDAP_BIND_USERNAME);
-    private static final String bindPassword = Config.getInstance().getProperty(Config.Key.LDAP_BIND_PASSWORD);
-    private static final String attributeMail = Config.getInstance().getProperty(Config.Key.LDAP_ATTRIBUTE_MAIL);
+    private static final boolean ldapEnabled = Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.LDAP_ENABLED);
+    private static final String ldapUrl = Config.getInstance().getProperty(Config.AlpineKey.LDAP_SERVER_URL);
+    private static final String domainName = Config.getInstance().getProperty(Config.AlpineKey.LDAP_DOMAIN);
+    private static final String baseDn = Config.getInstance().getProperty(Config.AlpineKey.LDAP_SERVER_URL);
+    private static final String bindUsername = Config.getInstance().getProperty(Config.AlpineKey.LDAP_BIND_USERNAME);
+    private static final String bindPassword = Config.getInstance().getProperty(Config.AlpineKey.LDAP_BIND_PASSWORD);
+    private static final String attributeMail = Config.getInstance().getProperty(Config.AlpineKey.LDAP_ATTRIBUTE_MAIL);
 
     public void inform(Event e) {
 

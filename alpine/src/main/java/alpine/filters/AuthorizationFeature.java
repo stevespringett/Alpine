@@ -25,8 +25,8 @@ import javax.ws.rs.ext.Provider;
 import java.lang.reflect.Method;
 
 /**
- * Determines if authorization is required or not (via {@link Config.Key#ENFORCE_AUTHENTICATION}
- * and {@link Config.Key#ENFORCE_AUTHORIZATION} and if so mandates that all resources requested
+ * Determines if authorization is required or not (via {@link Config.AlpineKey#ENFORCE_AUTHENTICATION}
+ * and {@link Config.AlpineKey#ENFORCE_AUTHORIZATION} and if so mandates that all resources requested
  * have the necessary permissions required to access the resource using {@link PermissionRequired}.
  *
  * @see AuthorizationFilter
@@ -35,8 +35,8 @@ import java.lang.reflect.Method;
 @Provider
 public class AuthorizationFeature implements DynamicFeature {
 
-    private static final boolean ENFORCE_AUTHENTICATION = Config.getInstance().getPropertyAsBoolean(Config.Key.ENFORCE_AUTHENTICATION);
-    private static final boolean ENFORCE_AUTHORIZATION = Config.getInstance().getPropertyAsBoolean(Config.Key.ENFORCE_AUTHORIZATION);
+    private static final boolean ENFORCE_AUTHENTICATION = Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.ENFORCE_AUTHENTICATION);
+    private static final boolean ENFORCE_AUTHORIZATION = Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.ENFORCE_AUTHORIZATION);
 
     @Override
     public void configure(ResourceInfo resourceInfo, FeatureContext context) {

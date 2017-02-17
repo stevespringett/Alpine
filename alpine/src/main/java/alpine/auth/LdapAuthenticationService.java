@@ -35,8 +35,8 @@ import java.util.Hashtable;
  */
 public class LdapAuthenticationService implements AuthenticationService {
 
-    private static final String ldapUrl = Config.getInstance().getProperty(Config.Key.LDAP_SERVER_URL);
-    private static final String domainName = Config.getInstance().getProperty(Config.Key.LDAP_DOMAIN);
+    private static final String ldapUrl = Config.getInstance().getProperty(Config.AlpineKey.LDAP_SERVER_URL);
+    private static final String domainName = Config.getInstance().getProperty(Config.AlpineKey.LDAP_DOMAIN);
 
     private String username;
     private String password;

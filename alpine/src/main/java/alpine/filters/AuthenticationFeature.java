@@ -25,7 +25,7 @@ import javax.ws.rs.ext.Provider;
 import java.lang.reflect.Method;
 
 /**
- * Determines if authentication is required or not (via {@link Config.Key#ENFORCE_AUTHENTICATION}
+ * Determines if authentication is required or not (via {@link Config.AlpineKey#ENFORCE_AUTHENTICATION}
  * and if so mandates that all resources requested are authenticated unless they are annotated
  * with {@link AuthenticationNotRequired}.
  *
@@ -35,7 +35,7 @@ import java.lang.reflect.Method;
 @Provider
 public class AuthenticationFeature implements DynamicFeature {
 
-    private static final boolean ENFORCE_AUTHENTICATION = Config.getInstance().getPropertyAsBoolean(Config.Key.ENFORCE_AUTHENTICATION);
+    private static final boolean ENFORCE_AUTHENTICATION = Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.ENFORCE_AUTHENTICATION);
 
     @Override
     public void configure(ResourceInfo resourceInfo, FeatureContext context) {

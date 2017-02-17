@@ -32,7 +32,7 @@ import java.security.Principal;
  */
 public class Authenticator {
 
-    private static final boolean LDAP_ENABLED = Config.getInstance().getPropertyAsBoolean(Config.Key.LDAP_ENABLED);
+    private static final boolean LDAP_ENABLED = Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.LDAP_ENABLED);
 
     private String username;
     private String password;

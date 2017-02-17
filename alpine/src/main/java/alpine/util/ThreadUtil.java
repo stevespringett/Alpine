@@ -34,12 +34,12 @@ public class ThreadUtil {
      * @since 1.0.0
      */
     public static int determineNumberOfWorkerThreads() {
-        int threads = Config.getInstance().getPropertyAsInt(Config.Key.WORKER_THREADS);
+        int threads = Config.getInstance().getPropertyAsInt(Config.AlpineKey.WORKER_THREADS);
         if (threads > 0) {
             return threads;
         } else if (threads == 0) {
             int cores = SystemUtil.getCpuCores();
-            int multiplier = Config.getInstance().getPropertyAsInt(Config.Key.WORKER_THREAD_MULTIPLIER);
+            int multiplier = Config.getInstance().getPropertyAsInt(Config.AlpineKey.WORKER_THREAD_MULTIPLIER);
             if (multiplier > 0) {
                 return cores * multiplier;
             } else {

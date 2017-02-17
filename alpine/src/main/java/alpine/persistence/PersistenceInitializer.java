@@ -28,7 +28,7 @@ import java.sql.SQLException;
  * Initializes the embedded H2 database. This can be used as a configuration
  * store or as the main database for the application.
  *
- * Refer to {@link Config.Key#DATABASE_MODE} and application.properties for
+ * Refer to {@link Config.AlpineKey#DATABASE_MODE} and application.properties for
  * additional details.
  *
  * @since 1.0.0
@@ -47,8 +47,8 @@ public class PersistenceInitializer implements ServletContextListener {
     }
 
     private void startDbServer() {
-        String mode = Config.getInstance().getProperty(Config.Key.DATABASE_MODE);
-        int port = Config.getInstance().getPropertyAsInt(Config.Key.DATABASE_PORT);
+        String mode = Config.getInstance().getProperty(Config.AlpineKey.DATABASE_MODE);
+        int port = Config.getInstance().getPropertyAsInt(Config.AlpineKey.DATABASE_PORT);
 
         if (StringUtils.isEmpty(mode) || !(mode.equals("server") || mode.equals("embedded"))) {
             logger.error("Database mode not specified. Expected values are 'server' or 'embedded'");
