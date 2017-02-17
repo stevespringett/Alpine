@@ -48,6 +48,7 @@ Too many frameworks unnecessary increase the attack surface of applications
 built using them. Even a simple Hello World application is often susceptible 
 to attack from the use of vulnerable components or poorly configured 
 frameworks. Alpine includes what is necessary for a modern app, nothing more.
+
 * **Control** - 
 Frameworks often force developers higher up the stack, freeing them from
 low-level details. While this is certainly a huge win for productivity, 
@@ -55,6 +56,36 @@ developers often don't understand how their app actually works. Alpine
 does not do this. It provides standards-based APIs in a pre-packaged 
 library giving developers both full control over their app, as well as a
 productivity jumpstart.
+
+Application Features
+-
+
+The following features are free and require little or no coding just for using Alpine.
+* Authentication for Internal (managed) and LDAP users
+* Authentication via API keys
+* Authentication via JWT
+* Stateless API-first design
+* Automatic generation of Swagger 2.0 definitions
+* REST resources are locked down by default (requires authentication)
+* Configurable enforcement of authentication and authorization
+* Built-in support for BCrypt for the hashing and salting of passwords for managed users
+* Build-in models for managed users, LDAP users, API keys, and groups (called teams in Alpine)
+* Build-in and consistent support for pagination and ordering via REST
+* Embedded database
+* Flexible persistence supporting RDBMS and non-RDBMS datastores (via Datanucleus JDO)
+* Separate application and audit logs
+* Scheduled and on-demand execution of parallel tasks via asynchronous pub/sub event framework
+* Extendable and centralized application configuration
+
+Build Features
+-
+
+These build-time features are inherited simply by using the Alpine pom
+* Simplifies dependency management. Simply including Alpine as a dependency is all that's required
+* Analysis of third-party components for known vulnerabilities via OWASP Dependency-Check
+* Support for HPE Fortify Source Code Analyzer (SCA) (requires Fortify license to use)
+* Alpine apps are automatically built as WARs
+* Optional packaging as an executable WAR containing an embedded Jetty container
 
 Why 'Alpine'
 -
