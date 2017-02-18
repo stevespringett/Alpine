@@ -44,6 +44,10 @@ public abstract class AlpineResource {
     private boolean serverSorting;
 
 
+    protected ContainerRequestContext getRequestContext() {
+        return requestContext;
+    }
+
     protected UriInfo getUriInfo() {
         return uriInfo;
     }
