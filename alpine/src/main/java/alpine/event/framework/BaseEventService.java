@@ -37,6 +37,7 @@ public abstract class BaseEventService {
     private Logger logger = Logger.getLogger(BaseEventService.class);
     private Map<Class<? extends Event>, ArrayList<Class<? extends Subscriber>>> subscriptionMap = new ConcurrentHashMap<>();
     private ExecutorService executor = Executors.newFixedThreadPool(1);
+    private final ExecutorService dynamicExecutor = Executors.newWorkStealingPool();
 
     /**
      * @since 1.0.0
@@ -64,7 +65,11 @@ public abstract class BaseEventService {
         ArrayList<Class<? extends Subscriber>> subscriberClasses = subscriptionMap.get(event.getClass());
         for (Class clazz: subscriberClasses) {
             logger.debug("Alerting subscriber " + clazz.getName());
-            executor.submit(() -> {
+
+            // Check to see if the Event is Unblocked. If so, use a separate executor pool from normal events
+            ExecutorService executorService = event instanceof UnblockedEvent  ? dynamicExecutor : executor;
+
+            executorService.submit(() -> {
                 try {
                     Subscriber subscriber = (Subscriber)clazz.newInstance();
                     subscriber.inform(event);
@@ -116,6 +121,7 @@ public abstract class BaseEventService {
     public void shutdown() {
         logger.info("Shutting down EventService");
         executor.shutdown();
+        dynamicExecutor.shutdown();
     }
 
 }
