@@ -62,8 +62,7 @@ public class LoginResource extends AlpineResource {
                 logger.info(SecurityMarkers.SECURITY_AUDIT, "Login succeeded (username: " + username +
                         " / ip address: " + super.getRemoteAddress() + " / agent: " + super.getUserAgent() + ")");
 
-                KeyManager km = KeyManager.getInstance();
-                JsonWebToken jwt = new JsonWebToken(km.getSecretKey());
+                JsonWebToken jwt = new JsonWebToken();
                 String token = jwt.createToken(principal);
                 return Response.ok(token).build();
             }
