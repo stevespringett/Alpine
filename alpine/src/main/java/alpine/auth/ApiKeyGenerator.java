@@ -33,7 +33,7 @@ public class ApiKeyGenerator {
         return generate(32);
     }
 
-    private static String generate(int chars) {
+    public static String generate(int chars) {
         SecureRandom secureRandom = new SecureRandom();
         char[] buff = new char[chars];
         for (int i = 0; i < chars; ++i) {
