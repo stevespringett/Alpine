@@ -73,7 +73,7 @@ public abstract class AlpineResource {
     }
 
     protected String getUserAgent() {
-        return requestContext.getHeaderString("USER_AGENT");
+        return requestContext.getHeaderString("User-Agent");
     }
 
     @PostConstruct
