@@ -25,12 +25,12 @@ public class ApiKeyGenerator {
     private ApiKeyGenerator() {}
 
     /**
-     * Generates a 40 character cryptographically secure API key
+     * Generates a 32 character cryptographically secure API key
      *
      * @since 1.0.0
      */
     public static String generate() {
-        return generate(40);
+        return generate(32);
     }
 
     private static String generate(int chars) {
