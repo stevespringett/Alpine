@@ -39,7 +39,7 @@ public class LdapUser implements Serializable, Principal, UserPrincipal {
     private static final long serialVersionUID = 261924579887470488L;
 
     @PrimaryKey
-    @Persistent(valueStrategy=IdGeneratorStrategy.NATIVE)
+    @Persistent(valueStrategy=IdGeneratorStrategy.INCREMENT)
     @JsonIgnore
     private long id;
 

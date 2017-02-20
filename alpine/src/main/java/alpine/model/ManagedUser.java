@@ -39,7 +39,7 @@ public class ManagedUser implements Serializable, Principal, UserPrincipal {
     private static final long serialVersionUID = 7944779964068911025L;
 
     @PrimaryKey
-    @Persistent(valueStrategy= IdGeneratorStrategy.NATIVE)
+    @Persistent(valueStrategy= IdGeneratorStrategy.INCREMENT)
     @JsonIgnore
     private long id;
 
