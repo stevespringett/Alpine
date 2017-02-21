@@ -30,6 +30,7 @@ import java.security.Key;
 import java.security.Principal;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * Decouples the general usage of JSON Web Tokens with the actual implementation of a JWT library
@@ -86,6 +87,18 @@ public class JsonWebToken {
     }
 
     /**
+     * Creates a new JWT for the specified principal. Token is signed using
+     * the SecretKey with an HMAC 256 algorithm.
+     *
+     * @since 1.0.0
+     */
+    public String createToken(Map<String, Object> claims) {
+        JwtBuilder jwtBuilder = Jwts.builder();
+        jwtBuilder.setClaims(claims);
+        return jwtBuilder.signWith(SignatureAlgorithm.HS256, key).compact();
+    }
+
+    /**
      * Validates a JWT by ensuring the signature matches and validates
      * against the SecretKey and checks the expiration date.
      *
@@ -109,21 +122,6 @@ public class JsonWebToken {
             logger.error(e.getMessage());
         }
         return false;
-    }
-
-    /**
-     * Strips the signature off the token and returns the value for the specified claim.
-     * This is an unsafe method and should be used with extreme caution.
-     *
-     * @param token the JWT token to parse
-     * @param claim the claim to retrieve
-     * @return the value of the claim
-     */
-    public static Object parse(String token, String claim) {
-        if (Jwts.parser().isSigned(token)) {
-            token = token.substring(0, token.lastIndexOf(".") + 1);
-        }
-        return Jwts.parser().parseClaimsJwt(token).getBody().get(claim);
     }
 
     /**
