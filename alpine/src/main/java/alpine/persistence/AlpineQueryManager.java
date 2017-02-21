@@ -26,9 +26,8 @@ import alpine.model.Team;
 import alpine.model.UserPrincipal;
 import alpine.util.UuidUtil;
 import javax.jdo.Query;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 public class AlpineQueryManager extends AbstractAlpineQueryManager {
@@ -49,7 +48,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     }
 
     public ApiKey createApiKey(Team team) {
-        Set<Team> teams = new HashSet<>();
+        List<Team> teams = new ArrayList<>();
         teams.add(team);
         pm.currentTransaction().begin();
         ApiKey apiKey = new ApiKey();
