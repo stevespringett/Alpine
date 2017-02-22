@@ -65,7 +65,7 @@ import java.io.IOException;
  */
 public final class ClickjackingFilter implements Filter {
 
-    private String mode = "SAMEORIGIN";
+    private String mode = "DENY";
 
     public void init(final FilterConfig filterConfig) {
         final String mode = filterConfig.getInitParameter("mode");
