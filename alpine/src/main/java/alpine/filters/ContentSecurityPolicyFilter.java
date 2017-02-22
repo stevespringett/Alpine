@@ -119,20 +119,23 @@ import java.io.IOException;
  */
 public final class ContentSecurityPolicyFilter implements Filter {
 
+    private static final String SELF = "'self'";
+    private static final String NONE = "'none'";
+
     private String policy = null;
-    private String defaultSrc = "self";
-    private String scriptSrc = "self";
-    private String styleSrc = "self";
-    private String imgSrc = "self";
-    private String connectSrc = "self";
-    private String fontSrc = "self";
-    private String objectSrc = "self";
-    private String mediaSrc = "self";
+    private String defaultSrc = SELF;
+    private String scriptSrc = SELF;
+    private String styleSrc = SELF;
+    private String imgSrc = SELF;
+    private String connectSrc = SELF;
+    private String fontSrc = SELF;
+    private String objectSrc = SELF;
+    private String mediaSrc = SELF;
     private String sandbox = null;
     private String reportUri = null;
-    private String childSrc = "self";
-    private String formAction = "self";
-    private String frameAncestors = "none";
+    private String childSrc = SELF;
+    private String formAction = SELF;
+    private String frameAncestors = NONE;
     private String pluginTypes = null;
 
 
