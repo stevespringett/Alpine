@@ -83,7 +83,7 @@ public final class ClickjackingFilter implements Filter {
             throws IOException, ServletException {
         final HttpServletResponse response = (HttpServletResponse)res;
         chain.doFilter(req, response);
-        response.addHeader("X-FRAME-OPTIONS", mode);
+        response.addHeader("X-Frame-Options", mode);
     }
 
     public void destroy() {
