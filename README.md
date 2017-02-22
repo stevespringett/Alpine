@@ -76,6 +76,11 @@ The following features are free and require little or no coding just for using A
 * Separate application and audit logs
 * Scheduled and on-demand execution of parallel tasks via asynchronous pub/sub event framework
 * Extendable and centralized application configuration
+* Defensive security mechanisms for enabling:
+  * Click-jacking protection (X-Frame-Options) (RFC-7034)
+  * Content Security Policy (Level 1 and 2)
+  * HTTP Public Key Pinning (HPKP) (RFC-7469)
+  * HTTP Strict Transport Security (HSTS) (RFC-6797)
 
 Build Features
 -
