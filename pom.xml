@@ -151,6 +151,11 @@
             <artifactId>jersey-media-multipart</artifactId>
             <version>${lib.jersey.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.ext</groupId>
+            <artifactId>jersey-bean-validation</artifactId>
+            <version>${lib.jersey.version}</version>
+        </dependency>
         <!-- JSON API specification and default implementation of JSR 353 -->
         <dependency>
             <groupId>javax.json</groupId>

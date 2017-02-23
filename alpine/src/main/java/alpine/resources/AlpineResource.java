@@ -18,15 +18,28 @@ package alpine.resources;
 
 import alpine.model.ApiKey;
 import alpine.model.LdapUser;
+import org.apache.commons.lang3.StringUtils;
+import org.glassfish.jersey.server.validation.ValidationError;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public abstract class AlpineResource {
+
+    private static final ValidatorFactory VALIDATOR_FACTORY = Validation.buildDefaultValidatorFactory();
 
     @Context
     private ContainerRequestContext requestContext;
@@ -74,6 +87,36 @@ public abstract class AlpineResource {
 
     protected String getUserAgent() {
         return requestContext.getHeaderString("User-Agent");
+    }
+
+    protected Validator getValidator() {
+        return VALIDATOR_FACTORY.getValidator();
+    }
+
+    @SafeVarargs
+    protected final List<ValidationError> contOnValidationError(Set<ConstraintViolation<Object>>... violationsArray) {
+        List<ValidationError> errors = new ArrayList<>();
+        for (Set<ConstraintViolation<Object>> violations : violationsArray) {
+            for (ConstraintViolation violation : violations) {
+                if (violation.getPropertyPath().iterator().next().getName() != null) {
+                    String path = violation.getPropertyPath() != null ? violation.getPropertyPath().toString() : null;
+                    String message = violation.getMessage() != null ? StringUtils.removeStart(violation.getMessage(), path + ".") : null;
+                    String messageTemplate = violation.getMessageTemplate();
+                    String invalidValue = violation.getInvalidValue() != null ? violation.getInvalidValue().toString() : null;
+                    ValidationError error = new ValidationError(message, messageTemplate, path, invalidValue);
+                    errors.add(error);
+                }
+            }
+        }
+        return errors;
+    }
+
+    @SafeVarargs
+    protected final void failOnValidationError(Set<ConstraintViolation<Object>>... violationsArray) {
+        List<ValidationError> errors = contOnValidationError(violationsArray);
+        if (errors.size() > 0) {
+            throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(errors).build());
+        }
     }
 
     @PostConstruct
