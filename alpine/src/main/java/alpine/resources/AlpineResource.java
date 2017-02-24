@@ -169,8 +169,8 @@ public abstract class AlpineResource {
      * <pre>
      *     Validator validator = getValidator();
      *     List&lt;ValidationError&gt; errors = contOnValidationError(
-     *         validator.validateProperty(jsonTeam, "uuid"),
-     *         validator.validateProperty(jsonTeam, "name")
+     *         validator.validateProperty(myObject, "uuid"),
+     *         validator.validateProperty(myObject, "name")
      *      );
      *      // If validation fails, this line will be reached.
      * </pre>
@@ -205,8 +205,8 @@ public abstract class AlpineResource {
      * <pre>
      *     Validator validator = getValidator();
      *     failOnValidationError(
-     *         validator.validateProperty(jsonTeam, "uuid"),
-     *         validator.validateProperty(jsonTeam, "name")
+     *         validator.validateProperty(myObject, "uuid"),
+     *         validator.validateProperty(myObject, "name")
      *      );
      *      // If validation fails, this line will not be reached.
      * </pre>
