@@ -40,7 +40,7 @@ import java.util.Set;
 
 /**
  * A value-added resource that all Alpine resources should extend from. This resource provides
- * access to pagination, ordering, filtering, convenience methods for obtains specific HTTP
+ * access to pagination, ordering, filtering, convenience methods for obtaining specific HTTP
  * request information, along with the ability to perform input validation and automatically
  * fail requests (with HTTP status 400) if validation failure occurs.
  *
