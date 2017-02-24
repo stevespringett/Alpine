@@ -28,6 +28,9 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.annotations.Unique;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.security.Principal;
 import java.util.List;
@@ -45,6 +48,9 @@ public class ApiKey implements Serializable, Principal {
     @Persistent
     @Unique(name="APIKEY_IDX")
     @Column(name="APIKEY", allowsNull="false")
+    @NotNull
+    @Size(min=32, max=255)
+    @Pattern(regexp = "[A-Za-z0-9]+", message = "The API key must contain only alpha and/or numeric characters")
     private String key;
 
     @Persistent(table="APIKEYS_TEAMS", defaultFetchGroup="true")
