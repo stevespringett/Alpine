@@ -3,6 +3,8 @@
 [![Coverity Scan Status](https://scan.coverity.com/projects/11764/badge.svg)](https://scan.coverity.com/projects/11764)
 [![Dependency Status](https://www.versioneye.com/user/projects/58a2a49a0f3d4f003ce97f07/badge.svg?style=flat)](https://www.versioneye.com/user/projects/58a2a49a0f3d4f003ce97f07)
 [![License][license-image]][license-url]
+![Static Analysis][fortify-image]
+[![Component Analysis][odc-image]][odc-url]
 
 Alpine
 =========
@@ -176,4 +178,7 @@ the [NOTICE.txt] [notice] file for more information.
   [GitHub Wiki]: https://github.com/stevespringett/alpine/wiki
   [license-image]: https://img.shields.io/badge/license-apache%20v2-brightgreen.svg
   [license-url]: https://github.com/stevespringett/alpine/blob/master/LICENSE.txt
+  [fortify-image]: https://img.shields.io/badge/static%20analysis-fortify%20sca-blue.svg
+  [odc-image]: https://img.shields.io/badge/component%20analysis-owasp%20dependency--check-blue.svg
+  [odc-url]: https://www.owasp.org/index.php/OWASP_Dependency_Check
   [notice]: https://github.com/stevespringett/alpine/blob/master/NOTICE.txt
