@@ -19,10 +19,28 @@ package alpine.auth;
 
 import alpine.Config;
 import alpine.model.ManagedUser;
+import alpine.util.ByteUtil;
 import org.mindrot.jbcrypt.BCrypt;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /**
- * A wrapper around BCrypt used to hash and check password validity.
+ * Alpine PasswordService that provides a secure method of hashing and validating user passwords.
+ *
+ * Internally, PasswordService uses a combination of SHA-512 and BCrypt for these functions.
+ * The password goes through the following flow during the hashing process:
+ *
+ * Password » SHA-512 » BCrypt (per-user salt, default rounds: 14)
+ *
+ * In this flow, a user password is hashed using SHA-512 which creates a 128 character HEX
+ * representation of a hash. This is called the prehash. The prehash acts to both 'extend' the
+ * password and to introduce built-in denial-of-service protection from exceptionally long
+ * passwords. Once the password is prehashed, it's sent to BCrypt where a per-user salt is
+ * used and the password is properly hashed. Both the creation and verification of hashes go
+ * through this process.
+ *
+ * Additionally, this class contains a method which will determine if a password should be rehashed
+ * due to an increase in rounds defined on the server.
  *
  * @since 1.0.0
  */
@@ -33,24 +51,31 @@ public class PasswordService {
     private PasswordService() { }
 
     /**
-     * Generates a salt using the configured number of rounds (determined by {@link Config.AlpineKey#BCRYPT_ROUNDS)
-     * and hashes the password.
+     * Given a password to hash, this method will first prehash the password using SHA-512 thus creating
+     * a 128 character HEX representation of the password, which is then sent to BCrypt where a unique
+     * salt is generated and the prehashed password is properly hashed using the configured BCrypt
+     * work factor (determined by {@link Config.AlpineKey#BCRYPT_ROUNDS).
      *
      * @since 1.0.0
      */
     public static char[] createHash(char[] password) {
+        char[] prehash = createSha512Hash(password);
         // Todo: remove String when Jbcrypt supports char[]
-        return BCrypt.hashpw(new String(password), BCrypt.gensalt(ROUNDS)).toCharArray();
+        return BCrypt.hashpw(new String(prehash), BCrypt.gensalt(ROUNDS)).toCharArray();
     }
 
     /**
-     * Hashes the specified password using the specified salt.
+     * Given a password to hash, this method will first prehash the password using SHA-512 thus creating
+     * a 128 character HEX representation of the password, which is then sent to BCrypt where the prehashed
+     * password is properly hashed using the specified salt and uses the configured BCrypt work factor
+     * (determined by {@link Config.AlpineKey#BCRYPT_ROUNDS).
      *
      * @since 1.0.0
      */
     public static char[] createHash(char[] password, char[] salt) {
+        char[] prehash = createSha512Hash(password);
         // Todo: remove String when Jbcrypt supports char[]
-        return BCrypt.hashpw(new String(password), new String(salt)).toCharArray();
+        return BCrypt.hashpw(new String(prehash), new String(salt)).toCharArray();
     }
 
     /**
@@ -59,35 +84,62 @@ public class PasswordService {
      * @since 1.0.0
      */
     public static boolean matches(char[] assertedPassword, ManagedUser user) {
+        char[] prehash = createSha512Hash(assertedPassword);
         // Todo: remove String when Jbcrypt supports char[]
-        return BCrypt.checkpw(new String(assertedPassword), new String(user.getPassword()));
+        return BCrypt.checkpw(new String(prehash), new String(user.getPassword()));
     }
 
     /**
      * Checks the asserted BCrypt formatted hashed password and determines if the password should
      * be rehashed or not. If the BCrypt work factor is increased (from 12 to 14 for example),
      * passwords should be evaluated and if the existing stored hash uses a work factor less than
-     * what is configured, then the assertedPassword should be rehashed. The same does not apply
-     * in reverse. Stored hashed passwords with a work factor greater than the configured work factor
+     * what is configured, then the bcryptHash should be rehashed. The same does not apply in
+     * reverse. Stored hashed passwords with a work factor greater than the configured work factor
      * will return false, meaning they should not be rehashed.
      *
-     * If the assertedPasswords length is less than the minimum length of a BCrypt hash, this method
+     * If the bcryptHash length is less than the minimum length of a BCrypt hash, this method
      * will return true.
      *
      * @since 1.0.0
      */
-    public static boolean shouldRehash(char[] assertedPassword) {
+    public static boolean shouldRehash(char[] bcryptHash) {
         int rounds;
-        if (assertedPassword.length < 59) {
+        if (bcryptHash.length < 59) {
             return true;
         }
         StringBuilder sb = new StringBuilder();
-        sb.append(assertedPassword[4]);
-        if (assertedPassword[5] != '$') {
-            sb.append(assertedPassword[5]);
+        sb.append(bcryptHash[4]);
+        if (bcryptHash[5] != '$') {
+            sb.append(bcryptHash[5]);
         }
         rounds = Integer.valueOf(sb.toString());
         return rounds < ROUNDS;
+    }
+
+    /**
+     * Creates a SHA-512 hash of the specified password and returns a HEX
+     * representation of the hash. This method should NOT be used solely
+     * for password hashing, but in conjunction with password-specific
+     * hashing functions.
+     *
+     * @since 1.0.0
+     */
+    private static char[] createSha512Hash(char[] password) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-512");
+            digest.update(ByteUtil.toBytes(password));
+            byte[] byteData = digest.digest();
+
+            StringBuilder sb = new StringBuilder();
+            for (byte data : byteData) {
+                sb.append(Integer.toString((data & 0xff) + 0x100, 16).substring(1));
+            }
+            char[] hash = new char[128];
+            sb.getChars(0, sb.length(), hash, 0);
+            return hash;
+        } catch (NoSuchAlgorithmException e) {
+            throw new UnsupportedOperationException(e);
+        }
     }
 
 }
