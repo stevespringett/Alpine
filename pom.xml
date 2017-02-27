@@ -85,6 +85,7 @@
         <plugin.dependency-check.externalReport>true</plugin.dependency-check.externalReport>
 
         <!-- Dependency Versions -->
+        <lib.bcrypt.version>0.4</lib.bcrypt.version>
         <lib.commons.collections4.version>4.1</lib.commons.collections4.version>
         <lib.commons.dbcp.version>1.4</lib.commons.dbcp.version>
         <lib.commons.io.version>2.5</lib.commons.io.version>
@@ -227,7 +228,7 @@
         <dependency>
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>
-            <version>0.4-atlassian-1</version>
+            <version>${lib.bcrypt.version}</version>
         </dependency>
         <!-- JAX-RS JSON -->
         <dependency>
@@ -315,13 +316,6 @@
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
-
-    <repositories>
-        <repository>
-            <id>atlassian-repo</id>
-            <url>https://maven.atlassian.com/3rdparty/</url>
-        </repository>
-    </repositories>
 
     <prerequisites>
         <maven>3.1</maven>
