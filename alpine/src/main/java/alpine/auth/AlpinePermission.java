@@ -18,12 +18,12 @@
 package alpine.auth;
 
 /**
- * Contains Permission constatns. This class is intended to be extended to
+ * Contains Permission constants. This class is intended to be extended to
  * allow for defining of additional permissions.
  *
  * @since 1.0.0
  */
-public abstract class Permission {
+public abstract class AlpinePermission {
 
     public static final String MANAGE_API_KEYS = "MANAGE_API_KEYS";
     public static final String MANAGE_TEAMS = "MANAGE_TEAMS";
