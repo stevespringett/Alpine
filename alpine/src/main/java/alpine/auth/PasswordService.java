@@ -44,7 +44,7 @@ import java.security.NoSuchAlgorithmException;
  *
  * @since 1.0.0
  */
-public class PasswordService {
+public final class PasswordService {
 
     private static final int ROUNDS = Config.getInstance().getPropertyAsInt(Config.AlpineKey.BCRYPT_ROUNDS);
 
