@@ -34,21 +34,20 @@ import java.util.UUID;
 public class AlpineQueryManager extends AbstractAlpineQueryManager {
 
     @SuppressWarnings("unchecked")
-    public ApiKey getApiKey(String key) {
+    public ApiKey getApiKey(final String key) {
         Query query = pm.newQuery(ApiKey.class, "key == :key");
         List<ApiKey> result = (List<ApiKey>)query.execute (key);
         return result.size() == 0 ? null : result.get(0);
     }
 
-    public ApiKey regenerateApiKey(ApiKey apiKey) {
+    public ApiKey regenerateApiKey(final ApiKey apiKey) {
         pm.currentTransaction().begin();
         apiKey.setKey(UuidUtil.stripHyphens(UUID.randomUUID().toString()));
         pm.currentTransaction().commit();
-        apiKey = pm.getObjectById(ApiKey.class, apiKey.getId());
-        return apiKey;
+        return pm.getObjectById(ApiKey.class, apiKey.getId());
     }
 
-    public ApiKey createApiKey(Team team) {
+    public ApiKey createApiKey(final Team team) {
         List<Team> teams = new ArrayList<>();
         teams.add(team);
         pm.currentTransaction().begin();
@@ -61,7 +60,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     }
 
     @SuppressWarnings("unchecked")
-    public LdapUser getLdapUser(String username) {
+    public LdapUser getLdapUser(final String username) {
         Query query = pm.newQuery(LdapUser.class, "username == :username");
         List<LdapUser> result = (List<LdapUser>)query.execute(username);
         return result.size() == 0 ? null : result.get(0);
@@ -74,7 +73,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
         return (List<LdapUser>)query.execute();
     }
 
-    public LdapUser createLdapUser(String username) {
+    public LdapUser createLdapUser(final String username) {
         pm.currentTransaction().begin();
         LdapUser user = new LdapUser();
         user.setUsername(username);
@@ -86,7 +85,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
         return getObjectById(LdapUser.class, user.getId());
     }
 
-    public LdapUser updateLdapUser(LdapUser transientUser) {
+    public LdapUser updateLdapUser(final LdapUser transientUser) {
         LdapUser user = getObjectById(LdapUser.class, transientUser.getId());
         pm.currentTransaction().begin();
         user.setDN(transientUser.getDN());
@@ -94,7 +93,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
         return pm.getObjectById(LdapUser.class, user.getId());
     }
 
-    public ManagedUser createManagedUser(String username, String password) {
+    public ManagedUser createManagedUser(final String username, final String password) {
         pm.currentTransaction().begin();
         ManagedUser user = new ManagedUser();
         user.setUsername(username);
@@ -106,7 +105,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     }
 
     @SuppressWarnings("unchecked")
-    public ManagedUser getManagedUser(String username) {
+    public ManagedUser getManagedUser(final String username) {
         Query query = pm.newQuery(ManagedUser.class, "username == :username");
         List<ManagedUser> result = (List<ManagedUser>)query.execute(username);
         return result.size() == 0 ? null : result.get(0);
@@ -120,7 +119,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     }
 
 
-    public Team createTeam(String name, boolean createApiKey) {
+    public Team createTeam(final String name, final boolean createApiKey) {
         pm.currentTransaction().begin();
         Team team = new Team();
         team.setName(name);
@@ -142,7 +141,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
         return (List<Team>)query.execute();
     }
 
-    public Team updateTeam(Team transientTeam) {
+    public Team updateTeam(final Team transientTeam) {
         Team team = getObjectByUuid(Team.class, transientTeam.getUuid());
         pm.currentTransaction().begin();
         team.setName(transientTeam.getName());
@@ -151,7 +150,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
         return pm.getObjectById(Team.class, team.getId());
     }
 
-    public boolean addUserToTeam(UserPrincipal user, Team team) {
+    public boolean addUserToTeam(final UserPrincipal user, final Team team) {
         List<Team> teams = user.getTeams();
         boolean found = false;
         for (Team t: teams) {
@@ -169,7 +168,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
         return false;
     }
 
-    public boolean removeUserFromTeam(UserPrincipal user, Team team) {
+    public boolean removeUserFromTeam(final UserPrincipal user, final Team team) {
         List<Team> teams = user.getTeams();
         boolean found = false;
         for (Team t: teams) {
