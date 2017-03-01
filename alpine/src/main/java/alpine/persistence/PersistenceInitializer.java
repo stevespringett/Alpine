@@ -55,7 +55,7 @@ public class PersistenceInitializer implements ServletContextListener {
             logger.error("Database mode not specified. Expected values are 'server' or 'embedded'");
         }
 
-        if (dbServer != null || mode.equals("embedded")) {
+        if (dbServer != null || "embedded".equals(mode)) {
             return;
         }
         String[] args = new String[]{
