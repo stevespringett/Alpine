@@ -20,7 +20,6 @@ package com.example.resources.v1;
 import alpine.auth.AuthenticationNotRequired;
 import alpine.auth.Authenticator;
 import alpine.auth.JsonWebToken;
-import alpine.auth.KeyManager;
 import alpine.logging.Logger;
 import alpine.resources.AlpineResource;
 import io.swagger.annotations.ApiResponse;
