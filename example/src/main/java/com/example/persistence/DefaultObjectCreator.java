@@ -40,5 +40,6 @@ public class DefaultObjectCreator implements ServletContextListener {
     }
 
     public void contextDestroyed(ServletContextEvent event) {
+        // Intentionally empty to satisfy interface
     }
 }

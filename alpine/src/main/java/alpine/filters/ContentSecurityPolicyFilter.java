@@ -204,6 +204,7 @@ public final class ContentSecurityPolicyFilter implements Filter {
     }
 
     public void destroy() {
+        // Intentionally empty to satisfy interface
     }
 
 }

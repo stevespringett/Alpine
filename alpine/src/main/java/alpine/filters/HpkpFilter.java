@@ -139,5 +139,6 @@ public final class HpkpFilter implements Filter {
     }
 
     public void destroy() {
+        // Intentionally empty to satisfy interface
     }
 }

@@ -88,6 +88,7 @@ public final class ClickjackingFilter implements Filter {
     }
 
     public void destroy() {
+        // Intentionally empty to satisfy interface
     }
 
 }
