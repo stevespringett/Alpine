@@ -294,7 +294,7 @@ public class SystemUtil {
         if (StringUtils.isBlank(model)) {
             bit32 = true;
             bit64 = false;
-        } else if (model.equals("64")) {
+        } else if ("64".equals(model)) {
             bit32 = false;
             bit64 = true;
         } else {
