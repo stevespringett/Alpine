@@ -23,8 +23,8 @@ public class Pagination {
     private int size;
 
     public Pagination(int page, int size) {
-        this.page = this.page;
-        this.size = this.size;
+        this.page = page;
+        this.size = size;
     }
 
     public Pagination(String page, String size) {
