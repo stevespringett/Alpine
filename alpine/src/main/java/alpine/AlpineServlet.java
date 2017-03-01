@@ -30,10 +30,13 @@ import org.owasp.security.logging.util.SecurityLoggingFactory;
 import org.owasp.security.logging.util.SecurityUtil;
 import javax.crypto.SecretKey;
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRegistration;
 import java.io.IOException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
+import java.util.Collection;
 
 /**
  * The AlpineServlet is the main servlet which extends
@@ -63,8 +66,24 @@ public class AlpineServlet extends ServletContainer {
                 .title(Config.getInstance().getProperty(Config.AlpineKey.APPLICATION_NAME) + " API")
                 .version(Config.getInstance().getProperty(Config.AlpineKey.APPLICATION_VERSION));
 
-        Swagger swagger = new Swagger().info(info);
-        swagger.securityDefinition("X-Api-Key", new ApiKeyAuthDefinition("X-Api-Key", In.HEADER));
+        Swagger swagger = new Swagger()
+                .info(info)
+                .securityDefinition("X-Api-Key", new ApiKeyAuthDefinition("X-Api-Key", In.HEADER));
+
+        // Dynamically get the url-pattern from web.xml and use that as the 'baseUrl' for
+        // the API documentation
+        ServletContext servletContext = getServletContext();
+        ServletRegistration servletRegistration = servletContext.getServletRegistration(config.getServletName());
+        Collection<String> mappings = servletRegistration.getMappings();
+        if (mappings.size() > 0) {
+            String baseUrl = mappings.iterator().next();
+            if (! baseUrl.startsWith("/")) {
+                baseUrl = "/" + baseUrl;
+            }
+            baseUrl = baseUrl.replace("/*", "").replaceAll("\\/$", "");
+            swagger.basePath(config.getServletContext().getContextPath() + baseUrl);
+        }
+
         new SwaggerContextService().withServletConfig(config).updateSwagger(swagger);
 
         KeyManager keyManager = KeyManager.getInstance();
