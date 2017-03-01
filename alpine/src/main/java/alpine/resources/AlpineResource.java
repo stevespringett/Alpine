@@ -63,8 +63,6 @@ public abstract class AlpineResource {
     private OrderBy orderBy;
     private Pagination pagination;
     private String filter;
-    private boolean serverPaging;
-    private boolean serverSorting;
 
 
     /**
