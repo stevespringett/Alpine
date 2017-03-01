@@ -51,7 +51,7 @@ public class PersistenceInitializer implements ServletContextListener {
         String mode = Config.getInstance().getProperty(Config.AlpineKey.DATABASE_MODE);
         int port = Config.getInstance().getPropertyAsInt(Config.AlpineKey.DATABASE_PORT);
 
-        if (StringUtils.isEmpty(mode) || !(mode.equals("server") || mode.equals("embedded"))) {
+        if (StringUtils.isEmpty(mode) || !("server".equals(mode) || "embedded".equals(mode))) {
             logger.error("Database mode not specified. Expected values are 'server' or 'embedded'");
         }
 
