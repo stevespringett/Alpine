@@ -45,6 +45,7 @@ import java.util.Set;
  * request information, along with the ability to perform input validation and automatically
  * fail requests (with HTTP status 400) if validation failure occurs.
  *
+ * @author Steve Springett
  * @since 1.0.0
  */
 public abstract class AlpineResource {
@@ -68,7 +69,7 @@ public abstract class AlpineResource {
     /**
      * Returns the ContainerRequestContext. This is automatically injected
      * into every instance of an AlpineResource.
-     *
+     * @return the ContainerRequestContext
      * @since 1.0.0
      */
     protected ContainerRequestContext getRequestContext() {
@@ -78,7 +79,7 @@ public abstract class AlpineResource {
     /**
      * Returns the UriInfo. This is automatically injected into every
      * instance of an AlpineResource.
-     *
+     * @return the UriInfo
      * @since 1.0.0
      */
     protected UriInfo getUriInfo() {
@@ -90,7 +91,7 @@ public abstract class AlpineResource {
      * is optionally part of any request. Ordering is determined by the
      * 'orderBy' parameter in the query string. Acceptable values for
      * 'orderBy' are 'asc' and 'desc'.
-     *
+     * @return an OrderBy enum value
      * @since 1.0.0
      */
     protected OrderBy getOrderBy() {
@@ -100,8 +101,9 @@ public abstract class AlpineResource {
     /**
      * Returns the pagination containing the page number and page size.
      * Pagination is determined by the 'page' and 'size' parameters in
-     * the query string.
-     *
+     * the query string. This object is available even when pagination
+     * is not used or requested.
+     * @return a Pagination object
      * @since 1.0.0
      */
     protected Pagination getPagination() {
@@ -111,7 +113,7 @@ public abstract class AlpineResource {
     /**
      * Return the filter string (if specified). Filtering is determined
      * by the 'filter' parameter in the query string.
-     *
+     * @return a String representation of the filter requested
      * @since 1.0.0
      */
     protected String getFilter() {
@@ -121,7 +123,7 @@ public abstract class AlpineResource {
     /**
      * Convenience method that returns the remote IP address that made
      * the request.
-     *
+     * @return the remote IP address as a String
      * @since 1.0.0
      */
     protected String getRemoteAddress() {
@@ -131,7 +133,7 @@ public abstract class AlpineResource {
     /**
      * Convenience method that returns the remote hostname that made
      * the request.
-     *
+     * @return the remote hostname as a String
      * @since 1.0.0
      */
     protected String getRemoteHost() {
@@ -141,7 +143,7 @@ public abstract class AlpineResource {
     /**
      * Convenience method that returns the User-Agent string for the
      * application that made the request.
-     *
+     * @return the User-Agent as a String
      * @since 1.0.0
      */
     protected String getUserAgent() {
@@ -152,7 +154,7 @@ public abstract class AlpineResource {
      * Returns a Validator instance. Internally, this uses
      * Validation.buildDefaultValidatorFactory().getValidator() so only call
      * this method sparingly and keep a reference to the Validator if possible.
-     *
+     * @return a Validator object
      * @since 1.0.0
      */
     protected Validator getValidator() {
@@ -174,19 +176,21 @@ public abstract class AlpineResource {
      *      // If validation fails, this line will be reached.
      * </pre>
      *
+     * @param violationsArray a Set of one or more ConstraintViolations
+     * @return a List of zero or more ValidationErrors
      * @since 1.0.0
      */
     @SafeVarargs
-    protected final List<ValidationError> contOnValidationError(Set<ConstraintViolation<Object>>... violationsArray) {
-        List<ValidationError> errors = new ArrayList<>();
+    protected final List<ValidationError> contOnValidationError(final Set<ConstraintViolation<Object>>... violationsArray) {
+        final List<ValidationError> errors = new ArrayList<>();
         for (Set<ConstraintViolation<Object>> violations : violationsArray) {
             for (ConstraintViolation violation : violations) {
                 if (violation.getPropertyPath().iterator().next().getName() != null) {
-                    String path = violation.getPropertyPath() != null ? violation.getPropertyPath().toString() : null;
-                    String message = violation.getMessage() != null ? StringUtils.removeStart(violation.getMessage(), path + ".") : null;
-                    String messageTemplate = violation.getMessageTemplate();
-                    String invalidValue = violation.getInvalidValue() != null ? violation.getInvalidValue().toString() : null;
-                    ValidationError error = new ValidationError(message, messageTemplate, path, invalidValue);
+                    final String path = violation.getPropertyPath() != null ? violation.getPropertyPath().toString() : null;
+                    final String message = violation.getMessage() != null ? StringUtils.removeStart(violation.getMessage(), path + ".") : null;
+                    final String messageTemplate = violation.getMessageTemplate();
+                    final String invalidValue = violation.getInvalidValue() != null ? violation.getInvalidValue().toString() : null;
+                    final ValidationError error = new ValidationError(message, messageTemplate, path, invalidValue);
                     errors.add(error);
                 }
             }
@@ -210,30 +214,35 @@ public abstract class AlpineResource {
      *      // If validation fails, this line will not be reached.
      * </pre>
      *
+     * @param violationsArray a Set of one or more ConstraintViolations
      * @since 1.0.0
      */
     @SafeVarargs
-    protected final void failOnValidationError(Set<ConstraintViolation<Object>>... violationsArray) {
-        List<ValidationError> errors = contOnValidationError(violationsArray);
+    protected final void failOnValidationError(final Set<ConstraintViolation<Object>>... violationsArray) {
+        final List<ValidationError> errors = contOnValidationError(violationsArray);
         if (errors.size() > 0) {
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(errors).build());
         }
     }
 
+    /**
+     * Initializes this resource instance by populating some of the features of this class
+     */
     @PostConstruct
     private void initialize() {
-        MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
-        String page = queryParams.getFirst("page");
-        String size = queryParams.getFirst("size");
-        String filter = queryParams.getFirst("filter");
-        String orderBy = queryParams.getFirst("orderBy");
+        final MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
+        final String page = queryParams.getFirst("page");
+        final String size = queryParams.getFirst("size");
+        final String filter = queryParams.getFirst("filter");
+        final String orderBy = queryParams.getFirst("orderBy");
 
-        if ("asc".equalsIgnoreCase(orderBy))
+        if ("asc".equalsIgnoreCase(orderBy)) {
             this.orderBy = OrderBy.ASCENDING;
-        else if ("desc".equalsIgnoreCase(orderBy))
+        } else if ("desc".equalsIgnoreCase(orderBy)) {
             this.orderBy = OrderBy.DESCENDING;
-        else
+        } else {
             this.orderBy = OrderBy.UNSPECIFIED;
+        }
 
         this.filter = filter;
         this.pagination = new Pagination(page, size);
@@ -241,21 +250,22 @@ public abstract class AlpineResource {
 
     /**
      * Returns the principal for who initiated the request.
-     * @see {@link alpine.model.ApiKey}
-     * @see {@link alpine.model.LdapUser}
-     *
+     * @return a Principal object
+     * @see alpine.model.ApiKey
+     * @see alpine.model.LdapUser
      * @since 1.0.0
      */
     protected Principal getPrincipal() {
-        Object principal = requestContext.getProperty("Principal");
+        final Object principal = requestContext.getProperty("Principal");
         if (principal != null) {
-            return (Principal)principal;
+            return (Principal) principal;
         } else {
             return null;
         }
     }
 
     /**
+     * @return true is the current Principal is an instance of LdapUser. False if not.
      * @since 1.0.0
      */
     protected boolean isLdapUser() {
@@ -263,6 +273,7 @@ public abstract class AlpineResource {
     }
 
     /**
+     * @return true is the current Principal is an instance of ManagedUser. False if not.
      * @since 1.0.0
      */
     protected boolean isManagedUser() {
@@ -270,6 +281,7 @@ public abstract class AlpineResource {
     }
 
     /**
+     * @return true is the current Principal is an instance of ApiKey. False if not.
      * @since 1.0.0
      */
     protected boolean isApiKey() {

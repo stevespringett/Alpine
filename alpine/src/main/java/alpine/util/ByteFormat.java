@@ -27,17 +27,18 @@ import java.text.NumberFormat;
  * <p/>
  * This class does not extend the JDK Format class because the idea was to KISS!
  *
+ * @author Steve Springett
  * @since 1.0.0
  */
 @SuppressWarnings("unused")
 public class ByteFormat {
 
-    private final static int BYTE = 1;
-    private final static int KILOBYTE = 1024;
-    private final static int MEGABYTE = 1024 * KILOBYTE;
-    private final static int GIGABYTE = 1024 * MEGABYTE;
+    private static final int BYTE = 1;
+    private static final int KILOBYTE = 1024;
+    private static final int MEGABYTE = 1024 * KILOBYTE;
+    private static final int GIGABYTE = 1024 * MEGABYTE;
 
-    private final static long LIMITS[] = {GIGABYTE, MEGABYTE, KILOBYTE, BYTE};
+    private static final long LIMITS[] = {GIGABYTE, MEGABYTE, KILOBYTE, BYTE};
 
     private final NumberFormat numberFormat;
     private String[] names;
@@ -87,10 +88,10 @@ public class ByteFormat {
                 continue;
             }
 
-            float fVal = ((float)count) / LIMITS[i];
+            final float fVal = ((float) count) / LIMITS[i];
 
             // for KB, MB and GB we don't ever add an "s", but we do for "byte" if the count is other than 1
-            String name = i == names.length - 1 && fVal != 1.0 ? names[i] + "s" : names[i];
+            final String name = i == names.length - 1 && fVal != 1.0 ? names[i] + "s" : names[i];
 
             synchronized (numberFormat) {
                 return numberFormat.format(fVal) + name;
@@ -103,10 +104,11 @@ public class ByteFormat {
 
     /**
      * Similar to format(int), but the raw byte count is placed in parentheses following the formatted value (if the
-     * value is greater than 1023 bytes), e.g.:
+     * value is greater than 1023 bytes).
+     * e.g.:
      * <p/>
-     * 1023 ->		1,023 bytes
-     * 1025 -> 	1 KB (1025 bytes)
+     * 1023 -> 1,023 bytes
+     * 1025 -> 1 KB (1025 bytes)
      * @param count int
      * @return String
      * @since 1.0.0
@@ -138,7 +140,7 @@ public class ByteFormat {
             return format((int) count);
         }
 
-        double dVal = ((double)count) / LIMITS[0];
+        final double dVal = ((double) count) / LIMITS[0];
         synchronized (numberFormat) {
             return numberFormat.format(dVal) + names[0];
         }
@@ -146,9 +148,10 @@ public class ByteFormat {
 
     /**
      * Similar to {@link #format(long)}, but the raw byte count is placed in parentheses following the formatted value (if the
-     * value is greater than 1023 bytes), e.g.:<pre>
-     * 1023 ->		1,023 bytes
-     * 1025 -> 	1 KB (1025 bytes)</pre>
+     * value is greater than 1023 bytes).
+     * e.g.:<pre>
+     * 1023 -> 1,023 bytes
+     * 1025 -> 1 KB (1025 bytes)</pre>
      * @param count int
      * @return String
      * @since 1.0.0
@@ -188,7 +191,6 @@ public class ByteFormat {
      * @param names String[]
      * @since 1.0.0
      */
-    @SuppressWarnings({"UnusedDeclaration"})
     public void setNames(String[] names) {
         if (names == null) {
             this.names = null;

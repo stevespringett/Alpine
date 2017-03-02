@@ -23,19 +23,33 @@ import alpine.event.framework.Event;
  * An Event implementation specific for LDAP synchronization tasks.
  *
  * @see alpine.tasks.LdapSyncTask
+ *
+ * @author Steve Springett
  * @since 1.0.0
  */
 public class LdapSyncEvent implements Event {
 
     private String username = null;
 
+    /**
+     * Default constructor. This will indicate the all LdapUser objects need to be synchronized.
+     */
     public LdapSyncEvent() {
     }
 
+    /**
+     * Use of this constructor will indicate that only the specified LdapUser object will need to be synchronized.
+     * @param username the username of the LdapUser to syncronize
+     */
     public LdapSyncEvent(String username) {
         this.username = username;
     }
 
+    /**
+     * Returns the username of the LdapUser to synchronize.
+     * This method will return null if the default constructor was used.
+     * @return a String of the username
+     */
     public String getUsername() {
         return username;
     }

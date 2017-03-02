@@ -19,24 +19,37 @@ package alpine.auth;
 
 import java.security.SecureRandom;
 
-public class ApiKeyGenerator {
+/**
+ * Class used to securely generate API keys.
+ * @author Steve Springett
+ * @since 1.0.0
+ */
+public final class ApiKeyGenerator {
 
-    private static char[] VALID_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456879".toCharArray();
-
-    private ApiKeyGenerator() {}
+    private static final char[] VALID_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456879".toCharArray();
 
     /**
-     * Generates a 32 character cryptographically secure API key
-     *
+     * Private constructor
+     */
+    private ApiKeyGenerator() { }
+
+    /**
+     * Generates a 32 character cryptographically secure API key.
+     *  @return a String representation of the API key
      * @since 1.0.0
      */
     public static String generate() {
         return generate(32);
     }
 
+    /**
+     * Generates a cryptographically secure API key of the specified length.
+     * @param chars the length of the API key to generate
+     * @return a String representation of the API key
+     */
     public static String generate(int chars) {
-        SecureRandom secureRandom = new SecureRandom();
-        char[] buff = new char[chars];
+        final SecureRandom secureRandom = new SecureRandom();
+        final char[] buff = new char[chars];
         for (int i = 0; i < chars; ++i) {
             if ((i % 10) == 0) {
                 secureRandom.setSeed(secureRandom.nextLong());

@@ -25,10 +25,11 @@ import org.apache.commons.lang3.StringUtils;
  * reveal system-wide information. These provide no security-related fixes
  * to any issue, and are merely available as a convenience.
  *
+ * @author Steve Springett
  * @since 1.0
  */
 @SuppressWarnings("unused")
-public class SystemUtil {
+public final class SystemUtil {
 
     // A few of the methods need to be initialized before they can be used
     private static boolean hasInitialized;
@@ -46,8 +47,11 @@ public class SystemUtil {
     private static final String BIT_BUCKET_UNIX = "/dev/null";
     private static final String BIT_BUCKET_WIN = "NUL"; // Yes, it's only one 'L'
 
-    private static final Logger logger = Logger.getLogger(SystemUtil.class);
+    private static final Logger LOGGER = Logger.getLogger(SystemUtil.class);
 
+    /**
+     * Private constructor
+     */
     private SystemUtil() {
     }
 
@@ -134,7 +138,7 @@ public class SystemUtil {
     }
 
     /**
-     * Return the name of the host operating system
+     * Return the name of the host operating system.
      * @return String containing the name of the host operating system
      * @since 1.0
      */
@@ -143,7 +147,7 @@ public class SystemUtil {
     }
 
     /**
-     * Return the OS architecture
+     * Return the OS architecture.
      * @return String containing the OS architecture
      * @since 1.0
      */
@@ -152,7 +156,7 @@ public class SystemUtil {
     }
 
     /**
-     * Return the OS version
+     * Return the OS version.
      * @return String containing the OS version
      * @since 1.0
      */
@@ -171,7 +175,7 @@ public class SystemUtil {
     }
 
     /**
-     * Return the path separator character used in java.class.path
+     * Return the path separator character used in java.class.path.
      * @return String containing the path separator character
      * @since 1.0
      */
@@ -180,7 +184,7 @@ public class SystemUtil {
     }
 
     /**
-     * Return the username that is executing the current running Java process
+     * Return the username that is executing the current running Java process.
      * @return String containing the username that is executing the current running Java process
      * @since 1.0
      */
@@ -189,7 +193,7 @@ public class SystemUtil {
     }
 
     /**
-     * Return the home directory of the user executing the current running Java process
+     * Return the home directory of the user executing the current running Java process.
      * @return String containing the home directory of the user executing the current running Java process
      * @since 1.0
      */
@@ -198,7 +202,7 @@ public class SystemUtil {
     }
 
     /**
-     * Return the Java vendor
+     * Return the Java vendor.
      * @return String containing the Java vendor
      * @since 1.0
      */
@@ -207,7 +211,7 @@ public class SystemUtil {
     }
 
     /**
-     * Return the Java version
+     * Return the Java version.
      * @return String containing the Java version
      * @since 1.0
      */
@@ -216,7 +220,7 @@ public class SystemUtil {
     }
 
     /**
-     * Return the JAVA_HOME environment variable
+     * Return the JAVA_HOME environment variable.
      * @return String containing the JAVA_HOME environment variable
      * @since 1.0
      */
@@ -225,7 +229,7 @@ public class SystemUtil {
     }
 
     /**
-     * Return the temporary directory to be used by Java
+     * Return the temporary directory to be used by Java.
      * @return String containing the temporary directory to be used by Java
      * @since 1.0
      */
@@ -234,7 +238,7 @@ public class SystemUtil {
     }
 
     /**
-     * Return the classpath
+     * Return the classpath.
      * @return String containing the classpath
      * @since 1.0
      */
@@ -243,7 +247,7 @@ public class SystemUtil {
     }
 
     /**
-     * Return the library path
+     * Return the library path.
      * @return String containing the library path
      * @since 1.0
      */
@@ -252,32 +256,39 @@ public class SystemUtil {
     }
 
     /**
-     * Return the bit bucket for the OS. '/dev/null' for Unix and 'NUL' for Windows
+     * Return the bit bucket for the OS. '/dev/null' for Unix and 'NUL' for Windows.
      * @return a String containing the bit bucket
      * @since 1.0
      */
     public static String getBitBucket() {
-        if (isWindows())
+        if (isWindows()) {
             return BIT_BUCKET_WIN;
-        else
+        } else {
             return BIT_BUCKET_UNIX;
+        }
     }
 
+    /**
+     * Returns the number of processor cores available to the JVM.
+     * @return an integer of the number of processor core
+     * @since 1.0.0
+     */
     public static int getCpuCores() {
         return Runtime.getRuntime().availableProcessors();
     }
 
     /**
-     * Initialize static variables
+     * Initialize static variables.
      */
     private static void init() {
-        if (hasInitialized)
+        if (hasInitialized) {
             return;
+        }
 
-        String osName = System.getProperty("os.name");
+        final String osName = System.getProperty("os.name");
 
         if (osName != null) {
-            String osNameLower = osName.toLowerCase();
+            final String osNameLower = osName.toLowerCase();
 
             isWindows = osNameLower.contains("windows");
             isMac = osNameLower.contains("mac os x") || osNameLower.contains("darwin");
@@ -288,7 +299,7 @@ public class SystemUtil {
 
         lineEnder = isWindows ? "\r\n" : "\n";
 
-        String model = System.getProperty("sun.arch.data.model");
+        final String model = System.getProperty("sun.arch.data.model");
         // sun.arch.data.model=32 // 32 bit JVM
         // sun.arch.data.model=64 // 64 bit JVM
         if (StringUtils.isBlank(model)) {

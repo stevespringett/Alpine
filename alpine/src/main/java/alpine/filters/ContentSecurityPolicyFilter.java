@@ -117,6 +117,9 @@ import java.io.IOException;
  * The sandbox param defaults to null indicating that the default sandbox will be applied. The report-uri and
  * plugin-types also default to null. frame-ancestors defaults to 'none' if not specified.
  * </p>
+ *
+ * @author Steve Springett
+ * @since 1.0.0
  */
 public final class ContentSecurityPolicyFilter implements Filter {
 
@@ -140,7 +143,7 @@ public final class ContentSecurityPolicyFilter implements Filter {
     private String frameAncestors = NONE;
     private String pluginTypes = null;
 
-
+    @Override
     public void init(final FilterConfig filterConfig) {
         defaultSrc = getValue(filterConfig, "default-src", defaultSrc);
         scriptSrc = getValue(filterConfig, "script-src", scriptSrc);
@@ -161,8 +164,15 @@ public final class ContentSecurityPolicyFilter implements Filter {
         policy = formatHeader();
     }
 
+    /**
+     * Returns the value of the initParam.
+     * @param filterConfig a FilterConfig instance
+     * @param initParam the name of the init parameter
+     * @param variable the variable to use if the init param was not defined
+     * @return a String
+     */
     private String getValue(FilterConfig filterConfig, String initParam, String variable) {
-        String value = filterConfig.getInitParameter(initParam);
+        final String value = filterConfig.getInitParameter(initParam);
         if (StringUtils.isNotBlank(value)) {
             return value;
         } else {
@@ -170,7 +180,11 @@ public final class ContentSecurityPolicyFilter implements Filter {
         }
     }
 
-    public String formatHeader() {
+    /**
+     * Formats a CSP header
+     * @return a String representation of CSP header
+     */
+    private String formatHeader() {
         final StringBuilder sb = new StringBuilder();
         getStringFromValue(sb, "default-src", defaultSrc);
         getStringFromValue(sb, "script-src", scriptSrc);
@@ -190,19 +204,27 @@ public final class ContentSecurityPolicyFilter implements Filter {
         return sb.toString().replaceAll("(\\[|\\])", "").trim();
     }
 
+    /**
+     * Assists in the formatting of a single CSP directive.
+     * @param builder a StringBuilder object
+     * @param directive a CSP directive
+     * @param value the value of the CSP directive
+     */
     private void getStringFromValue(final StringBuilder builder, final String directive, final String value) {
         if (value != null) {
             builder.append(directive).append(" ").append(value).append(";");
         }
     }
 
+    @Override
     public void doFilter(final ServletRequest req, final ServletResponse res, final FilterChain chain)
             throws IOException, ServletException {
-        final HttpServletResponse response = (HttpServletResponse)res;
+        final HttpServletResponse response = (HttpServletResponse) res;
         chain.doFilter(req, response);
         response.addHeader("Content-Security-Policy", policy);
     }
 
+    @Override
     public void destroy() {
         // Intentionally empty to satisfy interface
     }

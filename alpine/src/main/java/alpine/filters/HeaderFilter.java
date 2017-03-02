@@ -28,6 +28,7 @@ import javax.ws.rs.core.HttpHeaders;
 /**
  * Adds Powered-By, cache-control, and cors headers.
  *
+ * @author Steve Springett
  * @since 1.0.0
  */
 @Priority(Priorities.HEADER_DECORATOR)
@@ -36,6 +37,9 @@ public class HeaderFilter implements ContainerResponseFilter {
     private String appName;
     private String appVersion;
 
+    /**
+     * Initializes the filter.
+     */
     private void init() {
         if (appName == null) {
             appName = Config.getInstance().getProperty(Config.AlpineKey.APPLICATION_NAME);

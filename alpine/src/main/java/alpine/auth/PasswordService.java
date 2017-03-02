@@ -42,12 +42,16 @@ import java.security.NoSuchAlgorithmException;
  * Additionally, this class contains a method which will determine if a password should be rehashed
  * due to an increase in rounds defined on the server.
  *
+ * @author Steve Springett
  * @since 1.0.0
  */
 public final class PasswordService {
 
     private static final int ROUNDS = Config.getInstance().getPropertyAsInt(Config.AlpineKey.BCRYPT_ROUNDS);
 
+    /**
+     * Private constructor
+     */
     private PasswordService() { }
 
     /**
@@ -56,10 +60,12 @@ public final class PasswordService {
      * salt is generated and the prehashed password is properly hashed using the configured BCrypt
      * work factor (determined by {@link Config.AlpineKey#BCRYPT_ROUNDS).
      *
+     * @param password the password to hash
+     * @return a hashed password
      * @since 1.0.0
      */
     public static char[] createHash(char[] password) {
-        char[] prehash = createSha512Hash(password);
+        final char[] prehash = createSha512Hash(password);
         // Todo: remove String when Jbcrypt supports char[]
         return BCrypt.hashpw(new String(prehash), BCrypt.gensalt(ROUNDS)).toCharArray();
     }
@@ -70,10 +76,13 @@ public final class PasswordService {
      * password is properly hashed using the specified salt and uses the configured BCrypt work factor
      * (determined by {@link Config.AlpineKey#BCRYPT_ROUNDS).
      *
+     * @param password the password to hash
+     * @param salt the salt to use when hashing this password
+     * @return a hashed password
      * @since 1.0.0
      */
     public static char[] createHash(char[] password, char[] salt) {
-        char[] prehash = createSha512Hash(password);
+        final char[] prehash = createSha512Hash(password);
         // Todo: remove String when Jbcrypt supports char[]
         return BCrypt.hashpw(new String(prehash), new String(salt)).toCharArray();
     }
@@ -81,12 +90,15 @@ public final class PasswordService {
     /**
      * Checks the validity of the asserted password against a ManagedUsers actual hashed password.
      *
+     * @param assertedPassword the clear text password to check
+     * @param user The ManagedUser to check the password of
+     * @return true if assertedPassword matches the expected password of the ManangedUser, false if not
      * @since 1.0.0
      */
     public static boolean matches(char[] assertedPassword, ManagedUser user) {
-        char[] prehash = createSha512Hash(assertedPassword);
+        final char[] prehash = createSha512Hash(assertedPassword);
         // Todo: remove String when Jbcrypt supports char[]
-        return BCrypt.checkpw(new String(prehash), new String(user.getPassword()));
+        return BCrypt.checkpw(new String(prehash), user.getPassword());
     }
 
     /**
@@ -100,14 +112,16 @@ public final class PasswordService {
      * If the bcryptHash length is less than the minimum length of a BCrypt hash, this method
      * will return true.
      *
+     * @param bcryptHash the hashed BCrypt to check
+     * @return true if the password should be rehashed, false if not
      * @since 1.0.0
      */
     public static boolean shouldRehash(char[] bcryptHash) {
-        int rounds;
+        final int rounds;
         if (bcryptHash.length < 59) {
             return true;
         }
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         sb.append(bcryptHash[4]);
         if (bcryptHash[5] != '$') {
             sb.append(bcryptHash[5]);
@@ -122,19 +136,21 @@ public final class PasswordService {
      * for password hashing, but in conjunction with password-specific
      * hashing functions.
      *
+     * @param password the password to hash
+     * @return a char[] of the hashed password
      * @since 1.0.0
      */
     private static char[] createSha512Hash(char[] password) {
         try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-512");
+            final MessageDigest digest = MessageDigest.getInstance("SHA-512");
             digest.update(ByteUtil.toBytes(password));
-            byte[] byteData = digest.digest();
+            final byte[] byteData = digest.digest();
 
-            StringBuilder sb = new StringBuilder();
+            final StringBuilder sb = new StringBuilder();
             for (byte data : byteData) {
                 sb.append(Integer.toString((data & 0xff) + 0x100, 16).substring(1));
             }
-            char[] hash = new char[128];
+            final char[] hash = new char[128];
             sb.getChars(0, sb.length(), hash, 0);
             return hash;
         } catch (NoSuchAlgorithmException e) {

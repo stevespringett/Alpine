@@ -28,17 +28,21 @@ import javax.servlet.ServletContextListener;
  * This class simply creates objects on startup. The example application uses
  * an in-memory database so therefore we want to populate that database with
  * a known set of objects in order to demo certain functionality.
+ *
+ * @author Steve Springett
  */
 public class DefaultObjectCreator implements ServletContextListener {
 
+    @Override
     public void contextInitialized(ServletContextEvent event) {
         try (AlpineQueryManager qm = new AlpineQueryManager()) {
-            ManagedUser admin = qm.createManagedUser("admin", new String(PasswordService.createHash("admin".toCharArray())));
-            Team defaultTeam = qm.createTeam("Default Team", true);
+            final ManagedUser admin = qm.createManagedUser("admin", new String(PasswordService.createHash("admin".toCharArray())));
+            final Team defaultTeam = qm.createTeam("Default Team", true);
             qm.addUserToTeam(admin, defaultTeam);
         }
     }
 
+    @Override
     public void contextDestroyed(ServletContextEvent event) {
         // Intentionally empty to satisfy interface
     }

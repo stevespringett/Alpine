@@ -32,23 +32,27 @@ import java.util.concurrent.Executors;
  * @see alpine.Config.AlpineKey#WORKER_THREAD_MULTIPLIER
  * @see ThreadUtil#determineNumberOfWorkerThreads()
  *
+ * @author Steve Springett
  * @since 1.0.0
  */
-public class EventService extends BaseEventService {
+public final class EventService extends BaseEventService {
 
-    private static final EventService instance = new EventService();
-    private static final Logger logger = Logger.getLogger(EventService.class);
-    private static final ExecutorService executor = Executors.newFixedThreadPool(ThreadUtil.determineNumberOfWorkerThreads());
+    private static final EventService INSTANCE = new EventService();
+    private static final Logger LOGGER = Logger.getLogger(EventService.class);
+    private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(ThreadUtil.determineNumberOfWorkerThreads());
 
     static {
-        instance.setExecutorService(executor);
-        instance.setLogger(logger);
+        INSTANCE.setExecutorService(EXECUTOR);
+        INSTANCE.setLogger(LOGGER);
     }
 
+    /**
+     * Private constructor
+     */
     private EventService() { }
 
     public static EventService getInstance() {
-        return instance;
+        return INSTANCE;
     }
 
 }

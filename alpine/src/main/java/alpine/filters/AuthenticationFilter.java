@@ -34,18 +34,19 @@ import java.security.Principal;
  * authenticated. Exceptions are made for swagger URLs.
  *
  * @see AuthenticationFeature
+ * @author Steve Springett
  * @since 1.0.0
  */
 @Priority(Priorities.AUTHENTICATION)
 public class AuthenticationFilter implements ContainerRequestFilter {
 
     // Setup logging
-    private static final Logger logger = Logger.getLogger(AuthenticationFilter.class);
+    private static final Logger LOGGER = Logger.getLogger(AuthenticationFilter.class);
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
         if (requestContext instanceof ContainerRequest) {
-            ContainerRequest request = (ContainerRequest) requestContext;
+            final ContainerRequest request = (ContainerRequest) requestContext;
 
             // Bypass authentication for swagger
             if (request.getRequestUri().getPath().contains("/api/swagger")) {
@@ -54,23 +55,23 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
             Principal principal = null;
 
-            ApiKeyAuthenticationService apiKeyAuthService = new ApiKeyAuthenticationService(request);
+            final ApiKeyAuthenticationService apiKeyAuthService = new ApiKeyAuthenticationService(request);
             if (apiKeyAuthService.isSpecified()) {
                 try {
                     principal = apiKeyAuthService.authenticate();
                 } catch (AuthenticationException e) {
-                    logger.info("Invalid login attempt");
+                    LOGGER.info("Invalid login attempt");
                     requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
                     return;
                 }
             }
 
-            JwtAuthenticationService jwtAuthService = new JwtAuthenticationService(request);
+            final JwtAuthenticationService jwtAuthService = new JwtAuthenticationService(request);
             if (jwtAuthService.isSpecified()) {
                 try {
                     principal = jwtAuthService.authenticate();
                 } catch (AuthenticationException e) {
-                    logger.info("Invalid login attempt");
+                    LOGGER.info("Invalid login attempt");
                     requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
                     return;
                 }

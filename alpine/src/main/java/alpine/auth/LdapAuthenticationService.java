@@ -22,6 +22,7 @@ import alpine.model.LdapUser;
 import alpine.persistence.AlpineQueryManager;
 import org.apache.commons.lang3.StringUtils;
 import javax.naming.AuthenticationException;
+import javax.naming.CommunicationException;
 import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.naming.ldap.InitialLdapContext;
@@ -30,21 +31,24 @@ import java.security.Principal;
 import java.util.Hashtable;
 
 /**
- * Class that performs authentication against LDAP servers
+ * Class that performs authentication against LDAP servers.
  *
+ * @author Steve Springett
  * @since 1.0.0
  */
 public class LdapAuthenticationService implements AuthenticationService {
 
-    private static final String ldapUrl = Config.getInstance().getProperty(Config.AlpineKey.LDAP_SERVER_URL);
-    private static final String domainName = Config.getInstance().getProperty(Config.AlpineKey.LDAP_DOMAIN);
+    private static final String LDAP_URL = Config.getInstance().getProperty(Config.AlpineKey.LDAP_SERVER_URL);
+    private static final String DOMAIN_NAME = Config.getInstance().getProperty(Config.AlpineKey.LDAP_DOMAIN);
 
     private String username;
     private String password;
 
     /**
-     * Authentication service validates credentials against a directory service (LDAP)
+     * Authentication service validates credentials against a directory service (LDAP).
      *
+     * @param username the asserted username
+     * @param password the asserted password
      * @since 1.0.0
      */
     public LdapAuthenticationService(String username, String password) {
@@ -57,6 +61,7 @@ public class LdapAuthenticationService implements AuthenticationService {
      * this case, since the constructor requires it, this method will always
      * return true.
      *
+     * @return always will return true
      * @since 1.0.0
      */
     public boolean isSpecified() {
@@ -68,12 +73,14 @@ public class LdapAuthenticationService implements AuthenticationService {
      * and returns a Principal if authentication is successful. Otherwise,
      * returns an AuthenticationException.
      *
+     * @return a Principal if authentication was successful
+     * @throws AuthenticationException when authentication is unsuccessful
      * @since 1.0.0
      */
     public Principal authenticate() throws AuthenticationException {
         if (validateCredentials()) {
             try (AlpineQueryManager qm = new AlpineQueryManager()) {
-                LdapUser user = qm.getLdapUser(username);
+                final LdapUser user = qm.getLdapUser(username);
                 if (user != null) {
                     return user;
                 }
@@ -86,24 +93,28 @@ public class LdapAuthenticationService implements AuthenticationService {
      * Asserts a users credentials. Returns an LdapContext if assertion is successful
      * or an exception for any other reason.
      *
+     * @param username the username to assert
+     * @param password the password to assert
+     * @return the LdapContext upon a successful connection
+     * @throws NamingException when unable to establish a connection
      * @since 1.0.0
      */
     private LdapContext getConnection(String username, String password) throws NamingException {
         if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
             throw new NamingException("Username or password cannot be empty or null");
         }
-        Hashtable<String, String> props = new Hashtable<>();
-        String principalName = username + "@" + domainName;
+        final Hashtable<String, String> props = new Hashtable<>();
+        final String principalName = username + "@" + DOMAIN_NAME;
         props.put(Context.SECURITY_PRINCIPAL, principalName);
         props.put(Context.SECURITY_CREDENTIALS, password);
         props.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-        props.put(Context.PROVIDER_URL, ldapUrl);
+        props.put(Context.PROVIDER_URL, LDAP_URL);
 
-        try{
+        try {
             return new InitialLdapContext(props, null);
-        } catch(javax.naming.CommunicationException e){
+        } catch (CommunicationException e) {
             throw new NamingException("Failed to connect to directory server");
-        } catch(NamingException e){
+        } catch (NamingException e) {
             throw new NamingException("Failed to authenticate user");
         }
     }
@@ -112,6 +123,7 @@ public class LdapAuthenticationService implements AuthenticationService {
      * Asserts a users credentials. Returns a boolean value indicating if
      * assertion was successful or not.
      *
+     * @return true if assertion was successful, false if not
      * @since 1.0.0
      */
     private boolean validateCredentials() {

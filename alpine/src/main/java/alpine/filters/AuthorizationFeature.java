@@ -31,6 +31,7 @@ import java.lang.reflect.Method;
  * have the necessary permissions required to access the resource using {@link PermissionRequired}.
  *
  * @see AuthorizationFilter
+ * @author Steve Springett
  * @since 1.0.0
  */
 @Provider
@@ -42,7 +43,7 @@ public class AuthorizationFeature implements DynamicFeature {
     @Override
     public void configure(ResourceInfo resourceInfo, FeatureContext context) {
         if (ENFORCE_AUTHENTICATION && ENFORCE_AUTHORIZATION) {
-            Method method = resourceInfo.getResourceMethod();
+            final Method method = resourceInfo.getResourceMethod();
             if (method.isAnnotationPresent(PermissionRequired.class)) {
                 context.register(AuthorizationFilter.class);
             }

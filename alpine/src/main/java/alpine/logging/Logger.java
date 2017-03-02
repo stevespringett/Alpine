@@ -26,6 +26,7 @@ import org.slf4j.Marker;
  *
  * Note, if Markers are used, the logging implementation will be tied to SLF4j.
  *
+ * @author Steve Springett
  * @since 1.0.0
  */
 public final class Logger {
@@ -57,6 +58,9 @@ public final class Logger {
     }
 
     /**
+     * Is the logger instance enabled for the INFO level?
+     *
+     * @return True if this Logger is enabled for the INFO level, false otherwise.
      * @since 1.0.0
      */
     public boolean isInfoEnabled() {
@@ -64,6 +68,9 @@ public final class Logger {
     }
 
     /**
+     * Is the logger instance enabled for the DEBUG level?
+     *
+     * @return True if this Logger is enabled for the DEBUG level, false otherwise.
      * @since 1.0.0
      */
     public boolean isDebugEnabled() {
@@ -71,6 +78,9 @@ public final class Logger {
     }
 
     /**
+     * Is the logger instance enabled for the ERROR level?
+     *
+     * @return True if this Logger is enabled for the ERROR level, false otherwise.
      * @since 1.0.0
      */
     public boolean isErrorEnabled() {
@@ -78,6 +88,9 @@ public final class Logger {
     }
 
     /**
+     * Is the logger instance enabled for the TRACE level?
+     *
+     * @return True if this Logger is enabled for the TRACE level, false otherwise.
      * @since 1.0.0
      */
     public boolean isTraceEnabled() {
@@ -85,6 +98,9 @@ public final class Logger {
     }
 
     /**
+     * Is the logger instance enabled for the WARN level?
+     *
+     * @return True if this Logger is enabled for the WARN level, false otherwise.
      * @since 1.0.0
      */
     public boolean isWarnEnabled() {
@@ -92,248 +108,408 @@ public final class Logger {
     }
 
     /**
+     * Log a message at the INFO level.
+     *
+     * @param message the message string to be logged
      * @since 1.0.0
      */
-    public void info(String string) {
-        log.info(string);
+    public void info(String message) {
+        log.info(message);
     }
 
     /**
+     * Log a message at the INFO level.
+     *
+     * @param message the message string to be logged
+     * @param throwable the exception (throwable) to log
      * @since 1.0.0
      */
-    public void info(String string, Throwable throwable) {
-        log.info(string, throwable);
+    public void info(String message, Throwable throwable) {
+        log.info(message, throwable);
     }
 
     /**
+     * Log a message at the INFO level.
+     *
+     * @param marker The marker specific to this log statement
+     * @param message the message string to be logged
      * @since 1.0.0
      */
-    public void info(Marker marker, String string) {
-        log.info(marker, string);
+    public void info(Marker marker, String message) {
+        log.info(marker, message);
     }
 
     /**
+     * Log a message at the INFO level.
+     *
+     * @param marker The marker specific to this log statement
+     * @param message the message string to be logged
+     * @param object the argument
      * @since 1.0.0
      */
-    public void info(Marker marker, String string, Object object) {
-        log.info(marker, string, object);
+    public void info(Marker marker, String message, Object object) {
+        log.info(marker, message, object);
     }
 
     /**
+     * Log a message at the INFO level.
+     *
+     * @param marker The marker specific to this log statement
+     * @param message the message string to be logged
+     * @param o1 the first argument
+     * @param o2 the second argument
      * @since 1.0.0
      */
-    public void info(Marker marker, String string, Object o1, Object o2) {
-        log.info(marker, string, o1, o1);
+    public void info(Marker marker, String message, Object o1, Object o2) {
+        log.info(marker, message, o1, o1);
     }
 
     /**
+     * Log a message at the INFO level.
+     *
+     * @param marker The marker specific to this log statement
+     * @param message the message string to be logged
+     * @param objects a list of 3 or more arguments
      * @since 1.0.0
      */
-    public void info(Marker marker, String string, Object... objects) {
-        log.info(marker, string, objects);
+    public void info(Marker marker, String message, Object... objects) {
+        log.info(marker, message, objects);
     }
 
     /**
+     * Log a message at the INFO level.
+     *
+     * @param marker The marker specific to this log statement
+     * @param message the message string to be logged
+     * @param throwable the exception (throwable) to log
      * @since 1.0.0
      */
-    public void info(Marker marker, String string, Throwable throwable) {
-        log.info(marker, string, throwable);
+    public void info(Marker marker, String message, Throwable throwable) {
+        log.info(marker, message, throwable);
     }
 
     /**
+     * Log a message at the DEBUG level.
+     *
+     * @param message the message string to be logged
      * @since 1.0.0
      */
-    public void debug(String string) {
-        log.debug(string);
+    public void debug(String message) {
+        log.debug(message);
     }
 
     /**
+     * Log a message at the DEBUG level.
+     *
+     * @param message the message string to be logged
+     * @param throwable the exception (throwable) to log
      * @since 1.0.0
      */
-    public void debug(String string, Throwable throwable) {
-        log.debug(string, throwable);
+    public void debug(String message, Throwable throwable) {
+        log.debug(message, throwable);
     }
 
     /**
+     * Log a message at the DEBUG level.
+     *
+     * @param marker The marker specific to this log statement
+     * @param message the message string to be logged
      * @since 1.0.0
      */
-    public void debug(Marker marker, String string) {
-        log.debug(marker, string);
+    public void debug(Marker marker, String message) {
+        log.debug(marker, message);
     }
 
     /**
+     * Log a message at the DEBUG level.
+     *
+     * @param marker The marker specific to this log statement
+     * @param message the message string to be logged
+     * @param object the argument
      * @since 1.0.0
      */
-    public void debug(Marker marker, String string, Object object) {
-        log.debug(marker, string, object);
+    public void debug(Marker marker, String message, Object object) {
+        log.debug(marker, message, object);
     }
 
     /**
+     * Log a message at the DEBUG level.
+     *
+     * @param marker The marker specific to this log statement
+     * @param message the message string to be logged
+     * @param o1 the first argument
+     * @param o2 the second argument
      * @since 1.0.0
      */
-    public void debug(Marker marker, String string, Object o1, Object o2) {
-        log.debug(marker, string, o1, o1);
+    public void debug(Marker marker, String message, Object o1, Object o2) {
+        log.debug(marker, message, o1, o1);
     }
 
     /**
+     * Log a message at the DEBUG level.
+     *
+     * @param marker The marker specific to this log statement
+     * @param message the message string to be logged
+     * @param objects a list of 3 or more arguments
      * @since 1.0.0
      */
-    public void debug(Marker marker, String string, Object... objects) {
-        log.debug(marker, string, objects);
+    public void debug(Marker marker, String message, Object... objects) {
+        log.debug(marker, message, objects);
     }
 
     /**
+     * Log a message at the DEBUG level.
+     *
+     * @param marker The marker specific to this log statement
+     * @param message the message string to be logged
+     * @param throwable the exception (throwable) to log
      * @since 1.0.0
      */
-    public void debug(Marker marker, String string, Throwable throwable) {
-        log.debug(marker, string, throwable);
+    public void debug(Marker marker, String message, Throwable throwable) {
+        log.debug(marker, message, throwable);
     }
 
     /**
+     * Log a message at the ERROR level.
+     *
+     * @param message the message string to be logged
      * @since 1.0.0
      */
-    public void error(String string) {
-        log.error(string);
+    public void error(String message) {
+        log.error(message);
     }
 
     /**
+     * Log a message at the ERROR level.
+     *
+     * @param message the message string to be logged
+     * @param throwable the exception (throwable) to log
      * @since 1.0.0
      */
-    public void error(String string, Throwable throwable) {
-        log.error(string, throwable);
+    public void error(String message, Throwable throwable) {
+        log.error(message, throwable);
     }
 
     /**
+     * Log a message at the ERROR level.
+     *
+     * @param marker The marker specific to this log statement
+     * @param message the message string to be logged
      * @since 1.0.0
      */
-    public void error(Marker marker, String string) {
-        log.error(marker, string);
+    public void error(Marker marker, String message) {
+        log.error(marker, message);
     }
 
     /**
+     * Log a message at the ERROR level.
+     *
+     * @param marker The marker specific to this log statement
+     * @param message the message string to be logged
+     * @param object the argument
      * @since 1.0.0
      */
-    public void error(Marker marker, String string, Object object) {
-        log.error(marker, string, object);
+    public void error(Marker marker, String message, Object object) {
+        log.error(marker, message, object);
     }
 
     /**
+     * Log a message at the ERROR level.
+     *
+     * @param marker The marker specific to this log statement
+     * @param message the message string to be logged
+     * @param o1 the first argument
+     * @param o2 the second argument
      * @since 1.0.0
      */
-    public void error(Marker marker, String string, Object o1, Object o2) {
-        log.error(marker, string, o1, o1);
+    public void error(Marker marker, String message, Object o1, Object o2) {
+        log.error(marker, message, o1, o1);
     }
 
     /**
+     * Log a message at the ERROR level.
+     *
+     * @param marker The marker specific to this log statement
+     * @param message the message string to be logged
+     * @param objects a list of 3 or more arguments
      * @since 1.0.0
      */
-    public void error(Marker marker, String string, Object... objects) {
-        log.error(marker, string, objects);
+    public void error(Marker marker, String message, Object... objects) {
+        log.error(marker, message, objects);
     }
 
     /**
+     * Log a message at the ERROR level.
+     *
+     * @param marker The marker specific to this log statement
+     * @param message the message string to be logged
+     * @param throwable the exception (throwable) to log
      * @since 1.0.0
      */
-    public void error(Marker marker, String string, Throwable throwable) {
-        log.error(marker, string, throwable);
+    public void error(Marker marker, String message, Throwable throwable) {
+        log.error(marker, message, throwable);
     }
 
     /**
+     * Log a message at the TRACE level.
+     *
+     * @param message the message string to be logged
      * @since 1.0.0
      */
-    public void trace(String string) {
-        log.trace(string);
+    public void trace(String message) {
+        log.trace(message);
     }
 
     /**
+     * Log a message at the TRACE level.
+     *
+     * @param message the message string to be logged
+     * @param throwable the exception (throwable) to log
      * @since 1.0.0
      */
-    public void trace(String string, Throwable throwable) {
-        log.trace(string, throwable);
+    public void trace(String message, Throwable throwable) {
+        log.trace(message, throwable);
     }
 
     /**
+     * Log a message at the TRACE level.
+     *
+     * @param marker The marker specific to this log statement
+     * @param message the message string to be logged
      * @since 1.0.0
      */
-    public void trace(Marker marker, String string) {
-        log.trace(marker, string);
+    public void trace(Marker marker, String message) {
+        log.trace(marker, message);
     }
 
     /**
+     * Log a message at the TRACE level.
+     *
+     * @param marker The marker specific to this log statement
+     * @param message the message string to be logged
+     * @param object the argument
      * @since 1.0.0
      */
-    public void trace(Marker marker, String string, Object object) {
-        log.trace(marker, string, object);
+    public void trace(Marker marker, String message, Object object) {
+        log.trace(marker, message, object);
     }
 
     /**
+     * Log a message at the TRACE level.
+     *
+     * @param marker The marker specific to this log statement
+     * @param message the message string to be logged
+     * @param o1 the first argument
+     * @param o2 the second argument
      * @since 1.0.0
      */
-    public void trace(Marker marker, String string, Object o1, Object o2) {
-        log.trace(marker, string, o1, o1);
+    public void trace(Marker marker, String message, Object o1, Object o2) {
+        log.trace(marker, message, o1, o1);
     }
 
     /**
+     * Log a message at the TRACE level.
+     *
+     * @param marker The marker specific to this log statement
+     * @param message the message string to be logged
+     * @param objects a list of 3 or more arguments
      * @since 1.0.0
      */
-    public void trace(Marker marker, String string, Object... objects) {
-        log.trace(marker, string, objects);
+    public void trace(Marker marker, String message, Object... objects) {
+        log.trace(marker, message, objects);
     }
 
     /**
+     * Log a message at the TRACE level.
+     *
+     * @param marker The marker specific to this log statement
+     * @param message the message string to be logged
+     * @param throwable the exception (throwable) to log
      * @since 1.0.0
      */
-    public void trace(Marker marker, String string, Throwable throwable) {
-        log.trace(marker, string, throwable);
+    public void trace(Marker marker, String message, Throwable throwable) {
+        log.trace(marker, message, throwable);
     }
 
     /**
+     * Log a message at the WARN level.
+     *
+     * @param message the message string to be logged
      * @since 1.0.0
      */
-    public void warn(String string) {
-        log.warn(string);
+    public void warn(String message) {
+        log.warn(message);
     }
 
     /**
+     * Log a message at the WARN level.
+     *
+     * @param message the message string to be logged
+     * @param throwable the exception (throwable) to log
      * @since 1.0.0
      */
-    public void warn(String string, Throwable throwable) {
-        log.warn(string, throwable);
+    public void warn(String message, Throwable throwable) {
+        log.warn(message, throwable);
     }
 
     /**
+     * Log a message at the WARN level.
+     *
+     * @param marker The marker specific to this log statement
+     * @param message the message string to be logged
      * @since 1.0.0
      */
-    public void warn(Marker marker, String string) {
-        log.warn(marker, string);
+    public void warn(Marker marker, String message) {
+        log.warn(marker, message);
     }
 
     /**
+     * Log a message at the WARN level.
+     *
+     * @param marker The marker specific to this log statement
+     * @param message the message string to be logged
+     * @param object the argument
      * @since 1.0.0
      */
-    public void warn(Marker marker, String string, Object object) {
-        log.warn(marker, string, object);
+    public void warn(Marker marker, String message, Object object) {
+        log.warn(marker, message, object);
     }
 
     /**
+     * Log a message at the WARN level.
+     *
+     * @param marker The marker specific to this log statement
+     * @param message the message string to be logged
+     * @param o1 the first argument
+     * @param o2 the second argument
      * @since 1.0.0
      */
-    public void warn(Marker marker, String string, Object o1, Object o2) {
-        log.warn(marker, string, o1, o1);
+    public void warn(Marker marker, String message, Object o1, Object o2) {
+        log.warn(marker, message, o1, o1);
     }
 
     /**
+     * Log a message at the WARN level.
+     *
+     * @param marker The marker specific to this log statement
+     * @param message the message string to be logged
+     * @param objects a list of 3 or more arguments
      * @since 1.0.0
      */
-    public void warn(Marker marker, String string, Object... objects) {
-        log.warn(marker, string, objects);
+    public void warn(Marker marker, String message, Object... objects) {
+        log.warn(marker, message, objects);
     }
 
     /**
+     * Log a message at the WARN level.
+     *
+     * @param marker The marker specific to this log statement
+     * @param message the message string to be logged
+     * @param throwable the exception (throwable) to log
      * @since 1.0.0
      */
-    public void warn(Marker marker, String string, Throwable throwable) {
-        log.warn(marker, string, throwable);
+    public void warn(Marker marker, String message, Throwable throwable) {
+        log.warn(marker, message, throwable);
     }
 
 }

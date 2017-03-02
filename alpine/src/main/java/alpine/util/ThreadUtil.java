@@ -20,27 +20,31 @@ package alpine.util;
 import alpine.Config;
 
 /**
- * A collection of useful Thread utilities
+ * A collection of useful Thread utilities.
  *
+ * @author Steve Springett
  * @since 1.0.0
  */
 @SuppressWarnings("unused")
-public class ThreadUtil {
+public final class ThreadUtil {
 
-    private ThreadUtil() {}
+    /**
+     * Default constructor
+     */
+    private ThreadUtil() { }
 
     /**
      * Calculates the number of worker threads to use. Minimum return value is 1.
-     *
+     * @return the number of worker threads
      * @since 1.0.0
      */
     public static int determineNumberOfWorkerThreads() {
-        int threads = Config.getInstance().getPropertyAsInt(Config.AlpineKey.WORKER_THREADS);
+        final int threads = Config.getInstance().getPropertyAsInt(Config.AlpineKey.WORKER_THREADS);
         if (threads > 0) {
             return threads;
         } else if (threads == 0) {
-            int cores = SystemUtil.getCpuCores();
-            int multiplier = Config.getInstance().getPropertyAsInt(Config.AlpineKey.WORKER_THREAD_MULTIPLIER);
+            final int cores = SystemUtil.getCpuCores();
+            final int multiplier = Config.getInstance().getPropertyAsInt(Config.AlpineKey.WORKER_THREAD_MULTIPLIER);
             if (multiplier > 0) {
                 return cores * multiplier;
             } else {

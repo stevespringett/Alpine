@@ -31,6 +31,7 @@ import java.util.zip.GZIPOutputStream;
 /**
  * Provides a way to gzip the response if the client can accept a gzip response.
  *
+ * @author Steve Springett
  * @since 1.0.0
  */
 @Provider
@@ -38,7 +39,7 @@ public class GZipInterceptor implements ReaderInterceptor, WriterInterceptor {
 
     @Override
     public Object aroundReadFrom(ReaderInterceptorContext context) throws IOException, WebApplicationException {
-        List<String> header = context.getHeaders().get("Content-Encoding");
+        final List<String> header = context.getHeaders().get("Content-Encoding");
         if (header != null && header.contains("gzip")) {
             context.setInputStream(new GZIPInputStream(context.getInputStream()));
         }

@@ -75,6 +75,9 @@ import java.io.IOException;
  *     &lt;url-pattern&gt;/&#42;&lt;/url-pattern&gt;
  * &lt;/filter-mapping>
  * </pre>
+ *
+ * @author Steve Springett
+ * @since 1.0.0
  */
 public class HstsFilter implements Filter {
 
@@ -85,6 +88,7 @@ public class HstsFilter implements Filter {
     private long maxAge = DEFAULT_MAX_AGE;
     private boolean includeSubdomains;
 
+    @Override
     public void init(final FilterConfig filterConfig) throws ServletException {
 
         final String portString = filterConfig.getInitParameter("httpsPort");
@@ -104,6 +108,7 @@ public class HstsFilter implements Filter {
         includeSubdomains = BooleanUtil.valueOf(filterConfig.getInitParameter("includeSubdomains"));
     }
 
+    @Override
     public void doFilter(final ServletRequest req, final ServletResponse resp, final FilterChain chain)
             throws ServletException, IOException {
 
@@ -118,30 +123,31 @@ public class HstsFilter implements Filter {
             }
         } else {
             response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
-            StringBuilder sb = new StringBuilder();
+            final StringBuilder sb = new StringBuilder();
             sb.append("https://").append(request.getServerName());
 
-            if (httpsPort != DEFAULT_HTTPS_PORT)
+            if (httpsPort != DEFAULT_HTTPS_PORT) {
                 sb.append(":").append(httpsPort);
-
-            if (request.getContextPath() != null)
+            }
+            if (request.getContextPath() != null) {
                 sb.append(request.getContextPath());
-
-            if (request.getServletPath() != null)
+            }
+            if (request.getServletPath() != null) {
                 sb.append(request.getServletPath());
-
-            if (request.getPathInfo() != null)
+            }
+            if (request.getPathInfo() != null) {
                 sb.append(request.getPathInfo());
-
-            if (request.getQueryString() != null && request.getQueryString().length() > 0)
+            }
+            if (request.getQueryString() != null && request.getQueryString().length() > 0) {
                 sb.append("?").append(request.getQueryString());
-
+            }
             response.setHeader("Location", sb.toString());
             return;
         }
         chain.doFilter(request, response);
     }
 
+    @Override
     public void destroy() {
         // Intentionally empty to satisfy interface
     }

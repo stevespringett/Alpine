@@ -36,17 +36,28 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.security.Principal;
 
+/**
+ * Example login JAX-RS resource.
+ *
+ * @author Steve Springett
+ */
 @Path("/v1/login")
 @Api(value = "login")
 public class LoginResource extends AlpineResource {
 
-    private static final Logger logger = Logger.getLogger(LoginResource.class);
+    private static final Logger LOGGER = Logger.getLogger(LoginResource.class);
 
+    /**
+     * Processes login requests.
+     * @param username the asserted username
+     * @param password the asserted password
+     * @return a Response
+     */
     @POST
     @Produces(MediaType.TEXT_PLAIN)
     @ApiOperation(
             value = "Assert login credentials",
-            notes = "Upon a successful login, a JSON Web Token will be returned in the response body. This functionality requires authentication to be enabled.",
+            notes = "Upon a successful login, a JWT will be returned in the response. This functionality requires authentication to be enabled.",
             response = String.class
     )
     @ApiResponses(value = {
@@ -55,21 +66,23 @@ public class LoginResource extends AlpineResource {
     })
     @AuthenticationNotRequired
     public Response validateCredentials(@FormParam("username") String username, @FormParam("password") String password) {
-        Authenticator auth = new Authenticator(username, password);
+        final Authenticator auth = new Authenticator(username, password);
         try {
-            Principal principal = auth.authenticate();
+            final Principal principal = auth.authenticate();
             if (principal != null) {
-                logger.info(SecurityMarkers.SECURITY_AUDIT, "Login succeeded (username: " + username +
-                        " / ip address: " + super.getRemoteAddress() + " / agent: " + super.getUserAgent() + ")");
+                LOGGER.info(SecurityMarkers.SECURITY_AUDIT, "Login succeeded (username: " + username
+                        + " / ip address: " + super.getRemoteAddress()
+                        + " / agent: " + super.getUserAgent() + ")");
 
-                JsonWebToken jwt = new JsonWebToken();
-                String token = jwt.createToken(principal);
+                final JsonWebToken jwt = new JsonWebToken();
+                final String token = jwt.createToken(principal);
                 return Response.ok(token).build();
             }
         } catch (AuthenticationException e) {
+            LOGGER.warn(SecurityMarkers.SECURITY_AUDIT, "Unauthorized login attempt (username: "
+                    + username + " / ip address: " + super.getRemoteAddress()
+                    + " / agent: " + super.getUserAgent() + ")");
         }
-        logger.warn(SecurityMarkers.SECURITY_AUDIT, "Unauthorized login attempt (username: " + username +
-                " / ip address: " + super.getRemoteAddress() + " / agent: " + super.getUserAgent() + ")");
         return Response.status(Response.Status.UNAUTHORIZED).build();
     }
 

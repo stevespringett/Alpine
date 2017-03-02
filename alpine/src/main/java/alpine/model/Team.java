@@ -35,14 +35,20 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * Persistable object representing a Team.
+ *
+ * @author Steve Springett
+ * @since 1.0.0
+ */
 @PersistenceCapable
 @FetchGroups({
-        @FetchGroup(name="all", members={
-                @Persistent(name="uuid"),
-                @Persistent(name="name"),
-                @Persistent(name="apiKeys"),
-                @Persistent(name="ldapUsers"),
-                @Persistent(name="managedUsers")
+        @FetchGroup(name = "ALL", members = {
+                @Persistent(name = "uuid"),
+                @Persistent(name = "name"),
+                @Persistent(name = "apiKeys"),
+                @Persistent(name = "ldapUsers"),
+                @Persistent(name = "managedUsers")
         })
 })
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -50,48 +56,42 @@ public class Team implements Serializable {
 
     private static final long serialVersionUID = 6938424919898277944L;
 
+    /**
+     * Provides an enum that defines the JDO fetchgroups this class defines.
+     */
     public enum FetchGroup {
-        ALL("all");
-
-        private String fetchGroupName;
-        FetchGroup(String fetchGroupName) {
-            this.fetchGroupName = fetchGroupName;
-        }
-
-        public String getName() {
-            return fetchGroupName;
-        }
+        ALL
     }
 
     @PrimaryKey
-    @Persistent(valueStrategy= IdGeneratorStrategy.INCREMENT)
+    @Persistent(valueStrategy = IdGeneratorStrategy.INCREMENT)
     @JsonIgnore
     private long id;
 
     @Persistent
-    @Unique(name="TEAM_UUID_IDX")
-    @Column(name="UUID", jdbcType="VARCHAR", length=36, allowsNull="false")
+    @Unique(name = "TEAM_UUID_IDX")
+    @Column(name = "UUID", jdbcType = "VARCHAR", length = 36, allowsNull = "false")
     @NotNull
     @Pattern(regexp = "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", message = "The uuid must be a valid 36 character UUID")
     private String uuid;
 
     @Persistent
-    @Column(name="NAME", jdbcType="VARCHAR", length=50, allowsNull="false")
+    @Column(name = "NAME", jdbcType = "VARCHAR", length = 50, allowsNull = "false")
     @NotNull
-    @Size(min=1, max=255)
+    @Size(min = 1, max = 255)
     @Pattern(regexp = "[\\P{Cc}]+", message = "The team name must not contain control characters")
     private String name;
 
-    @Persistent(mappedBy="teams")
-    @Order(extensions=@Extension(vendorName="datanucleus", key="list-ordering", value="id ASC"))
+    @Persistent(mappedBy = "teams")
+    @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "id ASC"))
     private List<ApiKey> apiKeys;
 
-    @Persistent(mappedBy="teams")
-    @Order(extensions=@Extension(vendorName="datanucleus", key="list-ordering", value="username ASC"))
+    @Persistent(mappedBy = "teams")
+    @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "username ASC"))
     private List<LdapUser> ldapUsers;
 
-    @Persistent(mappedBy="teams")
-    @Order(extensions=@Extension(vendorName="datanucleus", key="list-ordering", value="username ASC"))
+    @Persistent(mappedBy = "teams")
+    @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "username ASC"))
     private List<ManagedUser> managedUsers;
 
     public long getId() {

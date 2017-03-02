@@ -28,16 +28,19 @@ import java.io.IOException;
  * This custom deserializer ensures that empty strings are deserialized as null rather than an "".
  *
  * Usage example:
- *
- * @JsonDeserialize(using = TrimmedStringDeserializer.class)
+ * <pre>
+ * &commat;JsonDeserialize(using = TrimmedStringDeserializer.class)
  * String name;
+ * </pre>
  *
+ * @author Steve Springett
  * @since 1.0.0
  */
 public class TrimmedStringDeserializer extends JsonDeserializer<String> {
 
+    @Override
     public String deserialize(JsonParser jsonParser, DeserializationContext context) throws IOException {
-        JsonNode node = jsonParser.readValueAsTree();
+        final JsonNode node = jsonParser.readValueAsTree();
         return StringUtils.trimToNull(node.asText());
     }
 

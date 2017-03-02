@@ -42,84 +42,110 @@ import java.security.spec.X509EncodedKeySpec;
 /**
  * Class that manages Alpine-generated default private, public, and secret keys.
  *
+ * @author Steve Springett
  * @since 1.0.0
  */
-public class KeyManager {
+public final class KeyManager {
 
+    /**
+     * Defines the type of key.
+     */
     enum KeyType {
         PRIVATE,
         PUBLIC,
         SECRET
     }
 
-    private static final Logger logger = Logger.getLogger(KeyManager.class);
-    private static final KeyManager instance = new KeyManager();
+    private static final Logger LOGGER = Logger.getLogger(KeyManager.class);
+    private static final KeyManager INSTANCE = new KeyManager();
     private KeyPair keyPair;
     private SecretKey secretKey;
 
+    /**
+     * Private constructor.
+     */
     private KeyManager() {
         initialize();
     }
 
     /**
-     * Returns an instance of the KeyManager
+     * Returns an INSTANCE of the KeyManager.
      *
+     * @return an instance of the KeyManager
      * @since 1.0.0
      */
     public static KeyManager getInstance() {
-        return instance;
+        return INSTANCE;
     }
 
+    /**
+     * Initializes the KeyManager
+     */
     private void initialize() {
         if (keyPair == null) {
             try {
                 loadKeyPair();
-            } catch (IOException | NoSuchAlgorithmException |InvalidKeySpecException e) {
-                logger.error("An error occurred loading key pair");
-                logger.error(e.getMessage());
+            } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
+                LOGGER.error("An error occurred loading key pair");
+                LOGGER.error(e.getMessage());
             }
         }
         if (secretKey == null) {
             try {
                 loadSecretKey();
             } catch (IOException | ClassNotFoundException e) {
-                logger.error("An error occurred loading secret key");
-                logger.error(e.getMessage());
+                LOGGER.error("An error occurred loading secret key");
+                LOGGER.error(e.getMessage());
             }
         }
     }
 
     /**
-     * Generates a key pair
+     * Generates a key pair.
      *
+     * @return a KeyPair (public / private keys)
+     * @throws NoSuchAlgorithmException if the algorithm cannot be found
      * @since 1.0.0
      */
     public KeyPair generateKeyPair() throws NoSuchAlgorithmException {
-        logger.info("Generating new key pair");
-        KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
-        SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+        LOGGER.info("Generating new key pair");
+        final KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+        final SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
         keyGen.initialize(4096, random);
         return keyGen.generateKeyPair();
     }
 
     /**
-     * Generates a secret key\
+     * Generates a secret key.
      *
+     * @return a SecretKey
+     * @throws NoSuchAlgorithmException if the algorithm cannot be found
      * @since 1.0.0
      */
     public SecretKey generateSecretKey() throws NoSuchAlgorithmException {
-        KeyGenerator keyGen = KeyGenerator.getInstance("AES");
-        SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
+        final KeyGenerator keyGen = KeyGenerator.getInstance("AES");
+        final SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
         keyGen.init(256, random);
         return keyGen.generateKey();
     }
 
+    /**
+     * Retrieves the path where the keys should be stored.
+     * @param keyType the type of key
+     * @return a File representing the path to the key
+     */
     private File getKeyPath(KeyType keyType) {
-        return new File(Config.getInstance().getDataDirectorty() + File.separator +
-                "keys" + File.separator +
-                keyType.name().toLowerCase() + ".key");
+        return new File(Config.getInstance().getDataDirectorty()
+                + File.separator
+                + "keys" + File.separator
+                + keyType.name().toLowerCase() + ".key");
     }
 
+    /**
+     * Given the type of key, this method will return the File path to that key.
+     * @param key the type of key
+     * @return a File representing the path to the key
+     */
     private File getKeyPath(Key key) {
         KeyType keyType = null;
         if (key instanceof PrivateKey) {
@@ -133,39 +159,43 @@ public class KeyManager {
     }
 
     /**
-     * Saves a key pair
+     * Saves a key pair.
      *
+     * @param keyPair the key pair to save
+     * @throws IOException if the files cannot be written
      * @since 1.0.0
      */
     public void save(KeyPair keyPair) throws IOException {
-        logger.info("Saving key pair");
-        PrivateKey privateKey = keyPair.getPrivate();
-        PublicKey publicKey = keyPair.getPublic();
+        LOGGER.info("Saving key pair");
+        final PrivateKey privateKey = keyPair.getPrivate();
+        final PublicKey publicKey = keyPair.getPublic();
 
         // Store Public Key
-        File publicKeyFile = getKeyPath(publicKey);
+        final File publicKeyFile = getKeyPath(publicKey);
         publicKeyFile.getParentFile().mkdirs(); // make directories if they do not exist
-        X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(publicKey.getEncoded());
+        final X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(publicKey.getEncoded());
         try (FileOutputStream fos = new FileOutputStream(publicKeyFile)) {
             fos.write(x509EncodedKeySpec.getEncoded());
         }
 
         // Store Private Key.
-        File privateKeyFile = getKeyPath(privateKey);
+        final File privateKeyFile = getKeyPath(privateKey);
         privateKeyFile.getParentFile().mkdirs(); // make directories if they do not exist
-        PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(privateKey.getEncoded());
+        final PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(privateKey.getEncoded());
         try (FileOutputStream fos = new FileOutputStream(privateKeyFile)) {
             fos.write(pkcs8EncodedKeySpec.getEncoded());
         }
     }
 
     /**
-     * Saves a secret key
+     * Saves a secret key.
      *
+     * @param key the SecretKey to save
+     * @throws IOException if the file cannot be written
      * @since 1.0.0
      */
     public void save(SecretKey key) throws IOException {
-        File keyFile = getKeyPath(key);
+        final File keyFile = getKeyPath(key);
         keyFile.getParentFile().mkdirs(); // make directories if they do not exist
         try (FileOutputStream fos = new FileOutputStream(keyFile);
              ObjectOutputStream oout = new ObjectOutputStream(fos)) {
@@ -174,17 +204,21 @@ public class KeyManager {
     }
 
     /**
-     * Loads a key pair
+     * Loads a key pair.
+     * @return a KeyPair
+     * @throws IOException if the file cannot be read
+     * @throws NoSuchAlgorithmException if the algorithm cannot be found
+     * @throws InvalidKeySpecException if the algorithm's key spec is incorrect
      */
     private KeyPair loadKeyPair() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         // Read Private Key
-        File filePrivateKey = getKeyPath(KeyType.PRIVATE);
+        final File filePrivateKey = getKeyPath(KeyType.PRIVATE);
 
         // Read Public Key
-        File filePublicKey = getKeyPath(KeyType.PUBLIC);
+        final File filePublicKey = getKeyPath(KeyType.PUBLIC);
 
-        byte[] encodedPrivateKey;
-        byte[] encodedPublicKey;
+        final byte[] encodedPrivateKey;
+        final byte[] encodedPublicKey;
 
         try (FileInputStream pvtfis = new FileInputStream(filePrivateKey);
              FileInputStream pubfis = new FileInputStream(filePublicKey)) {
@@ -197,18 +231,24 @@ public class KeyManager {
         }
 
         // Generate KeyPair
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(encodedPublicKey);
-        PublicKey publicKey = keyFactory.generatePublic(publicKeySpec);
-        PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(encodedPrivateKey);
-        PrivateKey privateKey = keyFactory.generatePrivate(privateKeySpec);
+        final KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        final X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(encodedPublicKey);
+        final PublicKey publicKey = keyFactory.generatePublic(publicKeySpec);
+        final PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(encodedPrivateKey);
+        final PrivateKey privateKey = keyFactory.generatePrivate(privateKeySpec);
 
         return this.keyPair = new KeyPair(publicKey, privateKey);
     }
 
+    /**
+     * Loads the secret key.
+     * @return a SecretKey
+     * @throws IOException if the file cannot be read
+     * @throws ClassNotFoundException if deserialization of the SecretKey fails
+     */
     private SecretKey loadSecretKey() throws IOException, ClassNotFoundException {
-        File file = getKeyPath(KeyType.SECRET);
-        SecretKey key;
+        final File file = getKeyPath(KeyType.SECRET);
+        final SecretKey key;
         try (FileInputStream fis = new FileInputStream(file);
              ObjectInputStream ois = new ObjectInputStream(fis)) {
 
@@ -218,8 +258,9 @@ public class KeyManager {
     }
 
     /**
-     * Checks to see if the key pair exists. Both (public and private) need to exist to return true
+     * Checks to see if the key pair exists. Both (public and private) need to exist to return true.
      *
+     * @return true if keypair exists, false if not
      * @since 1.0.0
      */
     public boolean keyPairExists() {
@@ -229,6 +270,7 @@ public class KeyManager {
     /**
      * Checks to see if the secret key exists.
      *
+     * @return true if secret key exists, false if not
      * @since 1.0.0
      */
     public boolean secretKeyExists() {
@@ -238,6 +280,7 @@ public class KeyManager {
     /**
      * Returns the keypair.
      *
+     * @return the KeyPair
      * @since 1.0.0
      */
     public KeyPair getKeyPair() {
@@ -247,6 +290,7 @@ public class KeyManager {
     /**
      * Returns only the public key.
      *
+     * @return the PublicKey
      * @since 1.0.0
      */
     public PublicKey getPublicKey() {
@@ -256,6 +300,7 @@ public class KeyManager {
     /**
      * Returns only the private key.
      *
+     * @return the PrivateKey
      * @since 1.0.0
      */
     public PrivateKey getPrivateKey() {
@@ -265,6 +310,7 @@ public class KeyManager {
     /**
      * Returns the secret key.
      *
+     * @return the SecretKey
      * @since 1.0.0
      */
     public SecretKey getSecretKey() {

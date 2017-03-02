@@ -25,33 +25,59 @@ import alpine.model.LdapUser;
 import alpine.model.ManagedUser;
 import alpine.model.Team;
 import alpine.model.UserPrincipal;
-import alpine.util.UuidUtil;
 import javax.jdo.Query;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * This QueryManager provides a concrete entension of {@link AbstractAlpineQueryManager} by
+ * providing methods that operate on the default Alpine models such as ManagedUser and Team.
+ *
+ * @author Steve Springett
+ * @since 1.0.0
+ */
 public class AlpineQueryManager extends AbstractAlpineQueryManager {
 
+    /**
+     * Returns an API key.
+     * @param key the key to return
+     * @return an ApiKey
+     * @since 1.0.0
+     */
     @SuppressWarnings("unchecked")
     public ApiKey getApiKey(final String key) {
-        Query query = pm.newQuery(ApiKey.class, "key == :key");
-        List<ApiKey> result = (List<ApiKey>)query.execute (key);
+        final Query query = pm.newQuery(ApiKey.class, "key == :key");
+        final List<ApiKey> result = (List<ApiKey>) query.execute(key);
         return result.size() == 0 ? null : result.get(0);
     }
 
+    /**
+     * Regenerates an API key. This method does not create a new ApiKey object,
+     * rather it uses the existing ApiKey object and simply creates a new
+     * key string.
+     * @param apiKey the ApiKey object to regenerate the key of.
+     * @return an ApiKey
+     * @since 1.0.0
+     */
     public ApiKey regenerateApiKey(final ApiKey apiKey) {
         pm.currentTransaction().begin();
-        apiKey.setKey(UuidUtil.stripHyphens(UUID.randomUUID().toString()));
+        apiKey.setKey(ApiKeyGenerator.generate());
         pm.currentTransaction().commit();
         return pm.getObjectById(ApiKey.class, apiKey.getId());
     }
 
+    /**
+     * Creates a new ApiKey object, including a cryptographically secure
+     * API key string.
+     * @param team The team to create the key for
+     * @return an ApiKey
+     */
     public ApiKey createApiKey(final Team team) {
-        List<Team> teams = new ArrayList<>();
+        final List<Team> teams = new ArrayList<>();
         teams.add(team);
         pm.currentTransaction().begin();
-        ApiKey apiKey = new ApiKey();
+        final ApiKey apiKey = new ApiKey();
         apiKey.setKey(ApiKeyGenerator.generate());
         apiKey.setTeams(teams);
         pm.makePersistent(apiKey);
@@ -59,69 +85,120 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
         return pm.getObjectById(ApiKey.class, apiKey.getId());
     }
 
+    /**
+     * Retrieves an LdapUser containing the specified username. If the username
+     * does not exist, returns null.
+     * @param username The username to retrieve
+     * @return an LdapUser
+     * @since 1.0.0
+     */
     @SuppressWarnings("unchecked")
     public LdapUser getLdapUser(final String username) {
-        Query query = pm.newQuery(LdapUser.class, "username == :username");
-        List<LdapUser> result = (List<LdapUser>)query.execute(username);
+        final Query query = pm.newQuery(LdapUser.class, "username == :username");
+        final List<LdapUser> result = (List<LdapUser>) query.execute(username);
         return result.size() == 0 ? null : result.get(0);
     }
 
+    /**
+     * Returns a complete list of all LdapUser objects, in ascending order by username.
+     * @return a list of LdapUsers
+     * @since 1.0.0
+     */
     @SuppressWarnings("unchecked")
     public List<LdapUser> getLdapUsers() {
-        Query query = pm.newQuery(LdapUser.class);
+        final Query query = pm.newQuery(LdapUser.class);
         query.setOrdering("username asc");
-        return (List<LdapUser>)query.execute();
+        return (List<LdapUser>) query.execute();
     }
 
+    /**
+     * Creates a new LdapUser object with the specified username.
+     * @param username The username of the new LdapUser. This must reference an existing username in the directory service
+     * @return an LdapUser
+     * @since 1.0.0
+     */
     public LdapUser createLdapUser(final String username) {
         pm.currentTransaction().begin();
-        LdapUser user = new LdapUser();
+        final LdapUser user = new LdapUser();
         user.setUsername(username);
         user.setDN("Syncing...");
-        //todo - Implement lookup/sync service that automatically obtains and updates DN, or in the case of incorrect or deleted entries, mark DN as 'INVALID'
         pm.makePersistent(user);
         pm.currentTransaction().commit();
         EventService.getInstance().publish(new LdapSyncEvent(user.getUsername()));
         return getObjectById(LdapUser.class, user.getId());
     }
 
+    /**
+     * Updates the specified LdapUser.
+     * @param transientUser the optionally detached LdapUser object to update.
+     * @return an LdapUser
+     * @since 1.0.0
+     */
     public LdapUser updateLdapUser(final LdapUser transientUser) {
-        LdapUser user = getObjectById(LdapUser.class, transientUser.getId());
+        final LdapUser user = getObjectById(LdapUser.class, transientUser.getId());
         pm.currentTransaction().begin();
         user.setDN(transientUser.getDN());
         pm.currentTransaction().commit();
         return pm.getObjectById(LdapUser.class, user.getId());
     }
 
-    public ManagedUser createManagedUser(final String username, final String password) {
+    /**
+     * Creates a new ManagedUser object.
+     * @param username The username for the user
+     * @param passwordHash The hashed password.
+     * @return a ManagedUser
+     * @see alpine.auth.PasswordService
+     * @since 1.0.0
+     */
+    public ManagedUser createManagedUser(final String username, final String passwordHash) {
         pm.currentTransaction().begin();
-        ManagedUser user = new ManagedUser();
+        final ManagedUser user = new ManagedUser();
         user.setUsername(username);
-        user.setPassword(password);
+        user.setPassword(passwordHash);
         user.setSuspended(false);
         pm.makePersistent(user);
         pm.currentTransaction().commit();
         return getObjectById(ManagedUser.class, user.getId());
     }
 
+    /**
+     * Returns a ManagedUser with the specified username. If the username
+     * does not exist, returns null.
+     * @param username The username to retrieve
+     * @return a ManagedUser
+     * @since 1.0.0
+     */
     @SuppressWarnings("unchecked")
     public ManagedUser getManagedUser(final String username) {
-        Query query = pm.newQuery(ManagedUser.class, "username == :username");
-        List<ManagedUser> result = (List<ManagedUser>)query.execute(username);
+        final Query query = pm.newQuery(ManagedUser.class, "username == :username");
+        final List<ManagedUser> result = (List<ManagedUser>) query.execute(username);
         return result.size() == 0 ? null : result.get(0);
     }
 
+    /**
+     * Returns a complete list of all ManagedUser objects, in ascending order by username.
+     * @return a List of ManagedUsers
+     * @since 1.0.0
+     */
     @SuppressWarnings("unchecked")
     public List<ManagedUser> getManagedUsers() {
-        Query query = pm.newQuery(ManagedUser.class);
+        final Query query = pm.newQuery(ManagedUser.class);
         query.setOrdering("username asc");
-        return (List<ManagedUser>)query.execute();
+        return (List<ManagedUser>) query.execute();
     }
 
-
+    /**
+     * Creates a new Team with the specified name. If createApiKey is true,
+     * then {@link #createApiKey} is invoked and a cryptographically secure
+     * API key is generated.
+     * @param name The name of th team
+     * @param createApiKey whether or not to create an API key for the team
+     * @return a Team
+     * @since 1.0.0
+     */
     public Team createTeam(final String name, final boolean createApiKey) {
         pm.currentTransaction().begin();
-        Team team = new Team();
+        final Team team = new Team();
         team.setName(name);
         //todo assign permissions
         team.setUuid(UUID.randomUUID().toString());
@@ -130,19 +207,30 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
         if (createApiKey) {
             createApiKey(team);
         }
-        return getObjectByUuid(Team.class, team.getUuid(), Team.FetchGroup.ALL.getName());
+        return getObjectByUuid(Team.class, team.getUuid(), Team.FetchGroup.ALL.name());
     }
 
+    /**
+     * Returns a complete list of all Team objects, in ascending order by name.
+     * @return a List of Teams
+     * @since 1.0.0
+     */
     @SuppressWarnings("unchecked")
     public List<Team> getTeams() {
-        pm.getFetchPlan().addGroup(Team.FetchGroup.ALL.getName());
-        Query query = pm.newQuery(Team.class);
+        pm.getFetchPlan().addGroup(Team.FetchGroup.ALL.name());
+        final Query query = pm.newQuery(Team.class);
         query.setOrdering("name asc");
-        return (List<Team>)query.execute();
+        return (List<Team>) query.execute();
     }
 
+    /**
+     * Updates the specified Team.
+     * @param transientTeam the optionally detached Team object to update
+     * @return a Team
+     * @since 1.0.0
+     */
     public Team updateTeam(final Team transientTeam) {
-        Team team = getObjectByUuid(Team.class, transientTeam.getUuid());
+        final Team team = getObjectByUuid(Team.class, transientTeam.getUuid());
         pm.currentTransaction().begin();
         team.setName(transientTeam.getName());
         //todo assign permissions
@@ -150,8 +238,17 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
         return pm.getObjectById(Team.class, team.getId());
     }
 
+    /**
+     * Associates a UserPrincipal to a Team.
+     * @param user The user to bind
+     * @param team The team to bind
+     * @return true if operation was successful, false if not. This is not an indication of team association,
+     * an unsuccessful return value may be due to the team or user not existing, or a binding that already
+     * exists between the two.
+     * @since 1.0.0
+     */
     public boolean addUserToTeam(final UserPrincipal user, final Team team) {
-        List<Team> teams = user.getTeams();
+        final List<Team> teams = user.getTeams();
         boolean found = false;
         for (Team t: teams) {
             if (team.getUuid().equals(t.getUuid())) {
@@ -168,8 +265,16 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
         return false;
     }
 
+    /**
+     * Removes the association of a UserPrincipal to a Team.
+     * @param user The user to unbind
+     * @param team The team to unbind
+     * @return true if operation was successful, false if not. This is not an indication of team disassociation,
+     * an unsuccessful return value may be due to the team or user not existing, or a binding that may not exist.
+     * @since 1.0.0
+     */
     public boolean removeUserFromTeam(final UserPrincipal user, final Team team) {
-        List<Team> teams = user.getTeams();
+        final List<Team> teams = user.getTeams();
         boolean found = false;
         for (Team t: teams) {
             if (team.getUuid().equals(t.getUuid())) {

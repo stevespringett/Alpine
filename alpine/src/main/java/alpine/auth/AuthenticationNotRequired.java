@@ -23,8 +23,16 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * An annotation that when used, indicated that a method (in a JAX-RS resource) does not
+ * require authentication (when authentication is enabled). Use of this annotation is
+ * ignored if authentication is not enabled.
+ *
+ * @author Steve Springett
+ * @since 1.0.0
+ */
 @NameBinding
 @Retention(value = RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD })
+@Target(ElementType.METHOD)
 public @interface AuthenticationNotRequired {
 }

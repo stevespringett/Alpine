@@ -63,11 +63,15 @@ import java.io.IOException;
  * Valid options are DENY, SAMEORIGIN, or ALLOW-FROM. Use of ALLOW-FROM requires an additional 'uri'
  * parameter to be specified.
  * </p>
+ *
+ * @author Steve Springett
+ * @since 1.0.0
  */
 public final class ClickjackingFilter implements Filter {
 
     private String mode = "DENY";
 
+    @Override
     public void init(final FilterConfig filterConfig) {
         final String mode = filterConfig.getInitParameter("mode");
         final String uri = filterConfig.getInitParameter("uri");
@@ -80,13 +84,15 @@ public final class ClickjackingFilter implements Filter {
         }
     }
 
+    @Override
     public void doFilter(final ServletRequest req, final ServletResponse res, final FilterChain chain)
             throws IOException, ServletException {
-        final HttpServletResponse response = (HttpServletResponse)res;
+        final HttpServletResponse response = (HttpServletResponse) res;
         chain.doFilter(req, response);
         response.addHeader("X-Frame-Options", mode);
     }
 
+    @Override
     public void destroy() {
         // Intentionally empty to satisfy interface
     }

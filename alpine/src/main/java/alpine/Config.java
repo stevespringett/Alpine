@@ -25,19 +25,30 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * The Config class is responsible for reading the application.properties file
+ * The Config class is responsible for reading the application.properties file.
  *
+ * @author Steve Springett
  * @since 1.0.0
  */
 public class Config {
 
-    private static final Logger logger = Logger.getLogger(Config.class);
-    private static final String propFile = "application.properties";
+    private static final Logger LOGGER = Logger.getLogger(Config.class);
+    private static final String PROP_FILE = "application.properties";
     private static Config instance;
     private static Properties properties;
 
     public interface Key {
+
+        /**
+         * The name of the property.
+         * @return String of the property name
+         */
         String getPropertyName();
+
+        /**
+         * The default value of the property if not found.
+         * @return the default value
+         */
         Object getDefaultValue();
     }
 
@@ -81,7 +92,7 @@ public class Config {
     }
 
     /**
-     * Returns an instance of the Config object
+     * Returns an instance of the Config object.
      * @return a Config object
      * @since 1.0.0
      */
@@ -103,12 +114,12 @@ public class Config {
             return;
         }
 
-        logger.info("Initializing Configuration");
+        LOGGER.info("Initializing Configuration");
         properties = new Properties();
         try (InputStream in = this.getClass().getClassLoader().getResourceAsStream("application.properties")) {
             properties.load(in);
         } catch (IOException e) {
-            logger.error("Unable to load " + propFile);
+            LOGGER.error("Unable to load " + PROP_FILE);
         }
     }
 
@@ -117,7 +128,7 @@ public class Config {
      * Expects a fully qualified path or a path starting with ~/
      *
      * Defaults to ~/.alpine if data directory is not specified.
-     *
+     * @return a File object of the data directory
      * @since 1.0.0
      */
     public File getDataDirectorty() {
@@ -129,7 +140,7 @@ public class Config {
     }
 
     /**
-     * Return the configured value for the specified Key
+     * Return the configured value for the specified Key.
      * @param key The Key to return the configuration for
      * @return a String of the value of the configuration
      * @since 1.0.0
@@ -143,30 +154,39 @@ public class Config {
     }
 
     /**
+     * Return the configured value for the specified Key.
+     * @param key The Key to return the configuration for
+     * @return a int of the value of the configuration
      * @since 1.0.0
      */
     public int getPropertyAsInt(Key key) {
         try {
             return Integer.parseInt(getProperty(key));
         } catch (NumberFormatException e) {
-            logger.error("Error parsing number from property: " + key.getPropertyName());
+            LOGGER.error("Error parsing number from property: " + key.getPropertyName());
             return -1;
         }
     }
 
     /**
+     * Return the configured value for the specified Key.
+     * @param key The Key to return the configuration for
+     * @return a long of the value of the configuration
      * @since 1.0.0
      */
     public long getPropertyAsLong(Key key) {
         try {
             return Long.parseLong(getProperty(key));
         } catch (NumberFormatException e) {
-            logger.error("Error parsing number from property: " + key.getPropertyName());
+            LOGGER.error("Error parsing number from property: " + key.getPropertyName());
             return -1;
         }
     }
 
     /**
+     * Return the configured value for the specified Key.
+     * @param key The Key to return the configuration for
+     * @return a boolean of the value of the configuration
      * @since 1.0.0
      */
     public boolean getPropertyAsBoolean(Key key) {
@@ -174,6 +194,9 @@ public class Config {
     }
 
     /**
+     * Return the configured value for the specified Key.
+     * @param key The Key to return the configuration for
+     * @return a String of the value of the configuration
      * @since 1.0.0
      */
     public String getProperty(String key) {
@@ -181,6 +204,10 @@ public class Config {
     }
 
     /**
+     * Return the configured value for the specified Key.
+     * @param key The String of the key to return the configuration for
+     * @param defaultValue The default value if the key cannot be found
+     * @return a String of the value of the configuration
      * @since 1.0.0
      */
     public String getProperty(String key, String defaultValue) {
@@ -190,6 +217,7 @@ public class Config {
     /**
      * Determins is unit tests are enabled by checking if the 'alpine.unittests.enabled'
      * system property is set to true or false.
+     * @return true if unit tests are enabled, false if not
      * @since 1.0.0
      */
     public static boolean isUnitTestsEnabled() {

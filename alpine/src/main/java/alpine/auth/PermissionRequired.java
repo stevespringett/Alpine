@@ -24,14 +24,22 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * This annotation is intended to be used in conjunction with JAX-RS resources (methods) to
+ * define what permissions are required to access the method.
+ *
+ * @author Steve Springett
+ * @since 1.0.0
+ */
 @Inherited
 @Retention(value = RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD })
+@Target(ElementType.METHOD)
 @Documented
 public @interface PermissionRequired {
 
     /**
-     * An array of permissions
+     * An array of permissions.
+     * @return an array of permissions
      */
     String[] value();
 

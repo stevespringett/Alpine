@@ -26,6 +26,7 @@ package alpine.event.framework;
  * a simple, non-blocking task needs to be done asap and there is a possibility that the path taken
  * for typical Events may be at capacity.
  *
+ * @author Steve Springett
  * @since 1.0.0
  */
 public interface UnblockedEvent extends Event {

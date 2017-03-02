@@ -24,6 +24,7 @@ import java.security.Principal;
 /**
  * Interface that defines an authentication service.
  *
+ * @author Steve Springett
  * @since 1.0.0
  */
 public interface AuthenticationService {
@@ -31,7 +32,7 @@ public interface AuthenticationService {
     /**
      * Defines a method which returns if the specified piece of
      * data, required to perform authentication is present.
-     *
+     * @return true if the authentication data was specified, false if not
      * @since 1.0.0
      */
     boolean isSpecified();
@@ -40,7 +41,8 @@ public interface AuthenticationService {
      * Defines an authentication method which returns a Principal
      * if authentication is successful or an AuthorizationException
      * if not.
-     *
+     * @return a Principal of the authenticated user
+     * @throws AuthenticationException an authentication failure
      * @since 1.0.0
      */
     @Nullable

@@ -31,6 +31,7 @@ import java.lang.reflect.Method;
  * with {@link AuthenticationNotRequired}.
  *
  * @see AuthenticationFilter
+ * @author Steve Springett
  * @since 1.0.0
  */
 @Provider
@@ -41,7 +42,7 @@ public class AuthenticationFeature implements DynamicFeature {
     @Override
     public void configure(ResourceInfo resourceInfo, FeatureContext context) {
         if (ENFORCE_AUTHENTICATION) {
-            Method method = resourceInfo.getResourceMethod();
+            final Method method = resourceInfo.getResourceMethod();
             if (!method.isAnnotationPresent(AuthenticationNotRequired.class)) {
                 context.register(AuthenticationFilter.class);
             }

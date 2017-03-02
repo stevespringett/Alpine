@@ -18,19 +18,24 @@
 package alpine.util;
 
 /**
- * A collection of useful Boolean utilities
+ * A collection of useful Boolean utilities.
  *
+ * @author Steve Springett
  * @since 1.0.0
  */
 @SuppressWarnings("unused")
-public class BooleanUtil {
+public final class BooleanUtil {
 
+    /**
+     * Private constructor
+     */
     private BooleanUtil() {
     }
 
     /**
      * Determines if the specified string contains 'true' or '1'.
-     *
+     * @param value a String representation of a boolean to convert
+     * @return a boolean
      * @since 1.0.0
      */
     public static boolean valueOf(String value) {
@@ -38,20 +43,9 @@ public class BooleanUtil {
     }
 
     /**
-     * @since 1.0.0
-     */
-    public static boolean isTrue(boolean value) {
-        return value;
-    }
-
-    /**
-     * @since 1.0.0
-     */
-    public static boolean isFalse(boolean value) {
-        return !value;
-    }
-
-    /**
+     * Determines if the specified object is null or not.
+     * @param o the object to evaluate
+     * @return true if null, false if not null
      * @since 1.0.0
      */
     public static boolean isNull(Object o) {
@@ -59,6 +53,9 @@ public class BooleanUtil {
     }
 
     /**
+     * Determines if the specified object is null or not.
+     * @param o the object to evaluate
+     * @return true if not null, false if null
      * @since 1.0.0
      */
     public static boolean isNotNull(Object o) {

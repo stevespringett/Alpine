@@ -21,6 +21,7 @@ package alpine.auth;
  * Contains Permission constants. This class is intended to be extended to
  * allow for defining of additional permissions.
  *
+ * @author Steve Springett
  * @since 1.0.0
  */
 public abstract class AlpinePermission {

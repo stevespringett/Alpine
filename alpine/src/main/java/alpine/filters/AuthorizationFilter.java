@@ -36,13 +36,14 @@ import java.security.Principal;
  * through this filter have the necessary permissions to do so.
  *
  * @see AuthorizationFeature
+ * @author Steve Springett
  * @since 1.0.0
  */
 @Priority(Priorities.AUTHORIZATION)
 public class AuthorizationFilter implements ContainerRequestFilter {
 
     // Setup logging
-    private static final Logger logger = Logger.getLogger(AuthorizationFilter.class);
+    private static final Logger LOGGER = Logger.getLogger(AuthorizationFilter.class);
 
     @Context
     private ResourceInfo resourceInfo;
@@ -51,19 +52,19 @@ public class AuthorizationFilter implements ContainerRequestFilter {
     public void filter(ContainerRequestContext requestContext) {
         if (requestContext instanceof ContainerRequest) {
 
-            Principal principal = (Principal) requestContext.getProperty("Principal");
+            final Principal principal = (Principal) requestContext.getProperty("Principal");
             if (principal == null) {
                 requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
                 return;
             }
 
-            PermissionRequired annotation = resourceInfo.getResourceMethod().getDeclaredAnnotation(PermissionRequired.class);
+            final PermissionRequired annotation = resourceInfo.getResourceMethod().getDeclaredAnnotation(PermissionRequired.class);
 
             try (AlpineQueryManager qm = new AlpineQueryManager()) {
                 if (principal instanceof LdapUser) {
-                    LdapUser user = qm.getLdapUser(((LdapUser) principal).getUsername());
+                    final LdapUser user = qm.getLdapUser(((LdapUser) principal).getUsername());
 
-                    String[] permissions = annotation.value();
+                    final String[] permissions = annotation.value();
                     for (String permission: permissions) {
                         // todo check if user has one of these required permissions
                     }

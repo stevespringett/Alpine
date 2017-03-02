@@ -83,6 +83,9 @@ import java.io.IOException;
  *     &lt;url-pattern&gt;/&#42;&lt;/url-pattern&gt;
  * &lt;/filter-mapping>
  * </pre>
+ *
+ * @author Steve Springett
+ * @since 1.0.0
  */
 public final class HpkpFilter implements Filter {
 
@@ -94,6 +97,7 @@ public final class HpkpFilter implements Filter {
     private boolean includeSubdomains = false;
     private String reportUri;
 
+    @Override
     public void init(final FilterConfig filterConfig) throws ServletException {
 
         primaryHash = filterConfig.getInitParameter("primaryHash");
@@ -109,6 +113,7 @@ public final class HpkpFilter implements Filter {
         includeSubdomains = BooleanUtil.valueOf(filterConfig.getInitParameter("includeSubdomains"));
     }
 
+    @Override
     public void doFilter(final ServletRequest req, final ServletResponse resp, final FilterChain chain)
             throws ServletException, IOException {
 
@@ -122,6 +127,10 @@ public final class HpkpFilter implements Filter {
         chain.doFilter(request, response);
     }
 
+    /**
+     * Formats the HPKP policy header.
+     * @return a properly formatted HPKP header
+     */
     private String formatPolicy() {
         final StringBuilder sb = new StringBuilder();
         sb.append("pin-sha256").append("=\"").append(primaryHash).append("\"; ");
@@ -138,6 +147,7 @@ public final class HpkpFilter implements Filter {
         return sb.toString();
     }
 
+    @Override
     public void destroy() {
         // Intentionally empty to satisfy interface
     }

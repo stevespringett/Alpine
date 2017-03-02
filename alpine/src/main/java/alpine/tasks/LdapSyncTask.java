@@ -40,38 +40,40 @@ import java.util.List;
  * A task to synchronize LDAP users. This should be added to a concrete class that
  * extends {@link AlpineTaskScheduler}.
  *
+ * @author Steve Springett
  * @since 1.0.0
  */
 public class LdapSyncTask implements Subscriber {
 
-    private static final Logger logger = Logger.getLogger(LdapSyncTask.class);
-    private static final boolean ldapEnabled = Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.LDAP_ENABLED);
-    private static final String ldapUrl = Config.getInstance().getProperty(Config.AlpineKey.LDAP_SERVER_URL);
-    private static final String domainName = Config.getInstance().getProperty(Config.AlpineKey.LDAP_DOMAIN);
-    private static final String baseDn = Config.getInstance().getProperty(Config.AlpineKey.LDAP_SERVER_URL);
-    private static final String bindUsername = Config.getInstance().getProperty(Config.AlpineKey.LDAP_BIND_USERNAME);
-    private static final String bindPassword = Config.getInstance().getProperty(Config.AlpineKey.LDAP_BIND_PASSWORD);
-    private static final String attributeMail = Config.getInstance().getProperty(Config.AlpineKey.LDAP_ATTRIBUTE_MAIL);
+    private static final Logger LOGGER = Logger.getLogger(LdapSyncTask.class);
+    private static final boolean LDAP_ENABLED = Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.LDAP_ENABLED);
+    private static final String LDAP_URL = Config.getInstance().getProperty(Config.AlpineKey.LDAP_SERVER_URL);
+    private static final String DOMAIN_NAME = Config.getInstance().getProperty(Config.AlpineKey.LDAP_DOMAIN);
+    private static final String BASE_DN = Config.getInstance().getProperty(Config.AlpineKey.LDAP_SERVER_URL);
+    private static final String BIND_USERNAME = Config.getInstance().getProperty(Config.AlpineKey.LDAP_BIND_USERNAME);
+    private static final String BIND_PASSWORD = Config.getInstance().getProperty(Config.AlpineKey.LDAP_BIND_PASSWORD);
+    private static final String ATTRIBUTE_MAIL = Config.getInstance().getProperty(Config.AlpineKey.LDAP_ATTRIBUTE_MAIL);
 
+    @Override
     public void inform(Event e) {
 
-        if (!ldapEnabled || StringUtils.isBlank(ldapUrl)) {
+        if (!LDAP_ENABLED || StringUtils.isBlank(LDAP_URL)) {
             return;
         }
 
         if (e instanceof LdapSyncEvent) {
-            logger.info("Starting LDAP synchronization task");
-            LdapSyncEvent event = (LdapSyncEvent) e;
+            LOGGER.info("Starting LDAP synchronization task");
+            final LdapSyncEvent event = (LdapSyncEvent) e;
 
-            Hashtable<String, String> props = new Hashtable<>();
-            String principalName = formatPrincipal(bindUsername);
+            final Hashtable<String, String> props = new Hashtable<>();
+            final String principalName = formatPrincipal(BIND_USERNAME);
             props.put(Context.SECURITY_PRINCIPAL, principalName);
-            props.put(Context.SECURITY_CREDENTIALS, bindPassword);
+            props.put(Context.SECURITY_CREDENTIALS, BIND_PASSWORD);
             props.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-            props.put(Context.PROVIDER_URL, ldapUrl);
+            props.put(Context.PROVIDER_URL, LDAP_URL);
 
-            String[] attributeFilter = {};
-            SearchControls sc = new SearchControls();
+            final String[] attributeFilter = {};
+            final SearchControls sc = new SearchControls();
             sc.setReturningAttributes(attributeFilter);
             sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
@@ -83,20 +85,20 @@ public class LdapSyncTask implements Subscriber {
 
                 if (event.getUsername() == null) {
                     // If username was null, we are going to sync all users
-                    List<LdapUser> users = qm.getLdapUsers();
+                    final List<LdapUser> users = qm.getLdapUsers();
                     for (LdapUser user: users) {
                         sync(ctx, qm, sc, user);
                     }
                 } else {
                     // If username was specified, we will only sync the one
-                    LdapUser user = qm.getLdapUser(event.getUsername());
+                    final LdapUser user = qm.getLdapUser(event.getUsername());
                     if (user != null) {
                         sync(ctx, qm, sc, user);
                     }
                 }
             } catch (NamingException ex) {
-                logger.error("Error occurred during LDAP synchronization");
-                logger.error(ex.getMessage());
+                LOGGER.error("Error occurred during LDAP synchronization");
+                LOGGER.error(ex.getMessage());
             } finally {
                 if (qm != null) {
                     qm.close();
@@ -107,23 +109,31 @@ public class LdapSyncTask implements Subscriber {
                     } catch (NamingException ex) {
                     }
                 }
-                logger.info("LDAP synchronization complete");
+                LOGGER.info("LDAP synchronization complete");
             }
         }
     }
 
+    /**
+     * Performs the actual sync of the specified user.
+     * @param ctx a DirContext
+     * @param qm the AlpineQueryManager to use
+     * @param sc the SearchControls to use
+     * @param user the LdapUser instance to sync
+     * @throws NamingException when a problem with the connection with the directory
+     */
     private void sync(DirContext ctx, AlpineQueryManager qm, SearchControls sc, LdapUser user) throws NamingException {
-        String searchFor = "userPrincipalName=" + formatPrincipal(user.getUsername());
+        final String searchFor = "userPrincipalName=" + formatPrincipal(user.getUsername());
 
-        logger.debug("Syncing: " + user.getUsername());
+        LOGGER.debug("Syncing: " + user.getUsername());
 
-        List<SearchResult> results = Collections.list(ctx.search(baseDn, searchFor, sc));
+        final List<SearchResult> results = Collections.list(ctx.search(BASE_DN, searchFor, sc));
         if (results.size() > 0) {
             // Should only return 1 result, but just in case, get the very first one
-            SearchResult result = results.get(0);
+            final SearchResult result = results.get(0);
 
             user.setDN(result.getNameInNamespace());
-            Attribute mail = result.getAttributes().get(attributeMail);
+            final Attribute mail = result.getAttributes().get(ATTRIBUTE_MAIL);
             if (mail != null) {
                 // user.setMail(mail.get()); //todo
             }
@@ -135,9 +145,14 @@ public class LdapSyncTask implements Subscriber {
         qm.updateLdapUser(user);
     }
 
+    /**
+     * Formats the principal in username@domain format.
+     * @param username the username
+     * @return a formatted user principal
+     */
     private String formatPrincipal(String username) {
-        if (StringUtils.isNotBlank(domainName)) {
-            return username + "@" + domainName;
+        if (StringUtils.isNotBlank(DOMAIN_NAME)) {
+            return username + "@" + DOMAIN_NAME;
         }
         return username;
     }

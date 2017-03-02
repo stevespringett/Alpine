@@ -27,42 +27,49 @@ import java.util.Properties;
 /**
  * Initializes the JDO persistence manager on server startup.
  *
+ * @author Steve Springett
  * @since 1.0.0
  */
 public class PersistenceManagerFactory implements ServletContextListener {
 
     // The following properties are used for unit tests
-    private static final Properties jdoOverrides;
+    private static final Properties JDO_OVERRIDES;
     static {
-        jdoOverrides = new Properties();
-        jdoOverrides.put("javax.jdo.option.ConnectionURL", "jdbc:h2:mem:alpine");
-        jdoOverrides.put("javax.jdo.option.ConnectionDriverName", "org.h2.Driver");
-        jdoOverrides.put("javax.jdo.option.ConnectionUserName", "sa");
-        jdoOverrides.put("javax.jdo.option.ConnectionPassword", "");
-        jdoOverrides.put("javax.jdo.option.Mapping", "h2");
-        jdoOverrides.put("datanucleus.connectionPoolingType", "DBCP");
-        jdoOverrides.put("datanucleus.schema.autoCreateSchema", "true");
-        jdoOverrides.put("datanucleus.schema.autoCreateTables", "true");
-        jdoOverrides.put("datanucleus.schema.autoCreateColumns", "true");
-        jdoOverrides.put("datanucleus.schema.autoCreateConstraints", "true");
-        jdoOverrides.put("datanucleus.query.jdoql.allowAll", "true");
-        jdoOverrides.put("datanucleus.NontransactionalRead", "true");
-        jdoOverrides.put("datanucleus.NontransactionalWrite", "true");
+        JDO_OVERRIDES = new Properties();
+        JDO_OVERRIDES.put("javax.jdo.option.ConnectionURL", "jdbc:h2:mem:alpine");
+        JDO_OVERRIDES.put("javax.jdo.option.ConnectionDriverName", "org.h2.Driver");
+        JDO_OVERRIDES.put("javax.jdo.option.ConnectionUserName", "sa");
+        JDO_OVERRIDES.put("javax.jdo.option.ConnectionPassword", "");
+        JDO_OVERRIDES.put("javax.jdo.option.Mapping", "h2");
+        JDO_OVERRIDES.put("datanucleus.connectionPoolingType", "DBCP");
+        JDO_OVERRIDES.put("datanucleus.schema.autoCreateSchema", "true");
+        JDO_OVERRIDES.put("datanucleus.schema.autoCreateTables", "true");
+        JDO_OVERRIDES.put("datanucleus.schema.autoCreateColumns", "true");
+        JDO_OVERRIDES.put("datanucleus.schema.autoCreateConstraints", "true");
+        JDO_OVERRIDES.put("datanucleus.query.jdoql.allowAll", "true");
+        JDO_OVERRIDES.put("datanucleus.NontransactionalRead", "true");
+        JDO_OVERRIDES.put("datanucleus.NontransactionalWrite", "true");
     }
 
     private static javax.jdo.PersistenceManagerFactory pmf;
 
+    @Override
     public void contextInitialized(ServletContextEvent event) {
         pmf = JDOHelper.getPersistenceManagerFactory("Alpine");
     }
 
+    @Override
     public void contextDestroyed(ServletContextEvent event) {
         pmf.close();
     }
 
+    /**
+     * Creates a new JDO PersistenceManager.
+     * @return a PersistenceManager
+     */
     public static PersistenceManager createPersistenceManager() {
         if (Config.isUnitTestsEnabled()) {
-            pmf = JDOHelper.getPersistenceManagerFactory(jdoOverrides, "Alpine");
+            pmf = JDOHelper.getPersistenceManagerFactory(JDO_OVERRIDES, "Alpine");
         }
         if (pmf == null) {
             throw new IllegalStateException("Context is not initialized yet.");

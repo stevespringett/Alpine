@@ -20,25 +20,33 @@ package alpine.model;
 import alpine.Config;
 import java.io.Serializable;
 
+/**
+ * A value object describing the name of the application, version, and the timestamp when it was built.
+ * This class can be used as-is, or extended. The {@link alpine.resources.VersionResource} uses this
+ * class in it's JSON response.
+ *
+ * @author Steve Springett
+ * @since 1.0.0
+ */
 public class About implements Serializable {
 
     private static final long serialVersionUID = -7573425245706188307L;
 
-    private static final String application = Config.getInstance().getProperty(Config.AlpineKey.APPLICATION_NAME);
-    private static final String version = Config.getInstance().getProperty(Config.AlpineKey.APPLICATION_VERSION);
-    private static final String timestamp = Config.getInstance().getProperty(Config.AlpineKey.APPLICATION_TIMESTAMP);
+    private static final String APPLICATION = Config.getInstance().getProperty(Config.AlpineKey.APPLICATION_NAME);
+    private static final String VERSION = Config.getInstance().getProperty(Config.AlpineKey.APPLICATION_VERSION);
+    private static final String TIMESTAMP = Config.getInstance().getProperty(Config.AlpineKey.APPLICATION_TIMESTAMP);
 
 
     public String getApplication() {
-        return application;
+        return APPLICATION;
     }
 
     public String getVersion() {
-        return version;
+        return VERSION;
     }
 
     public String getTimestamp() {
-        return timestamp;
+        return TIMESTAMP;
     }
 
 }

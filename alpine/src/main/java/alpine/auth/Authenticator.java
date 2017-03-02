@@ -28,7 +28,7 @@ import java.security.Principal;
  * @see AuthenticationService
  * @see ManagedUserAuthenticationService
  * @see LdapAuthenticationService
- *
+ * @author Steve Springett
  * @since 1.0.0
  */
 public class Authenticator {
@@ -38,6 +38,11 @@ public class Authenticator {
     private String username;
     private String password;
 
+    /**
+     * Constructs a new Authenticator object.
+     * @param username the username to assert
+     * @param password the password to assert
+     */
     public Authenticator(String username, String password) {
         this.username = username;
         this.password = password;
@@ -47,19 +52,20 @@ public class Authenticator {
      * Attempts to authenticate the credentials internally first and if not  successful,
      * checks to see if LDAP is enabled or not. If enabled, a second attempt to authenticate
      * the credentials will be made, but this time against the directory service.
-     *
+     * @return a Principal upon successful authentication
+     * @throws AuthenticationException upon authentication failure
      * @since 1.0.0
      */
     public Principal authenticate() throws AuthenticationException {
-        ManagedUserAuthenticationService userService = new ManagedUserAuthenticationService(username, password);
+        final ManagedUserAuthenticationService userService = new ManagedUserAuthenticationService(username, password);
         try {
-            Principal principal = userService.authenticate();
+            final Principal principal = userService.authenticate();
             if (principal != null) {
                 return principal;
             }
         } catch (AuthenticationException e) { }
         if (LDAP_ENABLED) {
-            LdapAuthenticationService ldapService = new LdapAuthenticationService(username, password);
+            final LdapAuthenticationService ldapService = new LdapAuthenticationService(username, password);
             return ldapService.authenticate();
         }
         throw new AuthenticationException("Username or password is not valid, or the account is suspended.");

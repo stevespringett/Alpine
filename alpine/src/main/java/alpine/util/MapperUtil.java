@@ -21,16 +21,34 @@ import alpine.logging.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 
-public class MapperUtil {
+/**
+ * A collection of useful ObjectMapper methods.
+ *
+ * @author Steve Springett
+ * @since 1.0.0
+ */
+public final class MapperUtil {
 
-    private static final Logger logger = Logger.getLogger(MapperUtil.class);
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final Logger LOGGER = Logger.getLogger(MapperUtil.class);
 
-    public static <T>T readAsObjectOf(Class<T> clazz, String value) {
+    /**
+     * Private constructor
+     */
+    private MapperUtil() { }
+
+    /**
+     * Reads in a String value and returns the object for which it represents.
+     * @param clazz The expected class of the value
+     * @param value the value to parse
+     * @param <T> The expected type to return
+     * @return the mapped object
+     */
+    public static <T> T readAsObjectOf(Class<T> clazz, String value) {
+        final ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.readValue(value, clazz);
         } catch (IOException e) {
-            logger.error(e.getMessage(), e.fillInStackTrace());
+            LOGGER.error(e.getMessage(), e.fillInStackTrace());
         }
         return null;
     }

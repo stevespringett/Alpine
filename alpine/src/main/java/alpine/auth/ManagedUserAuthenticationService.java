@@ -25,6 +25,7 @@ import java.security.Principal;
 /**
  * Class that performs authentication against internally managed users.
  *
+ * @author Steve Springett
  * @since 1.0.0
  */
 public class ManagedUserAuthenticationService implements AuthenticationService {
@@ -34,7 +35,8 @@ public class ManagedUserAuthenticationService implements AuthenticationService {
 
     /**
      * Authentication service validates credentials against internally managed users.
-     *
+     * @param username the asserted username
+     * @param password the asserted password
      * @since 1.0.0
      */
     public ManagedUserAuthenticationService(String username, String password) {
@@ -46,7 +48,7 @@ public class ManagedUserAuthenticationService implements AuthenticationService {
      * Returns whether the username/password combo was specified or not. In
      * this case, since the constructor requires it, this method will always
      * return true.
-     *
+     * @return always will return true
      * @since 1.0.0
      */
     public boolean isSpecified() {
@@ -58,11 +60,13 @@ public class ManagedUserAuthenticationService implements AuthenticationService {
      * and returns a Principal if authentication is successful. Otherwise,
      * returns an AuthenticationException.
      *
+     * @return a Principal if authentication was successful
+     * @throws AuthenticationException when authentication is unsuccessful
      * @since 1.0.0
      */
     public Principal authenticate() throws AuthenticationException {
         try (AlpineQueryManager qm = new AlpineQueryManager()) {
-            ManagedUser user = qm.getManagedUser(username);
+            final ManagedUser user = qm.getManagedUser(username);
             if (user != null && !user.isSuspended()) {
                 if (PasswordService.matches(password.toCharArray(), user)) {
                     return user;

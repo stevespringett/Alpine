@@ -21,6 +21,7 @@ package alpine.event.framework;
  * The Event interface simply defines a 'type'. All Events should implement this
  * interface.
  *
+ * @author Steve Springett
  * @since 1.0.0
  */
 public interface Event {

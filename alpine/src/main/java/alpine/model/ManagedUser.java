@@ -36,6 +36,12 @@ import java.io.Serializable;
 import java.security.Principal;
 import java.util.List;
 
+/**
+ * Persistable object representing an ManagedUser.
+ *
+ * @author Steve Springett
+ * @since 1.0.0
+ */
 @PersistenceCapable
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ManagedUser implements Serializable, Principal, UserPrincipal {
@@ -43,33 +49,33 @@ public class ManagedUser implements Serializable, Principal, UserPrincipal {
     private static final long serialVersionUID = 7944779964068911025L;
 
     @PrimaryKey
-    @Persistent(valueStrategy= IdGeneratorStrategy.INCREMENT)
+    @Persistent(valueStrategy = IdGeneratorStrategy.INCREMENT)
     @JsonIgnore
     private long id;
 
     @Persistent
-    @Unique(name="MANAGEDUSER_USERNAME_IDX")
-    @Column(name="USERNAME")
+    @Unique(name = "MANAGEDUSER_USERNAME_IDX")
+    @Column(name = "USERNAME")
     @NotNull
-    @Size(min=1, max=255)
+    @Size(min = 1, max = 255)
     @Pattern(regexp = "[\\P{Cc}]+", message = "The username must not contain control characters")
     private String username;
 
     @Persistent
-    @Column(name="PASSWORD", allowsNull="false")
+    @Column(name = "PASSWORD", allowsNull = "false")
     @NotNull
-    @Size(min=1, max=255)
+    @Size(min = 1, max = 255)
     @Pattern(regexp = "[\\P{Cc}]+", message = "The password must not contain control characters")
     private String password;
 
     @Persistent
-    @Column(name="SUSPENDED")
+    @Column(name = "SUSPENDED")
     private boolean suspended;
 
-    @Persistent(table="MANAGEDUSERS_TEAMS", defaultFetchGroup="true")
-    @Join(column="MANAGEDUSER_ID")
-    @Element(column="TEAM_ID")
-    @Order(extensions=@Extension(vendorName="datanucleus", key="list-ordering", value="name ASC"))
+    @Persistent(table = "MANAGEDUSERS_TEAMS", defaultFetchGroup = "true")
+    @Join(column = "MANAGEDUSER_ID")
+    @Element(column = "TEAM_ID")
+    @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "name ASC"))
     private List<Team> teams;
 
     public long getId() {
@@ -113,8 +119,9 @@ public class ManagedUser implements Serializable, Principal, UserPrincipal {
     }
 
     /**
-     * Do not use - only here to satisfy Principal implementation requirement
+     * Do not use - only here to satisfy Principal implementation requirement.
      * @deprecated use {@link ManagedUser#getUsername()}
+     * @return the value of {@link #getUsername()}
      */
     @Deprecated
     @JsonIgnore

@@ -20,23 +20,30 @@ package com.example.tasks;
 import alpine.event.LdapSyncEvent;
 import alpine.tasks.AlpineTaskScheduler;
 
-public class TaskScheduler extends AlpineTaskScheduler {
+/**
+ * A sample TaskScheduler implementation that runs Alpine-specific events.
+ *
+ * @author Steve Springett
+ */
+public final class TaskScheduler extends AlpineTaskScheduler {
 
-    // Holds an instance of TaskScheduler
-    private static final TaskScheduler instance = new TaskScheduler();
+    // Holds an INSTANCE of TaskScheduler
+    private static final TaskScheduler INSTANCE = new TaskScheduler();
 
+    /**
+     * Private constructor
+     */
     private TaskScheduler() {
-
         // Creates a new event that executes every 6 hours (21600000) after an initial 10 second (10000) delay
         scheduleEvent(new LdapSyncEvent(), 10000, 21600000);
     }
 
     /**
-     * Return an instance of the TaskScheduler instance
+     * Return an INSTANCE of the TaskScheduler instance.
      * @return a TaskScheduler instance
      */
     public static TaskScheduler getInstance() {
-        return instance;
+        return INSTANCE;
     }
 
 }

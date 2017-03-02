@@ -24,8 +24,9 @@ import javax.naming.AuthenticationException;
 import java.security.Principal;
 
 /**
- * Authentication service that validates API keys
+ * Authentication service that validates API keys.
  *
+ * @author Steve Springett
  * @since 1.0.0
  */
 public class ApiKeyAuthenticationService implements AuthenticationService {
@@ -35,7 +36,7 @@ public class ApiKeyAuthenticationService implements AuthenticationService {
     /**
      * Given the specified ContainerRequest, the constructor retrieves a header
      * named 'X-Api-Key', if it exists.
-     *
+     * @param request the ContainerRequest object
      * @since 1.0.0
      */
     public ApiKeyAuthenticationService(ContainerRequest request) {
@@ -43,8 +44,8 @@ public class ApiKeyAuthenticationService implements AuthenticationService {
     }
 
     /**
-     * Returns whether an API key was specified or not
-     *
+     * Returns whether an API key was specified or not.
+     * @return true if API key was specified, false if not
      * @since 1.0.0
      */
     public boolean isSpecified() {
@@ -55,12 +56,13 @@ public class ApiKeyAuthenticationService implements AuthenticationService {
      * Authenticates the API key (if it was specified in the X-Api-Key header)
      * and returns a Principal if authentication is successful. Otherwise,
      * returns an AuthenticationException.
-     *
+     * @return a Principal of which ApiKey is an instance of
+     * @throws AuthenticationException upon an authentication failure
      * @since 1.0.0
      */
     public Principal authenticate() throws AuthenticationException {
         try (AlpineQueryManager qm = new AlpineQueryManager()) {
-            ApiKey apiKey = qm.getApiKey(assertedApiKey);
+            final ApiKey apiKey = qm.getApiKey(assertedApiKey);
             if (apiKey == null) {
                 throw new AuthenticationException();
             } else {

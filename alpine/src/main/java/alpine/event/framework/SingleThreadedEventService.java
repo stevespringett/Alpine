@@ -29,23 +29,27 @@ import java.util.concurrent.Executors;
  *
  * Use EventService for an implementation that allows for a configurable number of threads.
  *
+ * @author Steve Springett
  * @since 1.0.0
  */
-public class SingleThreadedEventService extends BaseEventService {
+public final class SingleThreadedEventService extends BaseEventService {
 
-    private static final SingleThreadedEventService instance = new SingleThreadedEventService();
-    private static final Logger logger = Logger.getLogger(EventService.class);
-    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private static final SingleThreadedEventService INSTANCE = new SingleThreadedEventService();
+    private static final Logger LOGGER = Logger.getLogger(EventService.class);
+    private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
 
     static {
-        instance.setExecutorService(executor);
-        instance.setLogger(logger);
+        INSTANCE.setExecutorService(EXECUTOR);
+        INSTANCE.setLogger(LOGGER);
     }
 
+    /**
+     * Private constructor
+     */
     private SingleThreadedEventService() { }
 
     public static SingleThreadedEventService getInstance() {
-        return instance;
+        return INSTANCE;
     }
 
 }

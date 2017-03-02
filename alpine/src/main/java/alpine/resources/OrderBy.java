@@ -17,6 +17,12 @@
  */
 package alpine.resources;
 
+/**
+ * Defines possible values for ordering.
+ *
+ * @author Steve Springett
+ * @since 1.0.0
+ */
 public enum OrderBy {
 
     ASCENDING,

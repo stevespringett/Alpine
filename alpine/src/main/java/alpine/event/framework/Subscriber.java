@@ -21,13 +21,14 @@ package alpine.event.framework;
  * All subscribers need to implement this interface. Subscribers are informed
  * of events they are subscribed to via the inform method.
  *
+ * @author Steve Springett
  * @since 1.0.0
  */
 public interface Subscriber {
 
     /**
      * Defines a method to inform subscribers who implement this interface.
-     *
+     * @param event the Event to subscribe to
      * @since 1.0.0
      */
     void inform(Event event);

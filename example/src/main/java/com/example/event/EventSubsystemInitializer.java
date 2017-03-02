@@ -24,17 +24,24 @@ import com.example.tasks.TaskScheduler;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+/**
+ * Initializes the event subsystem.
+ *
+ * @author Steve Springett
+ */
 public class EventSubsystemInitializer implements ServletContextListener {
 
     // Starts the EventService
-    private static final EventService EVENT_SERVICE = EventService.getInstance();
+    private static final EventService EVENT_SERVICE = EventService.getEventService();
 
+    @Override
     public void contextInitialized(ServletContextEvent event) {
         EVENT_SERVICE.subscribe(LdapSyncEvent.class, LdapSyncTask.class);
 
         TaskScheduler.getInstance();
     }
 
+    @Override
     public void contextDestroyed(ServletContextEvent event) {
         TaskScheduler.getInstance().shutdown();
 

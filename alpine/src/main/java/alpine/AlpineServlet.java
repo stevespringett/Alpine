@@ -45,12 +45,13 @@ import java.util.Collection;
  * and setting the path to properties files used for
  * {@link Config Config}(uration).
  *
+ * @author Steve Springett
  * @since 1.0.0
  */
 public class AlpineServlet extends ServletContainer {
 
     private static final long serialVersionUID = -133386507668410112L;
-    private static final Logger logger = Logger.getLogger(alpine.AlpineServlet.class);
+    private static final Logger LOGGER = Logger.getLogger(alpine.AlpineServlet.class);
 
     /**
      * Overrides the servlet init method and loads sets the InputStream necessary
@@ -59,25 +60,25 @@ public class AlpineServlet extends ServletContainer {
      */
     @Override
     public void init(ServletConfig config) throws ServletException {
-        logger.info("Starting " + Config.getInstance().getProperty(Config.AlpineKey.APPLICATION_NAME));
+        LOGGER.info("Starting " + Config.getInstance().getProperty(Config.AlpineKey.APPLICATION_NAME));
         super.init(config);
 
-        Info info = new Info()
+        final Info info = new Info()
                 .title(Config.getInstance().getProperty(Config.AlpineKey.APPLICATION_NAME) + " API")
                 .version(Config.getInstance().getProperty(Config.AlpineKey.APPLICATION_VERSION));
 
-        Swagger swagger = new Swagger()
+        final Swagger swagger = new Swagger()
                 .info(info)
                 .securityDefinition("X-Api-Key", new ApiKeyAuthDefinition("X-Api-Key", In.HEADER));
 
         // Dynamically get the url-pattern from web.xml and use that as the 'baseUrl' for
         // the API documentation
-        ServletContext servletContext = getServletContext();
-        ServletRegistration servletRegistration = servletContext.getServletRegistration(config.getServletName());
-        Collection<String> mappings = servletRegistration.getMappings();
+        final ServletContext servletContext = getServletContext();
+        final ServletRegistration servletRegistration = servletContext.getServletRegistration(config.getServletName());
+        final Collection<String> mappings = servletRegistration.getMappings();
         if (mappings.size() > 0) {
             String baseUrl = mappings.iterator().next();
-            if (! baseUrl.startsWith("/")) {
+            if (!baseUrl.startsWith("/")) {
                 baseUrl = "/" + baseUrl;
             }
             baseUrl = baseUrl.replace("/*", "").replaceAll("\\/$", "");
@@ -86,29 +87,29 @@ public class AlpineServlet extends ServletContainer {
 
         new SwaggerContextService().withServletConfig(config).updateSwagger(swagger);
 
-        KeyManager keyManager = KeyManager.getInstance();
+        final KeyManager keyManager = KeyManager.getInstance();
         if (!keyManager.keyPairExists()) {
             try {
-                KeyPair keyPair = keyManager.generateKeyPair();
+                final KeyPair keyPair = keyManager.generateKeyPair();
                 keyManager.save(keyPair);
             } catch (NoSuchAlgorithmException e) {
-                logger.error("An error occurred generating new keypair");
-                logger.error(e.getMessage());
+                LOGGER.error("An error occurred generating new keypair");
+                LOGGER.error(e.getMessage());
             } catch (IOException e) {
-                logger.error("An error occurred saving newly generated keypair");
-                logger.error(e.getMessage());
+                LOGGER.error("An error occurred saving newly generated keypair");
+                LOGGER.error(e.getMessage());
             }
         }
         if (!keyManager.secretKeyExists()) {
             try {
-                SecretKey secretKey = keyManager.generateSecretKey();
+                final SecretKey secretKey = keyManager.generateSecretKey();
                 keyManager.save(secretKey);
             } catch (NoSuchAlgorithmException e) {
-                logger.error("An error occurred generating new secret key");
-                logger.error(e.getMessage());
+                LOGGER.error("An error occurred generating new secret key");
+                LOGGER.error(e.getMessage());
             } catch (IOException e) {
-                logger.error("An error occurred saving newly generated secret key");
-                logger.error(e.getMessage());
+                LOGGER.error("An error occurred saving newly generated secret key");
+                LOGGER.error(e.getMessage());
             }
         }
 
@@ -116,19 +117,19 @@ public class AlpineServlet extends ServletContainer {
         SecurityUtil.logJavaSystemProperties();
 
         // Determine if Watchdog logging is enabled and if so, start interval logging
-        int interval = Config.getInstance().getPropertyAsInt(Config.AlpineKey.WATCHDOG_LOGGING_INTERVAL);
+        final int interval = Config.getInstance().getPropertyAsInt(Config.AlpineKey.WATCHDOG_LOGGING_INTERVAL);
         if (interval > 0) {
-            IntervalLoggerController wd = SecurityLoggingFactory.getControllerInstance();
+            final IntervalLoggerController wd = SecurityLoggingFactory.getControllerInstance();
             wd.start(interval * 1000); // Interval is defined in seconds
         }
     }
 
     /**
-     * Overrides the servlet destroy method and shuts down the servlet
+     * Overrides the servlet destroy method and shuts down the servlet.
      */
     @Override
     public void destroy() {
-        logger.info("Stopping " + Config.getInstance().getProperty(Config.AlpineKey.APPLICATION_NAME));
+        LOGGER.info("Stopping " + Config.getInstance().getProperty(Config.AlpineKey.APPLICATION_NAME));
         super.destroy();
     }
 

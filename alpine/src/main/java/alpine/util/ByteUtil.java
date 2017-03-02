@@ -22,19 +22,32 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
-public class ByteUtil {
+/**
+ * A collection of functions that operate on bytes.
+ *
+ * @author Steve Springett
+ * @since 1.0.0
+ */
+public final class ByteUtil {
 
     /**
-     * Converts a char array to a byte array without the use of Strings
+     * Private constructor
+     */
+    private ByteUtil() { }
+
+    /**
+     * Converts a char array to a byte array without the use of Strings.
      *
      * http://stackoverflow.com/questions/5513144/converting-char-to-byte
      *
+     * @param chars the characters to convert
+     * @return a byte array of the converted characters
      * @since 1.0.0
      */
     public static byte[] toBytes(char[] chars) {
-        CharBuffer charBuffer = CharBuffer.wrap(chars);
-        ByteBuffer byteBuffer = Charset.forName("UTF-8").encode(charBuffer);
-        byte[] bytes = Arrays.copyOfRange(byteBuffer.array(), byteBuffer.position(), byteBuffer.limit());
+        final CharBuffer charBuffer = CharBuffer.wrap(chars);
+        final ByteBuffer byteBuffer = Charset.forName("UTF-8").encode(charBuffer);
+        final byte[] bytes = Arrays.copyOfRange(byteBuffer.array(), byteBuffer.position(), byteBuffer.limit());
         Arrays.fill(charBuffer.array(), '\u0000'); // clear sensitive data
         Arrays.fill(byteBuffer.array(), (byte) 0); // clear sensitive data
         return bytes;

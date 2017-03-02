@@ -32,49 +32,58 @@ import java.sql.SQLException;
  * Refer to {@link Config.AlpineKey#DATABASE_MODE} and application.properties for
  * additional details.
  *
+ * @author Steve Springett
  * @since 1.0.0
  */
 public class PersistenceInitializer implements ServletContextListener {
 
-    private static final Logger logger = Logger.getLogger(PersistenceInitializer.class);
+    private static final Logger LOGGER = Logger.getLogger(PersistenceInitializer.class);
     private static Server dbServer;
 
+    @Override
     public void contextInitialized(ServletContextEvent event) {
         startDbServer();
     }
 
+    @Override
     public void contextDestroyed(ServletContextEvent event) {
         stopDbServer();
     }
 
+    /**
+     * Starts the H2 database engine if the database mode is set to 'server'
+     */
     private void startDbServer() {
-        String mode = Config.getInstance().getProperty(Config.AlpineKey.DATABASE_MODE);
-        int port = Config.getInstance().getPropertyAsInt(Config.AlpineKey.DATABASE_PORT);
+        final String mode = Config.getInstance().getProperty(Config.AlpineKey.DATABASE_MODE);
+        final int port = Config.getInstance().getPropertyAsInt(Config.AlpineKey.DATABASE_PORT);
 
         if (StringUtils.isEmpty(mode) || !("server".equals(mode) || "embedded".equals(mode))) {
-            logger.error("Database mode not specified. Expected values are 'server' or 'embedded'");
+            LOGGER.error("Database mode not specified. Expected values are 'server' or 'embedded'");
         }
 
         if (dbServer != null || "embedded".equals(mode)) {
             return;
         }
-        String[] args = new String[]{
+        final String[] args = new String[] {
                 "-tcp",
                 "-tcpPort", String.valueOf(port),
-                "-tcpAllowOthers"
+                "-tcpAllowOthers",
         };
         try {
-            logger.info("Attempting to start database service");
+            LOGGER.info("Attempting to start database service");
             dbServer = Server.createTcpServer(args).start();
-            logger.info("Database service started");
+            LOGGER.info("Database service started");
         } catch (SQLException e) {
-            logger.error("Unable to start database service: " + e.getMessage());
+            LOGGER.error("Unable to start database service: " + e.getMessage());
             stopDbServer();
         }
     }
 
+    /**
+     * Stops the database server (if it was started).
+     */
     private void stopDbServer() {
-        logger.info("Shutting down database service");
+        LOGGER.info("Shutting down database service");
         if (dbServer != null) {
             dbServer.stop();
             dbServer.shutdown();

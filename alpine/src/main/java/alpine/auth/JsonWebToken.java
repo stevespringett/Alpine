@@ -38,11 +38,12 @@ import java.util.Map;
  * All JWT usages should only go through this class and hide the actual implementation details
  * and to avoid improper or insecure use of JWTs.
  *
+ * @author Steve Springett
  * @since 1.0.0
  */
 public class JsonWebToken {
 
-    private static final Logger logger = Logger.getLogger(JsonWebToken.class);
+    private static final Logger LOGGER = Logger.getLogger(JsonWebToken.class);
 
     private Key key;
     private String subject;
@@ -54,6 +55,7 @@ public class JsonWebToken {
      * secret key. Usage of other SecretKeys is allowed but management of those keys
      * is up to the implementor.
      *
+     * @param key the SecretKey to use in generating or validating the token
      * @since 1.0.0
      */
     public JsonWebToken(SecretKey key) {
@@ -75,11 +77,13 @@ public class JsonWebToken {
      * Creates a new JWT for the specified principal. Token is signed using
      * the SecretKey with an HMAC 256 algorithm.
      *
+     * @param principal the Principal to create the token for
+     * @return a String representation of the generated token
      * @since 1.0.0
      */
     public String createToken(Principal principal) {
-        Date today = new Date();
-        JwtBuilder jwtBuilder = Jwts.builder();
+        final Date today = new Date();
+        final JwtBuilder jwtBuilder = Jwts.builder();
         jwtBuilder.setSubject(principal.getName());
         jwtBuilder.setIssuer("Alpine");
         jwtBuilder.setIssuedAt(today);
@@ -91,10 +95,12 @@ public class JsonWebToken {
      * Creates a new JWT for the specified principal. Token is signed using
      * the SecretKey with an HMAC 256 algorithm.
      *
+     * @param claims a Map of all claims
+     * @return a String representation of the generated token
      * @since 1.0.0
      */
     public String createToken(Map<String, Object> claims) {
-        JwtBuilder jwtBuilder = Jwts.builder();
+        final JwtBuilder jwtBuilder = Jwts.builder();
         jwtBuilder.setClaims(claims);
         return jwtBuilder.signWith(SignatureAlgorithm.HS256, key).compact();
     }
@@ -103,46 +109,56 @@ public class JsonWebToken {
      * Validates a JWT by ensuring the signature matches and validates
      * against the SecretKey and checks the expiration date.
      *
+     * @param token the token to validate
+     * @return true if validation successful, false if not
      * @since 1.0.0
      */
     public boolean validateToken(String token) {
         try {
-            JwtParser jwtParser = Jwts.parser().setSigningKey(key);
+            final JwtParser jwtParser = Jwts.parser().setSigningKey(key);
             jwtParser.parse(token);
             this.subject = jwtParser.parseClaimsJws(token).getBody().getSubject();
             this.expiration = jwtParser.parseClaimsJws(token).getBody().getExpiration();
             return true;
         } catch (SignatureException e) {
-            logger.info("Received token that did not pass signature verification");
+            LOGGER.info("Received token that did not pass signature verification");
         } catch (ExpiredJwtException e) {
-            logger.debug("Received expired token");
+            LOGGER.debug("Received expired token");
         } catch (MalformedJwtException e) {
-            logger.debug("Received malformed token");
-            logger.debug(e.getMessage());
+            LOGGER.debug("Received malformed token");
+            LOGGER.debug(e.getMessage());
         } catch (UnsupportedJwtException | IllegalArgumentException e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
         return false;
     }
 
     /**
-     * Create a new future Date from the specified Date
+     * Create a new future Date from the specified Date.
      *
      * @param date The date to base the future date from
      * @param days The number of dates to + offset
      * @return a future date
      */
     private Date addDays(Date date, int days) {
-        Calendar cal = Calendar.getInstance();
+        final Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         cal.add(Calendar.DATE, days); //minus number would decrement the days
         return cal.getTime();
     }
 
+    /**
+     * Returns the subject of the token.
+     * @return a String
+     */
     public String getSubject() {
         return subject;
     }
 
+    /**
+     * Returns the expiration of the token.
+     * @return a Date
+     */
     public Date getExpiration() {
         return expiration;
     }

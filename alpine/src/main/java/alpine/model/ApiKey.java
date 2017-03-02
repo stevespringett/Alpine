@@ -18,7 +18,6 @@
 package alpine.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.Element;
 import javax.jdo.annotations.Extension;
@@ -36,28 +35,34 @@ import java.io.Serializable;
 import java.security.Principal;
 import java.util.List;
 
+/**
+ * Persistable object representing an ApiKey.
+ *
+ * @author Steve Springett
+ * @since 1.0.0
+ */
 @PersistenceCapable
 public class ApiKey implements Serializable, Principal {
 
     private static final long serialVersionUID = 1582714693932260365L;
 
     @PrimaryKey
-    @Persistent(valueStrategy=IdGeneratorStrategy.INCREMENT)
+    @Persistent(valueStrategy = IdGeneratorStrategy.INCREMENT)
     @JsonIgnore
     private long id;
 
     @Persistent
-    @Unique(name="APIKEY_IDX")
-    @Column(name="APIKEY", allowsNull="false")
+    @Unique(name = "APIKEY_IDX")
+    @Column(name = "APIKEY", allowsNull = "false")
     @NotNull
-    @Size(min=32, max=255)
+    @Size(min = 32, max = 255)
     @Pattern(regexp = "[A-Za-z0-9]+", message = "The API key must contain only alpha and/or numeric characters")
     private String key;
 
-    @Persistent(table="APIKEYS_TEAMS", defaultFetchGroup="true")
-    @Join(column="APIKEY_ID")
-    @Element(column="TEAM_ID")
-    @Order(extensions=@Extension(vendorName="datanucleus", key="list-ordering", value="name ASC"))
+    @Persistent(table = "APIKEYS_TEAMS", defaultFetchGroup = "true")
+    @Join(column = "APIKEY_ID")
+    @Element(column = "TEAM_ID")
+    @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "name ASC"))
     @JsonIgnore
     private List<Team> teams;
 
@@ -78,8 +83,9 @@ public class ApiKey implements Serializable, Principal {
     }
 
     /**
-     * Do not use - only here to satisfy Principal implementation requirement
-     * @deprecated use {@link LdapUser#getUsername()}
+     * Do not use - only here to satisfy Principal implementation requirement.
+     * @deprecated use {@link UserPrincipal#getUsername()}
+     * @return a String presentation of the username
      */
     @Deprecated
     @JsonIgnore

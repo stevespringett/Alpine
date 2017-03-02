@@ -28,6 +28,13 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+/**
+ * Bundled JAX-RS resource that displays the name of the application, version, and build timestamp.
+ *
+ * @see About
+ * @author Steve Springett
+ * @since 1.0.0
+ */
 @Path("/version")
 @Produces(MediaType.APPLICATION_JSON)
 @Api(value = "version")
@@ -41,7 +48,7 @@ public final class VersionResource {
     )
     @AuthenticationNotRequired
     public Response getVersion() {
-        return Response.ok(new GenericEntity<About>(new About()) {}).build();
+        return Response.ok(new GenericEntity<About>(new About()) { }).build();
     }
 
 }

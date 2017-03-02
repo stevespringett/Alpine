@@ -31,6 +31,7 @@ import java.util.concurrent.Executors;
  * Defaults to a single thread event system when extending this class. This can be changed by
  * specifying an alternative executor service.
  *
+ * @author Steve Springett
  * @since 1.0.0
  */
 public abstract class BaseEventService {
@@ -41,6 +42,7 @@ public abstract class BaseEventService {
     private final ExecutorService dynamicExecutor = Executors.newWorkStealingPool();
 
     /**
+     * @param executor an ExecutorService instance
      * @since 1.0.0
      */
     protected void setExecutorService(ExecutorService executor) {
@@ -48,6 +50,7 @@ public abstract class BaseEventService {
     }
 
     /**
+     * @param logger the logger instance to use for the executed event
      * @since 1.0.0
      */
     protected void setLogger(Logger logger) {
@@ -63,16 +66,16 @@ public abstract class BaseEventService {
      */
     public void publish(Event event) {
         logger.debug("Dispatching event: " + event.getClass().toString());
-        ArrayList<Class<? extends Subscriber>> subscriberClasses = subscriptionMap.get(event.getClass());
+        final ArrayList<Class<? extends Subscriber>> subscriberClasses = subscriptionMap.get(event.getClass());
         for (Class clazz: subscriberClasses) {
             logger.debug("Alerting subscriber " + clazz.getName());
 
             // Check to see if the Event is Unblocked. If so, use a separate executor pool from normal events
-            ExecutorService executorService = event instanceof UnblockedEvent  ? dynamicExecutor : executor;
+            final ExecutorService executorService = event instanceof UnblockedEvent  ? dynamicExecutor : executor;
 
             executorService.submit(() -> {
                 try {
-                    Subscriber subscriber = (Subscriber)clazz.newInstance();
+                    final Subscriber subscriber = (Subscriber) clazz.newInstance();
                     subscriber.inform(event);
                 } catch (InstantiationException | IllegalAccessException e) {
                     logger.error("An error occurred while informing subscriber: " + e.getMessage());
@@ -93,7 +96,7 @@ public abstract class BaseEventService {
         if (!subscriptionMap.containsKey(eventType)) {
             subscriptionMap.put(eventType, new ArrayList<>());
         }
-        ArrayList<Class<? extends Subscriber>> subscribers = subscriptionMap.get(eventType);
+        final ArrayList<Class<? extends Subscriber>> subscribers = subscriptionMap.get(eventType);
         if (!subscribers.contains(subscriberType)) {
             subscribers.add(subscriberType);
         }
