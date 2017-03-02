@@ -1,5 +1,4 @@
 [![Build Status](https://travis-ci.org/stevespringett/Alpine.svg?branch=master)](https://travis-ci.org/stevespringett/Alpine)
-[![Coverity Scan Status](https://scan.coverity.com/projects/11764/badge.svg)](https://scan.coverity.com/projects/11764)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/cefa2866cbc24deeb7fbc83b8f71ad60)](https://www.codacy.com/app/stevespringett/Alpine?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=stevespringett/Alpine&amp;utm_campaign=Badge_Grade)
 [![Dependency Status](https://www.versioneye.com/user/projects/58a2a49a0f3d4f003ce97f07/badge.svg?style=flat)](https://www.versioneye.com/user/projects/58a2a49a0f3d4f003ce97f07)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/690/badge)](https://bestpractices.coreinfrastructure.org/projects/690)
