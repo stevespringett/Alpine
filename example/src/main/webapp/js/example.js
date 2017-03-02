@@ -1,17 +1,4 @@
 
-$(document).ready(function() {
-    $("#swagger-button").click(function(){
-        getSwagger();
-    });
-    $("#version-button").click(function(){
-        getVersion();
-    });
-    $("#login-button").click(function(event){
-        event.preventDefault();
-        assertCredentials();
-    });
-});
-
 function getSwagger() {
     $.ajax({
         type: "GET",
@@ -47,3 +34,16 @@ function assertCredentials() {
         }
     });
 }
+
+$(document).ready(function() {
+    $("#swagger-button").click(function(){
+        getSwagger();
+    });
+    $("#version-button").click(function(){
+        getVersion();
+    });
+    $("#login-button").click(function(event){
+        event.preventDefault();
+        assertCredentials();
+    });
+});
