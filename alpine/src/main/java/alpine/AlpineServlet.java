@@ -85,7 +85,7 @@ public class AlpineServlet extends ServletContainer {
             swagger.basePath(config.getServletContext().getContextPath() + baseUrl);
         }
 
-        new SwaggerContextService().withServletConfig(config).updateSwagger(swagger);
+        new SwaggerContextService().withServletConfig(config).updateSwagger(swagger).initScanner();
 
         final KeyManager keyManager = KeyManager.getInstance();
         if (!keyManager.keyPairExists()) {
