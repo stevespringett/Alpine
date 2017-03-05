@@ -9,6 +9,8 @@
 Alpine
 =========
 
+<img src="http://6000rpms.com/images/Alpine.svg" width="300" align="right">
+
 An opinionated scaffolding library that jumpstarts Java projects with an 
 API-first design, secure defaults, and minimal dependencies. Alpine came 
 about due to many commonalities between several of my personal and 
@@ -175,6 +177,7 @@ Permission to modify and redistribute is granted under the terms of the
 Alpine makes use of several other open source libraries. Please see
 the [NOTICE.txt] [notice] file for more information.
 
+  [alpine-image]: http://6000rpms.com/images/Alpine.svg
   [GitHub Wiki]: https://github.com/stevespringett/alpine/wiki
   [license-image]: https://img.shields.io/badge/license-apache%20v2-brightgreen.svg
   [license-url]: https://github.com/stevespringett/alpine/blob/master/LICENSE.txt
