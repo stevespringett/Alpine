@@ -9,7 +9,7 @@
 Alpine
 =========
 
-<img src="http://6000rpms.com/images/Alpine.svg" width="300" align="right">
+<img src="http://stevespringett.github.io/alpine/images/Alpine.svg" width="300" align="right">
 
 An opinionated scaffolding library that jumpstarts Java projects with an 
 API-first design, secure defaults, and minimal dependencies. Alpine came 
