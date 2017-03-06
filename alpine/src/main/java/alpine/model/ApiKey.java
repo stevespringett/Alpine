@@ -17,6 +17,7 @@
  */
 package alpine.model;
 
+import alpine.validation.RegexSequence;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.Element;
@@ -56,7 +57,7 @@ public class ApiKey implements Serializable, Principal {
     @Column(name = "APIKEY", allowsNull = "false")
     @NotNull
     @Size(min = 32, max = 255)
-    @Pattern(regexp = "[A-Za-z0-9]+", message = "The API key must contain only alpha and/or numeric characters")
+    @Pattern(regexp = RegexSequence.Definition.ALPHA_NUMERIC, message = "The API key must contain only alpha and/or numeric characters")
     private String key;
 
     @Persistent(table = "APIKEYS_TEAMS", defaultFetchGroup = "true")
