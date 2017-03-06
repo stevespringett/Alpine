@@ -20,6 +20,8 @@ package alpine.resources;
 import alpine.model.ApiKey;
 import alpine.model.LdapUser;
 import alpine.model.ManagedUser;
+import alpine.validation.ValidationException;
+import alpine.validation.ValidationTask;
 import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.server.validation.ValidationError;
 import javax.annotation.PostConstruct;
@@ -220,6 +222,59 @@ public abstract class AlpineResource {
     @SafeVarargs
     protected final void failOnValidationError(final Set<ConstraintViolation<Object>>... violationsArray) {
         final List<ValidationError> errors = contOnValidationError(violationsArray);
+        if (errors.size() > 0) {
+            throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(errors).build());
+        }
+    }
+
+    /**
+     * Given one or mote ValidationTasks, this method will return a List of
+     * ValidationErrors. If the size of the List is 0, no errors were encountered
+     * during validation.
+     *
+     * Usage:
+     * <pre>
+     *     List&lt;ValidationException&gt; errors = contOnValidationError(
+     *         new ValidationTask(pattern, input, errorMessage),
+     *         new ValidationTask(pattern, input, errorMessage)
+     *      );
+     *      // If validation fails, this line will be reached.
+     * </pre>
+     *
+     * @param validationTasks an array of one or more ValidationTasks
+     * @return a List of zero or more ValidationException
+     * @since 1.0.0
+     */
+    protected final List<ValidationException> contOnValidationError(final ValidationTask... validationTasks) {
+        final List<ValidationException> errors = new ArrayList<>();
+        for (ValidationTask validationTask:  validationTasks) {
+            if (!validationTask.getPattern().matcher(validationTask.getInput()).matches()) {
+                errors.add(new ValidationException(validationTask.getInput(), validationTask.getErrorMessage()));
+            }
+        }
+        return errors;
+    }
+
+    /**
+     * Wrapper around {@link #contOnValidationError(ValidationTask[])} but instead of returning
+     * a list of errors, this method will halt processing of the request by throwing
+     * a BadRequestException, setting the HTTP status to 400 (BAD REQUEST) and providing
+     * a full list of validation errors in the body of the response.
+     *
+     * Usage:
+     * <pre>
+     *     List&lt;ValidationException&gt; errors = failOnValidationError(
+     *         new ValidationTask(pattern, input, errorMessage),
+     *         new ValidationTask(pattern, input, errorMessage)
+     *      );
+     *      // If validation fails, this line will not be reached.
+     * </pre>
+     *
+     * @param validationTasks an array of one or more ValidationTasks
+     * @since 1.0.0
+     */
+    protected final void failOnValidationError(final ValidationTask... validationTasks) {
+        final List<ValidationException> errors = contOnValidationError(validationTasks);
         if (errors.size() > 0) {
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(errors).build());
         }
