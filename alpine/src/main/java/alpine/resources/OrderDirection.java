@@ -18,12 +18,12 @@
 package alpine.resources;
 
 /**
- * Defines possible values for ordering.
+ * Defines possible values for sorting.
  *
  * @author Steve Springett
  * @since 1.0.0
  */
-public enum OrderBy {
+public enum OrderDirection {
 
     ASCENDING,
     DESCENDING,

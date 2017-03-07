@@ -20,6 +20,7 @@ package alpine.resources;
 import alpine.model.ApiKey;
 import alpine.model.LdapUser;
 import alpine.model.ManagedUser;
+import alpine.validation.RegexSequence;
 import alpine.validation.ValidationException;
 import alpine.validation.ValidationTask;
 import org.apache.commons.lang3.StringUtils;
@@ -63,9 +64,7 @@ public abstract class AlpineResource {
     @Context
     private UriInfo uriInfo;
 
-    private OrderBy orderBy;
-    private Pagination pagination;
-    private String filter;
+    private AlpineRequest alpineRequest;
 
 
     /**
@@ -89,37 +88,13 @@ public abstract class AlpineResource {
     }
 
     /**
-     * Returns the ordering (ASCENDING, DESCENDING, or UNSPECIFIED) that
-     * is optionally part of any request. Ordering is determined by the
-     * 'orderBy' parameter in the query string. Acceptable values for
-     * 'orderBy' are 'asc' and 'desc'.
-     * @return an OrderBy enum value
+     * Returns the AlpineRequest object containing pagination, order,
+     * filters, and other Alpine-specified aspects of the request.
+     * @return a AlpineRequest object
      * @since 1.0.0
      */
-    protected OrderBy getOrderBy() {
-        return orderBy;
-    }
-
-    /**
-     * Returns the pagination containing the page number and page size.
-     * Pagination is determined by the 'page' and 'size' parameters in
-     * the query string. This object is available even when pagination
-     * is not used or requested.
-     * @return a Pagination object
-     * @since 1.0.0
-     */
-    protected Pagination getPagination() {
-        return pagination;
-    }
-
-    /**
-     * Return the filter string (if specified). Filtering is determined
-     * by the 'filter' parameter in the query string.
-     * @return a String representation of the filter requested
-     * @since 1.0.0
-     */
-    protected String getFilter() {
-        return filter;
+    protected AlpineRequest getAlpineRequest() {
+        return alpineRequest;
     }
 
     /**
@@ -289,18 +264,23 @@ public abstract class AlpineResource {
         final String page = queryParams.getFirst("page");
         final String size = queryParams.getFirst("size");
         final String filter = queryParams.getFirst("filter");
-        final String orderBy = queryParams.getFirst("orderBy");
+        final String sort = queryParams.getFirst("sort");
+        OrderDirection orderDirection;
+        String orderBy = queryParams.getFirst("orderBy");
 
-        if ("asc".equalsIgnoreCase(orderBy)) {
-            this.orderBy = OrderBy.ASCENDING;
-        } else if ("desc".equalsIgnoreCase(orderBy)) {
-            this.orderBy = OrderBy.DESCENDING;
-        } else {
-            this.orderBy = OrderBy.UNSPECIFIED;
+        if (StringUtils.isBlank(orderBy) || !RegexSequence.Pattern.ALPHA_NUMERIC.matcher(orderBy).matches()) {
+            orderBy = null;
         }
 
-        this.filter = filter;
-        this.pagination = new Pagination(page, size);
+        if ("asc".equalsIgnoreCase(sort)) {
+            orderDirection = OrderDirection.ASCENDING;
+        } else if ("desc".equalsIgnoreCase(sort)) {
+            orderDirection = OrderDirection.DESCENDING;
+        } else {
+            orderDirection = OrderDirection.UNSPECIFIED;
+        }
+
+        this.alpineRequest = new AlpineRequest(getPrincipal(), new Pagination(page, size), filter, orderBy, orderDirection);
     }
 
     /**

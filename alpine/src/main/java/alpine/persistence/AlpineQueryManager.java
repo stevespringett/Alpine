@@ -25,6 +25,7 @@ import alpine.model.LdapUser;
 import alpine.model.ManagedUser;
 import alpine.model.Team;
 import alpine.model.UserPrincipal;
+import alpine.resources.AlpineRequest;
 import javax.jdo.Query;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,19 @@ import java.util.UUID;
  * @since 1.0.0
  */
 public class AlpineQueryManager extends AbstractAlpineQueryManager {
+
+    /**
+     * Default constructor
+     */
+    public AlpineQueryManager() { }
+
+    /**
+     * Constructs a new AlpineQueryManager
+     * @param request an AlpineRequest
+     */
+    public AlpineQueryManager(final AlpineRequest request) {
+        super(request);
+    }
 
     /**
      * Returns an API key.

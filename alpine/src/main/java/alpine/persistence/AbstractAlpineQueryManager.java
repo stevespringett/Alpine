@@ -17,8 +17,13 @@
  */
 package alpine.persistence;
 
+import alpine.resources.AlpineRequest;
+import alpine.resources.OrderDirection;
+import alpine.resources.Pagination;
+import alpine.validation.RegexSequence;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import java.security.Principal;
 import java.util.Collection;
 import java.util.List;
 
@@ -31,7 +36,74 @@ import java.util.List;
  */
 public abstract class AbstractAlpineQueryManager implements AutoCloseable {
 
-    protected PersistenceManager pm = PersistenceManagerFactory.createPersistenceManager();
+    final protected Principal principal;
+    final protected Pagination pagination;
+    final protected String filter;
+    final protected String orderBy;
+    final protected OrderDirection orderDirection;
+
+    final protected PersistenceManager pm = PersistenceManagerFactory.createPersistenceManager();
+
+    /**
+     * Default constructor
+     */
+    public AbstractAlpineQueryManager() {
+        principal = null;
+        pagination = new Pagination(0, 0);
+        filter = null;
+        orderBy = null;
+        orderDirection = OrderDirection.UNSPECIFIED;
+    }
+
+    /**
+     * Constructs a new QueryManager with the following:
+     * @param principal a Principal, or null
+     * @param pagination a Pagination request, or null
+     * @param filter a String filter, or null
+     * @param orderBy the field to order by
+     * @param orderDirection the sorting direction
+     */
+    public AbstractAlpineQueryManager(final Principal principal, final Pagination pagination, final String filter,
+                                      final String orderBy, final OrderDirection orderDirection) {
+        this.principal = principal;
+        this.pagination = pagination;
+        this.filter = filter;
+        this.orderBy = orderBy;
+        this.orderDirection = orderDirection;
+    }
+
+    /**
+     * Constructs a new QueryManager. Deconstructs the specified AlpineRequest
+     * into its individual components including pagination and ordering.
+     * @param request an AlpineRequest object
+     */
+    public AbstractAlpineQueryManager(final AlpineRequest request) {
+        this.principal = request.getPrincipal();
+        this.pagination = request.getPagination();
+        this.filter = request.getFilter();
+        this.orderBy = request.getOrderBy();
+        this.orderDirection = request.getOrderDirection();
+    }
+
+    /**
+     * Wrapper around {@link Query#execute()} that adds transparent support for
+     * pagination and ordering of results. Specific checks are performed to ensure
+     * the execution of the query is capable of being paged and that ordering
+     * can be securely performed.
+     * @param query the JDO Query object to execute
+     * @return a Collection of objects
+     */
+    public Object execute(Query query) {
+        if (pagination != null && pagination.isPaginated()) {
+            long begin = (pagination.getPage() * pagination.getSize()) -  pagination.getSize();
+            long end = begin + pagination.getSize();
+            query.setRange(begin, end);
+        }
+        if (orderBy != null && RegexSequence.Pattern.ALPHA_NUMERIC.matcher(orderBy).matches() && orderDirection != OrderDirection.UNSPECIFIED) {
+            query.setOrdering(orderBy + " " + orderDirection.name().toLowerCase());
+        }
+        return query.execute();
+    }
 
     /**
      * Deletes one or more PersistenceCapable objects.
