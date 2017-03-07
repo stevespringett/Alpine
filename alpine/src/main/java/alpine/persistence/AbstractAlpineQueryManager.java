@@ -21,8 +21,10 @@ import alpine.resources.AlpineRequest;
 import alpine.resources.OrderDirection;
 import alpine.resources.Pagination;
 import alpine.validation.RegexSequence;
+import org.datanucleus.api.jdo.JDOQuery;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import java.lang.reflect.Field;
 import java.security.Principal;
 import java.util.Collection;
 import java.util.List;
@@ -100,7 +102,18 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
             query.setRange(begin, end);
         }
         if (orderBy != null && RegexSequence.Pattern.ALPHA_NUMERIC.matcher(orderBy).matches() && orderDirection != OrderDirection.UNSPECIFIED) {
-            query.setOrdering(orderBy + " " + orderDirection.name().toLowerCase());
+            // Check to see if the specified orderBy field is defined in the class being queried.
+            boolean found = false;
+            org.datanucleus.store.query.Query iq = ((JDOQuery)query).getInternalQuery();
+            for (Field field: iq.getCandidateClass().getDeclaredFields()) {
+                if (orderBy.equals(field.getName())) {
+                    found = true;
+                    break;
+                }
+            }
+            if (found) {
+                query.setOrdering(orderBy + " " + orderDirection.name().toLowerCase());
+            }
         }
         return query.execute();
     }
