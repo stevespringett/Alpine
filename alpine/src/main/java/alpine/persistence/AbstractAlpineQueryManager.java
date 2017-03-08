@@ -38,13 +38,13 @@ import java.util.List;
  */
 public abstract class AbstractAlpineQueryManager implements AutoCloseable {
 
-    final protected Principal principal;
-    final protected Pagination pagination;
-    final protected String filter;
-    final protected String orderBy;
-    final protected OrderDirection orderDirection;
+    protected final Principal principal;
+    protected final Pagination pagination;
+    protected final String filter;
+    protected final String orderBy;
+    protected final OrderDirection orderDirection;
 
-    final protected PersistenceManager pm = PersistenceManagerFactory.createPersistenceManager();
+    protected final PersistenceManager pm = PersistenceManagerFactory.createPersistenceManager();
 
     /**
      * Default constructor
@@ -64,6 +64,7 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      * @param filter a String filter, or null
      * @param orderBy the field to order by
      * @param orderDirection the sorting direction
+     * @since 1.0.0
      */
     public AbstractAlpineQueryManager(final Principal principal, final Pagination pagination, final String filter,
                                       final String orderBy, final OrderDirection orderDirection) {
@@ -78,6 +79,7 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      * Constructs a new QueryManager. Deconstructs the specified AlpineRequest
      * into its individual components including pagination and ordering.
      * @param request an AlpineRequest object
+     * @since 1.0.0
      */
     public AbstractAlpineQueryManager(final AlpineRequest request) {
         this.principal = request.getPrincipal();
@@ -89,13 +91,24 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
 
     /**
      * Wrapper around {@link Query#execute()} that adds transparent support for
-     * pagination and ordering of results. Specific checks are performed to ensure
-     * the execution of the query is capable of being paged and that ordering
-     * can be securely performed.
+     * pagination and ordering of results via {@link #decorate(Query)}.
      * @param query the JDO Query object to execute
      * @return a Collection of objects
+     * @since 1.0.0
      */
-    public Object execute(Query query) {
+    public Object execute(final Query query) {
+        return decorate(query).execute();
+    }
+
+    /**
+     * Given a query, this method will decorate that query with pagination, ordering,
+     * and sorting direction. Specific checks are performed to ensure the execution
+     * of the query is capable of being paged and that ordering can be securely performed.
+     * @param query the JDO Query object to execute
+     * @return a Collection of objects
+     * @since 1.0.0
+     */
+    public Query decorate(final Query query) {
         if (pagination != null && pagination.isPaginated()) {
             long begin = (pagination.getPage() * pagination.getSize()) -  pagination.getSize();
             long end = begin + pagination.getSize();
@@ -115,7 +128,37 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
                 query.setOrdering(orderBy + " " + orderDirection.name().toLowerCase());
             }
         }
-        return query.execute();
+        return query;
+    }
+
+    /**
+     * Returns the number of items that would have resulted from returning all object.
+     * This method is performant in that the objects are not actually retrieved, only
+     * the count.
+     * @param query the query to return a count from
+     * @return the number of items
+     * @since 1.0.0
+     */
+    public long getCount(final Query query) {
+        //query.addExtension("datanucleus.query.resultSizeMethod", "count");
+        query.setResult("count(id)");
+        query.setOrdering(null);
+        return (Long)query.execute();
+    }
+
+    /**
+     * Returns the number of items that would have resulted from returning all object.
+     * This method is performant in that the objects are not actually retrieved, only
+     * the count.
+     * @param cls the persistence-capable class to query
+     * @return the number of items
+     * @since 1.0.0
+     */
+    public long getCount(final Class cls) {
+        Query query = pm.newQuery(cls);
+        //query.addExtension("datanucleus.query.resultSizeMethod", "count");
+        query.setResult("count(id)");
+        return (Long)query.execute();
     }
 
     /**
