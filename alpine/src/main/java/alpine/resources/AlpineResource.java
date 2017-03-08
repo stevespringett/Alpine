@@ -55,6 +55,8 @@ public abstract class AlpineResource {
 
     private static final ValidatorFactory VALIDATOR_FACTORY = Validation.buildDefaultValidatorFactory();
 
+    protected static final String TOTAL_COUNT_HEADER = "X-Total-Count";
+
     @Context
     private ContainerRequestContext requestContext;
 
