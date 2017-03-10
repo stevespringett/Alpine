@@ -61,6 +61,8 @@ public class RegexSequence {
         public static final String ALPHA_UPPERCASE = "^\\p{Upper}*$";
         public static final String NUMERIC = "^[-+]?\\p{Digit}*\\.?\\p{Digit}+([eE][-+]?\\p{Digit}+)?$";
         public static final String ALPHA_NUMERIC = "^\\p{Alnum}*$";
+        public static final String VISIBLE_CHARS = "^\\p{Graph}*$";
+        public static final String PRINTABLE_CHARS = "^\\p{Print}*$";
         public static final String HEXADECIMAL = "^[A-Fa-f0-9]*$";
         public static final String BINARY = "^[0-1]*$";
         public static final String UUID = "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$";
@@ -117,6 +119,8 @@ public class RegexSequence {
         public static final java.util.regex.Pattern ALPHA_UPPERCASE = java.util.regex.Pattern.compile(RegexSequence.Definition.ALPHA_UPPERCASE, java.util.regex.Pattern.UNICODE_CHARACTER_CLASS);
         public static final java.util.regex.Pattern NUMERIC = java.util.regex.Pattern.compile(RegexSequence.Definition.NUMERIC);
         public static final java.util.regex.Pattern ALPHA_NUMERIC = java.util.regex.Pattern.compile(RegexSequence.Definition.ALPHA_NUMERIC, java.util.regex.Pattern.UNICODE_CHARACTER_CLASS);
+        public static final java.util.regex.Pattern VISIBLE_CHARS = java.util.regex.Pattern.compile(RegexSequence.Definition.VISIBLE_CHARS, java.util.regex.Pattern.UNICODE_CHARACTER_CLASS);
+        public static final java.util.regex.Pattern PRINTABLE_CHARS = java.util.regex.Pattern.compile(RegexSequence.Definition.PRINTABLE_CHARS, java.util.regex.Pattern.UNICODE_CHARACTER_CLASS);
         public static final java.util.regex.Pattern HEXADECIMAL = java.util.regex.Pattern.compile(RegexSequence.Definition.HEXADECIMAL);
         public static final java.util.regex.Pattern BINARY = java.util.regex.Pattern.compile(RegexSequence.Definition.BINARY);
         public static final java.util.regex.Pattern UUID = java.util.regex.Pattern.compile(RegexSequence.Definition.UUID);
