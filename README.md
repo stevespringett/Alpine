@@ -15,6 +15,13 @@ API-first design, secure defaults, and minimal dependencies. Alpine came
 about due to many commonalities between several of my personal and 
 professional projects.
 
+Alpine provides the basis for quickly developing a 'Thin Server Architecture'.
+This type of architecture shifts the role of webapps to being API providers
+with little or no responsibility for server-side HTML rendering. This type
+of architecture is perfect for client-side rendered webapps that rely heavily
+on JSON, for Single Page Applications (SPA), and to power back-ends that drive
+mobile applications.
+
 Design Features
 -
 
