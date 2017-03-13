@@ -62,9 +62,10 @@ public class RegexSequence {
         public static final String NUMERIC = "^[-+]?\\p{Digit}*\\.?\\p{Digit}+([eE][-+]?\\p{Digit}+)?$";
         public static final String ALPHA_NUMERIC = "^\\p{Alnum}*$";
         public static final String WORD_CHARS = "^[a-zA-Z_0-9]*$";
-        public static final String VISIBLE_CHARS = "^[\\x21-\\x7E]*$";
-        public static final String PRINTABLE_CHARS = "^[\\x20-\\x7E]*$";
+        public static final String PRINTABLE_CHARS = "^[\\x20\\p{L}\\p{M}\\p{S}\\p{N}\\p{P}]*$";
+        public static final String PRINTABLE_CHARS_PLUS = "^[\\x20\\p{L}\\p{M}\\p{S}\\p{N}\\p{P}\\n\\r\\t]*$";
         public static final String NOT_CONTROL_CHARS = "^[^\\x00-\\x1F\\x7F]*$";
+
         public static final String HEXADECIMAL = "^[A-Fa-f0-9]*$";
         public static final String BINARY = "^[0-1]*$";
         public static final String UUID = "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$";
@@ -123,8 +124,8 @@ public class RegexSequence {
         public static final java.util.regex.Pattern NUMERIC = java.util.regex.Pattern.compile(RegexSequence.Definition.NUMERIC);
         public static final java.util.regex.Pattern ALPHA_NUMERIC = java.util.regex.Pattern.compile(RegexSequence.Definition.ALPHA_NUMERIC, java.util.regex.Pattern.UNICODE_CHARACTER_CLASS);
         public static final java.util.regex.Pattern WORD_CHARS = java.util.regex.Pattern.compile(RegexSequence.Definition.WORD_CHARS, java.util.regex.Pattern.UNICODE_CHARACTER_CLASS);
-        public static final java.util.regex.Pattern VISIBLE_CHARS = java.util.regex.Pattern.compile(RegexSequence.Definition.VISIBLE_CHARS, java.util.regex.Pattern.UNICODE_CHARACTER_CLASS);
-        public static final java.util.regex.Pattern PRINTABLE_CHARS = java.util.regex.Pattern.compile(RegexSequence.Definition.PRINTABLE_CHARS, java.util.regex.Pattern.UNICODE_CHARACTER_CLASS);
+        public static final java.util.regex.Pattern PRINTABLE_CHARS = java.util.regex.Pattern.compile(RegexSequence.Definition.PRINTABLE_CHARS);
+        public static final java.util.regex.Pattern PRINTABLE_CHARS_PLUS = java.util.regex.Pattern.compile(RegexSequence.Definition.PRINTABLE_CHARS_PLUS);
         public static final java.util.regex.Pattern NOT_CONTROL_CHARS = java.util.regex.Pattern.compile(Definition.NOT_CONTROL_CHARS);
         public static final java.util.regex.Pattern HEXADECIMAL = java.util.regex.Pattern.compile(RegexSequence.Definition.HEXADECIMAL);
         public static final java.util.regex.Pattern BINARY = java.util.regex.Pattern.compile(RegexSequence.Definition.BINARY);
