@@ -1,4 +1,3 @@
-<img src="http://stevespringett.github.io/alpine/images/Alpine.svg" width="300" align="right">
 [![Build Status](https://travis-ci.org/stevespringett/Alpine.svg?branch=master)](https://travis-ci.org/stevespringett/Alpine)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/cefa2866cbc24deeb7fbc83b8f71ad60)](https://www.codacy.com/app/stevespringett/Alpine?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=stevespringett/Alpine&amp;utm_campaign=Badge_Grade)
 [![Dependency Status](https://www.versioneye.com/user/projects/58a2a49a0f3d4f003ce97f07/badge.svg?style=flat)](https://www.versioneye.com/user/projects/58a2a49a0f3d4f003ce97f07)
@@ -6,6 +5,7 @@
 [![License][license-image]][license-url]
 ![Static Analysis][fortify-image]
 [![Component Analysis][odc-image]][odc-url]
+<img src="http://stevespringett.github.io/alpine/images/Alpine.svg" width="300" align="right">
 
 Alpine
 =========
