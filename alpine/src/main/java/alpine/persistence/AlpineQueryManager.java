@@ -202,6 +202,21 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     }
 
     /**
+     * Resolves a UserPrincipal. Default order resolution is to first match
+     * on ManagedUser then on LdapUser. This may be configurable in a future
+     * release.
+     * @return a UserPrincipal if found, null if not found
+     * @since 1.0.0
+     */
+    public UserPrincipal getUserPrincipal(String username) {
+        UserPrincipal principal = getManagedUser(username);
+        if (principal != null) {
+            return principal;
+        }
+        return getLdapUser(username);
+    }
+
+    /**
      * Creates a new Team with the specified name. If createApiKey is true,
      * then {@link #createApiKey} is invoked and a cryptographically secure
      * API key is generated.
@@ -262,8 +277,11 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @since 1.0.0
      */
     public boolean addUserToTeam(final UserPrincipal user, final Team team) {
-        final List<Team> teams = user.getTeams();
+        List<Team> teams = user.getTeams();
         boolean found = false;
+        if (teams == null) {
+            teams = new ArrayList<>();
+        }
         for (Team t: teams) {
             if (team.getUuid().equals(t.getUuid())) {
                 found = true;
@@ -289,6 +307,9 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      */
     public boolean removeUserFromTeam(final UserPrincipal user, final Team team) {
         final List<Team> teams = user.getTeams();
+        if (teams == null) {
+            return false;
+        }
         boolean found = false;
         for (Team t: teams) {
             if (team.getUuid().equals(t.getUuid())) {

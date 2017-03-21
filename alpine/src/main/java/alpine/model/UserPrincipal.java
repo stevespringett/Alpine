@@ -28,6 +28,18 @@ import java.util.List;
 public interface UserPrincipal {
 
     /**
+     * The database id of the principal.
+     * @return a long of the unique id
+     */
+    long getId();
+
+    /**
+     * Specifies the database id of the principal.
+     * @param id a long of the unique id
+     */
+    void setId(long id);
+
+    /**
      * The username of the principal.
      * @return a String of the username
      */
