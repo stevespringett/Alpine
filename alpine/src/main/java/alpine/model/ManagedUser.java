@@ -66,6 +66,7 @@ public class ManagedUser implements Serializable, Principal, UserPrincipal {
     @NotNull
     @Size(min = 1, max = 255)
     @Pattern(regexp = "[\\P{Cc}]+", message = "The password must not contain control characters")
+    @JsonIgnore
     private String password;
 
     @Persistent
