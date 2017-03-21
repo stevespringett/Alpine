@@ -33,6 +33,7 @@ public class UserPrincipalResolver {
 
     private String username;
     private UserPrincipal principal;
+    private boolean initialized;
 
     public UserPrincipalResolver(String username) {
         this.username = username;
@@ -46,6 +47,7 @@ public class UserPrincipalResolver {
      * @since 1.0.0
      */
     public UserPrincipal resolve() {
+        initialized = true;
         try (AlpineQueryManager qm = new AlpineQueryManager()) {
             UserPrincipal principal = qm.getManagedUser(username);
             if (principal != null) {
@@ -58,21 +60,25 @@ public class UserPrincipalResolver {
 
     /**
      * Returns whether or not the resolved UserPrincipal is an LdapUser or not.
-     * Requires that {@link #resolve()} is called first.
      * @return true if LdapUser, false if not
      * @since 1.0.0
      */
     public boolean isLdapUser() {
+        if (!initialized) {
+            resolve();
+        }
         return principal != null && principal instanceof LdapUser;
     }
 
     /**
      * Returns whether or not the resolved UserPrincipal is a ManagedUser or not.
-     * Requires that {@link #resolve()} is called first.
      * @return true if ManagedUser, false if not
      * @since 1.0.0
      */
     public boolean isManagedUser() {
+        if (!initialized) {
+            resolve();
+        }
         return principal != null && principal instanceof ManagedUser;
     }
 
