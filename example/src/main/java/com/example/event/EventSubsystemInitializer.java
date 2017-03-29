@@ -32,7 +32,7 @@ import javax.servlet.ServletContextListener;
 public class EventSubsystemInitializer implements ServletContextListener {
 
     // Starts the EventService
-    private static final EventService EVENT_SERVICE = EventService.getEventService();
+    private static final EventService EVENT_SERVICE = EventService.getInstance();
 
     @Override
     public void contextInitialized(ServletContextEvent event) {
