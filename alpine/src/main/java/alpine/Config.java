@@ -116,7 +116,7 @@ public class Config {
 
         LOGGER.info("Initializing Configuration");
         properties = new Properties();
-        try (InputStream in = this.getClass().getClassLoader().getResourceAsStream("application.properties")) {
+        try (InputStream in = this.getClass().getClassLoader().getResourceAsStream(PROP_FILE)) {
             properties.load(in);
         } catch (IOException e) {
             LOGGER.error("Unable to load " + PROP_FILE);
