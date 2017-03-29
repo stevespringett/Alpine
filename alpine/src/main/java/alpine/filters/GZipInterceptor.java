@@ -17,7 +17,10 @@
  */
 package alpine.filters;
 
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.ReaderInterceptorContext;
@@ -37,9 +40,19 @@ import java.util.zip.GZIPOutputStream;
 @Provider
 public class GZipInterceptor implements ReaderInterceptor, WriterInterceptor {
 
+    private HttpHeaders httpHeaders;
+
+    /**
+     * Constructor.
+     * @param httpHeaders the The HttpHeaders
+     */
+    public GZipInterceptor(@Context @NotNull HttpHeaders httpHeaders) {
+        this.httpHeaders = httpHeaders;
+    }
+
     @Override
     public Object aroundReadFrom(ReaderInterceptorContext context) throws IOException, WebApplicationException {
-        final List<String> header = context.getHeaders().get("Content-Encoding");
+        final List<String> header = context.getHeaders().get(HttpHeaders.CONTENT_ENCODING);
         if (header != null && header.contains("gzip")) {
             context.setInputStream(new GZIPInputStream(context.getInputStream()));
         }
@@ -48,8 +61,11 @@ public class GZipInterceptor implements ReaderInterceptor, WriterInterceptor {
 
     @Override
     public void aroundWriteTo(WriterInterceptorContext context) throws IOException, WebApplicationException {
-        context.setOutputStream(new GZIPOutputStream(context.getOutputStream()));
-        context.getHeaders().add("Content-Encoding", "gzip");
+        final List<String> requestHeader = httpHeaders.getRequestHeader(HttpHeaders.ACCEPT_ENCODING);
+        if (requestHeader != null && requestHeader.contains("gzip")) {
+            context.setOutputStream(new GZIPOutputStream(context.getOutputStream()));
+            context.getHeaders().add(HttpHeaders.CONTENT_ENCODING, "gzip");
+        }
         context.proceed();
     }
 
