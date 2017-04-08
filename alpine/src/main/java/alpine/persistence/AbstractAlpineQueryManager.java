@@ -28,6 +28,7 @@ import java.lang.reflect.Field;
 import java.security.Principal;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Base persistence manager that implements AutoCloseable so that the PersistenceManager will
@@ -101,6 +102,69 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
     }
 
     /**
+     * Wrapper around {@link Query#execute(Object)} that adds transparent support for
+     * pagination and ordering of results via {@link #decorate(Query)}.
+     * @param query the JDO Query object to execute
+     * @param p1 the value of the first parameter declared.
+     * @return a Collection of objects
+     * @since 1.0.0
+     */
+    public Object execute(final Query query, final Object p1) {
+        return decorate(query).execute(p1);
+    }
+
+    /**
+     * Wrapper around {@link Query#execute(Object, Object)} that adds transparent support for
+     * pagination and ordering of results via {@link #decorate(Query)}.
+     * @param query the JDO Query object to execute
+     * @param p1 the value of the first parameter declared.
+     * @param p2 the value of the second parameter declared.
+     * @return a Collection of objects
+     * @since 1.0.0
+     */
+    public Object execute(final Query query, final Object p1, final Object p2) {
+        return decorate(query).execute(p1, p2);
+    }
+
+    /**
+     * Wrapper around {@link Query#execute(Object, Object, Object)} that adds transparent support for
+     * pagination and ordering of results via {@link #decorate(Query)}.
+     * @param query the JDO Query object to execute
+     * @param p1 the value of the first parameter declared.
+     * @param p2 the value of the second parameter declared.
+     * @param p3 the value of the third parameter declared.
+     * @return a Collection of objects
+     * @since 1.0.0
+     */
+    public Object execute(final Query query, final Object p1, final Object p2, final Object p3) {
+        return decorate(query).execute(p1, p2, p3);
+    }
+
+    /**
+     * Wrapper around {@link Query#executeWithArray(Object...)} that adds transparent support for
+     * pagination and ordering of results via {@link #decorate(Query)}.
+     * @param query the JDO Query object to execute
+     * @param parameters the <code>Object</code> array with all of the parameters
+     * @return a Collection of objects
+     * @since 1.0.0
+     */
+    public Object execute(final Query query, final Object... parameters) {
+        return decorate(query).executeWithArray(parameters);
+    }
+
+    /**
+     * Wrapper around {@link Query#executeWithMap(Map)} that adds transparent support for
+     * pagination and ordering of results via {@link #decorate(Query)}.
+     * @param query the JDO Query object to execute
+     * @param parameters the <code>Map</code> containing all of the parameters.
+     * @return a Collection of objects
+     * @since 1.0.0
+     */
+    public Object execute(final Query query, final Map parameters) {
+        return decorate(query).executeWithMap(parameters);
+    }
+
+    /**
      * Given a query, this method will decorate that query with pagination, ordering,
      * and sorting direction. Specific checks are performed to ensure the execution
      * of the query is capable of being paged and that ordering can be securely performed.
@@ -110,14 +174,14 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      */
     public Query decorate(final Query query) {
         if (pagination != null && pagination.isPaginated()) {
-            long begin = (pagination.getPage() * pagination.getSize()) -  pagination.getSize();
-            long end = begin + pagination.getSize();
+            final long begin = (pagination.getPage() * pagination.getSize()) -  pagination.getSize();
+            final long end = begin + pagination.getSize();
             query.setRange(begin, end);
         }
         if (orderBy != null && RegexSequence.Pattern.ALPHA_NUMERIC.matcher(orderBy).matches() && orderDirection != OrderDirection.UNSPECIFIED) {
             // Check to see if the specified orderBy field is defined in the class being queried.
             boolean found = false;
-            org.datanucleus.store.query.Query iq = ((JDOQuery)query).getInternalQuery();
+            final org.datanucleus.store.query.Query iq = ((JDOQuery) query).getInternalQuery();
             for (Field field: iq.getCandidateClass().getDeclaredFields()) {
                 if (orderBy.equals(field.getName())) {
                     found = true;
@@ -143,7 +207,7 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
         //query.addExtension("datanucleus.query.resultSizeMethod", "count");
         query.setResult("count(id)");
         query.setOrdering(null);
-        return (Long)query.execute();
+        return (Long) query.execute();
     }
 
     /**
@@ -155,10 +219,10 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      * @since 1.0.0
      */
     public long getCount(final Class cls) {
-        Query query = pm.newQuery(cls);
+        final Query query = pm.newQuery(cls);
         //query.addExtension("datanucleus.query.resultSizeMethod", "count");
         query.setResult("count(id)");
-        return (Long)query.execute();
+        return (Long) query.execute();
     }
 
     /**
