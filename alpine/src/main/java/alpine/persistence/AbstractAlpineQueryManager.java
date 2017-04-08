@@ -214,6 +214,84 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      * Returns the number of items that would have resulted from returning all object.
      * This method is performant in that the objects are not actually retrieved, only
      * the count.
+     * @param query the query to return a count from
+     * @param p1 the value of the first parameter declared.
+     * @return the number of items
+     * @since 1.0.0
+     */
+    public long getCount(final Query query, final Object p1) {
+        query.setResult("count(id)");
+        query.setOrdering(null);
+        return (Long) query.execute(p1);
+    }
+
+    /**
+     * Returns the number of items that would have resulted from returning all object.
+     * This method is performant in that the objects are not actually retrieved, only
+     * the count.
+     * @param query the query to return a count from
+     * @param p1 the value of the first parameter declared.
+     * @param p2 the value of the second parameter declared.
+     * @return the number of items
+     * @since 1.0.0
+     */
+    public long getCount(final Query query, final Object p1, final Object p2) {
+        query.setResult("count(id)");
+        query.setOrdering(null);
+        return (Long) query.execute(p1, p2);
+    }
+
+    /**
+     * Returns the number of items that would have resulted from returning all object.
+     * This method is performant in that the objects are not actually retrieved, only
+     * the count.
+     * @param query the query to return a count from
+     * @param p1 the value of the first parameter declared.
+     * @param p2 the value of the second parameter declared.
+     * @param p3 the value of the third parameter declared.
+     * @return the number of items
+     * @since 1.0.0
+     */
+    public long getCount(final Query query, final Object p1, final Object p2, final Object p3) {
+        query.setResult("count(id)");
+        query.setOrdering(null);
+        return (Long) query.execute(p1, p2, p3);
+    }
+
+    /**
+     * Returns the number of items that would have resulted from returning all object.
+     * This method is performant in that the objects are not actually retrieved, only
+     * the count.
+     * @param query the query to return a count from
+     * @param parameters the <code>Object</code> array with all of the parameters
+     * @return the number of items
+     * @since 1.0.0
+     */
+    public long getCount(final Query query, final Object... parameters) {
+        query.setResult("count(id)");
+        query.setOrdering(null);
+        return (Long) query.executeWithArray(parameters);
+    }
+
+    /**
+     * Returns the number of items that would have resulted from returning all object.
+     * This method is performant in that the objects are not actually retrieved, only
+     * the count.
+     * @param query the query to return a count from
+     * @param parameters the <code>Map</code> containing all of the parameters.
+     * @return the number of items
+     * @since 1.0.0
+     */
+    public long getCount(final Query query, final Map parameters) {
+        query.setResult("count(id)");
+        query.setOrdering(null);
+        return (Long) query.executeWithMap(parameters);
+    }
+
+    /**
+     * Returns the number of items that would have resulted from returning all object.
+     * This method is performant in that the objects are not actually retrieved, only
+     * the count.
      * @param cls the persistence-capable class to query
      * @return the number of items
      * @since 1.0.0
