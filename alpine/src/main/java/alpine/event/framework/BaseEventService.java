@@ -68,6 +68,7 @@ public abstract class BaseEventService {
         logger.debug("Dispatching event: " + event.getClass().toString());
         final ArrayList<Class<? extends Subscriber>> subscriberClasses = subscriptionMap.get(event.getClass());
         if (subscriberClasses == null) {
+            logger.debug("No subscribers to inform from event: " + event.getClass().getName());
             return;
         }
         for (Class clazz: subscriberClasses) {
