@@ -351,6 +351,7 @@
                     <api>JDO</api>
                     <persistenceUnitName>Alpine</persistenceUnitName>
                     <verbose>true</verbose>
+                    <fork>false</fork>
                 </configuration>
                 <executions>
                     <execution>
