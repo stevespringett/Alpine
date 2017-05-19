@@ -59,7 +59,7 @@
 
         <!-- Maven Plugin Versions -->
         <maven.compiler.plugin.version>3.6.1</maven.compiler.plugin.version>
-        <maven.dependency.plugin.version>3.0.0</maven.dependency.plugin.version>
+        <maven.dependency.plugin.version>3.0.1</maven.dependency.plugin.version>
         <maven.javadoc.plugin.version>2.10.4</maven.javadoc.plugin.version>
         <maven.site.plugin.version>3.6</maven.site.plugin.version>
         <maven.source.plugin.version>3.0.1</maven.source.plugin.version>
