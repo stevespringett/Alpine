@@ -263,12 +263,12 @@ public abstract class AlpineResource {
     @PostConstruct
     private void initialize() {
         final MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
-        final String page = queryParams.getFirst("page");
-        final String size = queryParams.getFirst("size");
-        final String filter = queryParams.getFirst("filter");
-        final String sort = queryParams.getFirst("sort");
-        OrderDirection orderDirection;
-        String orderBy = queryParams.getFirst("orderBy");
+        final String page = multiParam(queryParams, "page", "pageNumber");
+        final String size = multiParam(queryParams, "size", "pageSize");
+        final String filter = multiParam(queryParams, "filter", "searchText");
+        final String sort = multiParam(queryParams, "sort", "sortName");
+        final OrderDirection orderDirection;
+        String orderBy = multiParam(queryParams, "orderBy", "sortOrder");
 
         if (StringUtils.isBlank(orderBy) || !RegexSequence.Pattern.ALPHA_NUMERIC.matcher(orderBy).matches()) {
             orderBy = null;
@@ -283,6 +283,23 @@ public abstract class AlpineResource {
         }
 
         this.alpineRequest = new AlpineRequest(getPrincipal(), new Pagination(page, size), filter, orderBy, orderDirection);
+    }
+
+    /**
+     * Provides a facility to retrieve a param by more than one name. Different libraries
+     * and frameworks, expect (in some cases) different names for the same param.
+     * @param queryParams the parameters from the querystring
+     * @param params an array of one or more param names
+     * @return the value of the param, or null if not found
+     */
+    private String multiParam(MultivaluedMap<String, String> queryParams, String... params) {
+        for (String param: params) {
+            final String value = queryParams.getFirst(param);
+            if (StringUtils.isNotBlank(value)) {
+                return value;
+            }
+        }
+        return null;
     }
 
     /**
