@@ -29,6 +29,7 @@ import java.security.Principal;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Base persistence manager that implements AutoCloseable so that the PersistenceManager will
@@ -346,10 +347,38 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      * @since 1.0.0
      */
     @SuppressWarnings("unchecked")
-    public <T> T getObjectByUuid(Class<T> clazz, String uuid) {
+    public <T> T getObjectByUuid(Class<T> clazz, UUID uuid) {
         final Query query = pm.newQuery(clazz, "uuid == :uuid");
         final List<T> result = (List<T>) query.execute(uuid);
         return result.size() == 0 ? null : result.get(0);
+    }
+
+    /**
+     * Retrieves an object by its UUID.
+     * @param <T> A type parameter. This type will be returned
+     * @param clazz the persistence class to retrive the ID for
+     * @param uuid the uuid of the object to retrieve
+     * @return an object of the specified type
+     * @since 1.0.0
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T getObjectByUuid(Class<T> clazz, String uuid) {
+        return getObjectByUuid(clazz, UUID.fromString(uuid));
+    }
+
+    /**
+     * Retrieves an object by its UUID.
+     * @param <T> A type parameter. This type will be returned
+     * @param clazz the persistence class to retrive the ID for
+     * @param uuid the uuid of the object to retrieve
+     * @param fetchGroup the JDO fetchgroup to use when making the query
+     * @return an object of the specified type
+     * @since 1.0.0
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T getObjectByUuid(Class<T> clazz, UUID uuid, String fetchGroup) {
+        pm.getFetchPlan().addGroup(fetchGroup);
+        return getObjectByUuid(clazz, uuid);
     }
 
     /**
@@ -363,8 +392,7 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      */
     @SuppressWarnings("unchecked")
     public <T> T getObjectByUuid(Class<T> clazz, String uuid, String fetchGroup) {
-        pm.getFetchPlan().addGroup(fetchGroup);
-        return getObjectByUuid(clazz, uuid);
+        return getObjectByUuid(clazz, UUID.fromString(uuid), fetchGroup);
     }
 
     /**

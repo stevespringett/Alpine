@@ -29,7 +29,6 @@ import alpine.resources.AlpineRequest;
 import javax.jdo.Query;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * This QueryManager provides a concrete entension of {@link AbstractAlpineQueryManager} by
@@ -41,12 +40,12 @@ import java.util.UUID;
 public class AlpineQueryManager extends AbstractAlpineQueryManager {
 
     /**
-     * Default constructor
+     * Default constructor.
      */
     public AlpineQueryManager() { }
 
     /**
-     * Constructs a new AlpineQueryManager
+     * Constructs a new AlpineQueryManager.
      * @param request an AlpineRequest
      */
     public AlpineQueryManager(final AlpineRequest request) {
@@ -205,11 +204,12 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * Resolves a UserPrincipal. Default order resolution is to first match
      * on ManagedUser then on LdapUser. This may be configurable in a future
      * release.
+     * @param username the username of the principal to retrieve
      * @return a UserPrincipal if found, null if not found
      * @since 1.0.0
      */
     public UserPrincipal getUserPrincipal(String username) {
-        UserPrincipal principal = getManagedUser(username);
+        final UserPrincipal principal = getManagedUser(username);
         if (principal != null) {
             return principal;
         }
@@ -230,7 +230,6 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
         final Team team = new Team();
         team.setName(name);
         //todo assign permissions
-        team.setUuid(UUID.randomUUID().toString());
         pm.makePersistent(team);
         pm.currentTransaction().commit();
         if (createApiKey) {

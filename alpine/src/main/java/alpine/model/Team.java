@@ -17,7 +17,6 @@
  */
 package alpine.model;
 
-import alpine.validation.RegexSequence;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import javax.jdo.annotations.Column;
@@ -35,6 +34,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Persistable object representing a Team.
@@ -69,12 +69,11 @@ public class Team implements Serializable {
     @JsonIgnore
     private long id;
 
-    @Persistent
+    @Persistent(customValueStrategy = "uuid")
     @Unique(name = "TEAM_UUID_IDX")
     @Column(name = "UUID", jdbcType = "VARCHAR", length = 36, allowsNull = "false")
     @NotNull
-    @Pattern(regexp = RegexSequence.Definition.UUID, message = "The uuid must be a valid 36 character UUID")
-    private String uuid;
+    private UUID uuid;
 
     @Persistent
     @Column(name = "NAME", jdbcType = "VARCHAR", length = 50, allowsNull = "false")
@@ -103,11 +102,11 @@ public class Team implements Serializable {
         this.id = id;
     }
 
-    public String getUuid() {
+    public UUID getUuid() {
         return uuid;
     }
 
-    public void setUuid(String uuid) {
+    public void setUuid(UUID uuid) {
         this.uuid = uuid;
     }
 
