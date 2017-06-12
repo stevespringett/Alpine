@@ -266,9 +266,9 @@ public abstract class AlpineResource {
         final String page = multiParam(queryParams, "page", "pageNumber");
         final String size = multiParam(queryParams, "size", "pageSize");
         final String filter = multiParam(queryParams, "filter", "searchText");
-        final String sort = multiParam(queryParams, "sort", "sortName");
+        final String sort = multiParam(queryParams, "sort", "sortOrder");
         final OrderDirection orderDirection;
-        String orderBy = multiParam(queryParams, "orderBy", "sortOrder");
+        String orderBy = multiParam(queryParams, "orderBy", "sortName");
 
         if (StringUtils.isBlank(orderBy) || !RegexSequence.Pattern.ALPHA_NUMERIC.matcher(orderBy).matches()) {
             orderBy = null;
