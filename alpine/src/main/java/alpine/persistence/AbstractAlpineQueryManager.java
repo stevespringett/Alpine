@@ -95,11 +95,15 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      * Wrapper around {@link Query#execute()} that adds transparent support for
      * pagination and ordering of results via {@link #decorate(Query)}.
      * @param query the JDO Query object to execute
-     * @return a Collection of objects
+     * @return a PaginatedResult object
      * @since 1.0.0
      */
-    public Object execute(final Query query) {
-        return decorate(query).execute();
+    public PaginatedResult execute(final Query query) {
+        final long count = getCount(query);
+        decorate(query);
+        return new PaginatedResult()
+                .objects(query.execute())
+                .total(count);
     }
 
     /**
@@ -107,11 +111,15 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      * pagination and ordering of results via {@link #decorate(Query)}.
      * @param query the JDO Query object to execute
      * @param p1 the value of the first parameter declared.
-     * @return a Collection of objects
+     * @return a PaginatedResult object
      * @since 1.0.0
      */
-    public Object execute(final Query query, final Object p1) {
-        return decorate(query).execute(p1);
+    public PaginatedResult execute(final Query query, final Object p1) {
+        final long count = getCount(query, p1);
+        decorate(query);
+        return new PaginatedResult()
+                .objects(query.execute(p1))
+                .total(count);
     }
 
     /**
@@ -120,11 +128,15 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      * @param query the JDO Query object to execute
      * @param p1 the value of the first parameter declared.
      * @param p2 the value of the second parameter declared.
-     * @return a Collection of objects
+     * @return a PaginatedResult object
      * @since 1.0.0
      */
-    public Object execute(final Query query, final Object p1, final Object p2) {
-        return decorate(query).execute(p1, p2);
+    public PaginatedResult execute(final Query query, final Object p1, final Object p2) {
+        final long count = getCount(query, p1, p2);
+        decorate(query);
+        return new PaginatedResult()
+                .objects(query.execute(p1, p2))
+                .total(count);
     }
 
     /**
@@ -134,11 +146,15 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      * @param p1 the value of the first parameter declared.
      * @param p2 the value of the second parameter declared.
      * @param p3 the value of the third parameter declared.
-     * @return a Collection of objects
+     * @return a PaginatedResult object
      * @since 1.0.0
      */
-    public Object execute(final Query query, final Object p1, final Object p2, final Object p3) {
-        return decorate(query).execute(p1, p2, p3);
+    public PaginatedResult execute(final Query query, final Object p1, final Object p2, final Object p3) {
+        final long count = getCount(query, p1, p2, p3);
+        decorate(query);
+        return new PaginatedResult()
+                .objects(query.execute(p1, p2, p3))
+                .total(count);
     }
 
     /**
@@ -146,11 +162,15 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      * pagination and ordering of results via {@link #decorate(Query)}.
      * @param query the JDO Query object to execute
      * @param parameters the <code>Object</code> array with all of the parameters
-     * @return a Collection of objects
+     * @return a PaginatedResult object
      * @since 1.0.0
      */
-    public Object execute(final Query query, final Object... parameters) {
-        return decorate(query).executeWithArray(parameters);
+    public PaginatedResult execute(final Query query, final Object... parameters) {
+        final long count = getCount(query, parameters);
+        decorate(query);
+        return new PaginatedResult()
+                .objects(query.executeWithArray(parameters))
+                .total(count);
     }
 
     /**
@@ -158,11 +178,15 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      * pagination and ordering of results via {@link #decorate(Query)}.
      * @param query the JDO Query object to execute
      * @param parameters the <code>Map</code> containing all of the parameters.
-     * @return a Collection of objects
+     * @return a PaginatedResult object
      * @since 1.0.0
      */
-    public Object execute(final Query query, final Map parameters) {
-        return decorate(query).executeWithMap(parameters);
+    public PaginatedResult execute(final Query query, final Map parameters) {
+        final long count = getCount(query, parameters);
+        decorate(query);
+        return new PaginatedResult()
+                .objects(query.executeWithMap(parameters))
+                .total(count);
     }
 
     /**
@@ -174,6 +198,8 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      * @since 1.0.0
      */
     public Query decorate(final Query query) {
+        // Clear the result to fetch if previously specified (i.e. by getting count)
+        query.setResult(null);
         if (pagination != null && pagination.isPaginated()) {
             final long begin = (pagination.getPage() * pagination.getSize()) -  pagination.getSize();
             final long end = begin + pagination.getSize();
@@ -206,9 +232,12 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      */
     public long getCount(final Query query) {
         //query.addExtension("datanucleus.query.resultSizeMethod", "count");
+        final String ordering = ((org.datanucleus.api.jdo.JDOQuery) query).getInternalQuery().getOrdering();
         query.setResult("count(id)");
         query.setOrdering(null);
-        return (Long) query.execute();
+        final long count = (Long) query.execute();
+        query.setOrdering(ordering);
+        return count;
     }
 
     /**
@@ -221,9 +250,12 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      * @since 1.0.0
      */
     public long getCount(final Query query, final Object p1) {
+        final String ordering = ((org.datanucleus.api.jdo.JDOQuery) query).getInternalQuery().getOrdering();
         query.setResult("count(id)");
         query.setOrdering(null);
-        return (Long) query.execute(p1);
+        final long count = (Long) query.execute(p1);
+        query.setOrdering(ordering);
+        return count;
     }
 
     /**
@@ -237,9 +269,12 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      * @since 1.0.0
      */
     public long getCount(final Query query, final Object p1, final Object p2) {
+        final String ordering = ((org.datanucleus.api.jdo.JDOQuery) query).getInternalQuery().getOrdering();
         query.setResult("count(id)");
         query.setOrdering(null);
-        return (Long) query.execute(p1, p2);
+        final long count = (Long) query.execute(p1, p2);
+        query.setOrdering(ordering);
+        return count;
     }
 
     /**
@@ -254,9 +289,12 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      * @since 1.0.0
      */
     public long getCount(final Query query, final Object p1, final Object p2, final Object p3) {
+        final String ordering = ((org.datanucleus.api.jdo.JDOQuery) query).getInternalQuery().getOrdering();
         query.setResult("count(id)");
         query.setOrdering(null);
-        return (Long) query.execute(p1, p2, p3);
+        final long count = (Long) query.execute(p1, p2, p3);
+        query.setOrdering(ordering);
+        return count;
     }
 
     /**
@@ -269,9 +307,12 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      * @since 1.0.0
      */
     public long getCount(final Query query, final Object... parameters) {
+        final String ordering = ((org.datanucleus.api.jdo.JDOQuery) query).getInternalQuery().getOrdering();
         query.setResult("count(id)");
         query.setOrdering(null);
-        return (Long) query.executeWithArray(parameters);
+        final long count = (Long) query.executeWithArray(parameters);
+        query.setOrdering(ordering);
+        return count;
     }
 
     /**
@@ -284,9 +325,12 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      * @since 1.0.0
      */
     public long getCount(final Query query, final Map parameters) {
+        final String ordering = ((org.datanucleus.api.jdo.JDOQuery) query).getInternalQuery().getOrdering();
         query.setResult("count(id)");
         query.setOrdering(null);
-        return (Long) query.executeWithMap(parameters);
+        final long count = (Long) query.executeWithMap(parameters);
+        query.setOrdering(ordering);
+        return count;
     }
 
     /**
