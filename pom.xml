@@ -89,7 +89,7 @@
         <lib.commons.collections4.version>4.1</lib.commons.collections4.version>
         <lib.commons.dbcp.version>1.4</lib.commons.dbcp.version>
         <lib.commons.io.version>2.5</lib.commons.io.version>
-        <lib.commons.lang3.version>3.5</lib.commons.lang3.version>
+        <lib.commons.lang3.version>3.6</lib.commons.lang3.version>
         <lib.datanucleus-api-jdo.version>4.1.4</lib.datanucleus-api-jdo.version>
         <lib.datanucleus.version>4.1.17</lib.datanucleus.version>
         <lib.h2.version>1.3.176</lib.h2.version>
@@ -105,7 +105,7 @@
         <lib.owasp.encoder.version>1.2.1</lib.owasp.encoder.version>
         <lib.owasp.security-logging.version>1.1.2</lib.owasp.security-logging.version>
         <lib.slf4j.version>1.7.25</lib.slf4j.version>
-        <lib.swagger.jersey.version>1.5.13</lib.swagger.jersey.version>
+        <lib.swagger.jersey.version>1.5.15</lib.swagger.jersey.version>
     </properties>
 
     <dependencies>
