@@ -98,6 +98,7 @@
         <lib.jersey.version>2.25.1</lib.jersey.version>
         <lib.jsp.api.version>2.2</lib.jsp.api.version>
         <lib.jsonwebtoken.version>0.7.0</lib.jsonwebtoken.version>
+        <lib.jsr305.version>3.0.2</lib.jsr305.version>
         <lib.jsr353-impl.version>1.0</lib.jsr353-impl.version>
         <lib.jsr353-spec.version>1.0</lib.jsr353-spec.version>
         <lib.jstl.version>1.2</lib.jstl.version>
@@ -290,6 +291,12 @@
             <artifactId>executable-war</artifactId>
             <version>1.0.0</version>
             <scope>provided</scope>
+        </dependency>
+        <!-- Quality -->
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+            <version>${lib.jsr305.version}</version>
         </dependency>
         <!-- Unit Tests -->
         <dependency>
