@@ -84,6 +84,13 @@
         <plugin.dependency-check.centralAnalyzerEnabled>true</plugin.dependency-check.centralAnalyzerEnabled>
         <plugin.dependency-check.externalReport>true</plugin.dependency-check.externalReport>
 
+        <!-- Software Security: Retire.js -->
+        <maven.retirejs.plugin.version>2.1.0</maven.retirejs.plugin.version>
+        <plugin.retirejs.breakOnFailure>true</plugin.retirejs.breakOnFailure>
+        <plugin.retirejs.webAppDir>${project.build.sourceDirectory}/../webapp</plugin.retirejs.webAppDir>
+        <plugin.retirejs.detail>true</plugin.retirejs.detail>
+        <plugin.retirejs.indentSize>4</plugin.retirejs.indentSize>
+
         <!-- Dependency Versions -->
         <lib.bcrypt.version>0.4</lib.bcrypt.version>
         <lib.commons.collections4.version>4.1</lib.commons.collections4.version>
@@ -473,10 +480,12 @@
         </profile>
 
         <profile>
-            <id>dependency-check</id>
+            <id>component-analysis</id>
+            <!-- Activate this profile to check third-party components for known vulnerabilities
+                 using OWASP Dependency-Check and Retire.js. -->
             <activation>
                 <property>
-                    <name>env.ACTIVATE_DEPENDENCY_CHECK</name>
+                    <name>env.ACTIVATE_COMPONENT_ANALYSIS</name>
                     <value>true</value>
                 </property>
             </activation>
@@ -500,6 +509,26 @@
                     </plugins>
                 </pluginManagement>
                 <plugins>
+                    <plugin>
+                        <groupId>com.h3xstream.retirejs</groupId>
+                        <artifactId>retirejs-maven-plugin</artifactId>
+                        <version>2.1.0</version>
+                        <configuration>
+                            <breakOnFailure>${plugin.retirejs.breakOnFailure}</breakOnFailure>
+                            <webAppDirectory>${plugin.retirejs.webAppDir}</webAppDirectory>
+                            <detail>${plugin.retirejs.detail}</detail>
+                            <indentSize>${plugin.retirejs.indentSize}</indentSize>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>retire-js</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>scan</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <plugin>
                         <groupId>org.owasp</groupId>
                         <artifactId>dependency-check-maven</artifactId>
