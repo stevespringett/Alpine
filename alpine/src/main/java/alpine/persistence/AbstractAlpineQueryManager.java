@@ -351,9 +351,7 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
     }
 
     /**
-     * Persists the specified PersistenceCapable object. If object contains a getId()
-     * method, will attempt to fetch the object after persisting it. Otherwise, will
-     * return the object without fetching.
+     * Persists the specified PersistenceCapable object.
      * @param object a PersistenceCapable object
      * @param <T> the type to return
      * @return the persisted object
@@ -363,13 +361,38 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
         pm.currentTransaction().begin();
         pm.makePersistent(object);
         pm.currentTransaction().commit();
-        try {
-            final Method method = object.getClass().getMethod("getId");
-            final long id = (Long) method.invoke(object);
-            return (T) pm.getObjectById(object.getClass(), id);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            return object;
-        }
+        pm.refresh(object);
+        return object;
+    }
+
+    /**
+     * Persists the specified PersistenceCapable objects.
+     * @param pcs an array of PersistenceCapable objects
+     * @param <T> the type to return
+     * @return the persisted objects
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T[] persist(T... pcs) {
+        pm.currentTransaction().begin();
+        pm.makePersistentAll(pcs);
+        pm.currentTransaction().commit();
+        pm.refreshAll(pcs);
+        return pcs;
+    }
+
+    /**
+     * Persists the specified PersistenceCapable objects.
+     * @param pcs a collection of PersistenceCapable objects
+     * @param <T> the type to return
+     * @return the persisted objects
+     */
+    @SuppressWarnings("unchecked")
+    public <T> Collection<T> persist(Collection pcs) {
+        pm.currentTransaction().begin();
+        pm.makePersistentAll(pcs);
+        pm.currentTransaction().commit();
+        pm.refreshAll(pcs);
+        return pcs;
     }
 
     /**
