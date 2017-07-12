@@ -25,6 +25,8 @@ import org.datanucleus.api.jdo.JDOQuery;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.security.Principal;
 import java.util.Collection;
 import java.util.List;
@@ -346,6 +348,28 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
         //query.addExtension("datanucleus.query.resultSizeMethod", "count");
         query.setResult("count(id)");
         return (Long) query.execute();
+    }
+
+    /**
+     * Persists the specified PersistenceCapable object. If object contains a getId()
+     * method, will attempt to fetch the object after persisting it. Otherwise, will
+     * return the object without fetching.
+     * @param object a PersistenceCapable object
+     * @param <T> the type to return
+     * @return the persisted object
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T persist(T object) {
+        pm.currentTransaction().begin();
+        pm.makePersistent(object);
+        pm.currentTransaction().commit();
+        try {
+            final Method method = object.getClass().getMethod("getId");
+            final long id = (Long) method.invoke(object);
+            return (T) pm.getObjectById(object.getClass(), id);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            return object;
+        }
     }
 
     /**
