@@ -362,7 +362,7 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
         pm.makePersistent(object);
         pm.currentTransaction().commit();
         pm.refresh(object);
-        return object;
+        return pm.detachCopy(object);
     }
 
     /**
@@ -377,7 +377,7 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
         pm.makePersistentAll(pcs);
         pm.currentTransaction().commit();
         pm.refreshAll(pcs);
-        return pcs;
+        return pm.detachCopy(pcs);
     }
 
     /**
@@ -392,7 +392,7 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
         pm.makePersistentAll(pcs);
         pm.currentTransaction().commit();
         pm.refreshAll(pcs);
-        return pcs;
+        return pm.detachCopy(pcs);
     }
 
     /**
