@@ -25,8 +25,6 @@ import org.datanucleus.api.jdo.JDOQuery;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.security.Principal;
 import java.util.Collection;
 import java.util.List;
@@ -55,7 +53,7 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      */
     public AbstractAlpineQueryManager() {
         principal = null;
-        pagination = new Pagination(0, 0);
+        pagination = new Pagination(Pagination.Strategy.NONE, 0, 0);
         filter = null;
         orderBy = null;
         orderDirection = OrderDirection.UNSPECIFIED;
@@ -203,8 +201,8 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
         // Clear the result to fetch if previously specified (i.e. by getting count)
         query.setResult(null);
         if (pagination != null && pagination.isPaginated()) {
-            final long begin = (pagination.getPage() * pagination.getSize()) -  pagination.getSize();
-            final long end = begin + pagination.getSize();
+            final long begin = pagination.getOffset();
+            final long end = begin + pagination.getLimit();
             query.setRange(begin, end);
         }
         if (orderBy != null && RegexSequence.Pattern.ALPHA_NUMERIC.matcher(orderBy).matches() && orderDirection != OrderDirection.UNSPECIFIED) {

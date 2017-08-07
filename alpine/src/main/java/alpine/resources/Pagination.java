@@ -25,44 +25,82 @@ package alpine.resources;
  */
 public class Pagination {
 
-    private int page;
-    private int size;
+    public enum Strategy {
+        OFFSET,
+        PAGES,
+        NONE
+    }
+
+    private Strategy strategy;
+    private int offset;
+    private int limit;
 
     /**
-     * Creates a new Pagination object with the specified page number and size.
-     * @param page the page number
-     * @param size the size of the page
+     * Creates a new Pagination object with the specified offset and limit, or page number
+     * and size. If any parameters are null, a value of 0 will be used.
+     * @param strategy the pagination strategy to use
+     * @param o1 the offset or page number to use
+     * @param o2 the number of results to limit a result-set to (aka, the size of the page)
      */
-    public Pagination(int page, int size) {
-        this.page = page;
-        this.size = size;
+    public Pagination(Strategy strategy, int o1, int o2) {
+        this.strategy = strategy;
+        calculateStrategy(strategy, o1, o2);
     }
 
     /**
-     * Creates a new Pagination object with the specified page number and size. If either of the
-     * specified parameters are null, a value of 0 will be used.
-     * @param page the page number
-     * @param size the size of the page
+     * Creates a new Pagination object with the specified offset and limit, or page number
+     * and size. If any parameters are null, a value of 0 will be used.
+     * @param strategy the pagination strategy to use
+     * @param o1 the offset or page number to use
+     * @param o2 the number of results to limit a result-set to (aka, the size of the page)
      */
-    public Pagination(String page, String size) {
-        this.page = parseIntegerFromParam(page);
-        this.size = parseIntegerFromParam(size);
+    public Pagination(Strategy strategy, String o1, String o2) {
+        this.strategy = strategy;
+        if (Strategy.OFFSET == strategy) {
+            calculateStrategy(strategy, parseIntegerFromParam(o1, 0), parseIntegerFromParam(o2, 100));
+        } else if (Strategy.PAGES == strategy) {
+            calculateStrategy(strategy, parseIntegerFromParam(o1, 1), parseIntegerFromParam(o2, 100));
+        }
     }
 
     /**
-     * Returns the page number.
-     * @return the page number
+     * Determines the offset and limit based on pagination strategy.
+     * @param strategy the pagination strategy to use
+     * @param o1 the offset or page number to use
+     * @param o2 the number of results to limit a result-set to (aka, the size of the page)
      */
-    public int getPage() {
-        return page;
+    private void calculateStrategy(Strategy strategy, int o1, int o2) {
+        if (Strategy.OFFSET == strategy) {
+            this.offset = o1;
+            this.limit = o2;
+        } else if (Strategy.PAGES == strategy) {
+            this.offset = (o1 * o2) -  o2;
+            this.limit = o2;
+        }
     }
 
     /**
-     * Returns the page size.
-     * @return the page size
+     * Returns the pagination strategy used.
+     * @return the pagination strategy
      */
-    public int getSize() {
-        return size;
+    public Strategy getStrategy() {
+        return strategy;
+    }
+
+    /**
+     * Returns the offset.
+     * @return the offset
+     */
+    public int getOffset() {
+        return offset;
+    }
+
+    /**
+     * Returns the limit.
+     * @return the limit
+     */
+    public int getLimit() {
+        return limit;
     }
 
     /**
@@ -71,19 +109,20 @@ public class Pagination {
      * @return if paginiation is used for this request
      */
     public boolean isPaginated() {
-        return page > 0 && size > 0;
+        return (Strategy.OFFSET == strategy || Strategy.PAGES == strategy) && limit > 0;
     }
 
     /**
      * Parses a parameter to an Integer, defaulting to 0 upon any errors encountered.
      * @param value the value to parse
+     * @param defaultValue the default value to use
      * @return an Integer
      */
-    private Integer parseIntegerFromParam(String value) {
+    private Integer parseIntegerFromParam(String value, int defaultValue) {
         try {
             return new Integer(value);
         } catch (NumberFormatException | NullPointerException e) {
-            return 0;
+            return defaultValue;
         }
     }
 

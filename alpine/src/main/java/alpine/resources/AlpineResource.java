@@ -263,8 +263,9 @@ public abstract class AlpineResource {
     @PostConstruct
     private void initialize() {
         final MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
+        final String offset = multiParam(queryParams, "offset");
         final String page = multiParam(queryParams, "page", "pageNumber");
-        final String size = multiParam(queryParams, "size", "pageSize");
+        final String size = multiParam(queryParams, "size", "pageSize", "limit");
         final String filter = multiParam(queryParams, "filter", "searchText");
         final String sort = multiParam(queryParams, "sort", "sortOrder");
         final OrderDirection orderDirection;
@@ -282,7 +283,15 @@ public abstract class AlpineResource {
             orderDirection = OrderDirection.UNSPECIFIED;
         }
 
-        this.alpineRequest = new AlpineRequest(getPrincipal(), new Pagination(page, size), filter, orderBy, orderDirection);
+        final Pagination pagination;
+        if (StringUtils.isNotBlank(offset)) {
+            pagination = new Pagination(Pagination.Strategy.OFFSET, offset, size);
+        } else if (StringUtils.isNotBlank(page) && StringUtils.isNotBlank(size)) {
+            pagination = new Pagination(Pagination.Strategy.PAGES, page, size);
+        } else {
+            pagination = new Pagination(Pagination.Strategy.OFFSET, 0, 100); // Always paginate queries from resources
+        }
+        this.alpineRequest = new AlpineRequest(getPrincipal(), pagination, filter, orderBy, orderDirection);
     }
 
     /**
