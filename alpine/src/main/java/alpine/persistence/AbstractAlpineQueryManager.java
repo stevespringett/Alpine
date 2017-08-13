@@ -22,6 +22,8 @@ import alpine.resources.OrderDirection;
 import alpine.resources.Pagination;
 import alpine.validation.RegexSequence;
 import org.datanucleus.api.jdo.JDOQuery;
+
+import javax.jdo.FetchPlan;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import java.lang.reflect.Field;
@@ -359,6 +361,7 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
         pm.currentTransaction().begin();
         pm.makePersistent(object);
         pm.currentTransaction().commit();
+        pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS);
         pm.refresh(object);
         return pm.detachCopy(object);
     }
@@ -374,6 +377,7 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
         pm.currentTransaction().begin();
         pm.makePersistentAll(pcs);
         pm.currentTransaction().commit();
+        pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS);
         pm.refreshAll(pcs);
         return pm.detachCopy(pcs);
     }
@@ -389,6 +393,7 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
         pm.currentTransaction().begin();
         pm.makePersistentAll(pcs);
         pm.currentTransaction().commit();
+        pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS);
         pm.refreshAll(pcs);
         return pm.detachCopy(pcs);
     }
