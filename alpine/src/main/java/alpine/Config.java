@@ -19,7 +19,10 @@ package alpine;
 
 import alpine.logging.Logger;
 import alpine.util.SystemUtil;
+import org.apache.commons.lang3.StringUtils;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -33,6 +36,7 @@ import java.util.Properties;
 public class Config {
 
     private static final Logger LOGGER = Logger.getLogger(Config.class);
+    private static final String ALPINE_APP_PROP = "alpine.application.properties";
     private static final String PROP_FILE = "application.properties";
     private static Config instance;
     private static Properties properties;
@@ -98,10 +102,10 @@ public class Config {
      */
     public static Config getInstance() {
         if (instance == null) {
+            LOGGER.info(StringUtils.repeat("-", 80));
             instance = new Config();
-        }
-        if (properties == null) {
             instance.init();
+            LOGGER.info(StringUtils.repeat("-", 80));
         }
         return instance;
     }
@@ -116,10 +120,24 @@ public class Config {
 
         LOGGER.info("Initializing Configuration");
         properties = new Properties();
-        try (InputStream in = this.getClass().getClassLoader().getResourceAsStream(PROP_FILE)) {
-            properties.load(in);
-        } catch (IOException e) {
-            LOGGER.error("Unable to load " + PROP_FILE);
+
+        final String alpineAppProp = System.getProperty("ALPINE_APP_PROP");
+        if (StringUtils.isNotBlank(alpineAppProp)) {
+            LOGGER.info("Loading application properties from " + alpineAppProp);
+            try {
+                properties.load(new FileInputStream(new File(alpineAppProp)));
+            } catch (FileNotFoundException e) {
+                LOGGER.error("Could not find property file " + alpineAppProp);
+            } catch (IOException e) {
+                LOGGER.error("Unable to load " + alpineAppProp);
+            }
+        } else {
+            LOGGER.info("System property " + ALPINE_APP_PROP + " not specified. Defaulting to load " + PROP_FILE + " from classpath");
+            try (InputStream in = this.getClass().getClassLoader().getResourceAsStream(PROP_FILE)) {
+                properties.load(in);
+            } catch (IOException e) {
+                LOGGER.error("Unable to load " + PROP_FILE);
+            }
         }
     }
 

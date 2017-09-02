@@ -18,6 +18,8 @@
 package alpine.persistence;
 
 import alpine.Config;
+import alpine.logging.Logger;
+
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.servlet.ServletContextEvent;
@@ -31,6 +33,8 @@ import java.util.Properties;
  * @since 1.0.0
  */
 public class PersistenceManagerFactory implements ServletContextListener {
+
+    private static final Logger LOGGER = Logger.getLogger(PersistenceManagerFactory.class);
 
     // The following properties are used for unit tests
     private static final Properties JDO_OVERRIDES;
@@ -55,11 +59,13 @@ public class PersistenceManagerFactory implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent event) {
+        LOGGER.info("Initializing persistence framework");
         pmf = JDOHelper.getPersistenceManagerFactory("Alpine");
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent event) {
+        LOGGER.info("Shutting down persistence framework");
         pmf.close();
     }
 
