@@ -341,9 +341,10 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      * the count.
      * @param cls the persistence-capable class to query
      * @return the number of items
+     * @param <T> candidate type for the query
      * @since 1.0.0
      */
-    public long getCount(final Class cls) {
+    public <T> long getCount(final Class<T> cls) {
         final Query query = pm.newQuery(cls);
         //query.addExtension("datanucleus.query.resultSizeMethod", "count");
         query.setResult("count(id)");

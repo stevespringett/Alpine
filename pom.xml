@@ -65,7 +65,7 @@
         <maven.source.plugin.version>3.0.1</maven.source.plugin.version>
         <maven.surefire.plugin.version>2.20</maven.surefire.plugin.version>
         <maven.war.plugin.version>3.1.0</maven.war.plugin.version>
-        <maven.datanucleus.plugin.version>4.0.5</maven.datanucleus.plugin.version>
+        <maven.datanucleus.plugin.version>5.0.2</maven.datanucleus.plugin.version>
 
         <!-- Software Security: HPE Fortify SCA -->
         <maven.fortify.plugin.version>17.10</maven.fortify.plugin.version>
@@ -97,11 +97,11 @@
         <lib.commons.dbcp.version>1.4</lib.commons.dbcp.version>
         <lib.commons.io.version>2.5</lib.commons.io.version>
         <lib.commons.lang3.version>3.6</lib.commons.lang3.version>
-        <lib.datanucleus-api-jdo.version>4.1.4</lib.datanucleus-api-jdo.version>
-        <lib.datanucleus.version>4.1.17</lib.datanucleus.version>
+        <lib.datanucleus-api-jdo.version>5.1.1</lib.datanucleus-api-jdo.version>
+        <lib.datanucleus.version>5.1.1</lib.datanucleus.version>
         <lib.h2.version>1.4.196</lib.h2.version>
         <lib.jackson.version>2.9.0</lib.jackson.version>
-        <lib.jdo.api.version>3.1</lib.jdo.api.version>
+        <lib.jdo.api.version>3.2.0-m7</lib.jdo.api.version>
         <lib.jersey.version>2.25.1</lib.jersey.version>
         <lib.jsp.api.version>2.2</lib.jsp.api.version>
         <lib.jsonwebtoken.version>0.7.0</lib.jsonwebtoken.version>
@@ -198,8 +198,8 @@
         </dependency>
         <!-- Persistence -->
         <dependency>
-            <groupId>javax.jdo</groupId>
-            <artifactId>jdo-api</artifactId>
+            <groupId>org.datanucleus</groupId>
+            <artifactId>javax.jdo</artifactId>
             <version>${lib.jdo.api.version}</version>
         </dependency>
         <dependency>
