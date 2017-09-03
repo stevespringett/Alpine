@@ -106,6 +106,10 @@ public class Config {
             instance = new Config();
             instance.init();
             LOGGER.info(StringUtils.repeat("-", 80));
+            LOGGER.info("Application: " + instance.getProperty(AlpineKey.APPLICATION_NAME));
+            LOGGER.info("Version:     " + instance.getProperty(AlpineKey.APPLICATION_VERSION));
+            LOGGER.info("Built-on:    " + instance.getProperty(AlpineKey.APPLICATION_TIMESTAMP));
+            LOGGER.info(StringUtils.repeat("-", 80));
         }
         return instance;
     }
