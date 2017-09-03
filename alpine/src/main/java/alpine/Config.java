@@ -125,7 +125,7 @@ public class Config {
         LOGGER.info("Initializing Configuration");
         properties = new Properties();
 
-        final String alpineAppProp = System.getProperty("ALPINE_APP_PROP");
+        final String alpineAppProp = System.getProperty(ALPINE_APP_PROP);
         if (StringUtils.isNotBlank(alpineAppProp)) {
             LOGGER.info("Loading application properties from " + alpineAppProp);
             try {
