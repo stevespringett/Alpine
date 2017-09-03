@@ -143,6 +143,10 @@ public class Config {
                 LOGGER.error("Unable to load " + PROP_FILE);
             }
         }
+        if (properties.size() == 0) {
+            LOGGER.error("A fatal error occurred loading application properties. Cannot continue. Shutting down.");
+            System.exit(1);
+        }
     }
 
     /**
