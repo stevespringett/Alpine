@@ -136,7 +136,8 @@ public class Config {
                 LOGGER.error("Unable to load " + alpineAppProp);
             }
         } else {
-            LOGGER.info("System property " + ALPINE_APP_PROP + " not specified. Defaulting to load " + PROP_FILE + " from classpath");
+            LOGGER.info("System property " + ALPINE_APP_PROP + " not specified");
+            LOGGER.info("Loading " + PROP_FILE + " from classpath");
             try (InputStream in = this.getClass().getClassLoader().getResourceAsStream(PROP_FILE)) {
                 properties.load(in);
             } catch (IOException e) {
