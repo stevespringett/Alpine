@@ -38,8 +38,10 @@ public class Config {
     private static final Logger LOGGER = Logger.getLogger(Config.class);
     private static final String ALPINE_APP_PROP = "alpine.application.properties";
     private static final String PROP_FILE = "application.properties";
+    private static final String INTERNAL_VERSION_PROP_FILE = "alpine.version";
     private static Config instance;
     private static Properties properties;
+    private static Properties internalVersionProperties;
 
     public interface Key {
 
@@ -110,6 +112,10 @@ public class Config {
             LOGGER.info("Version:     " + instance.getProperty(AlpineKey.APPLICATION_VERSION));
             LOGGER.info("Built-on:    " + instance.getProperty(AlpineKey.APPLICATION_TIMESTAMP));
             LOGGER.info(StringUtils.repeat("-", 80));
+            LOGGER.info("Framework:   " + instance.getFrameworkName());
+            LOGGER.info("Version :    " + instance.getFrameworkVersion());
+            LOGGER.info("Built-on:    " + instance.getFrameworkBuildTimestamp());
+            LOGGER.info(StringUtils.repeat("-", 80));
         }
         return instance;
     }
@@ -148,6 +154,44 @@ public class Config {
             LOGGER.error("A fatal error occurred loading application properties. Cannot continue. Shutting down.");
             System.exit(1);
         }
+
+        internalVersionProperties = new Properties();
+        try (InputStream in = this.getClass().getClassLoader().getResourceAsStream(INTERNAL_VERSION_PROP_FILE)) {
+            internalVersionProperties.load(in);
+        } catch (IOException e) {
+            LOGGER.error("Unable to load " + INTERNAL_VERSION_PROP_FILE);
+        }
+        if (internalVersionProperties.size() == 0) {
+            LOGGER.error("A fatal error occurred loading Alpine version information. Cannot continue. Shutting down.");
+            System.exit(1);
+        }
+    }
+
+    /**
+     * Returns the Alpine component name.
+     * @return the Alpine name
+     * @since 1.0.0
+     */
+    public String getFrameworkName() {
+        return internalVersionProperties.getProperty("name");
+    }
+
+    /**
+     * Returns the Alpine version.
+     * @return the Alpine version
+     * @since 1.0.0
+     */
+    public String getFrameworkVersion() {
+        return internalVersionProperties.getProperty("version");
+    }
+
+    /**
+     * Returns the Alpine built timestamp.
+     * @return the timestamp in which this version of Alpine was built
+     * @since 1.0.0
+     */
+    public String getFrameworkBuildTimestamp() {
+        return internalVersionProperties.getProperty("timestamp");
     }
 
     /**
