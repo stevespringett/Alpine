@@ -22,7 +22,6 @@ import alpine.resources.OrderDirection;
 import alpine.resources.Pagination;
 import alpine.validation.RegexSequence;
 import org.datanucleus.api.jdo.JDOQuery;
-
 import javax.jdo.FetchPlan;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -43,7 +42,7 @@ import java.util.UUID;
 public abstract class AbstractAlpineQueryManager implements AutoCloseable {
 
     protected final Principal principal;
-    protected final Pagination pagination;
+    protected Pagination pagination;
     protected final String filter;
     protected final String orderBy;
     protected final OrderDirection orderDirection;
@@ -189,6 +188,18 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
         return new PaginatedResult()
                 .objects(query.executeWithMap(parameters))
                 .total(count);
+    }
+
+    /**
+     * Advances the pagination based on the previous pagination settings. This is purely a
+     * convenience method as the method by itself is not aware of the query being executed,
+     * the result count, etc.
+     * @since 1.0.0
+     */
+    public void advancePagination() {
+        if (pagination.isPaginated()) {
+            pagination = new Pagination(pagination.getStrategy(), pagination.getOffset() + pagination.getLimit(), pagination.getLimit());
+        }
     }
 
     /**
