@@ -19,13 +19,14 @@ package alpine.tasks;
 
 import alpine.event.framework.Event;
 import alpine.event.framework.EventService;
+import alpine.event.framework.SingleThreadedEventService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * A simple framework for scheduling events to run periodicaly. Works in
+ * A simple framework for scheduling events to run periodically. Works in
  * conjunction with the {@link EventService} to process events.
  *
  * @author Steve Springett
@@ -66,9 +67,11 @@ public abstract class AlpineTaskScheduler {
 
         /**
          * Publishes the Event specified in the constructor.
+         * This method publishes to all {@link EventService}s.
          */
         public synchronized void run() {
             EventService.getInstance().publish(event);
+            SingleThreadedEventService.getInstance().publish(event);
         }
     }
 
