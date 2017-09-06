@@ -14,15 +14,6 @@ addons:
     build_command_prepend:
     build_command: mvn clean package
     branch_pattern: coverity_scan
-  sonarcloud:
-    organization: "stevespringett-github"
-    token:
-      secure: "b8WcbmL29xrLna7Ty9FB9VmTWAkIiQb4qvsLHrCEF9sigld9EmnSEqXW8uEf3JBL+y0jvWUkWroX+8q1ycGSyoodJ0F6n99ZK879RcfxRVy4vny9wYthUDcF684bTW0pbERYOq7fEne7GcxJqkUh3fHGJogr80qRjRwi1Jp9o6veSEKrry7czY3O+CtEIoK4OHyDNaVgiHSHLJVBoudC5yrKSuQvuxLTyB8ByXzAI/nUHllL12jXUR7w7/uNANEWj8gEQu3RyS8RYL7jk2EU2L4pF15EjCv3DcceQt5A1dG0vqoAhq9vwlV9Wo2fsrnR+N+jsKEuXpxdRW5dGYF2Foqfw1x6clFd7bqAv2akzE3V59R1YF0isUK2FDQuLSH9caY6ptU/gf/ZaS3v4ei+RZ1keZz6kwjHVJ6qbFAre52vNjVV62yWTBR91igOHggxCq+vzgsgVP//p3QOaMV8yqeFH0lm+YFCEMzfQxbE6G+8VhkOhAQdq+bKcLf2+ZP6EKWIEHlZ5VsddNvsVR1lLtgdEZxmyeC4l3e0nY+sAwkcUJrNCkVK7Ik4Ne9fx02pKbbcXK8renu+B39z/lsSooKz85+2k9HS++Rk3YePnLPGjuKCrbzoW3Jsshy46JWji/NEIvVuknrkajbU6QKyEuZ+f9iGiXw8bFwnzkcVwAQ="
 
 script:
-  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
-
-cache:
-  directories:
-    - '$HOME/.m2/repository'
-    - '$HOME/.sonar/cache'
+  - mvn clean install
