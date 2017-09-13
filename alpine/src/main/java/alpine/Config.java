@@ -151,8 +151,7 @@ public class Config {
             }
         }
         if (properties.size() == 0) {
-            LOGGER.error("A fatal error occurred loading application properties. Cannot continue. Shutting down.");
-            System.exit(1);
+            LOGGER.error("A fatal error occurred loading application properties. Please correct the issue and restart the application.");
         }
 
         internalVersionProperties = new Properties();
@@ -162,8 +161,7 @@ public class Config {
             LOGGER.error("Unable to load " + INTERNAL_VERSION_PROP_FILE);
         }
         if (internalVersionProperties.size() == 0) {
-            LOGGER.error("A fatal error occurred loading Alpine version information. Cannot continue. Shutting down.");
-            System.exit(1);
+            LOGGER.error("A fatal error occurred loading Alpine version information. Please correct the issue and restart the application.");
         }
     }
 
