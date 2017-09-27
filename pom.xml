@@ -59,11 +59,11 @@
 
         <!-- Maven Plugin Versions -->
         <maven.compiler.plugin.version>3.7.0</maven.compiler.plugin.version>
-        <maven.dependency.plugin.version>3.0.1</maven.dependency.plugin.version>
+        <maven.dependency.plugin.version>3.0.2</maven.dependency.plugin.version>
         <maven.javadoc.plugin.version>2.10.4</maven.javadoc.plugin.version>
         <maven.site.plugin.version>3.6</maven.site.plugin.version>
         <maven.source.plugin.version>3.0.1</maven.source.plugin.version>
-        <maven.surefire.plugin.version>2.20</maven.surefire.plugin.version>
+        <maven.surefire.plugin.version>2.20.1</maven.surefire.plugin.version>
         <maven.war.plugin.version>3.1.0</maven.war.plugin.version>
         <maven.datanucleus.plugin.version>5.0.2</maven.datanucleus.plugin.version>
 
@@ -97,8 +97,8 @@
         <lib.commons.dbcp.version>1.4</lib.commons.dbcp.version>
         <lib.commons.io.version>2.5</lib.commons.io.version>
         <lib.commons.lang3.version>3.6</lib.commons.lang3.version>
-        <lib.datanucleus-api-jdo.version>5.1.1</lib.datanucleus-api-jdo.version>
-        <lib.datanucleus.version>5.1.1</lib.datanucleus.version>
+        <lib.datanucleus-api-jdo.version>5.1.2</lib.datanucleus-api-jdo.version>
+        <lib.datanucleus.version>5.1.2</lib.datanucleus.version>
         <lib.h2.version>1.4.196</lib.h2.version>
         <lib.jackson.version>2.9.1</lib.jackson.version>
         <lib.jdo.api.version>3.2.0-m7</lib.jdo.api.version>
