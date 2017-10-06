@@ -18,6 +18,8 @@
 package alpine.event.framework;
 
 import alpine.logging.Logger;
+import alpine.model.EventServiceLog;
+import alpine.persistence.AlpineQueryManager;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -71,16 +73,18 @@ public abstract class BaseEventService {
             logger.debug("No subscribers to inform from event: " + event.getClass().getName());
             return;
         }
-        for (Class clazz: subscriberClasses) {
+        for (Class<? extends Subscriber> clazz: subscriberClasses) {
             logger.debug("Alerting subscriber " + clazz.getName());
 
             // Check to see if the Event is Unblocked. If so, use a separate executor pool from normal events
             final ExecutorService executorService = event instanceof UnblockedEvent  ? dynamicExecutor : executor;
 
             executorService.submit(() -> {
-                try {
-                    final Subscriber subscriber = (Subscriber) clazz.newInstance();
+                try (AlpineQueryManager qm = new AlpineQueryManager()) {
+                    final EventServiceLog eventServiceLog = qm.createEventServiceLog(clazz);
+                    final Subscriber subscriber = clazz.newInstance();
                     subscriber.inform(event);
+                    qm.updateEventServiceLog(eventServiceLog);
                 } catch (InstantiationException | IllegalAccessException e) {
                     logger.error("An error occurred while informing subscriber: " + e.getMessage());
                 }
