@@ -10,6 +10,8 @@
 Alpine
 =========
 
+[![Join the chat at https://gitter.im/java-alpine/Lobby](https://badges.gitter.im/java-alpine/Lobby.svg)](https://gitter.im/java-alpine/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 An opinionated scaffolding library that jumpstarts Java projects with an 
 API-first design, secure defaults, and minimal dependencies. Alpine came 
 about due to many commonalities between several of my personal and 
