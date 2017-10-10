@@ -17,6 +17,7 @@
  */
 package alpine.resources;
 
+import alpine.logging.Logger;
 import alpine.model.ApiKey;
 import alpine.model.LdapUser;
 import alpine.model.ManagedUser;
@@ -25,6 +26,7 @@ import alpine.validation.ValidationException;
 import alpine.validation.ValidationTask;
 import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.server.validation.ValidationError;
+import org.owasp.security.logging.SecurityMarkers;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
@@ -349,6 +351,23 @@ public abstract class AlpineResource {
      */
     protected boolean isApiKey() {
         return (getPrincipal() instanceof ApiKey);
+    }
+
+    /**
+     * Adds an auditable event to the security audit log.
+     * @param logger the logger to use
+     * @param message the initial content of the event
+     * @since 1.0.0
+     */
+    protected void addAuditableEvent(Logger logger, String message) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(message).append(" ");
+        if (getPrincipal() != null) {
+            sb.append("by: ").append(getPrincipal().getName()).append(" ");
+        }
+        sb.append("/ IP Address: ").append(getRemoteAddress()).append(" ");
+        sb.append("/ User Agent: ").append(getUserAgent());
+        logger.info(SecurityMarkers.SECURITY_AUDIT, sb.toString());
     }
 
 }
