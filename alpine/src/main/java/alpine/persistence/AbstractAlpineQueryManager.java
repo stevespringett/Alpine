@@ -375,7 +375,7 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
         pm.currentTransaction().commit();
         pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS);
         pm.refresh(object);
-        return pm.detachCopy(object);
+        return object;
     }
 
     /**
@@ -391,7 +391,7 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
         pm.currentTransaction().commit();
         pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS);
         pm.refreshAll(pcs);
-        return pm.detachCopy(pcs);
+        return pcs;
     }
 
     /**
@@ -407,7 +407,7 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
         pm.currentTransaction().commit();
         pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS);
         pm.refreshAll(pcs);
-        return pm.detachCopy(pcs);
+        return pcs;
     }
 
     /**
