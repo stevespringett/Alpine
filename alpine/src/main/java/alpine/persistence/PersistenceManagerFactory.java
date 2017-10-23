@@ -45,7 +45,7 @@ public class PersistenceManagerFactory implements ServletContextListener {
         JDO_OVERRIDES.put("javax.jdo.option.ConnectionUserName", "sa");
         JDO_OVERRIDES.put("javax.jdo.option.ConnectionPassword", "");
         JDO_OVERRIDES.put("javax.jdo.option.Mapping", "h2");
-        JDO_OVERRIDES.put("datanucleus.connectionPoolingType", "DBCP");
+        JDO_OVERRIDES.put("datanucleus.connectionPoolingType", "DBCP2");
         JDO_OVERRIDES.put("datanucleus.schema.autoCreateSchema", "true");
         JDO_OVERRIDES.put("datanucleus.schema.autoCreateTables", "true");
         JDO_OVERRIDES.put("datanucleus.schema.autoCreateColumns", "true");
