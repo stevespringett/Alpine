@@ -21,6 +21,8 @@ import alpine.auth.ApiKeyAuthenticationService;
 import alpine.auth.JwtAuthenticationService;
 import alpine.logging.Logger;
 import org.glassfish.jersey.server.ContainerRequest;
+import org.owasp.security.logging.SecurityMarkers;
+
 import javax.annotation.Priority;
 import javax.naming.AuthenticationException;
 import javax.ws.rs.Priorities;
@@ -60,7 +62,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
                 try {
                     principal = apiKeyAuthService.authenticate();
                 } catch (AuthenticationException e) {
-                    LOGGER.info("Invalid login attempt");
+                    LOGGER.info(SecurityMarkers.SECURITY_FAILURE, "Invalid API key asserted");
                     requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
                     return;
                 }
@@ -71,7 +73,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
                 try {
                     principal = jwtAuthService.authenticate();
                 } catch (AuthenticationException e) {
-                    LOGGER.info("Invalid login attempt");
+                    LOGGER.info(SecurityMarkers.SECURITY_FAILURE, "Invalid JWT asserted");
                     requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
                     return;
                 }
