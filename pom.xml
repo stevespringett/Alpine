@@ -96,7 +96,7 @@
         <lib.bcrypt.version>0.4</lib.bcrypt.version>
         <lib.commons.collections4.version>4.1</lib.commons.collections4.version>
         <lib.commons.dbcp2.version>2.1.1</lib.commons.dbcp2.version>
-        <lib.commons.io.version>2.5</lib.commons.io.version>
+        <lib.commons.io.version>2.6</lib.commons.io.version>
         <lib.commons.lang3.version>3.6</lib.commons.lang3.version>
         <lib.datanucleus-api-jdo.version>5.1.2</lib.datanucleus-api-jdo.version>
         <lib.datanucleus.version>5.1.2</lib.datanucleus.version>
