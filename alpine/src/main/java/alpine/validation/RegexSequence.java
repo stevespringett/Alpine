@@ -62,7 +62,7 @@ public class RegexSequence {
         public static final String NUMERIC = "^[-+]?\\p{Digit}*\\.?\\p{Digit}+([eE][-+]?\\p{Digit}+)?$";
         public static final String ALPHA_NUMERIC = "^\\p{Alnum}*$";
         public static final String WORD_CHARS = "^[a-zA-Z_0-9]*$";
-        public static final String PRINTABLE_CHARS = "^[\\x20\\p{L}\\p{M}\\p{S}\\p{N}\\p{P}]*$";
+        public static final String PRINTABLE_CHARS = "^[\\p{IsWhite_Space}\\p{L}\\p{M}\\p{S}\\p{N}\\p{P}]*$";
         public static final String PRINTABLE_CHARS_PLUS = "^[\\p{IsWhite_Space}\\p{L}\\p{M}\\p{S}\\p{N}\\p{P}\\n\\r\\t]*$";
         public static final String NOT_CONTROL_CHARS = "^[^\\x00-\\x1F\\x7F]*$";
 
