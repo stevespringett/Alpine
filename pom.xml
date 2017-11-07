@@ -300,9 +300,9 @@
         </dependency>
         <!-- Executable WAR with embedded Jetty -->
         <dependency>
-            <groupId>com.vast.common</groupId>
-            <artifactId>executable-war</artifactId>
-            <version>1.0.0</version>
+            <groupId>us.springett</groupId>
+            <artifactId>alpine-executable-war</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <!-- Quality -->
@@ -609,15 +609,15 @@
                         <configuration>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.vast.util.EmbeddedJettyServer</mainClass>
+                                    <mainClass>alpine.embedded.EmbeddedJettyServer</mainClass>
                                 </manifest>
                             </archive>
                             <packagingExcludes>WEB-INF/lib/executable-war-*.jar</packagingExcludes>
                             <dependentWarExcludes>WEB-INF/lib/*log4j*.jar,WEB-INF/lib/*slf4j*.jar</dependentWarExcludes>
                             <overlays>
                                 <overlay>
-                                    <groupId>com.vast.common</groupId>
-                                    <artifactId>executable-war</artifactId>
+                                    <groupId>us.springett</groupId>
+                                    <artifactId>alpine-executable-war</artifactId>
                                     <type>jar</type>
                                 </overlay>
                             </overlays>
