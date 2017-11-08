@@ -60,12 +60,12 @@ public class AlpineServlet extends ServletContainer {
      */
     @Override
     public void init(ServletConfig config) throws ServletException {
-        LOGGER.info("Starting " + Config.getInstance().getProperty(Config.AlpineKey.APPLICATION_NAME));
+        LOGGER.info("Starting " + Config.getInstance().getApplicationName());
         super.init(config);
 
         final Info info = new Info()
-                .title(Config.getInstance().getProperty(Config.AlpineKey.APPLICATION_NAME) + " API")
-                .version(Config.getInstance().getProperty(Config.AlpineKey.APPLICATION_VERSION));
+                .title(Config.getInstance().getApplicationName() + " API")
+                .version(Config.getInstance().getApplicationVersion());
 
         final Swagger swagger = new Swagger()
                 .info(info)
@@ -129,7 +129,7 @@ public class AlpineServlet extends ServletContainer {
      */
     @Override
     public void destroy() {
-        LOGGER.info("Stopping " + Config.getInstance().getProperty(Config.AlpineKey.APPLICATION_NAME));
+        LOGGER.info("Stopping " + Config.getInstance().getApplicationName());
         super.destroy();
     }
 

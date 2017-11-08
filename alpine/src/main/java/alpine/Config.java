@@ -38,10 +38,12 @@ public class Config {
     private static final Logger LOGGER = Logger.getLogger(Config.class);
     private static final String ALPINE_APP_PROP = "alpine.application.properties";
     private static final String PROP_FILE = "application.properties";
-    private static final String INTERNAL_VERSION_PROP_FILE = "alpine.version";
+    private static final String ALPINE_VERSION_PROP_FILE = "alpine.version";
+    private static final String APPLICATION_VERSION_PROP_FILE = "application.version";
     private static Config instance;
     private static Properties properties;
-    private static Properties internalVersionProperties;
+    private static Properties alpineVersionProperties;
+    private static Properties applicationVersionProperties;
 
     public interface Key {
 
@@ -59,9 +61,6 @@ public class Config {
     }
 
     public enum AlpineKey implements Key {
-        APPLICATION_NAME         ("application.name",                 "Unknown Alpine Application"),
-        APPLICATION_VERSION      ("application.version",              "0.0.0"),
-        APPLICATION_TIMESTAMP    ("application.timestamp",            "1970-01-01 00:00:00"),
         WORKER_THREADS           ("alpine.worker.threads",            0),
         WORKER_THREAD_MULTIPLIER ("alpine.worker.thread.multiplier",  4),
         DATA_DIRECTORY           ("alpine.data.directory",            "~/.alpine"),
@@ -108,9 +107,9 @@ public class Config {
             instance = new Config();
             instance.init();
             LOGGER.info(StringUtils.repeat("-", 80));
-            LOGGER.info("Application: " + instance.getProperty(AlpineKey.APPLICATION_NAME));
-            LOGGER.info("Version:     " + instance.getProperty(AlpineKey.APPLICATION_VERSION));
-            LOGGER.info("Built-on:    " + instance.getProperty(AlpineKey.APPLICATION_TIMESTAMP));
+            LOGGER.info("Application: " + instance.getFrameworkName());
+            LOGGER.info("Version:     " + instance.getFrameworkVersion());
+            LOGGER.info("Built-on:    " + instance.getFrameworkBuildTimestamp());
             LOGGER.info(StringUtils.repeat("-", 80));
             LOGGER.info("Framework:   " + instance.getFrameworkName());
             LOGGER.info("Version :    " + instance.getFrameworkVersion());
@@ -154,14 +153,24 @@ public class Config {
             LOGGER.error("A fatal error occurred loading application properties. Please correct the issue and restart the application.");
         }
 
-        internalVersionProperties = new Properties();
-        try (InputStream in = this.getClass().getClassLoader().getResourceAsStream(INTERNAL_VERSION_PROP_FILE)) {
-            internalVersionProperties.load(in);
+        alpineVersionProperties = new Properties();
+        try (InputStream in = this.getClass().getClassLoader().getResourceAsStream(ALPINE_VERSION_PROP_FILE)) {
+            alpineVersionProperties.load(in);
         } catch (IOException e) {
-            LOGGER.error("Unable to load " + INTERNAL_VERSION_PROP_FILE);
+            LOGGER.error("Unable to load " + ALPINE_VERSION_PROP_FILE);
         }
-        if (internalVersionProperties.size() == 0) {
+        if (alpineVersionProperties.size() == 0) {
             LOGGER.error("A fatal error occurred loading Alpine version information. Please correct the issue and restart the application.");
+        }
+
+        applicationVersionProperties = new Properties();
+        try (InputStream in = this.getClass().getClassLoader().getResourceAsStream(APPLICATION_VERSION_PROP_FILE)) {
+            applicationVersionProperties.load(in);
+        } catch (IOException e) {
+            LOGGER.error("Unable to load " + APPLICATION_VERSION_PROP_FILE);
+        }
+        if (applicationVersionProperties.size() == 0) {
+            LOGGER.error("A fatal error occurred loading application version information. Please correct the issue and restart the application.");
         }
     }
 
@@ -171,7 +180,7 @@ public class Config {
      * @since 1.0.0
      */
     public String getFrameworkName() {
-        return internalVersionProperties.getProperty("name");
+        return alpineVersionProperties.getProperty("name");
     }
 
     /**
@@ -180,7 +189,7 @@ public class Config {
      * @since 1.0.0
      */
     public String getFrameworkVersion() {
-        return internalVersionProperties.getProperty("version");
+        return alpineVersionProperties.getProperty("version");
     }
 
     /**
@@ -189,7 +198,34 @@ public class Config {
      * @since 1.0.0
      */
     public String getFrameworkBuildTimestamp() {
-        return internalVersionProperties.getProperty("timestamp");
+        return alpineVersionProperties.getProperty("timestamp");
+    }
+
+    /**
+     * Returns the Application component name.
+     * @return the Application name
+     * @since 1.0.0
+     */
+    public String getApplicationName() {
+        return applicationVersionProperties.getProperty("name", "Unknown Alpine Application");
+    }
+
+    /**
+     * Returns the Application version.
+     * @return the Application version
+     * @since 1.0.0
+     */
+    public String getApplicationVersion() {
+        return applicationVersionProperties.getProperty("version", "0.0.0");
+    }
+
+    /**
+     * Returns the Application built timestamp.
+     * @return the timestamp in which this version of the Application was built
+     * @since 1.0.0
+     */
+    public String getApplicationBuildTimestamp() {
+        return applicationVersionProperties.getProperty("timestamp", "1970-01-01 00:00:00");
     }
 
     /**
