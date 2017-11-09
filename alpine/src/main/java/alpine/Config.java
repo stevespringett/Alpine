@@ -107,9 +107,9 @@ public class Config {
             instance = new Config();
             instance.init();
             LOGGER.info(StringUtils.repeat("-", 80));
-            LOGGER.info("Application: " + instance.getFrameworkName());
-            LOGGER.info("Version:     " + instance.getFrameworkVersion());
-            LOGGER.info("Built-on:    " + instance.getFrameworkBuildTimestamp());
+            LOGGER.info("Application: " + instance.getApplicationName());
+            LOGGER.info("Version:     " + instance.getApplicationVersion());
+            LOGGER.info("Built-on:    " + instance.getApplicationBuildTimestamp());
             LOGGER.info(StringUtils.repeat("-", 80));
             LOGGER.info("Framework:   " + instance.getFrameworkName());
             LOGGER.info("Version :    " + instance.getFrameworkVersion());
