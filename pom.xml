@@ -69,7 +69,7 @@
         <maven.spdx.plugin.version>0.4.0</maven.spdx.plugin.version>
 
         <!-- Software Security: HPE Fortify SCA -->
-        <maven.fortify.plugin.version>17.10</maven.fortify.plugin.version>
+        <maven.fortify.plugin.version>17.20</maven.fortify.plugin.version>
         <plugin.fortify.sca.debug>false</plugin.fortify.sca.debug>
         <plugin.fortify.sca.verbose>false</plugin.fortify.sca.verbose>
         <plugin.fortify.sca.sourcePath>${project.build.directory}/dependency-sources</plugin.fortify.sca.sourcePath>
