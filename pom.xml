@@ -607,6 +607,7 @@
                         <artifactId>maven-war-plugin</artifactId>
                         <version>${maven.war.plugin.version}</version>
                         <configuration>
+                            <warName>${project.build.finalName}-embedded.war</warName>
                             <archive>
                                 <manifest>
                                     <mainClass>alpine.embedded.EmbeddedJettyServer</mainClass>
