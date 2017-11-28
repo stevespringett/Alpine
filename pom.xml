@@ -87,7 +87,7 @@
         <plugin.dependency-check.externalReport>true</plugin.dependency-check.externalReport>
 
         <!-- Software Security: Retire.js -->
-        <maven.retirejs.plugin.version>3.0.0</maven.retirejs.plugin.version>
+        <maven.retirejs.plugin.version>2.1.0</maven.retirejs.plugin.version>
         <plugin.retirejs.breakOnFailure>true</plugin.retirejs.breakOnFailure>
         <plugin.retirejs.webAppDir>${project.build.sourceDirectory}/../webapp</plugin.retirejs.webAppDir>
         <plugin.retirejs.detail>true</plugin.retirejs.detail>
