@@ -40,6 +40,8 @@ public class LdapAuthenticationService implements AuthenticationService {
 
     private static final String LDAP_URL = Config.getInstance().getProperty(Config.AlpineKey.LDAP_SERVER_URL);
     private static final String DOMAIN_NAME = Config.getInstance().getProperty(Config.AlpineKey.LDAP_DOMAIN);
+    private static final String BASE_DN = Config.getInstance().getProperty(Config.AlpineKey.LDAP_BASEDN);
+    private static final String LDAP_ATTRIBUTE_NAME = Config.getInstance().getProperty(Config.AlpineKey.LDAP_ATTRIBUTE_NAME);
 
     private String username;
     private String password;
@@ -104,7 +106,8 @@ public class LdapAuthenticationService implements AuthenticationService {
             throw new NamingException("Username or password cannot be empty or null");
         }
         final Hashtable<String, String> props = new Hashtable<>();
-        final String principalName = username + "@" + DOMAIN_NAME;
+        final String principalName = LDAP_ATTRIBUTE_NAME + "=" + formatPrincipal(username) + "," + BASE_DN;
+        props.put(Context.SECURITY_AUTHENTICATION, "simple");
         props.put(Context.SECURITY_PRINCIPAL, principalName);
         props.put(Context.SECURITY_CREDENTIALS, password);
         props.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
@@ -140,6 +143,18 @@ public class LdapAuthenticationService implements AuthenticationService {
                 } catch (NamingException e) { }
             }
         }
+    }
+
+    /**
+     * Formats the principal in username@domain format.
+     * @param username the username
+     * @return a formatted user principal
+     */
+    private String formatPrincipal(String username) {
+        if (StringUtils.isNotBlank(DOMAIN_NAME)) {
+            return username + "@" + DOMAIN_NAME;
+        }
+        return username;
     }
 
 }
