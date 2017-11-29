@@ -112,7 +112,7 @@ public final class KeyManager {
         final KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
         final SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
         keyGen.initialize(4096, random);
-        return keyGen.generateKeyPair();
+        return this.keyPair = keyGen.generateKeyPair();
     }
 
     /**
@@ -126,7 +126,7 @@ public final class KeyManager {
         final KeyGenerator keyGen = KeyGenerator.getInstance("AES");
         final SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
         keyGen.init(256, random);
-        return keyGen.generateKey();
+        return this.secretKey = keyGen.generateKey();
     }
 
     /**

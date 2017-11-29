@@ -26,7 +26,7 @@ import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.HttpHeaders;
 
 /**
- * Adds Powered-By, cache-control, and cors headers.
+ * Adds Powered-By and cache-control headers.
  *
  * @author Steve Springett
  * @since 1.0.0
@@ -42,10 +42,10 @@ public class HeaderFilter implements ContainerResponseFilter {
      */
     private void init() {
         if (appName == null) {
-            appName = Config.getInstance().getProperty(Config.AlpineKey.APPLICATION_NAME);
+            appName = Config.getInstance().getApplicationName();
         }
         if (appVersion == null) {
-            appVersion = Config.getInstance().getProperty(Config.AlpineKey.APPLICATION_VERSION);
+            appVersion = Config.getInstance().getApplicationVersion();
         }
     }
 
@@ -54,13 +54,6 @@ public class HeaderFilter implements ContainerResponseFilter {
         init();
         responseContext.getHeaders().add("X-Powered-By", appName + " v" + appVersion);
         responseContext.getHeaders().add(HttpHeaders.CACHE_CONTROL, "private, max-age=0, must-revalidate, no-cache");
-
-        // CORS Headers
-        responseContext.getHeaders().add("Access-Control-Allow-Methods", "GET POST PUT DELETE");
-        responseContext.getHeaders().add("Access-Control-Allow-Origin", "*");
-        responseContext.getHeaders().add("Access-Control-Allow-Headers", "Origin, Content-Type, Authorization, X-Api-Key, X-Total-Count, *");
-        responseContext.getHeaders().add("Access-Control-Expose-Headers", "Origin, Content-Type, Authorization, X-Api-Key, X-Total-Count, *");
-        responseContext.getHeaders().add("Access-Control-Request-Headers", "Origin, Content-Type, Authorization, X-Api-Key, *");
     }
 
 }

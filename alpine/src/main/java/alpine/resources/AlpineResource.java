@@ -27,6 +27,7 @@ import alpine.validation.ValidationTask;
 import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.server.validation.ValidationError;
 import org.owasp.security.logging.SecurityMarkers;
+import org.slf4j.Marker;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
@@ -354,12 +355,21 @@ public abstract class AlpineResource {
     }
 
     /**
-     * Adds an auditable event to the security audit log.
+     * Logs a security event to the security audit log. Expects one of:
+     * {@link SecurityMarkers#SECURITY_AUDIT}
+     * {@link SecurityMarkers#SECURITY_SUCCESS}
+     * {@link SecurityMarkers#SECURITY_FAILURE}
      * @param logger the logger to use
+     * @oaram marker the marker to add to the event
      * @param message the initial content of the event
      * @since 1.0.0
      */
-    protected void addAuditableEvent(Logger logger, String message) {
+    protected void logSecurityEvent(Logger logger, Marker marker, String message) {
+        if (!(SecurityMarkers.SECURITY_AUDIT == marker ||
+              SecurityMarkers.SECURITY_SUCCESS == marker ||
+              SecurityMarkers.SECURITY_FAILURE == marker)) {
+            return;
+        }
         final StringBuilder sb = new StringBuilder();
         sb.append(message).append(" ");
         if (getPrincipal() != null) {
@@ -367,7 +377,7 @@ public abstract class AlpineResource {
         }
         sb.append("/ IP Address: ").append(getRemoteAddress()).append(" ");
         sb.append("/ User Agent: ").append(getUserAgent());
-        logger.info(SecurityMarkers.SECURITY_AUDIT, sb.toString());
+        logger.info(marker, sb.toString());
     }
 
 }
