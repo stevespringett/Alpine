@@ -75,6 +75,7 @@ public class Config {
         LDAP_BASEDN              ("alpine.ldap.basedn",               null),
         LDAP_BIND_USERNAME       ("alpine.ldap.bind.username",        null),
         LDAP_BIND_PASSWORD       ("alpine.ldap.bind.password",        null),
+        LDAP_ATTRIBUTE_NAME      ("alpine.ldap.attribute.name",       "userPrincipalName"),
         LDAP_ATTRIBUTE_MAIL      ("alpine.ldap.attribute.mail",       "mail"),
         HTTP_PROXY_ADDRESS       ("alpine.http.proxy.address",        null),
         HTTP_PROXY_PORT          ("alpine.http.proxy.port",           null),
