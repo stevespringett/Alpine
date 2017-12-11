@@ -68,6 +68,7 @@
                         </goals>
                         <configuration>
                             <additionalparam>${javadoc.opts}</additionalparam>
+                            <javadocExecutable>${java.home}/../bin/javadoc</javadocExecutable>
                         </configuration>
                     </execution>
                 </executions>

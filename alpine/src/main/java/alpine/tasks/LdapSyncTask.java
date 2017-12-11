@@ -53,6 +53,7 @@ public class LdapSyncTask implements Subscriber {
     private static final String BIND_USERNAME = Config.getInstance().getProperty(Config.AlpineKey.LDAP_BIND_USERNAME);
     private static final String BIND_PASSWORD = Config.getInstance().getProperty(Config.AlpineKey.LDAP_BIND_PASSWORD);
     private static final String ATTRIBUTE_MAIL = Config.getInstance().getProperty(Config.AlpineKey.LDAP_ATTRIBUTE_MAIL);
+    private static final String LDAP_ATTRIBUTE_NAME = Config.getInstance().getProperty(Config.AlpineKey.LDAP_ATTRIBUTE_NAME);
 
     @Override
     public void inform(Event e) {
@@ -123,7 +124,7 @@ public class LdapSyncTask implements Subscriber {
      * @throws NamingException when a problem with the connection with the directory
      */
     private void sync(DirContext ctx, AlpineQueryManager qm, SearchControls sc, LdapUser user) throws NamingException {
-        final String searchFor = "userPrincipalName=" + formatPrincipal(user.getUsername());
+        final String searchFor = LDAP_ATTRIBUTE_NAME + "=" + formatPrincipal(user.getUsername());
 
         LOGGER.debug("Syncing: " + user.getUsername());
 
