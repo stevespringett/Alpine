@@ -102,7 +102,7 @@
         <lib.datanucleus-api-jdo.version>5.1.4</lib.datanucleus-api-jdo.version>
         <lib.datanucleus.version>5.1.4</lib.datanucleus.version>
         <lib.h2.version>1.4.196</lib.h2.version>
-        <lib.jackson.version>2.9.2</lib.jackson.version>
+        <lib.jackson.version>2.9.3</lib.jackson.version>
         <lib.jdo.api.version>3.2.0-m7</lib.jdo.api.version>
         <lib.jersey.version>2.26</lib.jersey.version>
         <lib.jsp.api.version>2.2</lib.jsp.api.version>
