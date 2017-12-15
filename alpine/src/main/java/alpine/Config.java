@@ -79,6 +79,8 @@ public class Config {
         LDAP_ATTRIBUTE_MAIL      ("alpine.ldap.attribute.mail",       "mail"),
         HTTP_PROXY_ADDRESS       ("alpine.http.proxy.address",        null),
         HTTP_PROXY_PORT          ("alpine.http.proxy.port",           null),
+        HTTP_PROXY_USERNAME      ("alpine.http.proxy.username",       null),
+        HTTP_PROXY_PASSWORD      ("alpine.http.proxy.password",       null),
         WATCHDOG_LOGGING_INTERVAL("alpine.watchdog.logging.interval", 0);
 
         private String propertyName;
