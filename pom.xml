@@ -118,7 +118,7 @@
         <lib.swagger.jersey.version>1.5.17</lib.swagger.jersey.version>
 
         <!-- Logback configuration - Used for Embedded Jetty profile -->
-        <logback.configuration.file>${project.build.directory}/${project.build.finalName}/WEB-INF/classes/logback.xml</logback.configuration.file>
+        <logback.configuration.file>${project.build.directory}/classes/logback.xml</logback.configuration.file>
     </properties>
 
     <dependencies>
