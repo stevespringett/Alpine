@@ -16,10 +16,6 @@
 
     <name>Example Alpine Application</name>
 
-    <properties>
-        <logback.configuration.file>${project.build.sourceDirectory}/../resources/logback.xml</logback.configuration.file>
-    </properties>
-
     <dependencies>
         <!-- Alpine -->
         <dependency>
