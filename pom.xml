@@ -632,7 +632,7 @@
                                 <id>copy-and-rename-file</id>
                                 <phase>compile</phase>
                                 <goals>
-                                    <goal>rename</goal>
+                                    <goal>copy</goal>
                                 </goals>
                                 <configuration>
                                     <sourceFile>${logback.configuration.file}</sourceFile>
