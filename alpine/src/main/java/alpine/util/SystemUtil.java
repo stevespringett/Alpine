@@ -44,6 +44,8 @@ public final class SystemUtil {
     private static boolean bit32;
     private static boolean bit64;
 
+    private static final JavaVersion JAVA_VERSION = new JavaVersion();
+
     private static final String BIT_BUCKET_UNIX = "/dev/null";
     private static final String BIT_BUCKET_WIN = "NUL"; // Yes, it's only one 'L'
 
@@ -207,16 +209,16 @@ public final class SystemUtil {
      * @since 1.0
      */
     public static String getJavaVendor() {
-        return System.getProperty("java.version");
+        return System.getProperty("java.vendor");
     }
 
     /**
      * Return the Java version.
-     * @return String containing the Java version
+     * @return JavaVersion containing Java version information
      * @since 1.0
      */
-    public static String getJavaVersion() {
-        return System.getProperty("java.vendor");
+    public static JavaVersion getJavaVersion() {
+        return JAVA_VERSION;
     }
 
     /**
