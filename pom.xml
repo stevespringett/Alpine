@@ -83,8 +83,27 @@
         <plugin.dependency-check.format>ALL</plugin.dependency-check.format>
         <plugin.dependency-check.skipTestScope>true</plugin.dependency-check.skipTestScope>
         <plugin.dependency-check.suppressionFile>${env.DEPENDENCY-CHECK_SUPPRESSION}</plugin.dependency-check.suppressionFile>
-        <plugin.dependency-check.centralAnalyzerEnabled>true</plugin.dependency-check.centralAnalyzerEnabled>
-        <plugin.dependency-check.externalReport>true</plugin.dependency-check.externalReport>
+        <plugin.dependency-check.analyzer.archiveAnalyzerEnabled>false</plugin.dependency-check.analyzer.archiveAnalyzerEnabled>
+        <plugin.dependency-check.analyzer.assemblyAnalyzerEnabled>false</plugin.dependency-check.analyzer.assemblyAnalyzerEnabled>
+        <plugin.dependency-check.analyzer.autoconfAnalyzerEnabled>false</plugin.dependency-check.analyzer.autoconfAnalyzerEnabled>
+        <plugin.dependency-check.analyzer.bundleAuditAnalyzerEnabled>false</plugin.dependency-check.analyzer.bundleAuditAnalyzerEnabled>
+        <plugin.dependency-check.analyzer.bundleAuditPath></plugin.dependency-check.analyzer.bundleAuditPath>
+        <plugin.dependency-check.analyzer.centralAnalyzerEnabled>true</plugin.dependency-check.analyzer.centralAnalyzerEnabled>
+        <plugin.dependency-check.analyzer.cmakeAnalyzerEnabled>false</plugin.dependency-check.analyzer.cmakeAnalyzerEnabled>
+        <plugin.dependency-check.analyzer.cocoapodsAnalyzerEnabled>false</plugin.dependency-check.analyzer.cocoapodsAnalyzerEnabled>
+        <plugin.dependency-check.analyzer.composerAnalyzerEnabled>false</plugin.dependency-check.analyzer.composerAnalyzerEnabled>
+        <plugin.dependency-check.analyzer.jarAnalyzer>true</plugin.dependency-check.analyzer.jarAnalyzer>
+        <plugin.dependency-check.analyzer.nexusAnalyzerEnabled>false</plugin.dependency-check.analyzer.nexusAnalyzerEnabled>
+        <plugin.dependency-check.analyzer.nexusUrl></plugin.dependency-check.analyzer.nexusUrl>
+        <plugin.dependency-check.analyzer.nexusUsesProxy></plugin.dependency-check.analyzer.nexusUsesProxy>
+        <plugin.dependency-check.analyzer.nodeAnalyzerEnabled>true</plugin.dependency-check.analyzer.nodeAnalyzerEnabled>
+        <plugin.dependency-check.analyzer.nspAnalyzerEnabled>true</plugin.dependency-check.analyzer.nspAnalyzerEnabled>
+        <plugin.dependency-check.analyzer.nuspecAnalyzerEnabled>false</plugin.dependency-check.analyzer.nuspecAnalyzerEnabled>
+        <plugin.dependency-check.analyzer.opensslAnalyzerEnabled>false</plugin.dependency-check.analyzer.opensslAnalyzerEnabled>
+        <plugin.dependency-check.analyzer.pyDistributionAnalyzerEnabled>false</plugin.dependency-check.analyzer.pyDistributionAnalyzerEnabled>
+        <plugin.dependency-check.analyzer.pyPackageAnalyzerEnabled>false</plugin.dependency-check.analyzer.pyPackageAnalyzerEnabled>
+        <plugin.dependency-check.analyzer.rubygemsAnalyzerEnabled>false</plugin.dependency-check.analyzer.rubygemsAnalyzerEnabled>
+        <plugin.dependency-check.analyzer.swiftPackageManagerAnalyzerEnabled>false</plugin.dependency-check.analyzer.swiftPackageManagerAnalyzerEnabled>
 
         <!-- Software Security: Retire.js -->
         <maven.retirejs.plugin.version>2.1.0</maven.retirejs.plugin.version>
@@ -512,8 +531,28 @@
                                 <format>${plugin.dependency-check.format}</format>
                                 <skipTestScope>${plugin.dependency-check.skipTestScope}</skipTestScope>
                                 <suppressionFile>${plugin.dependency-check.suppressionFile}</suppressionFile>
-                                <centralAnalyzerEnabled>${plugin.dependency-check.centralAnalyzerEnabled}</centralAnalyzerEnabled>
-                                <externalReport>${plugin.dependency-check.externalReport}</externalReport>
+                                <!-- Analyzer Configuration -->
+                                <archiveAnalyzerEnabled>${plugin.dependency-check.analyzer.archiveAnalyzerEnabled}</archiveAnalyzerEnabled>
+                                <assemblyAnalyzerEnabled>${plugin.dependency-check.analyzer.assemblyAnalyzerEnabled}</assemblyAnalyzerEnabled>
+                                <autoconfAnalyzerEnabled>${plugin.dependency-check.analyzer.autoconfAnalyzerEnabled}</autoconfAnalyzerEnabled>
+                                <bundleAuditAnalyzerEnabled>${plugin.dependency-check.analyzer.bundleAuditAnalyzerEnabled}</bundleAuditAnalyzerEnabled>
+                                <bundleAuditPath>${plugin.dependency-check.analyzer.bundleAuditPath}</bundleAuditPath>
+                                <centralAnalyzerEnabled>${plugin.dependency-check.analyzer.centralAnalyzerEnabled}</centralAnalyzerEnabled>
+                                <cmakeAnalyzerEnabled>${plugin.dependency-check.analyzer.cmakeAnalyzerEnabled}</cmakeAnalyzerEnabled>
+                                <cocoapodsAnalyzerEnabled>${plugin.dependency-check.analyzer.cocoapodsAnalyzerEnabled}</cocoapodsAnalyzerEnabled>
+                                <composerAnalyzerEnabled>${plugin.dependency-check.analyzer.composerAnalyzerEnabled}</composerAnalyzerEnabled>
+                                <jarAnalyzer>${plugin.dependency-check.analyzer.jarAnalyzer}</jarAnalyzer>
+                                <nexusAnalyzerEnabled>${plugin.dependency-check.analyzer.nexusAnalyzerEnabled}</nexusAnalyzerEnabled>
+                                <nexusUrl>${plugin.dependency-check.analyzer.nexusUrl}</nexusUrl>
+                                <nexusUsesProxy>${plugin.dependency-check.analyzer.nexusUsesProxy}</nexusUsesProxy>
+                                <nodeAnalyzerEnabled>${plugin.dependency-check.analyzer.nodeAnalyzerEnabled}</nodeAnalyzerEnabled>
+                                <nspAnalyzerEnabled>${plugin.dependency-check.analyzer.nspAnalyzerEnabled}</nspAnalyzerEnabled>
+                                <nuspecAnalyzerEnabled>${plugin.dependency-check.analyzer.nuspecAnalyzerEnabled}</nuspecAnalyzerEnabled>
+                                <opensslAnalyzerEnabled>${plugin.dependency-check.analyzer.opensslAnalyzerEnabled}</opensslAnalyzerEnabled>
+                                <pyDistributionAnalyzerEnabled>${plugin.dependency-check.analyzer.pyDistributionAnalyzerEnabled}</pyDistributionAnalyzerEnabled>
+                                <pyPackageAnalyzerEnabled>${plugin.dependency-check.analyzer.pyPackageAnalyzerEnabled}</pyPackageAnalyzerEnabled>
+                                <rubygemsAnalyzerEnabled>${plugin.dependency-check.analyzer.rubygemsAnalyzerEnabled}</rubygemsAnalyzerEnabled>
+                                <swiftPackageManagerAnalyzerEnabled>${plugin.dependency-check.analyzer.swiftPackageManagerAnalyzerEnabled}</swiftPackageManagerAnalyzerEnabled>
                             </configuration>
                         </plugin>
                     </plugins>
@@ -523,7 +562,7 @@
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>versions-maven-plugin</artifactId>
                         <version>${maven.versions.plugin.version}</version>
-                        <inherited>false</inherited>
+                        <inherited>true</inherited>
                         <executions>
                             <execution>
                                 <id>maven-versions</id>
@@ -533,6 +572,24 @@
                                     <goal>display-plugin-updates</goal>
                                     <goal>display-property-updates</goal>
                                 </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>${maven.dependency.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>tree-dependencies</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>analyze-only</goal>
+                                    <goal>tree</goal>
+                                </goals>
+                                <configuration>
+                                    <outputFile>${project.build.directory}/dependency-tree.txt</outputFile>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
@@ -585,8 +642,28 @@
                                         <format>${plugin.dependency-check.format}</format>
                                         <skipTestScope>${plugin.dependency-check.skipTestScope}</skipTestScope>
                                         <suppressionFile>${plugin.dependency-check.suppressionFile}</suppressionFile>
-                                        <centralAnalyzerEnabled>${plugin.dependency-check.centralAnalyzerEnabled}</centralAnalyzerEnabled>
-                                        <externalReport>${plugin.dependency-check.externalReport}</externalReport>
+                                        <!-- Analyzer Configuration -->
+                                        <archiveAnalyzerEnabled>${plugin.dependency-check.analyzer.archiveAnalyzerEnabled}</archiveAnalyzerEnabled>
+                                        <assemblyAnalyzerEnabled>${plugin.dependency-check.analyzer.assemblyAnalyzerEnabled}</assemblyAnalyzerEnabled>
+                                        <autoconfAnalyzerEnabled>${plugin.dependency-check.analyzer.autoconfAnalyzerEnabled}</autoconfAnalyzerEnabled>
+                                        <bundleAuditAnalyzerEnabled>${plugin.dependency-check.analyzer.bundleAuditAnalyzerEnabled}</bundleAuditAnalyzerEnabled>
+                                        <bundleAuditPath>${plugin.dependency-check.analyzer.bundleAuditPath}</bundleAuditPath>
+                                        <centralAnalyzerEnabled>${plugin.dependency-check.analyzer.centralAnalyzerEnabled}</centralAnalyzerEnabled>
+                                        <cmakeAnalyzerEnabled>${plugin.dependency-check.analyzer.cmakeAnalyzerEnabled}</cmakeAnalyzerEnabled>
+                                        <cocoapodsAnalyzerEnabled>${plugin.dependency-check.analyzer.cocoapodsAnalyzerEnabled}</cocoapodsAnalyzerEnabled>
+                                        <composerAnalyzerEnabled>${plugin.dependency-check.analyzer.composerAnalyzerEnabled}</composerAnalyzerEnabled>
+                                        <jarAnalyzer>${plugin.dependency-check.analyzer.jarAnalyzer}</jarAnalyzer>
+                                        <nexusAnalyzerEnabled>${plugin.dependency-check.analyzer.nexusAnalyzerEnabled}</nexusAnalyzerEnabled>
+                                        <nexusUrl>${plugin.dependency-check.analyzer.nexusUrl}</nexusUrl>
+                                        <nexusUsesProxy>${plugin.dependency-check.analyzer.nexusUsesProxy}</nexusUsesProxy>
+                                        <nodeAnalyzerEnabled>${plugin.dependency-check.analyzer.nodeAnalyzerEnabled}</nodeAnalyzerEnabled>
+                                        <nspAnalyzerEnabled>${plugin.dependency-check.analyzer.nspAnalyzerEnabled}</nspAnalyzerEnabled>
+                                        <nuspecAnalyzerEnabled>${plugin.dependency-check.analyzer.nuspecAnalyzerEnabled}</nuspecAnalyzerEnabled>
+                                        <opensslAnalyzerEnabled>${plugin.dependency-check.analyzer.opensslAnalyzerEnabled}</opensslAnalyzerEnabled>
+                                        <pyDistributionAnalyzerEnabled>${plugin.dependency-check.analyzer.pyDistributionAnalyzerEnabled}</pyDistributionAnalyzerEnabled>
+                                        <pyPackageAnalyzerEnabled>${plugin.dependency-check.analyzer.pyPackageAnalyzerEnabled}</pyPackageAnalyzerEnabled>
+                                        <rubygemsAnalyzerEnabled>${plugin.dependency-check.analyzer.rubygemsAnalyzerEnabled}</rubygemsAnalyzerEnabled>
+                                        <swiftPackageManagerAnalyzerEnabled>${plugin.dependency-check.analyzer.swiftPackageManagerAnalyzerEnabled}</swiftPackageManagerAnalyzerEnabled>
                                     </configuration>
                                     <reportSets>
                                         <reportSet>
