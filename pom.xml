@@ -307,6 +307,11 @@
         </dependency>
         <dependency>
             <groupId>org.owasp</groupId>
+            <artifactId>security-logging-common</artifactId>
+            <version>${lib.owasp.security-logging.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.owasp</groupId>
             <artifactId>security-logging-logback</artifactId>
             <version>${lib.owasp.security-logging.version}</version>
         </dependency>
@@ -735,6 +740,16 @@
                                 <overlay>
                                     <groupId>us.springett</groupId>
                                     <artifactId>alpine-executable-war</artifactId>
+                                    <type>jar</type>
+                                </overlay>
+                                <overlay>
+                                    <groupId>org.owasp</groupId>
+                                    <artifactId>security-logging-common</artifactId>
+                                    <type>jar</type>
+                                </overlay>
+                                <overlay>
+                                    <groupId>org.owasp</groupId>
+                                    <artifactId>security-logging-logback</artifactId>
                                     <type>jar</type>
                                 </overlay>
                             </overlays>
