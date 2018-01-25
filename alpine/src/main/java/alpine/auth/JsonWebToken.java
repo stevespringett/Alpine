@@ -26,6 +26,8 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
+import org.owasp.security.logging.SecurityMarkers;
+
 import javax.crypto.SecretKey;
 import java.security.Key;
 import java.security.Principal;
@@ -121,14 +123,14 @@ public class JsonWebToken {
             this.expiration = jwtParser.parseClaimsJws(token).getBody().getExpiration();
             return true;
         } catch (SignatureException e) {
-            LOGGER.info("Received token that did not pass signature verification");
+            LOGGER.info(SecurityMarkers.SECURITY_FAILURE, "Received token that did not pass signature verification");
         } catch (ExpiredJwtException e) {
-            LOGGER.debug("Received expired token");
+            LOGGER.debug(SecurityMarkers.SECURITY_FAILURE, "Received expired token");
         } catch (MalformedJwtException e) {
-            LOGGER.debug("Received malformed token");
-            LOGGER.debug(e.getMessage());
+            LOGGER.debug(SecurityMarkers.SECURITY_FAILURE, "Received malformed token");
+            LOGGER.debug(SecurityMarkers.SECURITY_FAILURE, e.getMessage());
         } catch (UnsupportedJwtException | IllegalArgumentException e) {
-            LOGGER.error(e.getMessage());
+            LOGGER.error(SecurityMarkers.SECURITY_FAILURE, e.getMessage());
         }
         return false;
     }
