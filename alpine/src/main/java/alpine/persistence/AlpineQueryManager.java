@@ -47,7 +47,9 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     /**
      * Default constructor.
      */
-    public AlpineQueryManager() { }
+    public AlpineQueryManager() {
+        super();
+    }
 
     /**
      * Constructs a new AlpineQueryManager.
