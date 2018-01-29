@@ -50,9 +50,24 @@ public class PersistenceManagerFactory implements ServletContextListener {
         JDO_OVERRIDES.put("datanucleus.schema.autoCreateTables", "true");
         JDO_OVERRIDES.put("datanucleus.schema.autoCreateColumns", "true");
         JDO_OVERRIDES.put("datanucleus.schema.autoCreateConstraints", "true");
+        JDO_OVERRIDES.put("datanucleus.generateSchema.database.mode", "create");
         JDO_OVERRIDES.put("datanucleus.query.jdoql.allowAll", "true");
-        JDO_OVERRIDES.put("datanucleus.NontransactionalRead", "true");
-        JDO_OVERRIDES.put("datanucleus.NontransactionalWrite", "true");
+    }
+
+    private static final Properties JDO_PROPERTIES;
+    static {
+        JDO_PROPERTIES = new Properties();
+        JDO_PROPERTIES.put("javax.jdo.option.ConnectionURL", Config.getInstance().getProperty(Config.AlpineKey.DATABASE_URL));
+        JDO_PROPERTIES.put("javax.jdo.option.ConnectionDriverName", Config.getInstance().getProperty(Config.AlpineKey.DATABASE_DRIVER));
+        JDO_PROPERTIES.put("javax.jdo.option.ConnectionUserName", Config.getInstance().getProperty(Config.AlpineKey.DATABASE_USERNAME));
+        JDO_PROPERTIES.put("javax.jdo.option.ConnectionPassword", Config.getInstance().getProperty(Config.AlpineKey.DATABASE_PASSWORD));
+        JDO_PROPERTIES.put("datanucleus.connectionPoolingType", "DBCP2");
+        JDO_PROPERTIES.put("datanucleus.schema.autoCreateSchema", "true");
+        JDO_PROPERTIES.put("datanucleus.schema.autoCreateTables", "true");
+        JDO_PROPERTIES.put("datanucleus.schema.autoCreateColumns", "true");
+        JDO_PROPERTIES.put("datanucleus.schema.autoCreateConstraints", "true");
+        JDO_PROPERTIES.put("datanucleus.generateSchema.database.mode", "create");
+        JDO_PROPERTIES.put("datanucleus.query.jdoql.allowAll", "true");
     }
 
     private static javax.jdo.PersistenceManagerFactory pmf;
@@ -60,7 +75,7 @@ public class PersistenceManagerFactory implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent event) {
         LOGGER.info("Initializing persistence framework");
-        pmf = JDOHelper.getPersistenceManagerFactory("Alpine");
+        pmf = JDOHelper.getPersistenceManagerFactory(JDO_PROPERTIES, "Alpine");
     }
 
     @Override

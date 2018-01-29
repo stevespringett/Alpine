@@ -40,10 +40,25 @@ public class Config {
     private static final String PROP_FILE = "application.properties";
     private static final String ALPINE_VERSION_PROP_FILE = "alpine.version";
     private static final String APPLICATION_VERSION_PROP_FILE = "application.version";
-    private static Config instance;
+    private static final Config INSTANCE;
     private static Properties properties;
     private static Properties alpineVersionProperties;
     private static Properties applicationVersionProperties;
+
+    static {
+        LOGGER.info(StringUtils.repeat("-", 80));
+        INSTANCE = new Config();
+        INSTANCE.init();
+        LOGGER.info(StringUtils.repeat("-", 80));
+        LOGGER.info("Application: " + INSTANCE.getApplicationName());
+        LOGGER.info("Version:     " + INSTANCE.getApplicationVersion());
+        LOGGER.info("Built-on:    " + INSTANCE.getApplicationBuildTimestamp());
+        LOGGER.info(StringUtils.repeat("-", 80));
+        LOGGER.info("Framework:   " + INSTANCE.getFrameworkName());
+        LOGGER.info("Version :    " + INSTANCE.getFrameworkVersion());
+        LOGGER.info("Built-on:    " + INSTANCE.getFrameworkBuildTimestamp());
+        LOGGER.info(StringUtils.repeat("-", 80));
+    }
 
     public interface Key {
 
@@ -66,6 +81,10 @@ public class Config {
         DATA_DIRECTORY           ("alpine.data.directory",            "~/.alpine"),
         DATABASE_MODE            ("alpine.database.mode",             "embedded"),
         DATABASE_PORT            ("alpine.database.port",             9092),
+        DATABASE_URL             ("alpine.database.url",              "jdbc:h2:mem:alpine"),
+        DATABASE_DRIVER          ("alpine.database.driver",           "org.h2.Driver"),
+        DATABASE_USERNAME        ("alpine.database.username",         "sa"),
+        DATABASE_PASSWORD        ("alpine.database.password",         ""),
         ENFORCE_AUTHENTICATION   ("alpine.enforce.authentication",    true),
         ENFORCE_AUTHORIZATION    ("alpine.enforce.authorization",     true),
         BCRYPT_ROUNDS            ("alpine.bcrypt.rounds",             14),
@@ -105,21 +124,7 @@ public class Config {
      * @since 1.0.0
      */
     public static Config getInstance() {
-        if (instance == null) {
-            LOGGER.info(StringUtils.repeat("-", 80));
-            instance = new Config();
-            instance.init();
-            LOGGER.info(StringUtils.repeat("-", 80));
-            LOGGER.info("Application: " + instance.getApplicationName());
-            LOGGER.info("Version:     " + instance.getApplicationVersion());
-            LOGGER.info("Built-on:    " + instance.getApplicationBuildTimestamp());
-            LOGGER.info(StringUtils.repeat("-", 80));
-            LOGGER.info("Framework:   " + instance.getFrameworkName());
-            LOGGER.info("Version :    " + instance.getFrameworkVersion());
-            LOGGER.info("Built-on:    " + instance.getFrameworkBuildTimestamp());
-            LOGGER.info(StringUtils.repeat("-", 80));
-        }
-        return instance;
+        return INSTANCE;
     }
 
     /**
