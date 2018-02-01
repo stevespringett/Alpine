@@ -78,7 +78,7 @@
         <plugin.fortify.sca.source.version>${maven.compiler.source}</plugin.fortify.sca.source.version>
 
         <!-- Software Security: OWASP Dependency-Check -->
-        <maven.dependency-check.plugin.version>3.0.2</maven.dependency-check.plugin.version>
+        <maven.dependency-check.plugin.version>3.1.1</maven.dependency-check.plugin.version>
         <plugin.dependency-check.autoUpdate>true</plugin.dependency-check.autoUpdate>
         <plugin.dependency-check.format>ALL</plugin.dependency-check.format>
         <plugin.dependency-check.skipTestScope>true</plugin.dependency-check.skipTestScope>
