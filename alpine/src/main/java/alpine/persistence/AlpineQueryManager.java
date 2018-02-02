@@ -182,6 +182,24 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     }
 
     /**
+     * Updates the specified ManagedUser.
+     * @param transientUser the optionally detached ManagedUser object to update.
+     * @return an ManagedUser
+     * @since 1.0.0
+     */
+    public ManagedUser updateManagedUser(final ManagedUser transientUser) {
+        final ManagedUser user = getObjectById(ManagedUser.class, transientUser.getId());
+        pm.currentTransaction().begin();
+        user.setFullname(transientUser.getFullname());
+        user.setEmail(transientUser.getEmail());
+        if (transientUser.getPassword() != null) {
+            user.setPassword(transientUser.getPassword());
+        }
+        pm.currentTransaction().commit();
+        return pm.getObjectById(ManagedUser.class, user.getId());
+    }
+
+    /**
      * Returns a ManagedUser with the specified username. If the username
      * does not exist, returns null.
      * @param username The username to retrieve

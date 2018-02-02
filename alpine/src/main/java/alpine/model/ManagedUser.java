@@ -69,10 +69,20 @@ public class ManagedUser implements Serializable, Principal, UserPrincipal {
     @JsonIgnore
     private String password;
 
+    @Size(max = 255)
+    @Pattern(regexp = "[\\P{Cc}]+", message = "The confirm password must not contain control characters")
+    @JsonIgnore
+    private transient String confirmPassword; // not persisted
+
     @Persistent
-    @Column(name = "EMAIL", allowsNull = "false")
-    @NotNull
-    @Size(min = 1, max = 255)
+    @Column(name = "FULLNAME")
+    @Size(max = 255)
+    @Pattern(regexp = "[\\P{Cc}]+", message = "The full name must not contain control characters")
+    private String fullname;
+
+    @Persistent
+    @Column(name = "EMAIL")
+    @Size(max = 255)
     @Pattern(regexp = "[\\P{Cc}]+", message = "The email address must not contain control characters")
     private String email;
 
@@ -108,6 +118,22 @@ public class ManagedUser implements Serializable, Principal, UserPrincipal {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getConfirmPassword() {
+        return confirmPassword;
+    }
+
+    public void setConfirmPassword(String confirmPassword) {
+        this.confirmPassword = confirmPassword;
+    }
+
+    public String getFullname() {
+        return fullname;
+    }
+
+    public void setFullname(String fullname) {
+        this.fullname = fullname;
     }
 
     public String getEmail() {
