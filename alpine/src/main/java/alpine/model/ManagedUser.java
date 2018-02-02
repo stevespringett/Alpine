@@ -70,6 +70,13 @@ public class ManagedUser implements Serializable, Principal, UserPrincipal {
     private String password;
 
     @Persistent
+    @Column(name = "EMAIL", allowsNull = "false")
+    @NotNull
+    @Size(min = 1, max = 255)
+    @Pattern(regexp = "[\\P{Cc}]+", message = "The email address must not contain control characters")
+    private String email;
+
+    @Persistent
     @Column(name = "SUSPENDED")
     private boolean suspended;
 
@@ -101,6 +108,14 @@ public class ManagedUser implements Serializable, Principal, UserPrincipal {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public boolean isSuspended() {
