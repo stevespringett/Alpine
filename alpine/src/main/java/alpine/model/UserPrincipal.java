@@ -52,6 +52,18 @@ public interface UserPrincipal {
     void setUsername(String username);
 
     /**
+     * The email address of the principal.
+     * @return a String of the email address
+     */
+    String getEmail();
+
+    /**
+     * Specifies the email address of the principal.
+     * @param email the email address of the principal
+     */
+    void setEmail(String email);
+
+    /**
      * A list of teams the principal is a member of.
      * @return a List of Team objects
      */
