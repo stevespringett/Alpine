@@ -37,6 +37,7 @@ public final class GravatarUtil {
     /**
      * Generates a hash value from the specified email address.
      * Returns null if emailAddress is empty or null.
+     * @since 1.0.0
      */
     public static String generateHash(String emailAddress) {
         if (StringUtils.isBlank(emailAddress)) {
@@ -50,6 +51,7 @@ public final class GravatarUtil {
      * the principal does not have an email address or the email
      * address does not have a Gravatar, will fallback to using
      * the mystery-man image.
+     * @since 1.0.0
      */
     public static String getGravatarUrl(UserPrincipal userPrincipal) {
         return getGravatarUrl(userPrincipal.getEmail());
@@ -60,6 +62,7 @@ public final class GravatarUtil {
      * the principal does not have an email address or the email
      * address does not have a Gravatar, will fallback to using
      * the mystery-man image.
+     * @since 1.0.0
      */
     public static String getGravatarUrl(UserPrincipal userPrincipal, int size) {
         return getGravatarUrl(userPrincipal.getEmail(), size);
@@ -69,6 +72,7 @@ public final class GravatarUtil {
      * Generates a Gravatar URL for the specified email address. If
      * the email address is blank or does not have a Gravatar, will
      * fallback to usingthe mystery-man image.
+     * @since 1.0.0
      */
     public static String getGravatarUrl(String emailAddress) {
         String hash = generateHash(emailAddress);
@@ -83,6 +87,7 @@ public final class GravatarUtil {
      * Generates a Gravatar URL for the specified email address. If
      * the email address is blank or does not have a Gravatar, will
      * fallback to usingthe mystery-man image.
+     * @since 1.0.0
      */
     public static String getGravatarUrl(String emailAddress, int size) {
         return getGravatarUrl(emailAddress) + "&s=" + size;
