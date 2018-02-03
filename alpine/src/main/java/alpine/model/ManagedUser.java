@@ -70,8 +70,11 @@ public class ManagedUser implements Serializable, Principal, UserPrincipal {
     private String password;
 
     @Size(max = 255)
+    @Pattern(regexp = "[\\P{Cc}]+", message = "The new password must not contain control characters")
+    private transient String newPassword; // not persisted
+
+    @Size(max = 255)
     @Pattern(regexp = "[\\P{Cc}]+", message = "The confirm password must not contain control characters")
-    @JsonIgnore
     private transient String confirmPassword; // not persisted
 
     @Persistent
@@ -118,6 +121,14 @@ public class ManagedUser implements Serializable, Principal, UserPrincipal {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getNewPassword() {
+        return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
     }
 
     public String getConfirmPassword() {
