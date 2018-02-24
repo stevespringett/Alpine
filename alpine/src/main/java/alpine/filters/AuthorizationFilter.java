@@ -20,8 +20,11 @@ package alpine.filters;
 import alpine.auth.PermissionRequired;
 import alpine.logging.Logger;
 import alpine.model.LdapUser;
+import alpine.model.ManagedUser;
+import alpine.model.UserPrincipal;
 import alpine.persistence.AlpineQueryManager;
 import org.glassfish.jersey.server.ContainerRequest;
+import org.owasp.security.logging.SecurityMarkers;
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -54,22 +57,35 @@ public class AuthorizationFilter implements ContainerRequestFilter {
 
             final Principal principal = (Principal) requestContext.getProperty("Principal");
             if (principal == null) {
-                requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+                LOGGER.info(SecurityMarkers.SECURITY_FAILURE, "A request was made without the assertion of a valid user principal");
+                requestContext.abortWith(Response.status(Response.Status.FORBIDDEN).build());
                 return;
             }
 
             final PermissionRequired annotation = resourceInfo.getResourceMethod().getDeclaredAnnotation(PermissionRequired.class);
 
             try (AlpineQueryManager qm = new AlpineQueryManager()) {
-                if (principal instanceof LdapUser) {
-                    final LdapUser user = qm.getLdapUser(((LdapUser) principal).getUsername());
-
-                    final String[] permissions = annotation.value();
-                    for (String permission: permissions) {
-                        // todo check if user has one of these required permissions
+                UserPrincipal user = null;
+                if (principal instanceof ManagedUser) {
+                    user = qm.getManagedUser(((ManagedUser) principal).getUsername());
+                } else if (principal instanceof LdapUser) {
+                    user = qm.getLdapUser(((LdapUser) principal).getUsername());
+                }
+                if (user == null) {
+                    LOGGER.info(SecurityMarkers.SECURITY_FAILURE, "A request was made but the system in unable to find the user principal");
+                    requestContext.abortWith(Response.status(Response.Status.FORBIDDEN).build());
+                    return;
+                }
+                final String[] permissions = annotation.value();
+                for (String permission: permissions) {
+                    if (qm.hasPermission(user, permission, true)) {
+                        return;
                     }
                 }
+                LOGGER.info(SecurityMarkers.SECURITY_FAILURE, "Unauthorized access attempt made by "
+                        + user.getUsername() + " to " + ((ContainerRequest) requestContext).getRequestUri().toString());
             }
+            requestContext.abortWith(Response.status(Response.Status.FORBIDDEN).build());
         }
     }
 

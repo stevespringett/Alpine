@@ -26,6 +26,7 @@ import alpine.model.ApiKey;
 import alpine.model.EventServiceLog;
 import alpine.model.LdapUser;
 import alpine.model.ManagedUser;
+import alpine.model.Permission;
 import alpine.model.Team;
 import alpine.model.UserPrincipal;
 import alpine.resources.AlpineRequest;
@@ -348,6 +349,121 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Returns a list of Permissions that are assigned to the specified Team.
+     * @param team the team to retrieve permissions for
+     * @return a List of Permission objects
+     * @since 1.0.0
+     */
+    @SuppressWarnings("unchecked")
+    public List<Permission> getPermissions(final Team team) {
+        final Query query = pm.newQuery(Permission.class, "teams.contains(:team)");
+        query.setOrdering("name asc");
+        return (List<Permission>) query.execute(team);
+    }
+
+    /**
+     * Returns a list of permission names that are assigned to the specified Team.
+     * @param team the team to retrieve permissions for
+     * @return a List of permission names
+     * @since 1.0.0
+     */
+    @SuppressWarnings("unchecked")
+    public List<String> getPermissionStrings(final Team team) {
+        List<String> permissions = new ArrayList<>();
+        for (Permission permission: getPermissions(team)) {
+            permissions.add(permission.getName());
+        }
+        return permissions;
+    }
+
+    /**
+     * Returns a list of Permissions that are assigned to the specified UserPrincipal.
+     * @param user the UserPrincipal to retrieve permissions for
+     * @return a List of Permission objects
+     * @since 1.0.0
+     */
+    @SuppressWarnings("unchecked")
+    public List<Permission> getPermissions(final UserPrincipal user) {
+        final Query query;
+        if (user instanceof ManagedUser) {
+            query = pm.newQuery(Permission.class, "managedUsers.contains(:user)");
+        } else {
+            query = pm.newQuery(Permission.class, "ldapUsers.contains(:user)");
+        }
+        query.setOrdering("name asc");
+        return (List<Permission>) query.execute(user);
+    }
+
+    /**
+     * Returns a list of permission names that are assigned to the specified UserPrincipal.
+     * @param user the UserPrincipal to retrieve permissions for
+     * @return a List of permission names
+     * @since 1.0.0
+     */
+    @SuppressWarnings("unchecked")
+    public List<String> getPermissionStrings(final UserPrincipal user) {
+        List<String> permissions = new ArrayList<>();
+        for (Permission permission: getPermissions(user)) {
+            permissions.add(permission.getName());
+        }
+        return permissions;
+    }
+
+    /**
+     * Determines if the specified UserPrincipal has been assigned the specified permission.
+     * @param user the UserPrincipal to query
+     * @param permissionName the name of the permission
+     * @return true if the user has the permission assigned, false if not
+     * @since 1.0.0
+     */
+    public boolean hasPermission(final UserPrincipal user, String permissionName) {
+        return hasPermission(user, permissionName, false);
+    }
+
+    /**
+     * Determines if the specified UserPrincipal has been assigned the specified permission.
+     * @param user the UserPrincipal to query
+     * @param permissionName the name of the permission
+     * @param includeTeams if true, will query all Team membership assigned to the user for the specified permission
+     * @return true if the user has the permission assigned, false if not
+     * @since 1.0.0
+     */
+    public boolean hasPermission(final UserPrincipal user, String permissionName, boolean includeTeams) {
+        final Query query;
+        if (user instanceof ManagedUser) {
+            query = pm.newQuery(Permission.class, "name == :permissionName && managedUsers.contains(:user)");
+        } else {
+            query = pm.newQuery(Permission.class, "name == :permissionName && ldapUsers.contains(:user)");
+        }
+        query.setResult("count(id)");
+        long count = (Long) query.execute(permissionName, user);
+        if (count > 0) {
+            return true;
+        }
+        if (includeTeams) {
+            for (Team team: user.getTeams()) {
+                if (hasPermission(team, permissionName)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Determines if the specified Team has been assigned the specified permission.
+     * @param team the Team to query
+     * @param permissionName the name of the permission
+     * @return true if the team has the permission assigned, false if not
+     * @since 1.0.0
+     */
+    public boolean hasPermission(final Team team, String permissionName) {
+        final Query query = pm.newQuery(Permission.class, "name == :permissionName && teams.contains(:team)");
+        query.setResult("count(id)");
+        return (Long) query.execute(permissionName, team) > 0;
     }
 
     /**
