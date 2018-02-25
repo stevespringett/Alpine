@@ -171,7 +171,7 @@ If your open source or commercial project is using Alpine, feel free to add its
 name:
 
 * [Hakbot Origin Controller](https://github.com/hakbot/hakbot-origin-controller)
-* [OWASP Dependency-Track](https://www.owasp.org/index.php/OWASP_Dependency_Track_Project)
+* [OWASP Dependency-Track](https://dependencytrack.org)
 
 Copyright & License
 -
