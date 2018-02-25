@@ -360,7 +360,7 @@ public abstract class AlpineResource {
      * {@link SecurityMarkers#SECURITY_SUCCESS}
      * {@link SecurityMarkers#SECURITY_FAILURE}
      * @param logger the logger to use
-     * @oaram marker the marker to add to the event
+     * @param marker the marker to add to the event
      * @param message the initial content of the event
      * @since 1.0.0
      */

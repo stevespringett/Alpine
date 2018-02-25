@@ -58,7 +58,7 @@ public final class PasswordService {
      * Given a password to hash, this method will first prehash the password using SHA-512 thus creating
      * a 128 character HEX representation of the password, which is then sent to BCrypt where a unique
      * salt is generated and the prehashed password is properly hashed using the configured BCrypt
-     * work factor (determined by {@link Config.AlpineKey#BCRYPT_ROUNDS).
+     * work factor (determined by {@link Config.AlpineKey#BCRYPT_ROUNDS}.
      *
      * @param password the password to hash
      * @return a hashed password
@@ -74,7 +74,7 @@ public final class PasswordService {
      * Given a password to hash, this method will first prehash the password using SHA-512 thus creating
      * a 128 character HEX representation of the password, which is then sent to BCrypt where the prehashed
      * password is properly hashed using the specified salt and uses the configured BCrypt work factor
-     * (determined by {@link Config.AlpineKey#BCRYPT_ROUNDS).
+     * (determined by {@link Config.AlpineKey#BCRYPT_ROUNDS}.
      *
      * @param password the password to hash
      * @param salt the salt to use when hashing this password

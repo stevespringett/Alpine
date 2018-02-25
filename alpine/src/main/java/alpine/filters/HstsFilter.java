@@ -73,7 +73,7 @@ import java.io.IOException;
  * &lt;filter-mapping&gt;
  *     &lt;filter-name&gt;HstsFilter&lt;/filter-name&gt;
  *     &lt;url-pattern&gt;/&#42;&lt;/url-pattern&gt;
- * &lt;/filter-mapping>
+ * &lt;/filter-mapping&gt;
  * </pre>
  *
  * @author Steve Springett

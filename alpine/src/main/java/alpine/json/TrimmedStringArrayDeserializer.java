@@ -32,7 +32,7 @@ import java.util.List;
  *
  * Usage example:
  * <pre>
- * &commat;JsonDeserialize(using = TrimmedStringArrayDeserializer.class)
+ * &#64;JsonDeserialize(using = TrimmedStringArrayDeserializer.class)
  * String name;
  * </pre>
  *

@@ -58,20 +58,20 @@ public class ByteFormat {
     /**
      * Given a raw byte count such as 1024 or 1048576, format it in human-readable form such as
      * "1 KB" or "1 GB".
-     * <p/>
+     * <p></p>
      * Here are some example results using the default min/max values for fraction digits:
-     * <p/>
-     * 0                   -> 0 bytes
-     * 1                   -> 1 byte
-     * 1023                -> 1,023 bytes
-     * 1024 (1 KB)         -> 1 KB
-     * 1025                -> 1 KB
-     * 2000                -> 2 KB
-     * 1048575             -> 1,024 KB
-     * 1048576 (1 MB)      -> 1 MB
-     * 1048577             -> 1 MB
-     * 5000000             -> 4.8 MB
-     * 1073741824 (1 GB)   -> 1 GB
+     * <p></p>
+     * 0                   - 0 bytes
+     * 1                   - 1 byte
+     * 1023                - 1,023 bytes
+     * 1024 (1 KB)         - 1 KB
+     * 1025                - 1 KB
+     * 2000                - 2 KB
+     * 1048575             - 1,024 KB
+     * 1048576 (1 MB)      - 1 MB
+     * 1048577             - 1 MB
+     * 5000000             - 4.8 MB
+     * 1073741824 (1 GB)   - 1 GB
      *
      * @param count int
      * @return String
@@ -106,9 +106,9 @@ public class ByteFormat {
      * Similar to format(int), but the raw byte count is placed in parentheses following the formatted value (if the
      * value is greater than 1023 bytes).
      * e.g.:
-     * <p/>
-     * 1023 -> 1,023 bytes
-     * 1025 -> 1 KB (1025 bytes)
+     * <p></p>
+     * 1023 - 1,023 bytes
+     * 1025 - 1 KB (1025 bytes)
      * @param count int
      * @return String
      * @since 1.0.0
@@ -127,10 +127,10 @@ public class ByteFormat {
      * Same as format(int), but accepts a long.  Note that the maximum unit this class can deal with is
      * gigabytes, so if the specified count is very large it will still be expressed in terms of
      * gigabytes, e.g. "5,000,000 GB".
-     * <p/>
+     * <p></p>
      * Example results:<pre>
-     * format(Integer.MAX_VALUE + 1L)   -> 2 GB
-     * format(Long.MAX_VALUE)           -> 8,589,934,592 GB</pre>
+     * format(Integer.MAX_VALUE + 1L)   - 2 GB
+     * format(Long.MAX_VALUE)           - 8,589,934,592 GB</pre>
      * @param count int
      * @return String
      * @since 1.0.0
@@ -150,8 +150,8 @@ public class ByteFormat {
      * Similar to {@link #format(long)}, but the raw byte count is placed in parentheses following the formatted value (if the
      * value is greater than 1023 bytes).
      * e.g.:<pre>
-     * 1023 -> 1,023 bytes
-     * 1025 -> 1 KB (1025 bytes)</pre>
+     * 1023 - 1,023 bytes
+     * 1025 - 1 KB (1025 bytes)</pre>
      * @param count int
      * @return String
      * @since 1.0.0

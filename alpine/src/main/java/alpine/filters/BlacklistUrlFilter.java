@@ -94,8 +94,8 @@ public final class BlacklistUrlFilter implements Filter {
      * @param request The request object.
      * @param response The response object.
      * @param chain Refers to the {@code FilterChain} object to pass control to the next {@code Filter}.
-     * @throws IOException
-     * @throws ServletException
+     * @throws IOException a IOException
+     * @throws ServletException a ServletException
      */
     public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
             throws IOException, ServletException {
