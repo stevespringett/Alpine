@@ -14,7 +14,7 @@ read -n1 -r -p "Press 'Y' to continue with release or any other key to exit" key
 
 if [ "$key" == "Y" ]; then
   mvn versions:revert
-  mvn release:clean release:prepare release:perform -Prelease -X -e | tee maven-central-deploy.log
+  mvn release:clean release:prepare release:perform -Prelease -X -e | tee release.log
 else
     echo -e "Exit without deploy"
 fi
