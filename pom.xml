@@ -154,13 +154,13 @@
         <lib.alpine.executable.war.version>1.0.0</lib.alpine.executable.war.version>
         <lib.bcrypt.version>0.4</lib.bcrypt.version>
         <lib.commons.collections4.version>4.1</lib.commons.collections4.version>
-        <lib.commons.dbcp2.version>2.1.1</lib.commons.dbcp2.version>
+        <lib.commons.dbcp2.version>2.2.0</lib.commons.dbcp2.version>
         <lib.commons.io.version>2.6</lib.commons.io.version>
         <lib.commons.lang3.version>3.7</lib.commons.lang3.version>
         <lib.datanucleus-api-jdo.version>5.1.4</lib.datanucleus-api-jdo.version>
-        <lib.datanucleus.version>5.1.5</lib.datanucleus.version>
+        <lib.datanucleus.version>5.1.6</lib.datanucleus.version>
         <lib.h2.version>1.4.196</lib.h2.version>
-        <lib.jackson.version>2.9.3</lib.jackson.version>
+        <lib.jackson.version>2.9.4</lib.jackson.version>
         <lib.jdo.api.version>3.2.0-m7</lib.jdo.api.version>
         <lib.jersey.version>2.26</lib.jersey.version>
         <lib.jsp.api.version>2.2</lib.jsp.api.version>
@@ -173,7 +173,7 @@
         <lib.owasp.encoder.version>1.2.1</lib.owasp.encoder.version>
         <lib.owasp.security-logging.version>1.1.4</lib.owasp.security-logging.version>
         <lib.slf4j.version>1.7.25</lib.slf4j.version>
-        <lib.swagger.jersey.version>1.5.17</lib.swagger.jersey.version>
+        <lib.swagger.jersey.version>1.5.18</lib.swagger.jersey.version>
 
         <!-- Logback configuration - Used for Embedded Jetty profile -->
         <logback.configuration.file>${project.build.directory}/classes/logback.xml</logback.configuration.file>
@@ -747,7 +747,7 @@
                                 </goals>
                                 <configuration>
                                     <sourceFile>${logback.configuration.file}</sourceFile>
-                                    <destinationFile>${project.build.directory}/${build.finalName}/logback.xml</destinationFile>
+                                    <destinationFile>${project.build.directory}/${project.build.finalName}/logback.xml</destinationFile>
                                 </configuration>
                             </execution>
                         </executions>
