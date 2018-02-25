@@ -179,10 +179,10 @@ Copyright & License
 Alpine is Copyright (c) Steve Springett. All Rights Reserved.
 
 Permission to modify and redistribute is granted under the terms of the 
-[Apache License 2.0] [license-url]
+[Apache License 2.0](https://github.com/stevespringett/alpine/blob/master/LICENSE.txt)
 
 Alpine makes use of several other open source libraries. Please see
-the [NOTICE.txt] [notice] file for more information.
+the [NOTICE.txt](https://github.com/stevespringett/alpine/blob/master/NOTICE.txt) file for more information.
 
   [alpine-image]: http://6000rpms.com/images/Alpine.svg
   [GitHub Wiki]: https://github.com/stevespringett/alpine/wiki
@@ -191,4 +191,3 @@ the [NOTICE.txt] [notice] file for more information.
   [fortify-image]: https://img.shields.io/badge/static%20analysis-fortify%20sca-blue.svg
   [odc-image]: https://img.shields.io/badge/component%20analysis-owasp%20dependency--check-blue.svg
   [odc-url]: https://www.owasp.org/index.php/OWASP_Dependency_Check
-  [notice]: https://github.com/stevespringett/alpine/blob/master/NOTICE.txt
