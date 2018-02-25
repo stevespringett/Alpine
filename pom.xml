@@ -76,6 +76,7 @@
         <plugin.fortify.sca.sourcePath>${project.build.directory}/dependency-sources</plugin.fortify.sca.sourcePath>
         <plugin.fortify.sca.buildId>${project.artifactId}</plugin.fortify.sca.buildId>
         <plugin.fortify.sca.source.version>${maven.compiler.source}</plugin.fortify.sca.source.version>
+        <plugin.fortify.sca.findbugs>false</plugin.fortify.sca.findbugs>
 
         <!-- Software Security: OWASP Dependency-Check -->
         <maven.dependency-check.plugin.version>3.1.1</maven.dependency-check.plugin.version>
@@ -484,6 +485,7 @@
                             <debug>${plugin.fortify.sca.debug}</debug>
                             <verbose>${plugin.fortify.sca.verbose}</verbose>
                             <source>${plugin.fortify.sca.source.version}</source>
+                            <findbugs>${plugin.fortify.sca.findbugs}</findbugs>
                         </configuration>
                         <executions>
                             <execution>
