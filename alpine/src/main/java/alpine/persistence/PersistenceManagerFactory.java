@@ -19,12 +19,10 @@ package alpine.persistence;
 
 import alpine.Config;
 import alpine.logging.Logger;
-
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import java.io.File;
 import java.util.Properties;
 
 /**
