@@ -25,6 +25,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Properties;
 
 /**
@@ -83,6 +89,7 @@ public class Config {
         DATABASE_PORT            ("alpine.database.port",             9092),
         DATABASE_URL             ("alpine.database.url",              "jdbc:h2:mem:alpine"),
         DATABASE_DRIVER          ("alpine.database.driver",           "org.h2.Driver"),
+        DATABASE_DRIVER_PATH     ("alpine.database.driver.path",      null),
         DATABASE_USERNAME        ("alpine.database.username",         "sa"),
         DATABASE_PASSWORD        ("alpine.database.password",         ""),
         ENFORCE_AUTHENTICATION   ("alpine.enforce.authentication",    true),
@@ -325,6 +332,44 @@ public class Config {
      */
     public String getProperty(String key, String defaultValue) {
         return properties.getProperty(key, defaultValue);
+    }
+
+    /**
+     * Extends the runtime classpath to include the files or directories specified.
+     * @param paths one or more strings representing a single JAR file or a directory containing JARs.
+     * @since 1.0.0
+     */
+    public void expandClasspath(String... paths) {
+        if (paths == null || paths.length == 0) {
+            return;
+        }
+        for (String path: paths) {
+            if (path.startsWith("~" + File.separator)) {
+                path = SystemUtil.getUserHome() + path.substring(1);
+            }
+            expandClasspath(new File(path));
+        }
+    }
+
+    /**
+     * Extends the runtime classpath to include the files or directories specified.
+     * @param files one or more File objects representing a single JAR file or a directory containing JARs.
+     * @since 1.0.0
+     */
+    public void expandClasspath(File... files) {
+        URLClassLoader urlClassLoader = (URLClassLoader)ClassLoader.getSystemClassLoader();
+        Class<URLClassLoader> urlClass = URLClassLoader.class;
+        for (File file: files) {
+            LOGGER.info("Expanding classpath to include: " + file.getAbsolutePath());
+            URI fileUri = file.toURI();
+            try {
+                Method method = urlClass.getDeclaredMethod("addURL", URL.class);
+                method.setAccessible(true);
+                method.invoke(urlClassLoader, fileUri.toURL());
+            } catch (MalformedURLException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                LOGGER.error("Error expanding classpath", e);
+            }
+        }
     }
 
     /**

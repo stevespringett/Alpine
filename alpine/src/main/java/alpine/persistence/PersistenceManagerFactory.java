@@ -24,6 +24,7 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import java.io.File;
 import java.util.Properties;
 
 /**
@@ -75,6 +76,12 @@ public class PersistenceManagerFactory implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent event) {
         LOGGER.info("Initializing persistence framework");
+
+        String driverPath = Config.getInstance().getProperty(Config.AlpineKey.DATABASE_DRIVER_PATH);
+        if (driverPath != null) {
+            Config.getInstance().expandClasspath(driverPath);
+        }
+
         pmf = JDOHelper.getPersistenceManagerFactory(JDO_PROPERTIES, "Alpine");
     }
 
