@@ -40,7 +40,7 @@ public class EventServiceLog implements Serializable {
     private static final long serialVersionUID = -2564458112865683869L;
 
     @PrimaryKey
-    @Persistent(valueStrategy = IdGeneratorStrategy.INCREMENT)
+    @Persistent(valueStrategy = IdGeneratorStrategy.NATIVE)
     @JsonIgnore
     private long id;
 

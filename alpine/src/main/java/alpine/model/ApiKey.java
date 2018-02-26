@@ -48,7 +48,7 @@ public class ApiKey implements Serializable, Principal {
     private static final long serialVersionUID = 1582714693932260365L;
 
     @PrimaryKey
-    @Persistent(valueStrategy = IdGeneratorStrategy.INCREMENT)
+    @Persistent(valueStrategy = IdGeneratorStrategy.NATIVE)
     @JsonIgnore
     private long id;
 

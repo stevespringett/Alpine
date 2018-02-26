@@ -47,7 +47,7 @@ public class Permission implements Serializable {
     private static final long serialVersionUID = 1420020753285692448L;
 
     @PrimaryKey
-    @Persistent(valueStrategy = IdGeneratorStrategy.INCREMENT)
+    @Persistent(valueStrategy = IdGeneratorStrategy.NATIVE)
     @JsonIgnore
     private long id;
 
