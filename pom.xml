@@ -105,6 +105,8 @@
         <maven.datanucleus.plugin.version>5.0.2</maven.datanucleus.plugin.version>
         <maven.spdx.plugin.version>0.4.0</maven.spdx.plugin.version>
         <maven.versions.plugin.version>2.5</maven.versions.plugin.version>
+        <maven.gpg.plugin.version>1.5</maven.gpg.plugin.version>
+        <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
 
         <!-- Software Security: HPE Fortify SCA -->
         <maven.fortify.plugin.version>17.20</maven.fortify.plugin.version>
@@ -787,6 +789,52 @@
                 </plugins>
             </build>
         </profile>
+
+        <profile>
+            <id>release</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <version>${maven.enforcer.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>enforce-java</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <requireJavaVersion>
+                                            <version>${maven.compiler.target}</version>
+                                        </requireJavaVersion>
+                                    </rules>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>${maven.gpg.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
     </profiles>
 
 </project>
