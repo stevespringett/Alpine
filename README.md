@@ -113,9 +113,6 @@ mvn clean install
 
 Maven Usage
 -------------------
-Alpine is currently pre-release software but snapshot builds can be used and 
-are available on the Maven Central Repository. These can be used without having
-to compile Alpine yourself.
 
 ```xml
 <!-- Place the parent right after the <project> root node
@@ -123,7 +120,7 @@ to compile Alpine yourself.
 <parent>
     <groupId>us.springett</groupId>
     <artifactId>alpine-parent</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
 </parent>
 
 <dependencies>
@@ -131,7 +128,7 @@ to compile Alpine yourself.
     <dependency>
         <groupId>us.springett</groupId>
         <artifactId>alpine</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.0</version>
     </dependency>
 </dependencies>
 ```
