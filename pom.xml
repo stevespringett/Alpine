@@ -16,15 +16,13 @@
 
   Copyright (c) Steve Springett. All Rights Reserved.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>us.springett</groupId>
     <artifactId>alpine-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
 
     <modules>
         <module>alpine</module>
@@ -126,15 +124,15 @@
         <plugin.dependency-check.analyzer.assemblyAnalyzerEnabled>false</plugin.dependency-check.analyzer.assemblyAnalyzerEnabled>
         <plugin.dependency-check.analyzer.autoconfAnalyzerEnabled>false</plugin.dependency-check.analyzer.autoconfAnalyzerEnabled>
         <plugin.dependency-check.analyzer.bundleAuditAnalyzerEnabled>false</plugin.dependency-check.analyzer.bundleAuditAnalyzerEnabled>
-        <plugin.dependency-check.analyzer.bundleAuditPath></plugin.dependency-check.analyzer.bundleAuditPath>
+        <plugin.dependency-check.analyzer.bundleAuditPath />
         <plugin.dependency-check.analyzer.centralAnalyzerEnabled>true</plugin.dependency-check.analyzer.centralAnalyzerEnabled>
         <plugin.dependency-check.analyzer.cmakeAnalyzerEnabled>false</plugin.dependency-check.analyzer.cmakeAnalyzerEnabled>
         <plugin.dependency-check.analyzer.cocoapodsAnalyzerEnabled>false</plugin.dependency-check.analyzer.cocoapodsAnalyzerEnabled>
         <plugin.dependency-check.analyzer.composerAnalyzerEnabled>false</plugin.dependency-check.analyzer.composerAnalyzerEnabled>
         <plugin.dependency-check.analyzer.jarAnalyzer>true</plugin.dependency-check.analyzer.jarAnalyzer>
         <plugin.dependency-check.analyzer.nexusAnalyzerEnabled>false</plugin.dependency-check.analyzer.nexusAnalyzerEnabled>
-        <plugin.dependency-check.analyzer.nexusUrl></plugin.dependency-check.analyzer.nexusUrl>
-        <plugin.dependency-check.analyzer.nexusUsesProxy></plugin.dependency-check.analyzer.nexusUsesProxy>
+        <plugin.dependency-check.analyzer.nexusUrl />
+        <plugin.dependency-check.analyzer.nexusUsesProxy />
         <plugin.dependency-check.analyzer.nodeAnalyzerEnabled>true</plugin.dependency-check.analyzer.nodeAnalyzerEnabled>
         <plugin.dependency-check.analyzer.nspAnalyzerEnabled>true</plugin.dependency-check.analyzer.nspAnalyzerEnabled>
         <plugin.dependency-check.analyzer.nuspecAnalyzerEnabled>false</plugin.dependency-check.analyzer.nuspecAnalyzerEnabled>
