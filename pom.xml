@@ -157,10 +157,10 @@
         <lib.commons.io.version>2.6</lib.commons.io.version>
         <lib.commons.lang3.version>3.7</lib.commons.lang3.version>
         <lib.datanucleus-api-jdo.version>5.1.4</lib.datanucleus-api-jdo.version>
-        <lib.datanucleus.version>5.1.6</lib.datanucleus.version>
+        <lib.datanucleus.version>5.1.7</lib.datanucleus.version>
         <lib.h2.version>1.4.196</lib.h2.version>
         <lib.jackson.version>2.9.4</lib.jackson.version>
-        <lib.jdo.api.version>3.2.0-m7</lib.jdo.api.version>
+        <lib.jdo.api.version>3.2.0-m8</lib.jdo.api.version>
         <lib.jersey.version>2.26</lib.jersey.version>
         <lib.jsp.api.version>2.2</lib.jsp.api.version>
         <lib.jsonwebtoken.version>0.9.0</lib.jsonwebtoken.version>
@@ -170,7 +170,7 @@
         <lib.jstl.version>1.2</lib.jstl.version>
         <lib.logback.version>1.2.3</lib.logback.version>
         <lib.owasp.encoder.version>1.2.1</lib.owasp.encoder.version>
-        <lib.owasp.security-logging.version>1.1.4</lib.owasp.security-logging.version>
+        <lib.owasp.security-logging.version>1.1.5</lib.owasp.security-logging.version>
         <lib.slf4j.version>1.7.25</lib.slf4j.version>
         <lib.swagger.jersey.version>1.5.18</lib.swagger.jersey.version>
 
