@@ -172,11 +172,29 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @since 1.0.0
      */
     public ManagedUser createManagedUser(final String username, final String passwordHash) {
+        return createManagedUser(username, null, null, passwordHash, false);
+    }
+
+    /**
+     * Creates a new ManagedUser object.
+     * @param username The username for the user
+     * @param fullname The fullname of the user
+     * @param email The users email address
+     * @param passwordHash The hashed password
+     * @param suspended Whether or not user being created is suspended or not
+     * @return a ManagedUser
+     * @see alpine.auth.PasswordService
+     * @since 1.0.1
+     */
+    public ManagedUser createManagedUser(final String username, final String fullname, final String email,
+                                         final String passwordHash, final boolean suspended) {
         pm.currentTransaction().begin();
         final ManagedUser user = new ManagedUser();
         user.setUsername(username);
+        user.setFullname(fullname);
+        user.setEmail(email);
         user.setPassword(passwordHash);
-        user.setSuspended(false);
+        user.setSuspended(suspended);
         pm.makePersistent(user);
         pm.currentTransaction().commit();
         return getObjectById(ManagedUser.class, user.getId());
