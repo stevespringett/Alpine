@@ -93,6 +93,14 @@ public class ManagedUser implements Serializable, Principal, UserPrincipal {
     @Column(name = "SUSPENDED")
     private boolean suspended;
 
+    @Persistent
+    @Column(name = "FORCE_PASSWORD_CHANGE")
+    private boolean forcePasswordChange;
+
+    @Persistent
+    @Column(name = "NON_EXPIRY_PASSWORD")
+    private boolean nonExpiryPassword;
+
     @Persistent(table = "MANAGEDUSERS_TEAMS", defaultFetchGroup = "true")
     @Join(column = "MANAGEDUSER_ID")
     @Element(column = "TEAM_ID")
@@ -161,6 +169,22 @@ public class ManagedUser implements Serializable, Principal, UserPrincipal {
 
     public void setSuspended(boolean suspended) {
         this.suspended = suspended;
+    }
+
+    public boolean isForcePasswordChange() {
+        return forcePasswordChange;
+    }
+
+    public void setForcePasswordChange(boolean forcePasswordChange) {
+        this.forcePasswordChange = forcePasswordChange;
+    }
+
+    public boolean isNonExpiryPassword() {
+        return nonExpiryPassword;
+    }
+
+    public void setNonExpiryPassword(boolean nonExpiryPassword) {
+        this.nonExpiryPassword = nonExpiryPassword;
     }
 
     public List<Team> getTeams() {

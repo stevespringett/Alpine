@@ -172,7 +172,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @since 1.0.0
      */
     public ManagedUser createManagedUser(final String username, final String passwordHash) {
-        return createManagedUser(username, null, null, passwordHash, false);
+        return createManagedUser(username, null, null, passwordHash, false, false, false);
     }
 
     /**
@@ -182,12 +182,15 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @param email The users email address
      * @param passwordHash The hashed password
      * @param suspended Whether or not user being created is suspended or not
+     * @param forcePasswordChange Whether or not user needs to change password on next login or not
+     * @param nonExpiryPassword Whether or not the users password ever expires or not
      * @return a ManagedUser
      * @see alpine.auth.PasswordService
      * @since 1.0.1
      */
     public ManagedUser createManagedUser(final String username, final String fullname, final String email,
-                                         final String passwordHash, final boolean suspended) {
+                                         final String passwordHash, final boolean suspended,
+                                         final boolean forcePasswordChange, final boolean nonExpiryPassword) {
         pm.currentTransaction().begin();
         final ManagedUser user = new ManagedUser();
         user.setUsername(username);
@@ -195,6 +198,8 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
         user.setEmail(email);
         user.setPassword(passwordHash);
         user.setSuspended(suspended);
+        user.setForcePasswordChange(forcePasswordChange);
+        user.setNonExpiryPassword(nonExpiryPassword);
         pm.makePersistent(user);
         pm.currentTransaction().commit();
         return getObjectById(ManagedUser.class, user.getId());
