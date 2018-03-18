@@ -34,6 +34,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.security.Principal;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -78,6 +79,11 @@ public class ManagedUser implements Serializable, Principal, UserPrincipal {
     private transient String confirmPassword; // not persisted
 
     @Persistent
+    @Column(name = "LAST_PASSWORD_CHANGE", allowsNull = "false")
+    @NotNull
+    private Date lastPasswordChange;
+
+    @Persistent
     @Column(name = "FULLNAME")
     @Size(max = 255)
     @Pattern(regexp = "[\\P{Cc}]+", message = "The full name must not contain control characters")
@@ -90,15 +96,15 @@ public class ManagedUser implements Serializable, Principal, UserPrincipal {
     private String email;
 
     @Persistent
-    @Column(name = "SUSPENDED")
+    @Column(name = "SUSPENDED", defaultValue = "false")
     private boolean suspended;
 
     @Persistent
-    @Column(name = "FORCE_PASSWORD_CHANGE")
+    @Column(name = "FORCE_PASSWORD_CHANGE", defaultValue = "false")
     private boolean forcePasswordChange;
 
     @Persistent
-    @Column(name = "NON_EXPIRY_PASSWORD")
+    @Column(name = "NON_EXPIRY_PASSWORD", defaultValue = "false")
     private boolean nonExpiryPassword;
 
     @Persistent(table = "MANAGEDUSERS_TEAMS", defaultFetchGroup = "true")
@@ -145,6 +151,14 @@ public class ManagedUser implements Serializable, Principal, UserPrincipal {
 
     public void setConfirmPassword(String confirmPassword) {
         this.confirmPassword = confirmPassword;
+    }
+
+    public Date getLastPasswordChange() {
+        return lastPasswordChange;
+    }
+
+    public void setLastPasswordChange(Date lastPasswordChange) {
+        this.lastPasswordChange = lastPasswordChange;
     }
 
     public String getFullname() {

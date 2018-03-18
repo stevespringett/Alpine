@@ -19,7 +19,6 @@ package alpine.auth;
 
 import alpine.model.ManagedUser;
 import alpine.persistence.AlpineQueryManager;
-import javax.naming.AuthenticationException;
 import java.security.Principal;
 
 /**
@@ -61,19 +60,25 @@ public class ManagedUserAuthenticationService implements AuthenticationService {
      * returns an AuthenticationException.
      *
      * @return a Principal if authentication was successful
-     * @throws AuthenticationException when authentication is unsuccessful
+     * @throws AlpineAuthenticationException when authentication is unsuccessful
      * @since 1.0.0
      */
-    public Principal authenticate() throws AuthenticationException {
+    public Principal authenticate() throws AlpineAuthenticationException {
         try (AlpineQueryManager qm = new AlpineQueryManager()) {
             final ManagedUser user = qm.getManagedUser(username);
-            if (user != null && !user.isSuspended()) {
+            if (user != null) {
                 if (PasswordService.matches(password.toCharArray(), user)) {
+                    if (user.isSuspended()) {
+                        throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.SUSPENDED);
+                    }
+                    if (user.isForcePasswordChange()) {
+                        throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.FORCE_PASSWORD_CHANGE);
+                    }
                     return user;
                 }
             }
         }
-        throw new AuthenticationException();
+        throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.INVALID_CREDENTIALS);
     }
 
 }

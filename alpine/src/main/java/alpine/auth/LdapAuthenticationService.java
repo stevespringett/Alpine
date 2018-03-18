@@ -21,7 +21,6 @@ import alpine.Config;
 import alpine.model.LdapUser;
 import alpine.persistence.AlpineQueryManager;
 import org.apache.commons.lang3.StringUtils;
-import javax.naming.AuthenticationException;
 import javax.naming.CommunicationException;
 import javax.naming.Context;
 import javax.naming.NamingException;
@@ -76,19 +75,22 @@ public class LdapAuthenticationService implements AuthenticationService {
      * returns an AuthenticationException.
      *
      * @return a Principal if authentication was successful
-     * @throws AuthenticationException when authentication is unsuccessful
+     * @throws AlpineAuthenticationException when authentication is unsuccessful
      * @since 1.0.0
      */
-    public Principal authenticate() throws AuthenticationException {
+    public Principal authenticate() throws AlpineAuthenticationException {
         if (validateCredentials()) {
             try (AlpineQueryManager qm = new AlpineQueryManager()) {
                 final LdapUser user = qm.getLdapUser(username);
                 if (user != null) {
                     return user;
+                } else {
+                    throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.UNMAPPED_ACCOUNT);
                 }
             }
+        } else {
+            throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.INVALID_CREDENTIALS);
         }
-        throw new AuthenticationException();
     }
 
     /**

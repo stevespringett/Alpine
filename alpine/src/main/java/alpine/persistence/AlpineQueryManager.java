@@ -181,25 +181,26 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @param fullname The fullname of the user
      * @param email The users email address
      * @param passwordHash The hashed password
-     * @param suspended Whether or not user being created is suspended or not
      * @param forcePasswordChange Whether or not user needs to change password on next login or not
      * @param nonExpiryPassword Whether or not the users password ever expires or not
+     * @param suspended Whether or not user being created is suspended or not
      * @return a ManagedUser
      * @see alpine.auth.PasswordService
      * @since 1.0.1
      */
     public ManagedUser createManagedUser(final String username, final String fullname, final String email,
-                                         final String passwordHash, final boolean suspended,
-                                         final boolean forcePasswordChange, final boolean nonExpiryPassword) {
+                                         final String passwordHash, final boolean forcePasswordChange,
+                                         final boolean nonExpiryPassword, final boolean suspended) {
         pm.currentTransaction().begin();
         final ManagedUser user = new ManagedUser();
         user.setUsername(username);
         user.setFullname(fullname);
         user.setEmail(email);
         user.setPassword(passwordHash);
-        user.setSuspended(suspended);
         user.setForcePasswordChange(forcePasswordChange);
         user.setNonExpiryPassword(nonExpiryPassword);
+        user.setSuspended(suspended);
+        user.setLastPasswordChange(new Date());
         pm.makePersistent(user);
         pm.currentTransaction().commit();
         return getObjectById(ManagedUser.class, user.getId());
@@ -216,7 +217,13 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
         pm.currentTransaction().begin();
         user.setFullname(transientUser.getFullname());
         user.setEmail(transientUser.getEmail());
+        user.setForcePasswordChange(transientUser.isForcePasswordChange());
+        user.setNonExpiryPassword(transientUser.isNonExpiryPassword());
+        user.setSuspended(transientUser.isSuspended());
         if (transientUser.getPassword() != null) {
+            if (!user.getPassword().equals(transientUser.getPassword())) {
+                user.setLastPasswordChange(new Date());
+            }
             user.setPassword(transientUser.getPassword());
         }
         pm.currentTransaction().commit();
