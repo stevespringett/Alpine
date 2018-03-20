@@ -69,10 +69,10 @@ public class ManagedUserAuthenticationService implements AuthenticationService {
             if (user != null) {
                 if (PasswordService.matches(password.toCharArray(), user)) {
                     if (user.isSuspended()) {
-                        throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.SUSPENDED);
+                        throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.SUSPENDED, user);
                     }
                     if (user.isForcePasswordChange()) {
-                        throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.FORCE_PASSWORD_CHANGE);
+                        throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.FORCE_PASSWORD_CHANGE, user);
                     }
                     return user;
                 }

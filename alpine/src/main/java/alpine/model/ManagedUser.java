@@ -113,6 +113,12 @@ public class ManagedUser implements Serializable, Principal, UserPrincipal {
     @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "name ASC"))
     private List<Team> teams;
 
+    @Persistent(table = "MANAGEDUSERS_PERMISSIONS", defaultFetchGroup = "true")
+    @Join(column = "MANAGEDUSER_ID")
+    @Element(column = "PERMISSION_ID")
+    @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "name ASC"))
+    private List<Permission> permissions;
+
     public long getId() {
         return id;
     }
@@ -207,6 +213,14 @@ public class ManagedUser implements Serializable, Principal, UserPrincipal {
 
     public void setTeams(List<Team> teams) {
         this.teams = teams;
+    }
+
+    public List<Permission> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(List<Permission> permissions) {
+        this.permissions = permissions;
     }
 
     /**

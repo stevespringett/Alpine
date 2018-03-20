@@ -20,10 +20,12 @@ package alpine.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import javax.jdo.annotations.Column;
+import javax.jdo.annotations.Element;
 import javax.jdo.annotations.Extension;
 import javax.jdo.annotations.FetchGroup;
 import javax.jdo.annotations.FetchGroups;
 import javax.jdo.annotations.IdGeneratorStrategy;
+import javax.jdo.annotations.Join;
 import javax.jdo.annotations.Order;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
@@ -49,7 +51,8 @@ import java.util.UUID;
                 @Persistent(name = "name"),
                 @Persistent(name = "apiKeys"),
                 @Persistent(name = "ldapUsers"),
-                @Persistent(name = "managedUsers")
+                @Persistent(name = "managedUsers"),
+                @Persistent(name = "permissions")
         })
 })
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -93,6 +96,12 @@ public class Team implements Serializable {
     @Persistent(mappedBy = "teams")
     @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "username ASC"))
     private List<ManagedUser> managedUsers;
+
+    @Persistent(table = "TEAMS_PERMISSIONS", defaultFetchGroup = "true")
+    @Join(column = "TEAM_ID")
+    @Element(column = "PERMISSION_ID")
+    @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "name ASC"))
+    private List<Permission> permissions;
 
     public long getId() {
         return id;
@@ -140,5 +149,13 @@ public class Team implements Serializable {
 
     public void setManagedUsers(List<ManagedUser> managedUsers) {
         this.managedUsers = managedUsers;
+    }
+
+    public List<Permission> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(List<Permission> permissions) {
+        this.permissions = permissions;
     }
 }

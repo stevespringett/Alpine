@@ -76,6 +76,18 @@ public interface UserPrincipal {
     void setTeams(List<Team> teams);
 
     /**
+     * A list of permissions the principal has.
+     * @return a List of Permissions objects
+     */
+    List<Permission> getPermissions();
+
+    /**
+     * Specifies the permissions the principal should have.
+     * @param permissions a List of Permission objects
+     */
+    void setPermissions(List<Permission> permissions);
+
+    /**
      * Use of this method may be necessary to satisfy {@link java.security.Principal}
      * requirements, but the implementation should not be used and should return
      * the same value as {@link #getUsername}.

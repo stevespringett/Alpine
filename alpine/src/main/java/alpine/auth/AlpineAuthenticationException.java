@@ -18,13 +18,14 @@
 package alpine.auth;
 
 import javax.naming.AuthenticationException;
+import java.security.Principal;
 
 /**
  * An exception class that optionally holds pre-determined causes for common
  * authentication failures.
  *
  * @author Steve Springett
- * @since 1.0.1
+ * @since 1.1.0
  */
 public class AlpineAuthenticationException extends AuthenticationException {
 
@@ -40,19 +41,23 @@ public class AlpineAuthenticationException extends AuthenticationException {
     }
 
     private CauseType causeType;
+    private Principal principal;
 
     public AlpineAuthenticationException(CauseType causeType) {
-        super();
         this.causeType = causeType;
     }
 
-    public AlpineAuthenticationException(CauseType causeType, String explanation) {
-        super(explanation);
+    public AlpineAuthenticationException(CauseType causeType, Principal principal) {
+        this.principal = principal;
         this.causeType = causeType;
     }
 
     public CauseType getCauseType() {
         return causeType;
+    }
+
+    public Principal getPrincipal() {
+        return principal;
     }
 
 }

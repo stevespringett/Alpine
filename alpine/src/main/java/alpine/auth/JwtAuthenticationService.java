@@ -68,7 +68,7 @@ public class JwtAuthenticationService implements AuthenticationService {
                     }
                     final ManagedUser managedUser = qm.getManagedUser(jwt.getSubject());
                     if (managedUser != null) {
-                        return managedUser;
+                        return (managedUser.isSuspended()) ? null : managedUser;
                     }
                     final LdapUser ldapUser =  qm.getLdapUser(jwt.getSubject());
                     if (ldapUser != null) {

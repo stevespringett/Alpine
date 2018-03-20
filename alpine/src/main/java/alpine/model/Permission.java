@@ -20,10 +20,8 @@ package alpine.model;
 import alpine.validation.RegexSequence;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.jdo.annotations.Column;
-import javax.jdo.annotations.Element;
 import javax.jdo.annotations.Extension;
 import javax.jdo.annotations.IdGeneratorStrategy;
-import javax.jdo.annotations.Join;
 import javax.jdo.annotations.Order;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
@@ -56,27 +54,25 @@ public class Permission implements Serializable {
     @Column(name = "NAME", allowsNull = "false")
     @NotNull
     @Size(min = 1, max = 255)
-    @Pattern(regexp = RegexSequence.Definition.ALPHA_NUMERIC, message = "The permission name must contain only alpha and/or numeric characters")
+    @Pattern(regexp = RegexSequence.Definition.WORD_CHARS, message = "The permission name must contain only alpha and/or numeric characters")
     private String name;
 
-    @Persistent(table = "PERMISSIONS_TEAMS", defaultFetchGroup = "true")
-    @Join(column = "PERMISSION_ID")
-    @Element(column = "TEAM_ID")
+    @Persistent
+    @Column(name = "DESCRIPTION", jdbcType = "CLOB")
+    private String description;
+
+    @Persistent(mappedBy = "permissions")
     @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "name ASC"))
     @JsonIgnore
     private List<Team> teams;
 
-    @Persistent(table = "PERMISSIONS_LDAPUSERS", defaultFetchGroup = "true")
-    @Join(column = "PERMISSION_ID")
-    @Element(column = "LDAPUSER_ID")
-    @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "name ASC"))
+    @Persistent(mappedBy = "permissions")
+    @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "username ASC"))
     @JsonIgnore
     private List<LdapUser> ldapUsers;
 
-    @Persistent(table = "PERMISSIONS_MANAGEDUSERS", defaultFetchGroup = "true")
-    @Join(column = "PERMISSION_ID")
-    @Element(column = "MANAGEDUSER_ID")
-    @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "name ASC"))
+    @Persistent(mappedBy = "permissions")
+    @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "username ASC"))
     @JsonIgnore
     private List<ManagedUser> managedUsers;
 
@@ -94,6 +90,14 @@ public class Permission implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public List<Team> getTeams() {

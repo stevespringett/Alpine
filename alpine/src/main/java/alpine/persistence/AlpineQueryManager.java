@@ -186,7 +186,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @param suspended Whether or not user being created is suspended or not
      * @return a ManagedUser
      * @see alpine.auth.PasswordService
-     * @since 1.0.1
+     * @since 1.1.0
      */
     public ManagedUser createManagedUser(final String username, final String fullname, final String email,
                                          final String passwordHash, final boolean forcePasswordChange,
@@ -382,6 +382,47 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     }
 
     /**
+     * Creates a Permission object.
+     * @param name The name of the permission
+     * @return a Permission
+     * @since 1.1.0
+     */
+    public Permission createPermission(final String name, final String description) {
+        pm.currentTransaction().begin();
+        final Permission permission = new Permission();
+        permission.setName(name);
+        permission.setDescription(description);
+        pm.makePersistent(permission);
+        pm.currentTransaction().commit();
+        return getObjectById(Permission.class, permission.getId());
+    }
+
+    /**
+     * Retrieves a Permission by its name.
+     * @param name The name of the permission
+     * @return a Permission
+     * @since 1.1.0
+     */
+    @SuppressWarnings("unchecked")
+    public Permission getPermission(final String name) {
+        final Query query = pm.newQuery(Permission.class, "name == :name");
+        final List<Permission> result = (List<Permission>) query.execute(name);
+        return result.size() == 0 ? null : result.get(0);
+    }
+
+    /**
+     * Returns a list of all Permissions defined in the system.
+     * @return a List of Permission objects
+     * @since 1.1.0
+     */
+    @SuppressWarnings("unchecked")
+    public List<Permission> getPermissions() {
+        final Query query = pm.newQuery(Permission.class);
+        query.setOrdering("name asc");
+        return (List<Permission>) query.execute();
+    }
+
+    /**
      * Returns a list of Permissions that are assigned to the specified Team.
      * @param team the team to retrieve permissions for
      * @return a List of Permission objects
@@ -410,24 +451,6 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     }
 
     /**
-     * Returns a list of Permissions that are assigned to the specified UserPrincipal.
-     * @param user the UserPrincipal to retrieve permissions for
-     * @return a List of Permission objects
-     * @since 1.0.0
-     */
-    @SuppressWarnings("unchecked")
-    public List<Permission> getPermissions(final UserPrincipal user) {
-        final Query query;
-        if (user instanceof ManagedUser) {
-            query = pm.newQuery(Permission.class, "managedUsers.contains(:user)");
-        } else {
-            query = pm.newQuery(Permission.class, "ldapUsers.contains(:user)");
-        }
-        query.setOrdering("name asc");
-        return (List<Permission>) query.execute(user);
-    }
-
-    /**
      * Returns a list of permission names that are assigned to the specified UserPrincipal.
      * @param user the UserPrincipal to retrieve permissions for
      * @return a List of permission names
@@ -436,7 +459,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     @SuppressWarnings("unchecked")
     public List<String> getPermissionStrings(final UserPrincipal user) {
         List<String> permissions = new ArrayList<>();
-        for (Permission permission: getPermissions(user)) {
+        for (Permission permission: user.getPermissions()) {
             permissions.add(permission.getName());
         }
         return permissions;

@@ -78,6 +78,12 @@ public class LdapUser implements Serializable, Principal, UserPrincipal {
     @Pattern(regexp = "[\\P{Cc}]+", message = "The email address must not contain control characters")
     private transient String email; // not persisted - will be retrieved from the directory service
 
+    @Persistent(table = "LDAPUSERS_PERMISSIONS", defaultFetchGroup = "true")
+    @Join(column = "LDAPUSER_ID")
+    @Element(column = "PERMISSION_ID")
+    @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "name ASC"))
+    private List<Permission> permissions;
+
     public long getId() {
         return id;
     }
@@ -116,6 +122,14 @@ public class LdapUser implements Serializable, Principal, UserPrincipal {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public List<Permission> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(List<Permission> permissions) {
+        this.permissions = permissions;
     }
 
     /**

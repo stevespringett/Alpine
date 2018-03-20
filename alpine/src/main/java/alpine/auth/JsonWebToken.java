@@ -17,7 +17,9 @@
  */
 package alpine.auth;
 
+import alpine.Config;
 import alpine.logging.Logger;
+import alpine.model.Permission;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.JwtParser;
@@ -27,13 +29,14 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import org.owasp.security.logging.SecurityMarkers;
-
 import javax.crypto.SecretKey;
 import java.security.Key;
 import java.security.Principal;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Decouples the general usage of JSON Web Tokens with the actual implementation of a JWT library
@@ -46,6 +49,14 @@ import java.util.Map;
 public class JsonWebToken {
 
     private static final Logger LOGGER = Logger.getLogger(JsonWebToken.class);
+    private static String ISSUER = "Alpine";
+    static {
+        if (Config.getInstance().getApplicationName() != null) {
+            ISSUER = Config.getInstance().getApplicationName();
+        } else {
+            Config.getInstance().getFrameworkName();
+        }
+    }
 
     private Key key;
     private String subject;
@@ -84,12 +95,31 @@ public class JsonWebToken {
      * @since 1.0.0
      */
     public String createToken(Principal principal) {
+        return createToken(principal, null);
+    }
+
+    /**
+     * Creates a new JWT for the specified principal. Token is signed using
+     * the SecretKey with an HMAC 256 algorithm.
+     *
+     * @param principal the Principal to create the token for
+     * @param permissions the effective list of permissions for the principal
+     * @return a String representation of the generated token
+     * @since 1.1.0
+     */
+    public String createToken(Principal principal, List<Permission> permissions) {
         final Date today = new Date();
         final JwtBuilder jwtBuilder = Jwts.builder();
         jwtBuilder.setSubject(principal.getName());
-        jwtBuilder.setIssuer("Alpine");
+        jwtBuilder.setIssuer(ISSUER);
         jwtBuilder.setIssuedAt(today);
         jwtBuilder.setExpiration(addDays(today, 7));
+        if (permissions != null) {
+            jwtBuilder.claim("permissions", permissions.stream()
+                    .map(Permission::getName)
+                    .collect(Collectors.joining(","))
+            );
+        }
         return jwtBuilder.signWith(SignatureAlgorithm.HS256, key).compact();
     }
 
