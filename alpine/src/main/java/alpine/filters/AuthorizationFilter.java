@@ -24,7 +24,6 @@ import alpine.model.LdapUser;
 import alpine.model.ManagedUser;
 import alpine.model.UserPrincipal;
 import alpine.persistence.AlpineQueryManager;
-import io.swagger.annotations.Api;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.owasp.security.logging.SecurityMarkers;
 import javax.annotation.Priority;
