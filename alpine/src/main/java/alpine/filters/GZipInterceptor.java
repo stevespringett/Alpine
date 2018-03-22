@@ -27,6 +27,8 @@ import javax.ws.rs.ext.ReaderInterceptorContext;
 import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -54,8 +56,9 @@ public class GZipInterceptor implements ReaderInterceptor, WriterInterceptor {
     public Object aroundReadFrom(ReaderInterceptorContext context) throws IOException, WebApplicationException {
         final List<String> header = context.getHeaders().get(HttpHeaders.CONTENT_ENCODING);
         if (header != null && header.contains("gzip")) {
-            try (GZIPInputStream inputStream = new GZIPInputStream(context.getInputStream())) {
-                context.setInputStream(inputStream);
+            try (InputStream contentInputSteam = context.getInputStream();
+                 GZIPInputStream gzipInputStream = new GZIPInputStream(contentInputSteam)) {
+                context.setInputStream(gzipInputStream);
             }
         }
         return context.proceed();
@@ -65,8 +68,9 @@ public class GZipInterceptor implements ReaderInterceptor, WriterInterceptor {
     public void aroundWriteTo(WriterInterceptorContext context) throws IOException, WebApplicationException {
         final List<String> requestHeader = httpHeaders.getRequestHeader(HttpHeaders.ACCEPT_ENCODING);
         if (requestHeader != null && requestHeader.contains("gzip")) {
-            try (GZIPOutputStream outputStream = new GZIPOutputStream(context.getOutputStream())) {
-                context.setOutputStream(outputStream);
+            try (OutputStream contextOutputStream = context.getOutputStream();
+                 GZIPOutputStream gzipOutputStream = new GZIPOutputStream(contextOutputStream)) {
+                context.setOutputStream(gzipOutputStream);
                 context.getHeaders().add(HttpHeaders.CONTENT_ENCODING, "gzip");
             }
         }
