@@ -148,8 +148,8 @@ public class Config {
         final String alpineAppProp = System.getProperty(ALPINE_APP_PROP);
         if (StringUtils.isNotBlank(alpineAppProp)) {
             LOGGER.info("Loading application properties from " + alpineAppProp);
-            try {
-                properties.load(new FileInputStream(new File(alpineAppProp)));
+            try (FileInputStream fileInputStream = new FileInputStream(new File(alpineAppProp))) {
+                properties.load(fileInputStream);
             } catch (FileNotFoundException e) {
                 LOGGER.error("Could not find property file " + alpineAppProp);
             } catch (IOException e) {
