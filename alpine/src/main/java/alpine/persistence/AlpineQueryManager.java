@@ -34,6 +34,7 @@ import javax.jdo.Query;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 /**
@@ -423,46 +424,25 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     }
 
     /**
-     * Returns a list of Permissions that are assigned to the specified Team.
-     * @param team the team to retrieve permissions for
+     * Determines the effective permissions for the specified user by collecting
+     * a List of all permissions assigned to the user either directly, or through
+     * team membership.
+     * @param user the user to retrieve permissions for
      * @return a List of Permission objects
-     * @since 1.0.0
+     * @since 1.1.0
      */
-    @SuppressWarnings("unchecked")
-    public List<Permission> getPermissions(final Team team) {
-        final Query query = pm.newQuery(Permission.class, "teams.contains(:team)");
-        query.setOrdering("name asc");
-        return (List<Permission>) query.execute(team);
-    }
-
-    /**
-     * Returns a list of permission names that are assigned to the specified Team.
-     * @param team the team to retrieve permissions for
-     * @return a List of permission names
-     * @since 1.0.0
-     */
-    @SuppressWarnings("unchecked")
-    public List<String> getPermissionStrings(final Team team) {
-        List<String> permissions = new ArrayList<>();
-        for (Permission permission: getPermissions(team)) {
-            permissions.add(permission.getName());
+    public List<Permission> getEffectivePermissions(UserPrincipal user) {
+        LinkedHashSet<Permission> permissions = new LinkedHashSet<>();
+        if (user.getPermissions() != null) {
+            permissions.addAll(user.getPermissions());
         }
-        return permissions;
-    }
-
-    /**
-     * Returns a list of permission names that are assigned to the specified UserPrincipal.
-     * @param user the UserPrincipal to retrieve permissions for
-     * @return a List of permission names
-     * @since 1.0.0
-     */
-    @SuppressWarnings("unchecked")
-    public List<String> getPermissionStrings(final UserPrincipal user) {
-        List<String> permissions = new ArrayList<>();
-        for (Permission permission: user.getPermissions()) {
-            permissions.add(permission.getName());
+        for (Team team: user.getTeams()) {
+            List<Permission> teamPermissions = getObjectById(Team.class, team.getId()).getPermissions();
+            if (teamPermissions != null) {
+                permissions.addAll(teamPermissions);
+            }
         }
-        return permissions;
+        return new ArrayList<>(permissions);
     }
 
     /**
