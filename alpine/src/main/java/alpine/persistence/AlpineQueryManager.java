@@ -436,10 +436,12 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
         if (user.getPermissions() != null) {
             permissions.addAll(user.getPermissions());
         }
-        for (Team team: user.getTeams()) {
-            List<Permission> teamPermissions = getObjectById(Team.class, team.getId()).getPermissions();
-            if (teamPermissions != null) {
-                permissions.addAll(teamPermissions);
+        if (user.getTeams() != null) {
+            for (Team team: user.getTeams()) {
+                List<Permission> teamPermissions = getObjectById(Team.class, team.getId()).getPermissions();
+                if (teamPermissions != null) {
+                    permissions.addAll(teamPermissions);
+                }
             }
         }
         return new ArrayList<>(permissions);
@@ -497,6 +499,28 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
         final Query query = pm.newQuery(Permission.class, "name == :permissionName && teams.contains(:team)");
         query.setResult("count(id)");
         return (Long) query.execute(permissionName, team) > 0;
+    }
+
+    /**
+     * Determines if the specified ApiKey has been assigned the specified permission.
+     * @param apiKey the ApiKey to query
+     * @param permissionName the name of the permission
+     * @return true if the apiKey has the permission assigned, false if not
+     * @since 1.1.1
+     */
+    public boolean hasPermission(final ApiKey apiKey, String permissionName) {
+        if (apiKey.getTeams() == null) {
+            return false;
+        }
+        for (Team team: apiKey.getTeams()) {
+            List<Permission> teamPermissions = getObjectById(Team.class, team.getId()).getPermissions();
+            for (Permission permission: teamPermissions) {
+                if (permission.getName().equals(permissionName)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
