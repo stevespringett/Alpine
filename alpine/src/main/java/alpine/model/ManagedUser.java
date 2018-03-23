@@ -96,15 +96,15 @@ public class ManagedUser implements Serializable, Principal, UserPrincipal {
     private String email;
 
     @Persistent
-    @Column(name = "SUSPENDED", defaultValue = "false")
+    @Column(name = "SUSPENDED")
     private boolean suspended;
 
     @Persistent
-    @Column(name = "FORCE_PASSWORD_CHANGE", defaultValue = "false")
+    @Column(name = "FORCE_PASSWORD_CHANGE")
     private boolean forcePasswordChange;
 
     @Persistent
-    @Column(name = "NON_EXPIRY_PASSWORD", defaultValue = "false")
+    @Column(name = "NON_EXPIRY_PASSWORD")
     private boolean nonExpiryPassword;
 
     @Persistent(table = "MANAGEDUSERS_TEAMS", defaultFetchGroup = "true")
