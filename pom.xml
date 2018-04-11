@@ -115,7 +115,7 @@
         <plugin.fortify.sca.findbugs>false</plugin.fortify.sca.findbugs>
 
         <!-- Software Security: OWASP Dependency-Check -->
-        <maven.dependency-check.plugin.version>3.1.1</maven.dependency-check.plugin.version>
+        <maven.dependency-check.plugin.version>3.1.2</maven.dependency-check.plugin.version>
         <plugin.dependency-check.autoUpdate>true</plugin.dependency-check.autoUpdate>
         <plugin.dependency-check.format>ALL</plugin.dependency-check.format>
         <plugin.dependency-check.skipTestScope>true</plugin.dependency-check.skipTestScope>
@@ -143,7 +143,7 @@
         <plugin.dependency-check.analyzer.swiftPackageManagerAnalyzerEnabled>false</plugin.dependency-check.analyzer.swiftPackageManagerAnalyzerEnabled>
 
         <!-- Software Security: Retire.js -->
-        <maven.retirejs.plugin.version>2.1.0</maven.retirejs.plugin.version>
+        <maven.retirejs.plugin.version>3.0.1</maven.retirejs.plugin.version>
         <plugin.retirejs.breakOnFailure>true</plugin.retirejs.breakOnFailure>
         <plugin.retirejs.webAppDir>${project.build.sourceDirectory}/../webapp</plugin.retirejs.webAppDir>
         <plugin.retirejs.detail>true</plugin.retirejs.detail>
@@ -156,12 +156,12 @@
         <lib.commons.dbcp2.version>2.2.0</lib.commons.dbcp2.version>
         <lib.commons.io.version>2.6</lib.commons.io.version>
         <lib.commons.lang3.version>3.7</lib.commons.lang3.version>
-        <lib.datanucleus-api-jdo.version>5.1.4</lib.datanucleus-api-jdo.version>
-        <lib.datanucleus.version>5.1.7</lib.datanucleus.version>
+        <lib.datanucleus-api-jdo.version>5.1.5</lib.datanucleus-api-jdo.version>
+        <lib.datanucleus.version>5.1.8</lib.datanucleus.version>
         <lib.h2.version>1.4.196</lib.h2.version>
-        <lib.jackson.version>2.9.4</lib.jackson.version>
+        <lib.jackson.version>2.9.5</lib.jackson.version>
         <lib.jdo.api.version>3.2.0-m8</lib.jdo.api.version>
-        <lib.jersey.version>2.26</lib.jersey.version>
+        <lib.jersey.version>2.27</lib.jersey.version>
         <lib.jsp.api.version>2.2</lib.jsp.api.version>
         <lib.jsonwebtoken.version>0.9.0</lib.jsonwebtoken.version>
         <lib.jsr305.version>3.0.2</lib.jsr305.version>
