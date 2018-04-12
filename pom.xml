@@ -153,12 +153,13 @@
         <lib.alpine.executable.war.version>1.0.0</lib.alpine.executable.war.version>
         <lib.bcrypt.version>0.4</lib.bcrypt.version>
         <lib.commons.collections4.version>4.1</lib.commons.collections4.version>
-        <lib.commons.dbcp2.version>2.2.0</lib.commons.dbcp2.version>
         <lib.commons.io.version>2.6</lib.commons.io.version>
         <lib.commons.lang3.version>3.7</lib.commons.lang3.version>
         <lib.datanucleus-api-jdo.version>5.1.5</lib.datanucleus-api-jdo.version>
         <lib.datanucleus.version>5.1.8</lib.datanucleus.version>
         <lib.h2.version>1.4.196</lib.h2.version>
+        <lib.hikaricp.version>3.1.0</lib.hikaricp.version>
+        <lib.javassist.version>3.22.0-GA</lib.javassist.version>
         <lib.jackson.version>2.9.5</lib.jackson.version>
         <lib.jdo.api.version>3.2.0-m8</lib.jdo.api.version>
         <lib.jersey.version>2.27</lib.jersey.version>
@@ -285,9 +286,14 @@
             <version>${lib.datanucleus.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-dbcp2</artifactId>
-            <version>${lib.commons.dbcp2.version}</version>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>${lib.hikaricp.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>${lib.javassist.version}</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>

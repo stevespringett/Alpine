@@ -44,7 +44,7 @@ public class PersistenceManagerFactory implements ServletContextListener {
         JDO_OVERRIDES.put("javax.jdo.option.ConnectionUserName", "sa");
         JDO_OVERRIDES.put("javax.jdo.option.ConnectionPassword", "");
         JDO_OVERRIDES.put("javax.jdo.option.Mapping", "h2");
-        JDO_OVERRIDES.put("datanucleus.connectionPoolingType", "DBCP2");
+        JDO_OVERRIDES.put("datanucleus.connectionPoolingType", "HikariCP");
         JDO_OVERRIDES.put("datanucleus.schema.autoCreateSchema", "true");
         JDO_OVERRIDES.put("datanucleus.schema.autoCreateTables", "true");
         JDO_OVERRIDES.put("datanucleus.schema.autoCreateColumns", "true");
@@ -60,7 +60,7 @@ public class PersistenceManagerFactory implements ServletContextListener {
         JDO_PROPERTIES.put("javax.jdo.option.ConnectionDriverName", Config.getInstance().getProperty(Config.AlpineKey.DATABASE_DRIVER));
         JDO_PROPERTIES.put("javax.jdo.option.ConnectionUserName", Config.getInstance().getProperty(Config.AlpineKey.DATABASE_USERNAME));
         JDO_PROPERTIES.put("javax.jdo.option.ConnectionPassword", Config.getInstance().getProperty(Config.AlpineKey.DATABASE_PASSWORD));
-        JDO_PROPERTIES.put("datanucleus.connectionPoolingType", "DBCP2");
+        JDO_PROPERTIES.put("datanucleus.connectionPoolingType", "HikariCP");
         JDO_PROPERTIES.put("datanucleus.schema.autoCreateSchema", "true");
         JDO_PROPERTIES.put("datanucleus.schema.autoCreateTables", "true");
         JDO_PROPERTIES.put("datanucleus.schema.autoCreateColumns", "true");
