@@ -228,6 +228,9 @@ public abstract class AlpineResource {
     protected final List<ValidationException> contOnValidationError(final ValidationTask... validationTasks) {
         final List<ValidationException> errors = new ArrayList<>();
         for (ValidationTask validationTask:  validationTasks) {
+            if (!validationTask.isRequired() && validationTask.getInput() == null) {
+                continue;
+            }
             if (!validationTask.getPattern().matcher(validationTask.getInput()).matches()) {
                 errors.add(new ValidationException(validationTask.getInput(), validationTask.getErrorMessage()));
             }

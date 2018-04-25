@@ -24,11 +24,17 @@ public class ValidationTask {
     private Pattern pattern;
     private String input;
     private String errorMessage;
+    private boolean required;
 
-    public ValidationTask(Pattern pattern, String input, String errorMessage) {
+    public ValidationTask(Pattern pattern, String input, String errorMessage, boolean required) {
         this.pattern = pattern;
         this.input = input;
         this.errorMessage = errorMessage;
+        this.required = required;
+    }
+
+    public ValidationTask(Pattern pattern, String input, String errorMessage) {
+        this(pattern, input, errorMessage, true);
     }
 
     public Pattern getPattern() {
@@ -43,4 +49,7 @@ public class ValidationTask {
         return errorMessage;
     }
 
+    public boolean isRequired() {
+        return required;
+    }
 }
