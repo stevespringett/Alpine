@@ -20,6 +20,8 @@ package alpine.event.framework;
 import alpine.logging.Logger;
 import alpine.model.EventServiceLog;
 import alpine.persistence.AlpineQueryManager;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,7 +38,7 @@ import java.util.concurrent.Executors;
  * @author Steve Springett
  * @since 1.0.0
  */
-public abstract class BaseEventService {
+public abstract class BaseEventService implements IEventService {
 
     private Logger logger = Logger.getLogger(BaseEventService.class);
     private Map<Class<? extends Event>, ArrayList<Class<? extends Subscriber>>> subscriptionMap = new ConcurrentHashMap<>();
@@ -60,10 +62,7 @@ public abstract class BaseEventService {
     }
 
     /**
-     * Publishes events. Published events will get dispatched to all subscribers in the order in which they
-     * subscribed. Subscribers are informed asynchronously one after the next.
-     * @param event An Event to publish
-     *
+     * {@inheritDoc}
      * @since 1.0.0
      */
     public void publish(Event event) {
@@ -85,19 +84,37 @@ public abstract class BaseEventService {
                     final Subscriber subscriber = clazz.newInstance();
                     subscriber.inform(event);
                     qm.updateEventServiceLog(eventServiceLog);
-                } catch (InstantiationException | IllegalAccessException e) {
-                    logger.error("An error occurred while informing subscriber: " + e.getMessage());
+                    if (event instanceof RoutableEvent) {
+                        RoutableEvent routableEvent = (RoutableEvent)event;
+                        if (routableEvent.onSuccess() != null) {
+                            logger.debug("Calling onSuccess");
+                            Method method = routableEvent.onSuccess().getEventService().getMethod("getInstance");
+                            IEventService es = (IEventService) method.invoke(routableEvent.onSuccess().getEventService(), new Object[0]);
+                            es.publish(routableEvent.onSuccess().getEvent());
+                        }
+                    }
+                } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+                    logger.error("An error occurred while informing subscriber: " + e);
+                    if (event instanceof RoutableEvent) {
+                        RoutableEvent routableEvent = (RoutableEvent)event;
+                        if (routableEvent.onFailure() != null) {
+                            logger.debug("Calling onFailure");
+                            try {
+                                Method method = routableEvent.onFailure().getEventService().getMethod("getInstance");
+                                IEventService es = (IEventService) method.invoke(routableEvent.onFailure().getEventService(), new Object[0]);
+                                es.publish(routableEvent.onFailure().getEvent());
+                            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
+                                logger.error("Exception while calling onFailure callback", ex);
+                            }
+                        }
+                    }
                 }
             });
         }
     }
 
     /**
-     * Subscribes to an event. Subscribes are automatically notified of all events for which they are
-     * subscribed.
-     * @param eventType The type of event to subscribe to
-     * @param subscriberType The Subscriber that gets informed when the type of event is published
-     *
+     * {@inheritDoc}
      * @since 1.0.0
      */
     public void subscribe(Class<? extends Event> eventType, Class<? extends Subscriber> subscriberType) {
@@ -111,11 +128,7 @@ public abstract class BaseEventService {
     }
 
     /**
-     * Unsubscribes a subscriber. All event types the subscriber has subscribed to will be
-     * unsubscribed. Once unsubscribed, the subscriber will no longer be informed of published
-     * events.
-     * @param subscriberType The Subscriber to unsubscribe.
-     *
+     * {@inheritDoc}
      * @since 1.0.0
      */
     public void unsubscribe(Class<? extends Subscriber> subscriberType) {
@@ -125,9 +138,7 @@ public abstract class BaseEventService {
     }
 
     /**
-     * Shuts down the executioner. Once shut down, future work will not be performed. This should
-     * only be called prior to the application being shut down.
-     *
+     * {@inheritDoc}
      * @since 1.0.0
      */
     public void shutdown() {
