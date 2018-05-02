@@ -149,6 +149,14 @@
         <plugin.retirejs.detail>true</plugin.retirejs.detail>
         <plugin.retirejs.indentSize>4</plugin.retirejs.indentSize>
 
+        <!-- Software Analysis: CycloneDX -->
+        <maven.cyclonedx.plugin.version>1.0.0</maven.cyclonedx.plugin.version>
+        <plugin.cyclonedx.includeCompileScope>true</plugin.cyclonedx.includeCompileScope>
+        <plugin.cyclonedx.includeProvidedScope>true</plugin.cyclonedx.includeProvidedScope>
+        <plugin.cyclonedx.includeRuntimeScope>true</plugin.cyclonedx.includeRuntimeScope>
+        <plugin.cyclonedx.includeSystemScope>true</plugin.cyclonedx.includeSystemScope>
+        <plugin.cyclonedx.includeTestScope>false</plugin.cyclonedx.includeTestScope>
+
         <!-- Dependency Versions -->
         <lib.alpine.executable.war.version>1.0.0</lib.alpine.executable.war.version>
         <lib.bcrypt.version>0.4</lib.bcrypt.version>
@@ -652,6 +660,27 @@
                                 </goals>
                             </execution>
                         </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.cyclonedx</groupId>
+                        <artifactId>cyclonedx-maven-plugin</artifactId>
+                        <version>${maven.cyclonedx.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>cyclonddx</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>makeBom</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <includeCompileScope>${plugin.cyclonedx.includeCompileScope}</includeCompileScope>
+                            <includeProvidedScope>${plugin.cyclonedx.includeProvidedScope}</includeProvidedScope>
+                            <includeRuntimeScope>${plugin.cyclonedx.includeRuntimeScope}</includeRuntimeScope>
+                            <includeSystemScope>${plugin.cyclonedx.includeSystemScope}</includeSystemScope>
+                            <includeTestScope>${plugin.cyclonedx.includeTestScope}</includeTestScope>
+                        </configuration>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
