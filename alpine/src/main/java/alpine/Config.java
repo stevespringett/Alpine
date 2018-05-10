@@ -99,7 +99,7 @@ public class Config {
         LDAP_SERVER_URL          ("alpine.ldap.server.url",           null),
         LDAP_DOMAIN              ("alpine.ldap.domain",               null),
         LDAP_BASEDN              ("alpine.ldap.basedn",               null),
-        LDAP_SECURITY_AUTH       ("alpine.ldap.security.auth",        null),
+        LDAP_SECURITY_AUTH       ("alpine.ldap.security.auth",        "simple"),
         LDAP_BIND_USERNAME       ("alpine.ldap.bind.username",        null),
         LDAP_BIND_PASSWORD       ("alpine.ldap.bind.password",        null),
         LDAP_ATTRIBUTE_NAME      ("alpine.ldap.attribute.name",       "userPrincipalName"),
