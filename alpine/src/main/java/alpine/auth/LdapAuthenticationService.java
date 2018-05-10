@@ -41,6 +41,7 @@ public class LdapAuthenticationService implements AuthenticationService {
     private static final String DOMAIN_NAME = Config.getInstance().getProperty(Config.AlpineKey.LDAP_DOMAIN);
     private static final String BASE_DN = Config.getInstance().getProperty(Config.AlpineKey.LDAP_BASEDN);
     private static final String LDAP_ATTRIBUTE_NAME = Config.getInstance().getProperty(Config.AlpineKey.LDAP_ATTRIBUTE_NAME);
+    private static final String LDAP_SECURITY_AUTH = Config.getInstance().getProperty(Config.AlpineKey.LDAP_SECURITY_AUTH);
 
     private String username;
     private String password;
@@ -109,7 +110,10 @@ public class LdapAuthenticationService implements AuthenticationService {
         }
         final Hashtable<String, String> props = new Hashtable<>();
         final String principalName = LDAP_ATTRIBUTE_NAME + "=" + formatPrincipal(username) + "," + BASE_DN;
-        props.put(Context.SECURITY_AUTHENTICATION, "simple");
+        
+        if (StringUtils.isNotBlank(LDAP_SECURITY_AUTH)) {
+            props.put(Context.SECURITY_AUTHENTICATION, LDAP_SECURITY_AUTH);
+        }
         props.put(Context.SECURITY_PRINCIPAL, principalName);
         props.put(Context.SECURITY_CREDENTIALS, password);
         props.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");

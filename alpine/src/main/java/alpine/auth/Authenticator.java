@@ -57,9 +57,16 @@ public class Authenticator {
      */
     public Principal authenticate() throws AlpineAuthenticationException {
         final ManagedUserAuthenticationService userService = new ManagedUserAuthenticationService(username, password);
-        final Principal principal = userService.authenticate();
-        if (principal != null) {
-            return principal;
+        try{
+	        final Principal principal = userService.authenticate();
+	        if (principal != null) {
+	            return principal;
+	        }
+        }catch(AlpineAuthenticationException e){
+             // If LDAP is enabled, a second attempt to authenticate the credentials will be made against LDAP so we skip this validation exception.
+            if (!LDAP_ENABLED) {
+                throw e;
+              }
         }
         if (LDAP_ENABLED) {
             final LdapAuthenticationService ldapService = new LdapAuthenticationService(username, password);
