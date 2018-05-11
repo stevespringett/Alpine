@@ -163,6 +163,7 @@ public class LdapAuthenticationService implements AuthenticationService {
 	 *   alpine.ldap.auth.username.format=userPrincipalName=%s,ou=People,dc=company,dc=com
      * @param username the username
      * @return a formatted user principal
+     * @since 1.2.0
      */
     private String formatPrincipal(String username) {
 		if  (StringUtils.isNotBlank(LDAP_AUTH_USERNAME_FMT)) {
