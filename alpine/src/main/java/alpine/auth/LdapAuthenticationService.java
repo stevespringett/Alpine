@@ -42,7 +42,8 @@ public class LdapAuthenticationService implements AuthenticationService {
     private static final String BASE_DN = Config.getInstance().getProperty(Config.AlpineKey.LDAP_BASEDN);
     private static final String LDAP_ATTRIBUTE_NAME = Config.getInstance().getProperty(Config.AlpineKey.LDAP_ATTRIBUTE_NAME);
     private static final String LDAP_SECURITY_AUTH = Config.getInstance().getProperty(Config.AlpineKey.LDAP_SECURITY_AUTH);
-
+    private static final String LDAP_AUTH_USERNAME_FMT = Config.getInstance().getProperty(Config.AlpineKey.LDAP_AUTH_USERNAME_FMT);
+	
     private String username;
     private String password;
 
@@ -109,7 +110,7 @@ public class LdapAuthenticationService implements AuthenticationService {
             throw new NamingException("Username or password cannot be empty or null");
         }
         final Hashtable<String, String> props = new Hashtable<>();
-        final String principalName = LDAP_ATTRIBUTE_NAME + "=" + formatPrincipal(username) + "," + BASE_DN;
+        final String principalName = formatPrincipal(username);
         
         if (StringUtils.isNotBlank(LDAP_SECURITY_AUTH)) {
             props.put(Context.SECURITY_AUTHENTICATION, LDAP_SECURITY_AUTH);
@@ -152,14 +153,25 @@ public class LdapAuthenticationService implements AuthenticationService {
     }
 
     /**
-     * Formats the principal in username@domain format.
+     * Formats the principal in username@domain format or in a custom format if is specified in the config file.
+	 * If LDAP_AUTH_USERNAME_FMT is configured to a non-empty value, the substring %s in this value will be replaced with the entered username.
+	 * The recommended format of this value depends on your LDAP server(Active Directory, OpenLDAP, etc.).
+	 * Examples:
+	 *   alpine.ldap.auth.username.format=%s
+	 * 	 alpine.ldap.auth.username.format=%s@company.com
+	 *   alpine.ldap.auth.username.format=uid=%s,ou=People,dc=company,dc=com
+	 *   alpine.ldap.auth.username.format=userPrincipalName=%s,ou=People,dc=company,dc=com
      * @param username the username
      * @return a formatted user principal
      */
     private String formatPrincipal(String username) {
-        if (StringUtils.isNotBlank(DOMAIN_NAME)) {
-            return username + "@" + DOMAIN_NAME;
-        }
+		if  (StringUtils.isNotBlank(LDAP_AUTH_USERNAME_FMT)) {
+			return String.format(LDAP_AUTH_USERNAME_FMT, username);
+		} else {
+			if (StringUtils.isNotBlank(DOMAIN_NAME)) {
+				return LDAP_ATTRIBUTE_NAME + "=" + username + "@" + DOMAIN_NAME + "," + BASE_DN;
+			}
+		}
         return username;
     }
 
