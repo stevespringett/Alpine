@@ -132,4 +132,11 @@ public class FileSystemResourceServlet extends StaticResourceServlet {
         };
     }
 
+    public void setDirectory(String directory) {
+        this.directory = directory;
+    }
+
+    public void setAbsolute(boolean absolute) {
+        this.absolute = absolute;
+    }
 }
