@@ -27,16 +27,18 @@ package alpine.event.framework;
  */
 public abstract class AbstractRoutableEvent implements RoutableEvent {
 
-    private EventCallback onSuccessCallback = null;
-    private EventCallback onFailureCallback = null;
+    private Event onSuccessEvent = null;
+    private Event onFailureEvent = null;
+    private Class<? extends IEventService> onSuccessEventService;
+    private Class<? extends IEventService> onFailureEventService;
 
     /**
      * {@inheritDoc}
      * @since 1.2.0
      */
     @Override
-    public EventCallback onSuccess() {
-        return onSuccessCallback;
+    public Event onSuccess() {
+        return onSuccessEvent;
     }
 
     /**
@@ -44,8 +46,8 @@ public abstract class AbstractRoutableEvent implements RoutableEvent {
      * @since 1.2.0
      */
     @Override
-    public EventCallback onFailure() {
-        return onFailureCallback;
+    public Event onFailure() {
+        return onFailureEvent;
     }
 
     /**
@@ -53,8 +55,8 @@ public abstract class AbstractRoutableEvent implements RoutableEvent {
      * @since 1.2.0
      */
     @Override
-    public RoutableEvent onSuccess(EventCallback onSuccessCallback) {
-        this.onSuccessCallback = onSuccessCallback;
+    public RoutableEvent onSuccess(Event onSuccessEvent) {
+        this.onSuccessEvent = onSuccessEvent;
         return this;
     }
 
@@ -63,9 +65,46 @@ public abstract class AbstractRoutableEvent implements RoutableEvent {
      * @since 1.2.0
      */
     @Override
-    public RoutableEvent onFailure(EventCallback onFailureCallback) {
-        this.onFailureCallback = onFailureCallback;
+    public RoutableEvent onSuccess(Event onSuccessEvent, Class<? extends IEventService> onSuccessEventService) {
+        this.onSuccessEvent = onSuccessEvent;
+        this.onSuccessEventService = onSuccessEventService;
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     * @since 1.2.0
+     */
+    @Override
+    public RoutableEvent onFailure(Event onFailureEvent) {
+        this.onFailureEvent = onFailureEvent;
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @since 1.2.0
+     */
+    @Override
+    public RoutableEvent onFailure(Event onFailureEvent, Class<? extends IEventService> onFailureEventService) {
+        this.onFailureEvent = onFailureEvent;
+        this.onFailureEventService = onFailureEventService;
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @since 1.2.0
+     */
+    public Class<? extends IEventService> getOnSuccessEventService() {
+        return onSuccessEventService;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @since 1.2.0
+     */
+    public Class<? extends IEventService> getOnFailureEventService() {
+        return onFailureEventService;
+    }
 }

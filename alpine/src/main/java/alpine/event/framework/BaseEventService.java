@@ -88,12 +88,12 @@ public abstract class BaseEventService implements IEventService {
                         RoutableEvent routableEvent = (RoutableEvent)event;
                         if (routableEvent.onSuccess() != null) {
                             logger.debug("Calling onSuccess");
-                            if (routableEvent.onSuccess().getEventService() != null) {
-                                Method method = routableEvent.onSuccess().getEventService().getMethod("getInstance");
-                                IEventService es = (IEventService) method.invoke(routableEvent.onSuccess().getEventService(), new Object[0]);
-                                es.publish(routableEvent.onSuccess().getEvent());
+                            if (routableEvent.getOnSuccessEventService() != null) {
+                                Method method = routableEvent.getOnSuccessEventService().getMethod("getInstance");
+                                IEventService es = (IEventService) method.invoke(routableEvent.getOnSuccessEventService(), new Object[0]);
+                                es.publish(routableEvent.onSuccess());
                             } else {
-                                Event.dispatch(routableEvent.onSuccess().getEvent());
+                                Event.dispatch(routableEvent.onSuccess());
                             }
                         }
                     }
@@ -103,16 +103,16 @@ public abstract class BaseEventService implements IEventService {
                         RoutableEvent routableEvent = (RoutableEvent)event;
                         if (routableEvent.onFailure() != null) {
                             logger.debug("Calling onFailure");
-                            if (routableEvent.onFailure().getEventService() != null) {
+                            if (routableEvent.getOnFailureEventService() != null) {
                                 try {
-                                    Method method = routableEvent.onFailure().getEventService().getMethod("getInstance");
-                                    IEventService es = (IEventService) method.invoke(routableEvent.onFailure().getEventService(), new Object[0]);
-                                    es.publish(routableEvent.onFailure().getEvent());
+                                    Method method = routableEvent.getOnFailureEventService().getMethod("getInstance");
+                                    IEventService es = (IEventService) method.invoke(routableEvent.getOnFailureEventService(), new Object[0]);
+                                    es.publish(routableEvent.onFailure());
                                 } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
                                     logger.error("Exception while calling onFailure callback", ex);
                                 }
                             } else {
-                                Event.dispatch(routableEvent.onFailure().getEvent());
+                                Event.dispatch(routableEvent.onFailure());
                             }
                         }
                     }

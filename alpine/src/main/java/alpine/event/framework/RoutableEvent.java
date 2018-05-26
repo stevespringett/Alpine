@@ -30,29 +30,60 @@ public interface RoutableEvent extends Event {
     /**
      * Returns the optional callback event that should be processed if this event is successful.
      * @since 1.2.0
-     * @return an EventCallback
+     * @return an Event
      */
-    EventCallback onSuccess();
+    Event onSuccess();
 
     /**
      * Returns the optional callback event that should be processed if this event is not successful.
      * @since 1.2.0
-     * @return an EventCallback
+     * @return an Event
      */
-    EventCallback onFailure();
+    Event onFailure();
 
     /**
-     * Fluent method that sets the onSuccess EventCallBack and returns this object.
+     * Fluent method that sets the onSuccess Event and returns this object.
+     * @param onSuccessEvent the event to publish if this event succeeds
      * @since 1.2.0
      * @return the current object
      */
-    RoutableEvent onSuccess(EventCallback onSuccessCallback);
+    RoutableEvent onSuccess(Event onSuccessEvent);
 
     /**
-     * Fluent method that sets the onFailure EventCallBack and returns this object.
+     * Fluent method that sets the onSuccess Event and returns this object.
+     * @param onSuccessEvent the event to publish if this event succeeds
+     * @param onSuccessEventService the specific IEventService implementation to use
      * @since 1.2.0
      * @return the current object
      */
-    RoutableEvent onFailure(EventCallback onFailureCallback);
+    RoutableEvent onSuccess(Event onSuccessEvent, Class<? extends IEventService> onSuccessEventService);
 
+    /**
+     * Fluent method that sets the onFailure Event and returns this object.
+     * @param onFailureEvent the event to publish if this event fails
+     * @since 1.2.0
+     * @return the current object
+     */
+    RoutableEvent onFailure(Event onFailureEvent);
+
+    /**
+     * Fluent method that sets the onFailure Event and returns this object.
+     * @param onFailureEvent the event to publish if this event fails
+     * @param onFailureEventService the specific IEventService implementation to use
+     * @since 1.2.0
+     * @return the current object
+     */
+    RoutableEvent onFailure(Event onFailureEvent, Class<? extends IEventService> onFailureEventService);
+
+    /**
+     * Returns the optional event service used to publish a success event.
+     * @since 1.2.0
+     */
+    Class<? extends IEventService> getOnSuccessEventService();
+
+    /**
+     * Returns the optional event service used to publish a failure event.
+     * @since 1.2.0
+     */
+    public Class<? extends IEventService> getOnFailureEventService();
 }
