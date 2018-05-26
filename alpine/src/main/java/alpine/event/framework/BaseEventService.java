@@ -88,9 +88,13 @@ public abstract class BaseEventService implements IEventService {
                         RoutableEvent routableEvent = (RoutableEvent)event;
                         if (routableEvent.onSuccess() != null) {
                             logger.debug("Calling onSuccess");
-                            Method method = routableEvent.onSuccess().getEventService().getMethod("getInstance");
-                            IEventService es = (IEventService) method.invoke(routableEvent.onSuccess().getEventService(), new Object[0]);
-                            es.publish(routableEvent.onSuccess().getEvent());
+                            if (routableEvent.onSuccess().getEventService() != null) {
+                                Method method = routableEvent.onSuccess().getEventService().getMethod("getInstance");
+                                IEventService es = (IEventService) method.invoke(routableEvent.onSuccess().getEventService(), new Object[0]);
+                                es.publish(routableEvent.onSuccess().getEvent());
+                            } else {
+                                Event.dispatch(routableEvent.onSuccess().getEvent());
+                            }
                         }
                     }
                 } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
@@ -99,12 +103,16 @@ public abstract class BaseEventService implements IEventService {
                         RoutableEvent routableEvent = (RoutableEvent)event;
                         if (routableEvent.onFailure() != null) {
                             logger.debug("Calling onFailure");
-                            try {
-                                Method method = routableEvent.onFailure().getEventService().getMethod("getInstance");
-                                IEventService es = (IEventService) method.invoke(routableEvent.onFailure().getEventService(), new Object[0]);
-                                es.publish(routableEvent.onFailure().getEvent());
-                            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
-                                logger.error("Exception while calling onFailure callback", ex);
+                            if (routableEvent.onFailure().getEventService() != null) {
+                                try {
+                                    Method method = routableEvent.onFailure().getEventService().getMethod("getInstance");
+                                    IEventService es = (IEventService) method.invoke(routableEvent.onFailure().getEventService(), new Object[0]);
+                                    es.publish(routableEvent.onFailure().getEvent());
+                                } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
+                                    logger.error("Exception while calling onFailure callback", ex);
+                                }
+                            } else {
+                                Event.dispatch(routableEvent.onFailure().getEvent());
                             }
                         }
                     }
@@ -135,6 +143,15 @@ public abstract class BaseEventService implements IEventService {
         for (ArrayList<Class<? extends Subscriber>> list : subscriptionMap.values()) {
             list.remove(subscriberType);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * @since 1.2.0
+     */
+    public boolean hasSubscriptions(Event event) {
+        final ArrayList<Class<? extends Subscriber>> subscriberClasses = subscriptionMap.get(event.getClass());
+        return subscriberClasses != null;
     }
 
     /**

@@ -56,6 +56,15 @@ public interface IEventService {
     void unsubscribe(Class<? extends Subscriber> subscriberType);
 
     /**
+     * Determines if the specified event is able to be processed by the EventService. If a subscriber
+     * exists for the event type, this method will return true, otherwise false.
+     * @param event the event to query if subscribers exist
+     *
+     * @since 1.2.0
+     */
+    boolean hasSubscriptions(Event event);
+
+    /**
      * Shuts down the executioner. Once shut down, future work will not be performed. This should
      * only be called prior to the application being shut down.
      *

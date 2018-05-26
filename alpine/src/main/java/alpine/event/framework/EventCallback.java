@@ -30,8 +30,20 @@ public class EventCallback {
     private Event event;
 
     /**
+     * Constructs a new EventCallback object. By using this constructor,
+     * resolution of the {@link IEventService} to use will be determined by
+     * {@link Event#dispatch(Event)}.
+     *
+     * @param event an Event
+     * @since 1.2.0
+     */
+    public EventCallback(Event event) {
+        this.event = event;
+    }
+
+    /**
      * Constructs a new EventCallback object.
-     * @param eventService an IEventService implementation
+     * @param eventService the specific IEventService implementation to use
      * @param event an Event
      * @since 1.2.0
      */

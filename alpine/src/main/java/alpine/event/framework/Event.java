@@ -17,6 +17,8 @@
  */
 package alpine.event.framework;
 
+import alpine.logging.Logger;
+
 /**
  * The Event interface simply defines a 'type'. All Events should implement this
  * interface.
@@ -26,4 +28,29 @@ package alpine.event.framework;
  */
 public interface Event {
 
+    /**
+     * The dispath method provides convenience in not having to know (or care) about
+     * what {@link IEventService} implementation is used to process an event.
+     *
+     * This method supports both {@link EventService} and {@link SingleThreadedEventService}
+     * and may send an event to zero or more of the event services if they have a subscriber
+     * capable of processing the event.
+     *
+     * @author Steve Springett
+     * @since 1.2.0
+     */
+    static void dispatch(Event event) {
+        boolean informed = false;
+        if (EventService.getInstance().hasSubscriptions(event)) {
+            informed = true;
+            EventService.getInstance().publish(event);
+        }
+        if (SingleThreadedEventService.getInstance().hasSubscriptions(event)) {
+            informed = true;
+            SingleThreadedEventService.getInstance().publish(event);
+        }
+        if (!informed) {
+            Logger.getLogger(Event.class).debug("No subscribers to inform from event: " + event.getClass().getName());
+        }
+    }
 }
