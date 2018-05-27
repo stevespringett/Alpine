@@ -29,8 +29,8 @@ public abstract class AbstractRoutableEvent implements RoutableEvent {
 
     private Event onSuccessEvent = null;
     private Event onFailureEvent = null;
-    private Class<? extends IEventService> onSuccessEventService;
-    private Class<? extends IEventService> onFailureEventService;
+    private Class<? extends IEventService> onSuccessEventService = null;
+    private Class<? extends IEventService> onFailureEventService = null;
 
     /**
      * {@inheritDoc}
