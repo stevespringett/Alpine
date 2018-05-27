@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/stevespringett/Alpine.svg?branch=master)](https://travis-ci.org/stevespringett/Alpine)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/cefa2866cbc24deeb7fbc83b8f71ad60)](https://www.codacy.com/app/stevespringett/Alpine?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=stevespringett/Alpine&amp;utm_campaign=Badge_Grade)
-[![Dependency Status](https://www.versioneye.com/user/projects/58a2a49a0f3d4f003ce97f07/badge.svg?style=flat)](https://www.versioneye.com/user/projects/58a2a49a0f3d4f003ce97f07)
+[![Dependency Status](https://img.shields.io/librariesio/github/stevespringett/Alpine.svg)](https://libraries.io/github/stevespringett/Alpine)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/690/badge)](https://bestpractices.coreinfrastructure.org/projects/690)
 [![License][license-image]][license-url]
 [![Join the chat at https://gitter.im/java-alpine/Lobby](https://badges.gitter.im/java-alpine/Lobby.svg)](https://gitter.im/java-alpine/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
@@ -93,6 +93,7 @@ The following features are free and require little or no coding just for using A
   * Content Security Policy (Level 1 and 2)
   * HTTP Public Key Pinning (HPKP) (RFC-7469)
   * HTTP Strict Transport Security (HSTS) (RFC-6797)
+  * Whitelist and Blacklist URL filters
 
 Build Features
 -
