@@ -19,13 +19,13 @@ package alpine.event.framework;
 
 /**
  * Provides a default abstract implementation of an Event which supports
- * an unbounded chain of callbacks that can be 'routed' between different
+ * an unbounded chain of callbacks that can be routed between different
  * {@link IEventService} implementations.
  *
  * @author Steve Springett
  * @since 1.2.0
  */
-public abstract class AbstractRoutableEvent implements RoutableEvent {
+public abstract class AbstractChainableEvent implements ChainableEvent {
 
     private Event onSuccessEvent = null;
     private Event onFailureEvent = null;
@@ -55,7 +55,7 @@ public abstract class AbstractRoutableEvent implements RoutableEvent {
      * @since 1.2.0
      */
     @Override
-    public RoutableEvent onSuccess(Event onSuccessEvent) {
+    public ChainableEvent onSuccess(Event onSuccessEvent) {
         this.onSuccessEvent = onSuccessEvent;
         return this;
     }
@@ -65,7 +65,7 @@ public abstract class AbstractRoutableEvent implements RoutableEvent {
      * @since 1.2.0
      */
     @Override
-    public RoutableEvent onSuccess(Event onSuccessEvent, Class<? extends IEventService> onSuccessEventService) {
+    public ChainableEvent onSuccess(Event onSuccessEvent, Class<? extends IEventService> onSuccessEventService) {
         this.onSuccessEvent = onSuccessEvent;
         this.onSuccessEventService = onSuccessEventService;
         return this;
@@ -76,7 +76,7 @@ public abstract class AbstractRoutableEvent implements RoutableEvent {
      * @since 1.2.0
      */
     @Override
-    public RoutableEvent onFailure(Event onFailureEvent) {
+    public ChainableEvent onFailure(Event onFailureEvent) {
         this.onFailureEvent = onFailureEvent;
         return this;
     }
@@ -86,7 +86,7 @@ public abstract class AbstractRoutableEvent implements RoutableEvent {
      * @since 1.2.0
      */
     @Override
-    public RoutableEvent onFailure(Event onFailureEvent, Class<? extends IEventService> onFailureEventService) {
+    public ChainableEvent onFailure(Event onFailureEvent, Class<? extends IEventService> onFailureEventService) {
         this.onFailureEvent = onFailureEvent;
         this.onFailureEventService = onFailureEventService;
         return this;

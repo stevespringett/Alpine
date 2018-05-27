@@ -84,35 +84,35 @@ public abstract class BaseEventService implements IEventService {
                     final Subscriber subscriber = clazz.newInstance();
                     subscriber.inform(event);
                     qm.updateEventServiceLog(eventServiceLog);
-                    if (event instanceof RoutableEvent) {
-                        RoutableEvent routableEvent = (RoutableEvent)event;
-                        if (routableEvent.onSuccess() != null) {
+                    if (event instanceof ChainableEvent) {
+                        ChainableEvent chainableEvent = (ChainableEvent)event;
+                        if (chainableEvent.onSuccess() != null) {
                             logger.debug("Calling onSuccess");
-                            if (routableEvent.getOnSuccessEventService() != null) {
-                                Method method = routableEvent.getOnSuccessEventService().getMethod("getInstance");
-                                IEventService es = (IEventService) method.invoke(routableEvent.getOnSuccessEventService(), new Object[0]);
-                                es.publish(routableEvent.onSuccess());
+                            if (chainableEvent.getOnSuccessEventService() != null) {
+                                Method method = chainableEvent.getOnSuccessEventService().getMethod("getInstance");
+                                IEventService es = (IEventService) method.invoke(chainableEvent.getOnSuccessEventService(), new Object[0]);
+                                es.publish(chainableEvent.onSuccess());
                             } else {
-                                Event.dispatch(routableEvent.onSuccess());
+                                Event.dispatch(chainableEvent.onSuccess());
                             }
                         }
                     }
                 } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
                     logger.error("An error occurred while informing subscriber: " + e);
-                    if (event instanceof RoutableEvent) {
-                        RoutableEvent routableEvent = (RoutableEvent)event;
-                        if (routableEvent.onFailure() != null) {
+                    if (event instanceof ChainableEvent) {
+                        ChainableEvent chainableEvent = (ChainableEvent)event;
+                        if (chainableEvent.onFailure() != null) {
                             logger.debug("Calling onFailure");
-                            if (routableEvent.getOnFailureEventService() != null) {
+                            if (chainableEvent.getOnFailureEventService() != null) {
                                 try {
-                                    Method method = routableEvent.getOnFailureEventService().getMethod("getInstance");
-                                    IEventService es = (IEventService) method.invoke(routableEvent.getOnFailureEventService(), new Object[0]);
-                                    es.publish(routableEvent.onFailure());
+                                    Method method = chainableEvent.getOnFailureEventService().getMethod("getInstance");
+                                    IEventService es = (IEventService) method.invoke(chainableEvent.getOnFailureEventService(), new Object[0]);
+                                    es.publish(chainableEvent.onFailure());
                                 } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
                                     logger.error("Exception while calling onFailure callback", ex);
                                 }
                             } else {
-                                Event.dispatch(routableEvent.onFailure());
+                                Event.dispatch(chainableEvent.onFailure());
                             }
                         }
                     }

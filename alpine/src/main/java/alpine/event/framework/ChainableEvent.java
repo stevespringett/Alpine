@@ -18,14 +18,14 @@
 package alpine.event.framework;
 
 /**
- * The RoutableEvent interface defines methods necessary to support
+ * The ChainableEvent interface defines methods necessary to support
  * an unbounded chain of callbacks and event between different
  * {@link IEventService} implementations.
  *
  * @author Steve Springett
  * @since 1.2.0
  */
-public interface RoutableEvent extends Event {
+public interface ChainableEvent extends Event {
 
     /**
      * Returns the optional callback event that should be processed if this event is successful.
@@ -47,7 +47,7 @@ public interface RoutableEvent extends Event {
      * @since 1.2.0
      * @return the current object
      */
-    RoutableEvent onSuccess(Event onSuccessEvent);
+    ChainableEvent onSuccess(Event onSuccessEvent);
 
     /**
      * Fluent method that sets the onSuccess Event and returns this object.
@@ -56,7 +56,7 @@ public interface RoutableEvent extends Event {
      * @since 1.2.0
      * @return the current object
      */
-    RoutableEvent onSuccess(Event onSuccessEvent, Class<? extends IEventService> onSuccessEventService);
+    ChainableEvent onSuccess(Event onSuccessEvent, Class<? extends IEventService> onSuccessEventService);
 
     /**
      * Fluent method that sets the onFailure Event and returns this object.
@@ -64,7 +64,7 @@ public interface RoutableEvent extends Event {
      * @since 1.2.0
      * @return the current object
      */
-    RoutableEvent onFailure(Event onFailureEvent);
+    ChainableEvent onFailure(Event onFailureEvent);
 
     /**
      * Fluent method that sets the onFailure Event and returns this object.
@@ -73,7 +73,7 @@ public interface RoutableEvent extends Event {
      * @since 1.2.0
      * @return the current object
      */
-    RoutableEvent onFailure(Event onFailureEvent, Class<? extends IEventService> onFailureEventService);
+    ChainableEvent onFailure(Event onFailureEvent, Class<? extends IEventService> onFailureEventService);
 
     /**
      * Returns the optional event service used to publish a success event.
