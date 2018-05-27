@@ -158,7 +158,7 @@
         <plugin.cyclonedx.includeTestScope>false</plugin.cyclonedx.includeTestScope>
 
         <!-- Dependency Versions -->
-        <lib.alpine.executable.war.version>1.0.0</lib.alpine.executable.war.version>
+        <lib.alpine.executable.war.version>1.0.1</lib.alpine.executable.war.version>
         <lib.bcrypt.version>0.4</lib.bcrypt.version>
         <lib.commons.collections4.version>4.1</lib.commons.collections4.version>
         <lib.commons.io.version>2.6</lib.commons.io.version>
