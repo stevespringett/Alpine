@@ -17,6 +17,8 @@
  */
 package alpine.event.framework;
 
+import java.util.ArrayList;
+
 /**
  * Provides a default abstract implementation of an Event which supports
  * an unbounded chain of callbacks that can be routed between different
@@ -27,18 +29,17 @@ package alpine.event.framework;
  */
 public abstract class AbstractChainableEvent implements ChainableEvent {
 
-    private Event onSuccessEvent = null;
-    private Event onFailureEvent = null;
-    private Class<? extends IEventService> onSuccessEventService = null;
-    private Class<? extends IEventService> onFailureEventService = null;
+    private ArrayList<ChainLink> onSuccessChains = new ArrayList<>();
+    private ArrayList<ChainLink> onFailureChains = new ArrayList<>();
 
     /**
      * {@inheritDoc}
      * @since 1.2.0
      */
     @Override
-    public Event onSuccess() {
-        return onSuccessEvent;
+    public ChainLink[] onSuccess() {
+        ChainLink[] chain = new ChainLink[onSuccessChains.size()];
+        return onSuccessChains.toArray(chain);
     }
 
     /**
@@ -46,8 +47,9 @@ public abstract class AbstractChainableEvent implements ChainableEvent {
      * @since 1.2.0
      */
     @Override
-    public Event onFailure() {
-        return onFailureEvent;
+    public ChainLink[] onFailure() {
+        ChainLink[] chain = new ChainLink[onFailureChains.size()];
+        return onFailureChains.toArray(chain);
     }
 
     /**
@@ -56,7 +58,8 @@ public abstract class AbstractChainableEvent implements ChainableEvent {
      */
     @Override
     public ChainableEvent onSuccess(Event onSuccessEvent) {
-        this.onSuccessEvent = onSuccessEvent;
+        this.onSuccessChains.add(new ChainLink()
+                .onSuccess(onSuccessEvent));
         return this;
     }
 
@@ -66,8 +69,8 @@ public abstract class AbstractChainableEvent implements ChainableEvent {
      */
     @Override
     public ChainableEvent onSuccess(Event onSuccessEvent, Class<? extends IEventService> onSuccessEventService) {
-        this.onSuccessEvent = onSuccessEvent;
-        this.onSuccessEventService = onSuccessEventService;
+        this.onSuccessChains.add(new ChainLink()
+                .onSuccess(onSuccessEvent, onSuccessEventService));
         return this;
     }
 
@@ -77,7 +80,8 @@ public abstract class AbstractChainableEvent implements ChainableEvent {
      */
     @Override
     public ChainableEvent onFailure(Event onFailureEvent) {
-        this.onFailureEvent = onFailureEvent;
+        this.onFailureChains.add(new ChainLink()
+                .onFailure(onFailureEvent));
         return this;
     }
 
@@ -87,24 +91,9 @@ public abstract class AbstractChainableEvent implements ChainableEvent {
      */
     @Override
     public ChainableEvent onFailure(Event onFailureEvent, Class<? extends IEventService> onFailureEventService) {
-        this.onFailureEvent = onFailureEvent;
-        this.onFailureEventService = onFailureEventService;
+        this.onFailureChains.add(new ChainLink()
+                .onFailure(onFailureEvent, onFailureEventService));
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     * @since 1.2.0
-     */
-    public Class<? extends IEventService> getOnSuccessEventService() {
-        return onSuccessEventService;
-    }
-
-    /**
-     * {@inheritDoc}
-     * @since 1.2.0
-     */
-    public Class<? extends IEventService> getOnFailureEventService() {
-        return onFailureEventService;
-    }
 }

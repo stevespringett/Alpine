@@ -86,14 +86,14 @@ public abstract class BaseEventService implements IEventService {
                     qm.updateEventServiceLog(eventServiceLog);
                     if (event instanceof ChainableEvent) {
                         ChainableEvent chainableEvent = (ChainableEvent)event;
-                        if (chainableEvent.onSuccess() != null) {
-                            logger.debug("Calling onSuccess");
-                            if (chainableEvent.getOnSuccessEventService() != null) {
-                                Method method = chainableEvent.getOnSuccessEventService().getMethod("getInstance");
-                                IEventService es = (IEventService) method.invoke(chainableEvent.getOnSuccessEventService(), new Object[0]);
-                                es.publish(chainableEvent.onSuccess());
+                        logger.debug("Calling onSuccess");
+                        for (ChainLink chainLink: chainableEvent.onSuccess()) {
+                            if (chainLink.getSuccessEventService() != null) {
+                                Method method = chainLink.getSuccessEventService().getMethod("getInstance");
+                                IEventService es = (IEventService) method.invoke(chainLink.getSuccessEventService(), new Object[0]);
+                                es.publish(chainLink.getSuccessEvent());
                             } else {
-                                Event.dispatch(chainableEvent.onSuccess());
+                                Event.dispatch(chainLink.getSuccessEvent());
                             }
                         }
                     }
@@ -101,18 +101,18 @@ public abstract class BaseEventService implements IEventService {
                     logger.error("An error occurred while informing subscriber: " + e);
                     if (event instanceof ChainableEvent) {
                         ChainableEvent chainableEvent = (ChainableEvent)event;
-                        if (chainableEvent.onFailure() != null) {
-                            logger.debug("Calling onFailure");
-                            if (chainableEvent.getOnFailureEventService() != null) {
+                        logger.debug("Calling onFailure");
+                        for (ChainLink chainLink: chainableEvent.onFailure()) {
+                            if (chainLink.getFailureEventService() != null) {
                                 try {
-                                    Method method = chainableEvent.getOnFailureEventService().getMethod("getInstance");
-                                    IEventService es = (IEventService) method.invoke(chainableEvent.getOnFailureEventService(), new Object[0]);
-                                    es.publish(chainableEvent.onFailure());
+                                    Method method = chainLink.getFailureEventService().getMethod("getInstance");
+                                    IEventService es = (IEventService) method.invoke(chainLink.getFailureEventService(), new Object[0]);
+                                    es.publish(chainLink.getFailureEvent());
                                 } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
                                     logger.error("Exception while calling onFailure callback", ex);
                                 }
                             } else {
-                                Event.dispatch(chainableEvent.onFailure());
+                                Event.dispatch(chainLink.getFailureEvent());
                             }
                         }
                     }

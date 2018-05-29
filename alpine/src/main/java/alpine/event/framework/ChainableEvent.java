@@ -32,14 +32,14 @@ public interface ChainableEvent extends Event {
      * @since 1.2.0
      * @return an Event
      */
-    Event onSuccess();
+    ChainLink[] onSuccess();
 
     /**
      * Returns the optional callback event that should be processed if this event is not successful.
      * @since 1.2.0
      * @return an Event
      */
-    Event onFailure();
+    ChainLink[] onFailure();
 
     /**
      * Fluent method that sets the onSuccess Event and returns this object.
@@ -75,15 +75,4 @@ public interface ChainableEvent extends Event {
      */
     ChainableEvent onFailure(Event onFailureEvent, Class<? extends IEventService> onFailureEventService);
 
-    /**
-     * Returns the optional event service used to publish a success event.
-     * @since 1.2.0
-     */
-    Class<? extends IEventService> getOnSuccessEventService();
-
-    /**
-     * Returns the optional event service used to publish a failure event.
-     * @since 1.2.0
-     */
-    public Class<? extends IEventService> getOnFailureEventService();
 }
