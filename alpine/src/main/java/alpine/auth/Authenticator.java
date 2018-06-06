@@ -63,10 +63,12 @@ public class Authenticator {
 	            return principal;
 	        }
         }catch(AlpineAuthenticationException e){
-             // If LDAP is enabled, a second attempt to authenticate the credentials will be made against LDAP so we skip this validation exception.
-            if (!LDAP_ENABLED) {
+            // If LDAP is enabled, a second attempt to authenticate the credentials will be
+            // made against LDAP so we skip this validation exception. However, if the ManagedUser does exist, 
+            // return the correct error
+            if (!LDAP_ENABLED || (e.getCauseType() != AlpineAuthenticationException.CauseType.INVALID_CREDENTIALS)){
                 throw e;
-              }
+            }
         }
         if (LDAP_ENABLED) {
             final LdapAuthenticationService ldapService = new LdapAuthenticationService(username, password);
