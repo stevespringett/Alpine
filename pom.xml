@@ -115,7 +115,7 @@
         <plugin.fortify.sca.findbugs>false</plugin.fortify.sca.findbugs>
 
         <!-- Software Security: OWASP Dependency-Check -->
-        <maven.dependency-check.plugin.version>3.1.2</maven.dependency-check.plugin.version>
+        <maven.dependency-check.plugin.version>3.2.1</maven.dependency-check.plugin.version>
         <plugin.dependency-check.autoUpdate>true</plugin.dependency-check.autoUpdate>
         <plugin.dependency-check.format>ALL</plugin.dependency-check.format>
         <plugin.dependency-check.skipTestScope>true</plugin.dependency-check.skipTestScope>
@@ -150,7 +150,7 @@
         <plugin.retirejs.indentSize>4</plugin.retirejs.indentSize>
 
         <!-- Software Analysis: CycloneDX -->
-        <maven.cyclonedx.plugin.version>1.0.1</maven.cyclonedx.plugin.version>
+        <maven.cyclonedx.plugin.version>1.1.0</maven.cyclonedx.plugin.version>
         <plugin.cyclonedx.includeCompileScope>true</plugin.cyclonedx.includeCompileScope>
         <plugin.cyclonedx.includeProvidedScope>true</plugin.cyclonedx.includeProvidedScope>
         <plugin.cyclonedx.includeRuntimeScope>true</plugin.cyclonedx.includeRuntimeScope>
@@ -667,10 +667,10 @@
                         <version>${maven.cyclonedx.plugin.version}</version>
                         <executions>
                             <execution>
-                                <id>cyclonddx</id>
+                                <id>cyclonedx-aggregate</id>
                                 <phase>test</phase>
                                 <goals>
-                                    <goal>makeBom</goal>
+                                    <goal>makeAggregateBom</goal>
                                 </goals>
                             </execution>
                         </executions>
