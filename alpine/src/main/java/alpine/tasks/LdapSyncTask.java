@@ -98,8 +98,7 @@ public class LdapSyncTask implements Subscriber {
                     }
                 }
             } catch (NamingException ex) {
-                LOGGER.error("Error occurred during LDAP synchronization");
-                LOGGER.error(ex.getMessage());
+                LOGGER.error("Error occurred during LDAP synchronization", ex);
             } finally {
                 if (qm != null) {
                     qm.close();

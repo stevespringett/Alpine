@@ -18,6 +18,7 @@
 package alpine.auth;
 
 import alpine.Config;
+import alpine.logging.Logger;
 import alpine.model.LdapUser;
 import alpine.persistence.AlpineQueryManager;
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +38,7 @@ import java.util.Hashtable;
  */
 public class LdapAuthenticationService implements AuthenticationService {
 
+    private static final Logger LOGGER = Logger.getLogger(LdapAuthenticationService.class);
     private static final String LDAP_URL = Config.getInstance().getProperty(Config.AlpineKey.LDAP_SERVER_URL);
     private static final String DOMAIN_NAME = Config.getInstance().getProperty(Config.AlpineKey.LDAP_DOMAIN);
     private static final String BASE_DN = Config.getInstance().getProperty(Config.AlpineKey.LDAP_BASEDN);
@@ -123,7 +125,8 @@ public class LdapAuthenticationService implements AuthenticationService {
         try {
             return new InitialLdapContext(props, null);
         } catch (CommunicationException e) {
-            throw new NamingException("Failed to connect to directory server");
+            LOGGER.error("Failed to connect to directory server", e);
+            throw(e);
         } catch (NamingException e) {
             throw new NamingException("Failed to authenticate user");
         }
