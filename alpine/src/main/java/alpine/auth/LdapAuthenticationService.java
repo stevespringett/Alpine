@@ -170,7 +170,7 @@ public class LdapAuthenticationService implements AuthenticationService {
 			return String.format(LDAP_AUTH_USERNAME_FMT, username);
 		} else {
 			if (StringUtils.isNotBlank(DOMAIN_NAME)) {
-				return LDAP_ATTRIBUTE_NAME + "=" + username + "@" + DOMAIN_NAME + "," + BASE_DN;
+				return LDAP_ATTRIBUTE_NAME + "=" + username + "@" + DOMAIN_NAME;
 			}
 		}
         return username;
