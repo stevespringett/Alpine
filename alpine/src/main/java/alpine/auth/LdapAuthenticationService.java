@@ -41,8 +41,6 @@ public class LdapAuthenticationService implements AuthenticationService {
     private static final Logger LOGGER = Logger.getLogger(LdapAuthenticationService.class);
     private static final String LDAP_URL = Config.getInstance().getProperty(Config.AlpineKey.LDAP_SERVER_URL);
     private static final String DOMAIN_NAME = Config.getInstance().getProperty(Config.AlpineKey.LDAP_DOMAIN);
-    private static final String BASE_DN = Config.getInstance().getProperty(Config.AlpineKey.LDAP_BASEDN);
-    private static final String LDAP_ATTRIBUTE_NAME = Config.getInstance().getProperty(Config.AlpineKey.LDAP_ATTRIBUTE_NAME);
     private static final String LDAP_SECURITY_AUTH = Config.getInstance().getProperty(Config.AlpineKey.LDAP_SECURITY_AUTH);
     private static final String LDAP_AUTH_USERNAME_FMT = Config.getInstance().getProperty(Config.AlpineKey.LDAP_AUTH_USERNAME_FMT);
 	
@@ -173,7 +171,7 @@ public class LdapAuthenticationService implements AuthenticationService {
 			return String.format(LDAP_AUTH_USERNAME_FMT, username);
 		} else {
 			if (StringUtils.isNotBlank(DOMAIN_NAME)) {
-				return LDAP_ATTRIBUTE_NAME + "=" + username + "@" + DOMAIN_NAME;
+				return username + "@" + DOMAIN_NAME;
 			}
 		}
         return username;
