@@ -20,6 +20,7 @@ package alpine.event.framework;
 import alpine.logging.Logger;
 import alpine.model.EventServiceLog;
 import alpine.persistence.AlpineQueryManager;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -42,7 +43,8 @@ public abstract class BaseEventService implements IEventService {
 
     private Logger logger = Logger.getLogger(BaseEventService.class);
     private Map<Class<? extends Event>, ArrayList<Class<? extends Subscriber>>> subscriptionMap = new ConcurrentHashMap<>();
-    private ExecutorService executor = Executors.newFixedThreadPool(1);
+    private ExecutorService executor = Executors.newFixedThreadPool(1,
+            new BasicThreadFactory.Builder().namingPattern("Alpine-BaseEventService-%d").build());
     private final ExecutorService dynamicExecutor = Executors.newWorkStealingPool();
 
     /**

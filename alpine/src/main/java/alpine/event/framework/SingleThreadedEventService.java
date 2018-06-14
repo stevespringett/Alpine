@@ -18,6 +18,8 @@
 package alpine.event.framework;
 
 import alpine.logging.Logger;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -36,9 +38,12 @@ public final class SingleThreadedEventService extends BaseEventService {
 
     private static final SingleThreadedEventService INSTANCE = new SingleThreadedEventService();
     private static final Logger LOGGER = Logger.getLogger(EventService.class);
-    private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
+    private static final ExecutorService EXECUTOR;
 
     static {
+        BasicThreadFactory factory = new BasicThreadFactory.Builder()
+                .namingPattern("Alpine-SingleThreadedEventService").build();
+        EXECUTOR = Executors.newSingleThreadExecutor(factory);
         INSTANCE.setExecutorService(EXECUTOR);
         INSTANCE.setLogger(LOGGER);
     }
