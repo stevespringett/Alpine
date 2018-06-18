@@ -19,11 +19,18 @@ package alpine.persistence;
 
 import alpine.Config;
 import alpine.logging.Logger;
+import alpine.model.InstalledUpgrades;
+import alpine.model.SchemaVersion;
+import org.datanucleus.PersistenceNucleusContext;
+import org.datanucleus.api.jdo.JDOPersistenceManagerFactory;
+import org.datanucleus.store.schema.SchemaAwareStoreManager;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * Initializes the JDO persistence manager on server startup.
@@ -45,7 +52,7 @@ public class PersistenceManagerFactory implements ServletContextListener {
         JDO_OVERRIDES.put("javax.jdo.option.ConnectionPassword", "");
         JDO_OVERRIDES.put("javax.jdo.option.Mapping", "h2");
         JDO_OVERRIDES.put("datanucleus.connectionPoolingType", "HikariCP");
-        JDO_OVERRIDES.put("datanucleus.schema.autoCreateSchema", "true");
+        JDO_OVERRIDES.put("datanucleus.schema.autoCreateDatabase", "true");
         JDO_OVERRIDES.put("datanucleus.schema.autoCreateTables", "true");
         JDO_OVERRIDES.put("datanucleus.schema.autoCreateColumns", "true");
         JDO_OVERRIDES.put("datanucleus.schema.autoCreateConstraints", "true");
@@ -61,7 +68,7 @@ public class PersistenceManagerFactory implements ServletContextListener {
         JDO_PROPERTIES.put("javax.jdo.option.ConnectionUserName", Config.getInstance().getProperty(Config.AlpineKey.DATABASE_USERNAME));
         JDO_PROPERTIES.put("javax.jdo.option.ConnectionPassword", Config.getInstance().getProperty(Config.AlpineKey.DATABASE_PASSWORD));
         JDO_PROPERTIES.put("datanucleus.connectionPoolingType", "HikariCP");
-        JDO_PROPERTIES.put("datanucleus.schema.autoCreateSchema", "true");
+        JDO_PROPERTIES.put("datanucleus.schema.autoCreateDatabase", "true");
         JDO_PROPERTIES.put("datanucleus.schema.autoCreateTables", "true");
         JDO_PROPERTIES.put("datanucleus.schema.autoCreateColumns", "true");
         JDO_PROPERTIES.put("datanucleus.schema.autoCreateConstraints", "true");
@@ -69,18 +76,25 @@ public class PersistenceManagerFactory implements ServletContextListener {
         JDO_PROPERTIES.put("datanucleus.query.jdoql.allowAll", "true");
     }
 
-    private static javax.jdo.PersistenceManagerFactory pmf;
+    private static JDOPersistenceManagerFactory pmf;
 
     @Override
     public void contextInitialized(ServletContextEvent event) {
         LOGGER.info("Initializing persistence framework");
 
-        String driverPath = Config.getInstance().getProperty(Config.AlpineKey.DATABASE_DRIVER_PATH);
+        final String driverPath = Config.getInstance().getProperty(Config.AlpineKey.DATABASE_DRIVER_PATH);
         if (driverPath != null) {
             Config.getInstance().expandClasspath(driverPath);
         }
 
-        pmf = JDOHelper.getPersistenceManagerFactory(JDO_PROPERTIES, "Alpine");
+        pmf = (JDOPersistenceManagerFactory)JDOHelper.getPersistenceManagerFactory(JDO_PROPERTIES, "Alpine");
+
+        // Ensure that the UpgradeMetaProcessor and SchemaVersion tables are created NOW, not dynamically at runtime.
+        final PersistenceNucleusContext ctx = pmf.getNucleusContext();
+        final Set<String> classNames = new HashSet<>();
+        classNames.add(InstalledUpgrades.class.getCanonicalName());
+        classNames.add(SchemaVersion.class.getCanonicalName());
+        ((SchemaAwareStoreManager)ctx.getStoreManager()).createSchemaForClasses(classNames, new Properties());
     }
 
     @Override
@@ -95,7 +109,7 @@ public class PersistenceManagerFactory implements ServletContextListener {
      */
     public static PersistenceManager createPersistenceManager() {
         if (Config.isUnitTestsEnabled()) {
-            pmf = JDOHelper.getPersistenceManagerFactory(JDO_OVERRIDES, "Alpine");
+            pmf = (JDOPersistenceManagerFactory)JDOHelper.getPersistenceManagerFactory(JDO_OVERRIDES, "Alpine");
         }
         if (pmf == null) {
             throw new IllegalStateException("Context is not initialized yet.");

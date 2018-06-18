@@ -31,8 +31,8 @@ public class VersionComparator {
     private int major;
     private int minor;
     private int revision;
-    private boolean isBeta;
-    private int betaNumber;
+    private boolean isSnapshot;
+    private int prereleaseNumber;
 
     /**
      * Constructs a new VersionComparator using the specified semantic version.
@@ -45,8 +45,8 @@ public class VersionComparator {
         revision = versions[2];
 
         if (versions[3] > 0) {
-            isBeta = true;
-            betaNumber = versions[3];
+            isSnapshot = true;
+            prereleaseNumber = versions[3];
         }
     }
 
@@ -56,17 +56,17 @@ public class VersionComparator {
      * @return an int array consisting of major, minor, revision, and suffix
      */
     private int[] parse(String version) {
-        final Matcher m = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)(\\s*[Bb]eta\\s*(\\d*))?").matcher(version);
+        final Matcher m = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)-?(SNAPSHOT)?\\.?(\\d*)?").matcher(version);
         if (!m.matches()) {
-            throw new IllegalArgumentException("Malformed version string");
+            throw new IllegalArgumentException("Malformed version string: " + version);
         }
 
         return new int[] {Integer.parseInt(m.group(1)),   // major
                 Integer.parseInt(m.group(2)),             // minor
                 Integer.parseInt(m.group(3)),             // revision
-                m.group(4) == null ? 0                    // no beta suffix
-                        : m.group(5).isEmpty() ? 1        // "beta"
-                        : Integer.parseInt(m.group(5)),   // "beta3"
+                m.group(4) == null ? 0                    // no SNAPSHOT suffix
+                        : m.group(5).isEmpty() ? 0        // "SNAPSHOT"
+                        : Integer.parseInt(m.group(5)),   // "SNAPSHOT.123"
         };
     }
 
@@ -82,7 +82,7 @@ public class VersionComparator {
             return true;
         } else if (this.major == comparator.getMajor() && this.minor == comparator.getMinor() && this.revision > comparator.getRevision()) {
             return true;
-        } else if (this.major == comparator.getMajor() && this.minor == comparator.getMinor() && this.revision == comparator.getRevision() && this.betaNumber > comparator.getBetaNumber()) {
+        } else if (this.major == comparator.getMajor() && this.minor == comparator.getMinor() && this.revision == comparator.getRevision() && this.prereleaseNumber > comparator.getPrereleaseNumber()) {
             return true;
         }
         return false;
@@ -100,7 +100,7 @@ public class VersionComparator {
             return true;
         } else if (this.major == comparator.getMajor() && this.minor == comparator.getMinor() && this.revision < comparator.getRevision()) {
             return true;
-        } else if (this.major == comparator.getMajor() && this.minor == comparator.getMinor() && this.revision == comparator.getRevision() && this.betaNumber < comparator.getBetaNumber()) {
+        } else if (this.major == comparator.getMajor() && this.minor == comparator.getMinor() && this.revision == comparator.getRevision() && this.prereleaseNumber < comparator.getPrereleaseNumber()) {
             return true;
         }
         return false;
@@ -113,15 +113,15 @@ public class VersionComparator {
             return this.major == comparator.getMajor()
                     && this.minor == comparator.getMinor()
                     && this.revision == comparator.getRevision()
-                    && this.isBeta == comparator.isBeta()
-                    && this.betaNumber == comparator.getBetaNumber();
+                    && this.isSnapshot == comparator.isSnapshot()
+                    && this.prereleaseNumber == comparator.getPrereleaseNumber();
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return 1000 * (major + 1) + 100 * (minor + 1) + 10 * (revision + 1) + (betaNumber + 1);
+        return 1000 * (major + 1) + 100 * (minor + 1) + 10 * (revision + 1) + (prereleaseNumber + 1);
     }
 
     public int getMajor() {
@@ -136,12 +136,12 @@ public class VersionComparator {
         return revision;
     }
 
-    public boolean isBeta() {
-        return isBeta;
+    public boolean isSnapshot() {
+        return isSnapshot;
     }
 
-    public int getBetaNumber() {
-        return betaNumber;
+    public int getPrereleaseNumber() {
+        return prereleaseNumber;
     }
 
     @Override
@@ -149,8 +149,8 @@ public class VersionComparator {
         // Do not change this. Upgrade logic depends on the format and that the format can be parsed by this class
         final StringBuilder sb = new StringBuilder();
         sb.append(major).append(".").append(minor).append(".").append(revision);
-        if (isBeta) {
-            sb.append(" Beta ").append(betaNumber);
+        if (isSnapshot) {
+            sb.append("-SNAPSHOT.").append(prereleaseNumber);
         }
         return sb.toString();
     }

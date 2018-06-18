@@ -519,5 +519,9 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
         super.finalize();
     }
 
+    public PersistenceManager getPersistenceManager() {
+        return pm;
+    }
+
 }
 
