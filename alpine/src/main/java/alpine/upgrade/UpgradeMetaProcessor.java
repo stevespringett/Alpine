@@ -147,6 +147,8 @@ public class UpgradeMetaProcessor {
                 updateStatement = connection.prepareStatement("INSERT INTO SCHEMAVERSION (VERSION) VALUES (?)");
             }
 
+            LOGGER.debug("Updating database schema to: " + version.toString());
+
             updateStatement.setString(1, version.toString());
             updateStatement.executeUpdate();
             connection.commit();
