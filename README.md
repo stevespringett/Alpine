@@ -11,7 +11,7 @@
 Alpine
 =========
 
-An opinionated scaffolding library that jumpstarts Java projects with an 
+An opinionated scaffolding library that jump-starts Java projects with an 
 API-first design, secure defaults, and minimal dependencies. Alpine came 
 about due to many commonalities between several of my personal and 
 professional projects.
@@ -87,6 +87,7 @@ The following features are free and require little or no coding just for using A
 * Separate application and audit logs
 * Scheduled and on-demand execution of parallel tasks via asynchronous pub/sub event framework
 * Extendable and centralized application configuration
+* Lightweight upgrade framework can optionally perform automatic upgrades on startup
 * Built-in input validation (JSR 303 & 349) for all REST resources and default model classes
 * Defensive security mechanisms for enabling:
   * Click-jacking protection (X-Frame-Options) (RFC-7034)
@@ -122,7 +123,7 @@ Maven Usage
 <parent>
     <groupId>us.springett</groupId>
     <artifactId>alpine-parent</artifactId>
-    <version>1.1.2</version>
+    <version>1.2.0</version>
 </parent>
 
 <dependencies>
@@ -130,7 +131,7 @@ Maven Usage
     <dependency>
         <groupId>us.springett</groupId>
         <artifactId>alpine</artifactId>
-        <version>1.1.2</version>
+        <version>1.2.0</version>
     </dependency>
 </dependencies>
 ```
