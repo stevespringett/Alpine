@@ -75,7 +75,7 @@ public class UpgradeExecutor {
         try {
             installedUpgrades.updateSchemaVersion(null);
         } catch (SQLException e) {
-            LOGGER.debug("Failed to update schema version: " + e.getMessage());
+            LOGGER.error("Failed to update schema version", e);
             return;
         }
 
