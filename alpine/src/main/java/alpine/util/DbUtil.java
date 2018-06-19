@@ -118,4 +118,14 @@ public class DbUtil {
         }
     }
 
+    public static void executeUpdate(Connection connection, String statement) throws SQLException {
+        Statement stmt = null;
+        try {
+            stmt = connection.createStatement();
+            stmt.executeUpdate(statement);
+        } finally {
+            close(stmt);
+        }
+    }
+
 }
