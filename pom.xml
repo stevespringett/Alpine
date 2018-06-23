@@ -169,6 +169,7 @@
         <lib.hikaricp.version>3.2.0</lib.hikaricp.version>
         <lib.javassist.version>3.22.0-GA</lib.javassist.version>
         <lib.jackson.version>2.9.6</lib.jackson.version>
+        <lib.javamail.version>1.6.1</lib.javamail.version>
         <lib.jdo.api.version>3.2.0-m8</lib.jdo.api.version>
         <lib.jersey.version>2.27</lib.jersey.version>
         <lib.jsp.api.version>2.2</lib.jsp.api.version>
@@ -384,6 +385,12 @@
             <artifactId>alpine-executable-war</artifactId>
             <version>${lib.alpine.executable.war.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <!-- JavaMail API -->
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>${lib.javamail.version}</version>
         </dependency>
         <!-- Quality -->
         <dependency>
