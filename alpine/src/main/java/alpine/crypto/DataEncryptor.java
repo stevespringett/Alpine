@@ -1,0 +1,130 @@
+/*
+ * This file is part of Alpine.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Copyright (c) Steve Springett. All Rights Reserved.
+ */
+package alpine.crypto;
+
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
+import java.security.SecureRandom;
+import java.util.Base64;
+
+/**
+ * This class performs symmetric encryption of data using the system-defined
+ * secret key. The encryption routines in this class require the use of the
+ * unlimited strength policy files, included in the most recent versions of
+ * Java by default. Older Java versions may need to install the policy files
+ * for the methods in this class to function correctly.
+ *
+ * @author Steve Springett
+ * @since 1.3.0
+ */
+public class DataEncryptor {
+
+    /**
+     * Private constructor.
+     */
+    private DataEncryptor() { }
+
+    /**
+     * Encrypts the specified plainText using AES-256.
+     * @param plainText the text to encrypt
+     * @return the encrypted bytes
+     * @throws Exception a number of exceptions may be thrown
+     * @since 1.3.0
+     */
+    public static byte[] encryptAsBytes(String plainText) throws Exception {
+        byte[] clean = plainText.getBytes();
+
+        // Generating IV
+        int ivSize = 16;
+        byte[] iv = new byte[ivSize];
+        SecureRandom random = new SecureRandom();
+        random.nextBytes(iv);
+        IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
+
+        // Retrieve Secret Key
+        SecretKey secretKey = KeyManager.getInstance().getSecretKey();
+
+        // Encrypt
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec);
+        byte[] encrypted = cipher.doFinal(clean);
+
+        // Combine IV and encrypted parts
+        byte[] encryptedIVAndText = new byte[ivSize + encrypted.length];
+        System.arraycopy(iv, 0, encryptedIVAndText, 0, ivSize);
+        System.arraycopy(encrypted, 0, encryptedIVAndText, ivSize, encrypted.length);
+
+        return encryptedIVAndText;
+    }
+
+    /**
+     * Encrypts the specified plainText using AES-256 and returns a Base64 encoded
+     * representation of the encrypted bytes.
+     * @param plainText the text to encrypt
+     * @return a Base64 encoded representation of the encrypted bytes
+     * @throws Exception a number of exceptions may be thrown
+     * @since 1.3.0
+     */
+    public static String encryptAsString(String plainText) throws Exception {
+        return Base64.getEncoder().encodeToString(encryptAsBytes(plainText));
+    }
+
+    /**
+     * Decrypts the specified bytes using AES-256.
+     * @param encryptedIvTextBytes the text to decrypt
+     * @return the decrypted bytes
+     * @throws Exception a number of exceptions may be thrown
+     * @since 1.3.0
+     */
+    public static byte[] decryptAsBytes(byte[] encryptedIvTextBytes) throws Exception {
+        int ivSize = 16;
+
+        // Extract IV
+        byte[] iv = new byte[ivSize];
+        System.arraycopy(encryptedIvTextBytes, 0, iv, 0, iv.length);
+        IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
+
+        // Extract encrypted bytes
+        int encryptedSize = encryptedIvTextBytes.length - ivSize;
+        byte[] encryptedBytes = new byte[encryptedSize];
+        System.arraycopy(encryptedIvTextBytes, ivSize, encryptedBytes, 0, encryptedSize);
+
+        // Retrieve Secret Key
+        SecretKey secretKey = KeyManager.getInstance().getSecretKey();
+
+        // Decrypt
+        Cipher cipherDecrypt = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipherDecrypt.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec);
+        return cipherDecrypt.doFinal(encryptedBytes);
+    }
+
+    /**
+     * Decrypts the specified string using AES-256. The encryptedText is
+     * expected to be the Base64 encoded representation of the encrypted bytes
+     * generated from {@link #encryptAsString(String)}.
+     * @param encryptedText the text to decrypt
+     * @return the decrypted string
+     * @throws Exception a number of exceptions may be thrown
+     * @since 1.3.0
+     */
+    public static String decryptAsString(String encryptedText) throws Exception {
+        return new String(decryptAsBytes(Base64.getDecoder().decode(encryptedText)));
+    }
+
+}
