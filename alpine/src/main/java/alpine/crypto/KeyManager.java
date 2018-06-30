@@ -15,7 +15,7 @@
  *
  * Copyright (c) Steve Springett. All Rights Reserved.
  */
-package alpine.auth;
+package alpine.crypto;
 
 import alpine.Config;
 import alpine.logging.Logger;

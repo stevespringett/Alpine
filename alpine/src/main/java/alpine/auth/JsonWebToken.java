@@ -18,6 +18,7 @@
 package alpine.auth;
 
 import alpine.Config;
+import alpine.crypto.KeyManager;
 import alpine.logging.Logger;
 import alpine.model.Permission;
 import io.jsonwebtoken.ExpiredJwtException;

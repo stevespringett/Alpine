@@ -17,6 +17,7 @@
  */
 package alpine.auth;
 
+import alpine.crypto.KeyManager;
 import alpine.model.LdapUser;
 import alpine.model.ManagedUser;
 import alpine.persistence.AlpineQueryManager;

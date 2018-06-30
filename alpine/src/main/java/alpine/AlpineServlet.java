@@ -17,7 +17,7 @@
  */
 package alpine;
 
-import alpine.auth.KeyManager;
+import alpine.crypto.KeyManager;
 import alpine.logging.Logger;
 import io.swagger.jaxrs.config.SwaggerContextService;
 import io.swagger.models.Info;
