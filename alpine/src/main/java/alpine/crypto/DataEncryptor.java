@@ -43,11 +43,12 @@ public class DataEncryptor {
     /**
      * Encrypts the specified plainText using AES-256.
      * @param plainText the text to encrypt
+     * @param secretKey the secret key to use to encrypt with
      * @return the encrypted bytes
      * @throws Exception a number of exceptions may be thrown
      * @since 1.3.0
      */
-    public static byte[] encryptAsBytes(String plainText) throws Exception {
+    public static byte[] encryptAsBytes(SecretKey secretKey, String plainText) throws Exception {
         byte[] clean = plainText.getBytes();
 
         // Generating IV
@@ -56,9 +57,6 @@ public class DataEncryptor {
         SecureRandom random = new SecureRandom();
         random.nextBytes(iv);
         IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
-
-        // Retrieve Secret Key
-        SecretKey secretKey = KeyManager.getInstance().getSecretKey();
 
         // Encrypt
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
@@ -74,8 +72,33 @@ public class DataEncryptor {
     }
 
     /**
+     * Encrypts the specified plainText using AES-256. This method uses the default secret key.
+     * @param plainText the text to encrypt
+     * @return the encrypted bytes
+     * @throws Exception a number of exceptions may be thrown
+     * @since 1.3.0
+     */
+    public static byte[] encryptAsBytes(String plainText) throws Exception {
+        SecretKey secretKey = KeyManager.getInstance().getSecretKey();
+        return encryptAsBytes(secretKey, plainText);
+    }
+
+    /**
      * Encrypts the specified plainText using AES-256 and returns a Base64 encoded
      * representation of the encrypted bytes.
+     * @param secretKey the secret key to use to encrypt with
+     * @param plainText the text to encrypt
+     * @return a Base64 encoded representation of the encrypted bytes
+     * @throws Exception a number of exceptions may be thrown
+     * @since 1.3.0
+     */
+    public static String encryptAsString(SecretKey secretKey, String plainText) throws Exception {
+        return Base64.getEncoder().encodeToString(encryptAsBytes(secretKey, plainText));
+    }
+
+    /**
+     * Encrypts the specified plainText using AES-256 and returns a Base64 encoded
+     * representation of the encrypted bytes. This method uses the default secret key.
      * @param plainText the text to encrypt
      * @return a Base64 encoded representation of the encrypted bytes
      * @throws Exception a number of exceptions may be thrown
@@ -87,12 +110,13 @@ public class DataEncryptor {
 
     /**
      * Decrypts the specified bytes using AES-256.
+     * @param secretKey the secret key to decrypt with
      * @param encryptedIvTextBytes the text to decrypt
      * @return the decrypted bytes
      * @throws Exception a number of exceptions may be thrown
      * @since 1.3.0
      */
-    public static byte[] decryptAsBytes(byte[] encryptedIvTextBytes) throws Exception {
+    public static byte[] decryptAsBytes(SecretKey secretKey, byte[] encryptedIvTextBytes) throws Exception {
         int ivSize = 16;
 
         // Extract IV
@@ -105,9 +129,6 @@ public class DataEncryptor {
         byte[] encryptedBytes = new byte[encryptedSize];
         System.arraycopy(encryptedIvTextBytes, ivSize, encryptedBytes, 0, encryptedSize);
 
-        // Retrieve Secret Key
-        SecretKey secretKey = KeyManager.getInstance().getSecretKey();
-
         // Decrypt
         Cipher cipherDecrypt = Cipher.getInstance("AES/CBC/PKCS5Padding");
         cipherDecrypt.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec);
@@ -115,9 +136,36 @@ public class DataEncryptor {
     }
 
     /**
+     * Decrypts the specified bytes using AES-256. This method uses the default secret key.
+     * @param encryptedIvTextBytes the text to decrypt
+     * @return the decrypted bytes
+     * @throws Exception a number of exceptions may be thrown
+     * @since 1.3.0
+     */
+    public static byte[] decryptAsBytes(byte[] encryptedIvTextBytes) throws Exception {
+        SecretKey secretKey = KeyManager.getInstance().getSecretKey();
+        return decryptAsBytes(secretKey, encryptedIvTextBytes);
+    }
+
+
+    /**
      * Decrypts the specified string using AES-256. The encryptedText is
      * expected to be the Base64 encoded representation of the encrypted bytes
      * generated from {@link #encryptAsString(String)}.
+     * @param secretKey the secret key to decrypt with
+     * @param encryptedText the text to decrypt
+     * @return the decrypted string
+     * @throws Exception a number of exceptions may be thrown
+     * @since 1.3.0
+     */
+    public static String decryptAsString(SecretKey secretKey, String encryptedText) throws Exception {
+        return new String(decryptAsBytes(secretKey, Base64.getDecoder().decode(encryptedText)));
+    }
+
+    /**
+     * Decrypts the specified string using AES-256. The encryptedText is
+     * expected to be the Base64 encoded representation of the encrypted bytes
+     * generated from {@link #encryptAsString(String)}. This method uses the default secret key.
      * @param encryptedText the text to decrypt
      * @return the decrypted string
      * @throws Exception a number of exceptions may be thrown
