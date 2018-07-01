@@ -22,6 +22,7 @@
 
     <persistence-unit name="Alpine">
         <class>alpine.model.ApiKey</class>
+        <class>alpine.model.ConfigProperty</class>
         <class>alpine.model.EventServiceLog</class>
         <class>alpine.model.InstalledUpgrades</class>
         <class>alpine.model.LdapUser</class>

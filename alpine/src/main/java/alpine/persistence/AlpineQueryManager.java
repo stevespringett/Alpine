@@ -23,6 +23,7 @@ import alpine.event.framework.EventService;
 import alpine.event.framework.LoggableSubscriber;
 import alpine.event.framework.Subscriber;
 import alpine.model.ApiKey;
+import alpine.model.ConfigProperty;
 import alpine.model.EventServiceLog;
 import alpine.model.LdapUser;
 import alpine.model.ManagedUser;
@@ -575,6 +576,32 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
         query.setOrdering("completed desc");
         final List<EventServiceLog> result = (List<EventServiceLog>) query.execute(clazz);
         return result.size() == 0 ? null : result.get(0);
+    }
+
+    /**
+     * Returns a ConfigProperty with the specified groupName and propertyName.
+     * @param groupName the group name of the config property
+     * @param propertyName the name of the property
+     * @return a ConfigProperty object
+     * @since 1.3.0
+     */
+    @SuppressWarnings("unchecked")
+    public ConfigProperty getConfigProperty(final String groupName, final String propertyName) {
+        final Query query = pm.newQuery(ConfigProperty.class, "groupName == :groupName && propertyName == :propertyName");
+        final List<ConfigProperty> result = (List<ConfigProperty>) query.execute(groupName, propertyName);
+        return result.size() == 0 ? null : result.get(0);
+    }
+
+    /**
+     * Returns a list of ConfigProperty objects with the specified groupName.
+     * @param groupName the group name of the properties
+     * @return a List of ConfigProperty objects
+     * @since 1.3.0
+     */
+    @SuppressWarnings("unchecked")
+    public List<ConfigProperty> getConfigProperties(final String groupName) {
+        final Query query = pm.newQuery(ConfigProperty.class, "groupName == :groupName");
+        return (List<ConfigProperty>) query.execute(groupName);
     }
 
 }
