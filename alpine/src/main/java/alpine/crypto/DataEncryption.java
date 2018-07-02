@@ -33,12 +33,12 @@ import java.util.Base64;
  * @author Steve Springett
  * @since 1.3.0
  */
-public class DataEncryptor {
+public class DataEncryption {
 
     /**
      * Private constructor.
      */
-    private DataEncryptor() { }
+    private DataEncryption() { }
 
     /**
      * Encrypts the specified plainText using AES-256.
