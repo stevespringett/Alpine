@@ -604,4 +604,29 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
         return (List<ConfigProperty>) query.execute(groupName);
     }
 
+    /**
+     * Creates a ConfigProperty object.
+     * @param groupName the group name of the property
+     * @param propertyName the name of the property
+     * @param propertyValue the value of the property
+     * @param propertyType the type of property
+     * @param description a description of the property
+     * @return a ConfigProperty object
+     * @since 1.3.0
+     */
+    public ConfigProperty createConfigProperty(final String groupName, final String propertyName,
+                                               final String propertyValue, final String propertyType,
+                                               final String description) {
+        pm.currentTransaction().begin();
+        final ConfigProperty configProperty = new ConfigProperty();
+        configProperty.setGroupName(groupName);
+        configProperty.setPropertyName(propertyName);
+        configProperty.setPropertyValue(propertyValue);
+        configProperty.setPropertyType(propertyType);
+        configProperty.setDescription(description);
+        pm.makePersistent(configProperty);
+        pm.currentTransaction().commit();
+        return getObjectById(ConfigProperty.class, configProperty.getId());
+    }
+
 }
