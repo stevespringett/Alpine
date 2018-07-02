@@ -43,6 +43,19 @@ public class ConfigProperty implements Serializable {
 
     private static final long serialVersionUID = 5286421336166302912L;
 
+    /**
+     * Convenience for specifying common types of properties. This is not required,
+     * as the type can be any string value, not just the constants defined here.
+     */
+    public enum PropertyType {
+        URL,
+        BOOLEAN,
+        STRING,
+        INTEGER,
+        NUMBER,
+        ENCRYPTEDSTRING
+    }
+
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.NATIVE)
     @JsonIgnore
