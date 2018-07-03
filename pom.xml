@@ -105,8 +105,8 @@
         <maven.gpg.plugin.version>1.5</maven.gpg.plugin.version>
         <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
 
-        <!-- Software Security: HPE Fortify SCA -->
-        <maven.fortify.plugin.version>17.20</maven.fortify.plugin.version>
+        <!-- Software Security: Fortify SCA -->
+        <maven.fortify.plugin.version>18.10</maven.fortify.plugin.version>
         <plugin.fortify.sca.debug>false</plugin.fortify.sca.debug>
         <plugin.fortify.sca.verbose>false</plugin.fortify.sca.verbose>
         <plugin.fortify.sca.sourcePath>${project.build.directory}/dependency-sources</plugin.fortify.sca.sourcePath>
@@ -510,7 +510,7 @@
                         </executions>
                     </plugin>
                     <plugin>
-                        <groupId>com.hpe.security.fortify.maven.plugin</groupId>
+                        <groupId>com.fortify.sca.plugins.maven</groupId>
                         <artifactId>sca-maven-plugin</artifactId>
                         <version>${maven.fortify.plugin.version}</version>
                         <configuration>
