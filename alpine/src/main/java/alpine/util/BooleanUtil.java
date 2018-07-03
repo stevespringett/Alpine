@@ -33,13 +33,13 @@ public final class BooleanUtil {
     }
 
     /**
-     * Determines if the specified string contains 'true' or '1'.
+     * Determines if the specified string contains 'true' or '1' or 'on'
      * @param value a String representation of a boolean to convert
      * @return a boolean
      * @since 1.0.0
      */
     public static boolean valueOf(String value) {
-        return (value != null) && (value.trim().equalsIgnoreCase("true") || value.trim().equals("1"));
+        return (value != null) && (value.trim().equalsIgnoreCase("true") || value.trim().equals("1") || value.trim().equals("on"));
     }
 
     /**
