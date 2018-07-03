@@ -601,6 +601,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     @SuppressWarnings("unchecked")
     public List<ConfigProperty> getConfigProperties(final String groupName) {
         final Query query = pm.newQuery(ConfigProperty.class, "groupName == :groupName");
+        query.setOrdering("propertyName asc");
         return (List<ConfigProperty>) query.execute(groupName);
     }
 
@@ -612,6 +613,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     @SuppressWarnings("unchecked")
     public List<ConfigProperty> getConfigProperties() {
         final Query query = pm.newQuery(ConfigProperty.class);
+        query.setOrdering("groupName asc, propertyName asc");
         return (List<ConfigProperty>) query.execute();
     }
 
