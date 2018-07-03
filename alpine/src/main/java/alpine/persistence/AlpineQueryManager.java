@@ -605,6 +605,17 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     }
 
     /**
+     * Returns a list of ConfigProperty objects.
+     * @return a List of ConfigProperty objects
+     * @since 1.3.0
+     */
+    @SuppressWarnings("unchecked")
+    public List<ConfigProperty> getConfigProperties() {
+        final Query query = pm.newQuery(ConfigProperty.class);
+        return (List<ConfigProperty>) query.execute();
+    }
+
+    /**
      * Creates a ConfigProperty object.
      * @param groupName the group name of the property
      * @param propertyName the name of the property
