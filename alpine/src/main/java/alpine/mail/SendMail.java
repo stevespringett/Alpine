@@ -52,10 +52,10 @@ public class SendMail {
     private int port;
     private String username;
     private String password;
-    private boolean useSSL;
     private boolean useStartTLS;
     private boolean useNTLM;
     private boolean smtpauth;
+    private boolean trustCert;
     private boolean debug;
 
     public SendMail from(final String from) throws SendMailException {
@@ -128,11 +128,6 @@ public class SendMail {
         return this;
     }
 
-    public SendMail useSSL(final boolean useSSL) {
-        this.useSSL = useSSL;
-        return this;
-    }
-
     public SendMail useStartTLS(final boolean useStartTLS) {
         this.useStartTLS = useStartTLS;
         return this;
@@ -145,6 +140,11 @@ public class SendMail {
 
     public SendMail smtpauth(final boolean smtpauth) {
         this.smtpauth = smtpauth;
+        return this;
+    }
+
+    public SendMail trustCert(final boolean trustCert) {
+        this.trustCert = trustCert;
         return this;
     }
 
@@ -171,7 +171,7 @@ public class SendMail {
 
     public void send() throws SendMailException {
         Properties props = new Properties();
-        if (useSSL) {
+        if (trustCert) {
             // This block will automatically allow the SendMail client to accept any certificate,
             // even self-signed ones not currently in the local keystore.
             MailSSLSocketFactory sf;
