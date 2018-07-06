@@ -37,23 +37,21 @@ import java.io.Serializable;
  * @since 1.3.0
  */
 @PersistenceCapable
-@Unique(name="CONFIGPROPERTY_COMPOSITE_IDX", members={"groupName", "propertyName"})
+@Unique(members={"groupName", "propertyName"})
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ConfigProperty implements Serializable {
 
     private static final long serialVersionUID = 5286421336166302912L;
 
-    /**
-     * Convenience for specifying common types of properties. This is not required,
-     * as the type can be any string value, not just the constants defined here.
-     */
     public enum PropertyType {
-        URL,
         BOOLEAN,
-        STRING,
         INTEGER,
         NUMBER,
-        ENCRYPTEDSTRING
+        STRING,
+        ENCRYPTEDSTRING,
+        TIMESTAMP,
+        URL,
+        UUID
     }
 
     @PrimaryKey
@@ -62,32 +60,30 @@ public class ConfigProperty implements Serializable {
     private long id;
 
     @Persistent
-    @Column(name = "GROUPNAME")
+    @Column(name = "GROUPNAME", allowsNull = "false")
     @NotNull
     @Size(min = 1, max = 255)
     @Pattern(regexp = "[\\P{Cc}]+", message = "The groupName must not contain control characters")
     private String groupName;
 
     @Persistent
-    @Column(name = "PROPERTYNAME")
+    @Column(name = "PROPERTYNAME", allowsNull = "false")
     @NotNull
     @Size(min = 1, max = 255)
     @Pattern(regexp = "[\\P{Cc}]+", message = "The propertyName must not contain control characters")
     private String propertyName;
 
     @Persistent
-    @Column(name = "PROPERTYVALUE", length = 1024)
+    @Column(name = "PROPERTYVALUE", allowsNull = "false", length = 1024)
     @NotNull
     @Size(min = 1, max = 1024)
     @Pattern(regexp = "[\\P{Cc}]+", message = "The propertyValue must not contain control characters")
     private String propertyValue;
 
     @Persistent
-    @Column(name = "PROPERTYTYPE")
+    @Column(name = "PROPERTYTYPE", jdbcType = "VARCHAR", allowsNull = "false")
     @NotNull
-    @Size(min = 1, max = 255)
-    @Pattern(regexp = "[\\P{Cc}]+", message = "The propertyType must not contain control characters")
-    private String propertyType;
+    private PropertyType propertyType;
 
     @Persistent
     @Column(name = "DESCRIPTION")
@@ -127,11 +123,11 @@ public class ConfigProperty implements Serializable {
         this.propertyValue = propertyValue;
     }
 
-    public String getPropertyType() {
+    public PropertyType getPropertyType() {
         return propertyType;
     }
 
-    public void setPropertyType(String propertyType) {
+    public void setPropertyType(PropertyType propertyType) {
         this.propertyType = propertyType;
     }
 
