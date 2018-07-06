@@ -74,7 +74,7 @@ public class ConfigProperty implements Serializable {
     private String propertyName;
 
     @Persistent
-    @Column(name = "PROPERTYVALUE", allowsNull = "false", length = 1024)
+    @Column(name = "PROPERTYVALUE", length = 1024)
     @NotNull
     @Size(min = 1, max = 1024)
     @Pattern(regexp = "[\\P{Cc}]+", message = "The propertyValue must not contain control characters")
