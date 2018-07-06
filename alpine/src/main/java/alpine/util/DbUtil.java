@@ -118,6 +118,18 @@ public class DbUtil {
         }
     }
 
+    public static void dropTable(Connection connection, String tableName) {
+        Statement drop = null;
+        try {
+            drop = connection.createStatement();
+            drop.execute("DROP TABLE " + tableName);
+        } catch (SQLException e) {
+            // throw it away. Some databases do not permit this, so we'll ignore any errors.
+        } finally {
+            close(drop);
+        }
+    }
+
     public static void executeUpdate(Connection connection, String statement) throws SQLException {
         Statement stmt = null;
         try {
