@@ -20,57 +20,70 @@ package alpine.notification;
 public class Subscription {
 
     private Class<? extends Subscriber> subscriber;
-    private String groupId;
-    private NotificationType type;
+    private String scope;
+    private String group;
+    private NotificationLevel level;
 
     public Subscription(Class<? extends Subscriber> subscriber) {
         this.subscriber = subscriber;
     }
 
-    public Subscription(Class<? extends Subscriber> subscriber, String groupId) {
+    public Subscription(Class<? extends Subscriber> subscriber, String group) {
         this.subscriber = subscriber;
-        this.groupId = groupId;
+        this.group = group;
     }
 
-    public Subscription(Class<? extends Subscriber> subscriber, NotificationType type) {
+    public Subscription(Class<? extends Subscriber> subscriber, NotificationLevel level) {
         this.subscriber = subscriber;
-        this.type = type;
+        this.level = level;
     }
 
-    public Subscription(Class<? extends Subscriber> subscriber, String groupId, NotificationType type) {
+    public Subscription(Class<? extends Subscriber> subscriber, String scope, String group, NotificationLevel level) {
         this.subscriber = subscriber;
-        this.groupId = groupId;
-        this.type = type;
+        this.scope = scope;
+        this.group = group;
+        this.level = level;
     }
 
     public Class<? extends Subscriber> getSubscriber() {
         return subscriber;
     }
 
-    public String getGroupId() {
-        return groupId;
+    public String getScope() {
+        return scope;
     }
 
-    public NotificationType getType() {
-        return type;
+    public String getGroup() {
+        return group;
+    }
+
+    public NotificationLevel getLevel() {
+        return level;
     }
 
     @Override
     public boolean equals(Object object) {
         if (object instanceof Subscription) {
             Subscription subscription = (Subscription)object;
+            // Validate Scope
+            if ((subscription.getScope() != null && !subscription.getScope().equals(this.scope))) {
+                return false;
+            }
+            if ((this.getScope() != null && !subscription.getScope().equals(this.scope))) {
+                return false;
+            }
             // Validate Group ID
-            if ((subscription.getGroupId() != null && !subscription.getGroupId().equals(this.groupId))) {
+            if ((subscription.getGroup() != null && !subscription.getGroup().equals(this.group))) {
                 return false;
             }
-            if ((this.getGroupId() != null && !subscription.getGroupId().equals(this.groupId))) {
+            if ((this.getGroup() != null && !subscription.getGroup().equals(this.group))) {
                 return false;
             }
-            // Validate Type
-            if ((subscription.getType() != null && subscription.getType() != this.type)) {
+            // Validate Level
+            if ((subscription.getLevel() != null && subscription.getLevel() != this.level)) {
                 return false;
             }
-            if ((this.getType() != null && subscription.getType() != this.type)) {
+            if ((this.getLevel() != null && subscription.getLevel() != this.level)) {
                 return false;
             }
             // Validate Subscriber

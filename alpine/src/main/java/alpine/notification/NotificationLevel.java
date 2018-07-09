@@ -17,7 +17,7 @@
  */
 package alpine.notification;
 
-public enum NotificationType {
+public enum NotificationLevel {
     INFORMATIONAL,
     WARNING,
     ERROR

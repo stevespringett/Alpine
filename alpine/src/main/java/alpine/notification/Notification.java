@@ -21,8 +21,9 @@ import java.time.LocalDateTime;
 
 public final class Notification {
 
-    private String groupId;
-    private NotificationType type;
+    private String scope;
+    private String group;
+    private NotificationLevel level;
     private String title;
     private String content;
     private LocalDateTime timestamp;
@@ -42,18 +43,28 @@ public final class Notification {
         this.timestamp = LocalDateTime.now();
     }
 
-    public Notification groupId(final String groupId) {
-        this.groupId = groupId;
+    public Notification scope(final String scope) {
+        this.scope = scope;
         return this;
     }
 
-    public Notification groupId(final Enum groupId) {
-        this.groupId = groupId.name();
+    public Notification scope(final Enum scope) {
+        this.scope = scope.name();
         return this;
     }
 
-    public Notification type(final NotificationType type) {
-        this.type = type;
+    public Notification group(final String group) {
+        this.group = group;
+        return this;
+    }
+
+    public Notification group(final Enum group) {
+        this.group = group.name();
+        return this;
+    }
+
+    public Notification level(final NotificationLevel level) {
+        this.level = level;
         return this;
     }
 
@@ -87,20 +98,28 @@ public final class Notification {
         return this;
     }
 
-    public String getGroupId() {
-        return groupId;
+    public String getScope() {
+        return scope;
     }
 
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
+    public void setScope(String scope) {
+        this.scope = scope;
     }
 
-    public NotificationType getType() {
-        return type;
+    public String getGroup() {
+        return group;
     }
 
-    public void setType(NotificationType type) {
-        this.type = type;
+    public void setGroup(String group) {
+        this.group = group;
+    }
+
+    public NotificationLevel getLevel() {
+        return level;
+    }
+
+    public void setLevel(NotificationLevel level) {
+        this.level = level;
     }
 
     public String getTitle() {

@@ -64,16 +64,20 @@ public final class NotificationService implements INotificationService {
             return;
         }
         for (Subscription subscription: subscriptions) {
-            if (subscription.getGroupId() != null && subscription.getType() != null) { // subscription was very specific
-                if (subscription.getGroupId().equals(notification.getGroupId()) && subscription.getType() == notification.getType()) {
+            if (subscription.getScope() != null && subscription.getGroup() != null && subscription.getLevel() != null) { // subscription was the most specific
+                if (subscription.getScope().equals(notification.getScope()) && subscription.getGroup().equals(notification.getGroup()) && subscription.getLevel() == notification.getLevel()) {
                     alertSubscriber(notification, subscription.getSubscriber());
                 }
-            } else if (subscription.getGroupId() != null) { // subscription was somewhat specific
-                if (subscription.getGroupId().equals(notification.getGroupId())) {
+            } else if (subscription.getGroup() != null && subscription.getLevel() != null) { // subscription was very specific
+                if (subscription.getGroup().equals(notification.getGroup()) && subscription.getLevel() == notification.getLevel()) {
                     alertSubscriber(notification, subscription.getSubscriber());
                 }
-            } else if (subscription.getType() != null) { // subscription was somewhat specific
-                if (subscription.getType() == notification.getType()) {
+            } else if (subscription.getGroup() != null) { // subscription was somewhat specific
+                if (subscription.getGroup().equals(notification.getGroup())) {
+                    alertSubscriber(notification, subscription.getSubscriber());
+                }
+            } else if (subscription.getLevel() != null) { // subscription was somewhat specific
+                if (subscription.getLevel() == notification.getLevel()) {
                     alertSubscriber(notification, subscription.getSubscriber());
                 }
             } else { // subscription was not specific
