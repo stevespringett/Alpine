@@ -120,7 +120,7 @@ public class Pagination {
      */
     private Integer parseIntegerFromParam(String value, int defaultValue) {
         try {
-            return new Integer(value);
+            return Integer.valueOf(value);
         } catch (NumberFormatException | NullPointerException e) {
             return defaultValue;
         }

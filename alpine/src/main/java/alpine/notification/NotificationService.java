@@ -19,6 +19,8 @@ package alpine.notification;
 
 import alpine.logging.Logger;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -90,8 +92,8 @@ public final class NotificationService implements INotificationService {
         LOGGER.debug("Alerting subscriber " + subscriberClass.getName());
         EXECUTOR_SERVICE.submit(() -> {
             try {
-                subscriberClass.newInstance().inform(notification);
-            } catch (InstantiationException | IllegalAccessException e) {
+                subscriberClass.getDeclaredConstructor().newInstance().inform(notification);
+            } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException | SecurityException e) {
                 LOGGER.error("An error occurred while informing subscriber: " + e);
             }
         });

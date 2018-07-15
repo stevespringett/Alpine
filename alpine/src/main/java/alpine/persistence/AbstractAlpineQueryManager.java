@@ -509,19 +509,8 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
         pm.close();
     }
 
-    /**
-     * Upon finalization, closes the PersistenceManager, if not already closed.
-     * @throws Throwable the {@code Exception} raised by this method
-     * @since 1.0.0
-     */
-    protected void finalize() throws Throwable {
-        close();
-        super.finalize();
-    }
-
     public PersistenceManager getPersistenceManager() {
         return pm;
     }
 
 }
-

@@ -83,7 +83,7 @@ public abstract class BaseEventService implements IEventService {
             executorService.submit(() -> {
                 try (AlpineQueryManager qm = new AlpineQueryManager()) {
                     final EventServiceLog eventServiceLog = qm.createEventServiceLog(clazz);
-                    final Subscriber subscriber = clazz.newInstance();
+                    final Subscriber subscriber = clazz.getDeclaredConstructor().newInstance();
                     subscriber.inform(event);
                     qm.updateEventServiceLog(eventServiceLog);
                     if (event instanceof ChainableEvent) {
@@ -99,7 +99,7 @@ public abstract class BaseEventService implements IEventService {
                             }
                         }
                     }
-                } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+                } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException | SecurityException e) {
                     logger.error("An error occurred while informing subscriber: " + e);
                     if (event instanceof ChainableEvent) {
                         ChainableEvent chainableEvent = (ChainableEvent)event;
