@@ -18,7 +18,16 @@
 package alpine.notification;
 
 public enum NotificationLevel {
-    INFORMATIONAL,
-    WARNING,
-    ERROR
+    INFORMATIONAL(2),
+    WARNING(1),
+    ERROR(0);
+
+    private int level;
+    NotificationLevel(int level) {
+        this.level = level;
+    }
+
+    public int getLevel() {
+        return level;
+    }
 }
