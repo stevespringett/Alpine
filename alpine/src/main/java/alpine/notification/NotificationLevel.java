@@ -27,7 +27,7 @@ public enum NotificationLevel {
         this.level = level;
     }
 
-    public int getLevel() {
+    public int asNumericLevel() {
         return level;
     }
 }
