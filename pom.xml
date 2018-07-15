@@ -164,7 +164,10 @@
         <lib.commons.io.version>2.6</lib.commons.io.version>
         <lib.commons.lang3.version>3.7</lib.commons.lang3.version>
         <lib.datanucleus-api-jdo.version>5.1.6</lib.datanucleus-api-jdo.version>
-        <lib.datanucleus-jdo-query.version>5.0.5</lib.datanucleus-jdo-query.version>
+        <!-- Auto-generated classes have warnings which break build
+             https://github.com/datanucleus/datanucleus-jdo-query/pull/10
+        <lib.datanucleus-jdo-query.version>5.0.6</lib.datanucleus-jdo-query.version>
+        -->
         <lib.datanucleus.version>5.1.9</lib.datanucleus.version>
         <lib.h2.version>1.4.197</lib.h2.version>
         <lib.hikaricp.version>3.2.0</lib.hikaricp.version>
@@ -295,11 +298,13 @@
             <artifactId>datanucleus-rdbms</artifactId>
             <version>${lib.datanucleus.version}</version>
         </dependency>
+        <!--
         <dependency>
             <groupId>org.datanucleus</groupId>
             <artifactId>datanucleus-jdo-query</artifactId>
             <version>${lib.datanucleus-jdo-query.version}</version>
         </dependency>
+        -->
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
