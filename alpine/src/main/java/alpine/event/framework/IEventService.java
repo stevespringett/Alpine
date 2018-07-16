@@ -59,7 +59,7 @@ public interface IEventService {
      * Determines if the specified event is able to be processed by the EventService. If a subscriber
      * exists for the event type, this method will return true, otherwise false.
      * @param event the event to query if subscribers exist
-     *
+     * @return true if the event has subscribers, false it not
      * @since 1.2.0
      */
     boolean hasSubscriptions(Event event);

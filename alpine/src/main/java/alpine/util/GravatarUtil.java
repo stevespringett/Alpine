@@ -38,6 +38,7 @@ public final class GravatarUtil {
      * Generates a hash value from the specified email address.
      * Returns null if emailAddress is empty or null.
      * @param emailAddress the email address to generate a hash from
+     * @return a hash value of the specified email address
      * @since 1.0.0
      */
     public static String generateHash(String emailAddress) {
@@ -53,6 +54,7 @@ public final class GravatarUtil {
      * address does not have a Gravatar, will fallback to using
      * the mystery-man image.
      * @param userPrincipal the user principal to generate a Gravatar URL from
+     * @return a Gravatar URL for the specified principal
      * @since 1.0.0
      */
     public static String getGravatarUrl(UserPrincipal userPrincipal) {
@@ -66,6 +68,7 @@ public final class GravatarUtil {
      * the mystery-man image.
      * @param userPrincipal the user principal to generate a Gravatar URL from
      * @param size the size of the image
+     * @return a Gravatar URL for the specified principal
      * @since 1.0.0
      */
     public static String getGravatarUrl(UserPrincipal userPrincipal, int size) {
@@ -77,6 +80,7 @@ public final class GravatarUtil {
      * the email address is blank or does not have a Gravatar, will
      * fallback to usingthe mystery-man image.
      * @param emailAddress the email address to generate the Gravatar URL from
+     * @return a Gravatar URL for the specified email address
      * @since 1.0.0
      */
     public static String getGravatarUrl(String emailAddress) {
@@ -94,6 +98,7 @@ public final class GravatarUtil {
      * fallback to usingthe mystery-man image.
      * @param emailAddress the email address to generate the Gravatar URL from
      * @param size the size of the image
+     * @return a Gravatar URL for the specified email address
      * @since 1.0.0
      */
     public static String getGravatarUrl(String emailAddress, int size) {

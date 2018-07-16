@@ -71,9 +71,11 @@
                             <goal>jar</goal>
                         </goals>
                         <configuration>
+                            <!--
                             <additionalOptions>
                                 <additionalOption>${javadoc.opts}</additionalOption>
                             </additionalOptions>
+                            -->
                             <javadocExecutable>${java.home}/../bin/javadoc</javadocExecutable>
                         </configuration>
                     </execution>
@@ -95,16 +97,15 @@
         </resources>
     </build>
 
+    <!--
     <profiles>
         <profile>
-            <id>java8-doclint-disabled</id>
-            <activation>
-                <jdk>[1.8,)</jdk>
-            </activation>
+            <id>disable-doclint</id>
             <properties>
                 <javadoc.opts>-Xdoclint:none</javadoc.opts>
             </properties>
         </profile>
     </profiles>
+    -->
 
 </project>

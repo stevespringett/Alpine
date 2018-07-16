@@ -30,9 +30,8 @@ public final class Notification {
     private Object subject;
 
     /**
-     * Convenience method provides a shorthand for {@link NotificationService#getInstance().publish()}
-     *
-     * @author Steve Springett
+     * Convenience method provides a shorthand for {@link NotificationService#getInstance}.publish().
+     * @param notification the Notification to dispatch
      * @since 1.3.0
      */
     public static void dispatch(Notification notification) {

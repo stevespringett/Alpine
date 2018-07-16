@@ -53,7 +53,7 @@ public class UpgradeMetaProcessor {
      * Determines if the specified upgrade already has a record of being executed previously or not.
      * @param upgradeClass the class to check fi an upgrade has previously executed
      * @return true if already executed, false if not
-     * @throws SQLException
+     * @throws SQLException a SQLException
      * @since 1.2.0
      */
     public boolean hasUpgradeRan(Class<? extends UpgradeItem> upgradeClass) throws SQLException {
@@ -76,7 +76,7 @@ public class UpgradeMetaProcessor {
      * @param upgradeClass the name of the upgrade class
      * @param startTime the time (in millis) of the execution
      * @param endTime the time (in millis) the execution completed
-     * @throws SQLException
+     * @throws SQLException a SQLException
      * @since 1.2.0
      */
     public void installUpgrade(Class<? extends UpgradeItem> upgradeClass, long startTime, long endTime) throws SQLException {
@@ -124,7 +124,7 @@ public class UpgradeMetaProcessor {
     /**
      * Updates the schema version in the database.
      * @param version the version to set the schema to
-     * @throws SQLException
+     * @throws SQLException a SQLException
      * @since 1.2.0
      */
     public void updateSchemaVersion(VersionComparator version) throws SQLException {

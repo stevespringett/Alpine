@@ -29,7 +29,7 @@ import java.io.IOException;
  *
  * Usage example:
  * <pre>
- * &commat;JsonDeserialize(using = TrimmedStringDeserializer.class)
+ * {@literal @}JsonDeserialize(using = TrimmedStringDeserializer.class)
  * String name;
  * </pre>
  *

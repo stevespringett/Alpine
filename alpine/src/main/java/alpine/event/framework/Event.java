@@ -36,7 +36,7 @@ public interface Event {
      * and may send an event to zero or more of the event services if they have a subscriber
      * capable of processing the event.
      *
-     * @author Steve Springett
+     * @param event the event to dispatch
      * @since 1.2.0
      */
     static void dispatch(Event event) {

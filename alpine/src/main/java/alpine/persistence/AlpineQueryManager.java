@@ -386,6 +386,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     /**
      * Creates a Permission object.
      * @param name The name of the permission
+     * @param description the permissions description
      * @return a Permission
      * @since 1.1.0
      */

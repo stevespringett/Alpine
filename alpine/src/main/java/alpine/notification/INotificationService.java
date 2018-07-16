@@ -65,7 +65,7 @@ public interface INotificationService {
      * Determines if the specified notification is able to be processed by the NotificationService.
      * If a subscriber exists for the notification, this method will return true, otherwise false.
      * @param notification the notification to query if subscribers exist
-     *
+     * @return true if the notification has subscribers, false if not
      * @since 1.3.0
      */
     boolean hasSubscriptions(Notification notification);
