@@ -44,7 +44,9 @@ public final class EventService extends BaseEventService {
 
     static {
         BasicThreadFactory factory = new BasicThreadFactory.Builder()
-                .namingPattern("Alpine-EventService-%d").build();
+                .namingPattern("Alpine-EventService-%d")
+                .uncaughtExceptionHandler(new LoggableUncaughtExceptionHandler())
+                .build();
         EXECUTOR = Executors.newFixedThreadPool(ThreadUtil.determineNumberOfWorkerThreads(), factory);
         INSTANCE.setExecutorService(EXECUTOR);
         INSTANCE.setLogger(LOGGER);

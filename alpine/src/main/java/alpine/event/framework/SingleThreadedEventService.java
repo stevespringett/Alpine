@@ -42,7 +42,9 @@ public final class SingleThreadedEventService extends BaseEventService {
 
     static {
         BasicThreadFactory factory = new BasicThreadFactory.Builder()
-                .namingPattern("Alpine-SingleThreadedEventService").build();
+                .namingPattern("Alpine-SingleThreadedEventService")
+                .uncaughtExceptionHandler(new LoggableUncaughtExceptionHandler())
+                .build();
         EXECUTOR = Executors.newSingleThreadExecutor(factory);
         INSTANCE.setExecutorService(EXECUTOR);
         INSTANCE.setLogger(LOGGER);
