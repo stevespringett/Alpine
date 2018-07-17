@@ -43,8 +43,11 @@ public abstract class BaseEventService implements IEventService {
 
     private Logger logger = Logger.getLogger(BaseEventService.class);
     private Map<Class<? extends Event>, ArrayList<Class<? extends Subscriber>>> subscriptionMap = new ConcurrentHashMap<>();
-    private ExecutorService executor = Executors.newFixedThreadPool(1,
-            new BasicThreadFactory.Builder().namingPattern("Alpine-BaseEventService-%d").build());
+    private ExecutorService executor = Executors.newFixedThreadPool(1, new BasicThreadFactory.Builder()
+            .namingPattern("Alpine-BaseEventService-%d")
+            .uncaughtExceptionHandler(new LoggableUncaughtExceptionHandler())
+            .build()
+    );
     private final ExecutorService dynamicExecutor = Executors.newWorkStealingPool();
 
     /**
@@ -80,7 +83,7 @@ public abstract class BaseEventService implements IEventService {
             // Check to see if the Event is Unblocked. If so, use a separate executor pool from normal events
             final ExecutorService executorService = event instanceof UnblockedEvent  ? dynamicExecutor : executor;
 
-            executorService.submit(() -> {
+            executorService.execute(() -> {
                 try (AlpineQueryManager qm = new AlpineQueryManager()) {
                     final EventServiceLog eventServiceLog = qm.createEventServiceLog(clazz);
                     final Subscriber subscriber = clazz.getDeclaredConstructor().newInstance();

@@ -17,9 +17,9 @@
  */
 package alpine.notification;
 
+import alpine.event.framework.LoggableUncaughtExceptionHandler;
 import alpine.logging.Logger;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Map;
@@ -42,7 +42,11 @@ public final class NotificationService implements INotificationService {
     private static final Logger LOGGER = Logger.getLogger(NotificationService.class);
     private static final Map<Class<? extends Notification>, ArrayList<Subscription>> SUBSCRIPTION_MAP = new ConcurrentHashMap<>();
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(4,
-            new BasicThreadFactory.Builder().namingPattern("Alpine-NotificationService-%d").build());
+            new BasicThreadFactory.Builder()
+                    .namingPattern("Alpine-NotificationService-%d")
+                    .uncaughtExceptionHandler(new LoggableUncaughtExceptionHandler())
+                    .build()
+    );
 
     /**
      * Private constructor
@@ -90,7 +94,7 @@ public final class NotificationService implements INotificationService {
 
     private void alertSubscriber(Notification notification, Class<? extends Subscriber> subscriberClass) {
         LOGGER.debug("Alerting subscriber " + subscriberClass.getName());
-        EXECUTOR_SERVICE.submit(() -> {
+        EXECUTOR_SERVICE.execute(() -> {
             try {
                 subscriberClass.getDeclaredConstructor().newInstance().inform(notification);
             } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException | SecurityException e) {
