@@ -158,7 +158,7 @@
         <plugin.cyclonedx.includeTestScope>false</plugin.cyclonedx.includeTestScope>
 
         <!-- Dependency Versions -->
-        <lib.alpine.executable.war.version>1.0.1</lib.alpine.executable.war.version>
+        <lib.alpine.executable.war.version>1.0.2</lib.alpine.executable.war.version>
         <lib.bcrypt.version>0.4</lib.bcrypt.version>
         <lib.commons.collections4.version>4.2</lib.commons.collections4.version>
         <lib.commons.io.version>2.6</lib.commons.io.version>
@@ -593,7 +593,7 @@
                                 <cmakeAnalyzerEnabled>${plugin.dependency-check.analyzer.cmakeAnalyzerEnabled}</cmakeAnalyzerEnabled>
                                 <cocoapodsAnalyzerEnabled>${plugin.dependency-check.analyzer.cocoapodsAnalyzerEnabled}</cocoapodsAnalyzerEnabled>
                                 <composerAnalyzerEnabled>${plugin.dependency-check.analyzer.composerAnalyzerEnabled}</composerAnalyzerEnabled>
-                                <jarAnalyzer>${plugin.dependency-check.analyzer.jarAnalyzer}</jarAnalyzer>
+                                <jarAnalyzerEnabled>${plugin.dependency-check.analyzer.jarAnalyzer}</jarAnalyzerEnabled>
                                 <nexusAnalyzerEnabled>${plugin.dependency-check.analyzer.nexusAnalyzerEnabled}</nexusAnalyzerEnabled>
                                 <nexusUrl>${plugin.dependency-check.analyzer.nexusUrl}</nexusUrl>
                                 <nexusUsesProxy>${plugin.dependency-check.analyzer.nexusUsesProxy}</nexusUsesProxy>
