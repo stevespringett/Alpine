@@ -39,7 +39,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 /**
- * This QueryManager provides a concrete entension of {@link AbstractAlpineQueryManager} by
+ * This QueryManager provides a concrete extension of {@link AbstractAlpineQueryManager} by
  * providing methods that operate on the default Alpine models such as ManagedUser and Team.
  *
  * @author Steve Springett
