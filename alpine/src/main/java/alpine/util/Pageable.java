@@ -24,7 +24,7 @@ import java.util.List;
  * having to implement a new type.
  *
  * @author Steve Springett
- * @since 3.2.0
+ * @since 1.3.0
  */
 public class Pageable<T> {
 
