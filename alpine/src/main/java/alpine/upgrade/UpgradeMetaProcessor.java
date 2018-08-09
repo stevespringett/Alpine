@@ -60,7 +60,7 @@ public class UpgradeMetaProcessor {
         PreparedStatement statement = null;
         ResultSet results = null;
         try {
-            statement = connection.prepareStatement("SELECT UPGRADECLASS FROM INSTALLEDUPGRADES WHERE UPGRADECLASS = ?");
+            statement = connection.prepareStatement("SELECT \"UPGRADECLASS\" FROM \"INSTALLEDUPGRADES\" WHERE \"UPGRADECLASS\" = ?");
             statement.setString(1, upgradeClass.getCanonicalName());
             results = statement.executeQuery();
             return results.next();
@@ -82,7 +82,7 @@ public class UpgradeMetaProcessor {
     public void installUpgrade(Class<? extends UpgradeItem> upgradeClass, long startTime, long endTime) throws SQLException {
         PreparedStatement statement = null;
         try {
-            statement = connection.prepareStatement("INSERT INTO INSTALLEDUPGRADES (UPGRADECLASS, STARTTIME, ENDTIME) VALUES (?, ?, ?)");
+            statement = connection.prepareStatement("INSERT INTO \"INSTALLEDUPGRADES\" (\"UPGRADECLASS\", \"STARTTIME\", \"ENDTIME\") VALUES (?, ?, ?)");
             statement.setString(1, upgradeClass.getCanonicalName());
             statement.setTimestamp(2, new Timestamp(startTime));
             statement.setTimestamp(3, new Timestamp(endTime));
@@ -105,7 +105,7 @@ public class UpgradeMetaProcessor {
         PreparedStatement statement = null;
         ResultSet results = null;
         try {
-            statement = connection.prepareStatement("SELECT VERSION FROM SCHEMAVERSION");
+            statement = connection.prepareStatement("SELECT \"VERSION\" FROM \"SCHEMAVERSION\"");
             results = statement.executeQuery();
 
             if (results.next()) {
@@ -132,7 +132,7 @@ public class UpgradeMetaProcessor {
         PreparedStatement updateStatement = null;
         ResultSet results = null;
         try {
-            statement = connection.prepareStatement("SELECT VERSION FROM SCHEMAVERSION");
+            statement = connection.prepareStatement("SELECT \"VERSION\" FROM \"SCHEMAVERSION\"");
             results = statement.executeQuery();
 
             if (results.next()) {
@@ -140,11 +140,11 @@ public class UpgradeMetaProcessor {
                 if (version == null || currentVersion.isNewerThan(version)) {
                     return;
                 }
-                updateStatement = connection.prepareStatement("UPDATE SCHEMAVERSION SET VERSION = ?");
+                updateStatement = connection.prepareStatement("UPDATE \"SCHEMAVERSION\" SET \"VERSION\" = ?");
             } else {
                 // Does not exist. Populate schema table with current running version
                 version = new VersionComparator(Config.getInstance().getApplicationVersion());
-                updateStatement = connection.prepareStatement("INSERT INTO SCHEMAVERSION (VERSION) VALUES (?)");
+                updateStatement = connection.prepareStatement("INSERT INTO \"SCHEMAVERSION\" (\"VERSION\") VALUES (?)");
             }
 
             LOGGER.debug("Updating database schema to: " + version.toString());

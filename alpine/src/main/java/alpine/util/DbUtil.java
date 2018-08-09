@@ -110,7 +110,7 @@ public class DbUtil {
         Statement drop = null;
         try {
             drop = connection.createStatement();
-            drop.execute("ALTER TABLE " + tableName + " DROP COLUMN " + columnName);
+            drop.execute("ALTER TABLE \"" + tableName + "\" DROP COLUMN \"" + columnName + "\"");
         } catch (SQLException e) {
             // throw it away. Some databases do not permit this, so we'll ignore any errors.
         } finally {
@@ -122,7 +122,7 @@ public class DbUtil {
         Statement drop = null;
         try {
             drop = connection.createStatement();
-            drop.execute("DROP TABLE " + tableName);
+            drop.execute("DROP TABLE \"" + tableName + "\"");
         } catch (SQLException e) {
             // throw it away. Some databases do not permit this, so we'll ignore any errors.
         } finally {
