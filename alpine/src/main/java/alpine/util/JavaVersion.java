@@ -31,7 +31,11 @@ public class JavaVersion {
             update = NumberUtils.toInt(javaVersionElements[3]);
             build = NumberUtils.toInt(javaVersionElements[4]);
         } else {
-            //todo: make compatible with Java 9
+            String[] javaVersionElements = RUNTIME_VERSION.split("\\.|\\+");
+            major = NumberUtils.toInt(javaVersionElements[0]);
+            minor = NumberUtils.toInt(javaVersionElements[1]);
+            update = NumberUtils.toInt(javaVersionElements[2]);
+            build = NumberUtils.toInt(javaVersionElements[3]);
         }
     }
 
@@ -49,5 +53,12 @@ public class JavaVersion {
 
     public int getBuild() {
         return build;
+    }
+
+
+
+    public static void main(String args[]) {
+        JavaVersion jv= new JavaVersion();
+        System.out.println(jv.getMajor());
     }
 }
