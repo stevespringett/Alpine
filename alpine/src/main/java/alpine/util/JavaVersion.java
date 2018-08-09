@@ -19,19 +19,27 @@ package alpine.util;
 
 import org.apache.commons.lang3.math.NumberUtils;
 
+/**
+ * This class provides a consistent mechanism to identify Java versions regardless of
+ * the version of Java being identified. This class supports legacy Java versions from
+ * Java 1.0 to 1.8 as well as Java versions >= 9 when the numbering format was changed.
+ *
+ * @author Steve Springett
+ * @since 1.3.0
+ */
 public class JavaVersion {
 
     private static final String RUNTIME_VERSION = System.getProperty("java.runtime.version");
     private static int major, minor, update, build;
     static {
         if (RUNTIME_VERSION.startsWith("1.")) {
-            String[] javaVersionElements = RUNTIME_VERSION.split("\\.|_|-b");
+            final String[] javaVersionElements = RUNTIME_VERSION.split("\\.|_|-b");
             major = NumberUtils.toInt(javaVersionElements[1]);
             minor = NumberUtils.toInt(javaVersionElements[2]);
             update = NumberUtils.toInt(javaVersionElements[3]);
             build = NumberUtils.toInt(javaVersionElements[4]);
         } else {
-            String[] javaVersionElements = RUNTIME_VERSION.split("\\.|\\+");
+            final String[] javaVersionElements = RUNTIME_VERSION.split("\\.|\\+");
             major = NumberUtils.toInt(javaVersionElements[0]);
             minor = NumberUtils.toInt(javaVersionElements[1]);
             update = NumberUtils.toInt(javaVersionElements[2]);
@@ -55,10 +63,4 @@ public class JavaVersion {
         return build;
     }
 
-
-
-    public static void main(String args[]) {
-        JavaVersion jv= new JavaVersion();
-        System.out.println(jv.getMajor());
-    }
 }
