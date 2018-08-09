@@ -22,7 +22,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 /**
  * This class provides a consistent mechanism to identify Java versions regardless of
  * the version of Java being identified. This class supports legacy Java versions from
- * Java 1.0 to 1.8 as well as Java versions >= 9 when the numbering format was changed.
+ * Java 1.0 to 1.8 as well as Java 9 and higher when the numbering format was changed.
  *
  * @author Steve Springett
  * @since 1.3.0
