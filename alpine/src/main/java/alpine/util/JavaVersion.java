@@ -63,4 +63,13 @@ public class JavaVersion {
         return build;
     }
 
+    /**
+     * Returns a semantic version string of the version with the following format:
+     * major.minor.update+build.
+     */
+    @Override
+    public String toString() {
+        return major + "." + minor + "." + update + "+" + build;
+    }
+
 }
