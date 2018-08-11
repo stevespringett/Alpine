@@ -24,7 +24,7 @@ Configure the Maven POM with the Alpine Embedded WAR dependency and configure th
     <dependency>
         <groupId>us.springett</groupId>
         <artifactId>alpine-executable-war</artifactId>
-        <version>1.0.2</version>
+        <version>1.1.0</version>
         <scope>provided</scope>
     </dependency>
 </dependencies>
@@ -53,6 +53,17 @@ Configure the Maven POM with the Alpine Embedded WAR dependency and configure th
     </plugin>
 </plugins>
 ```
+
+Command-Line Arguments
+-
+The following command-line arguments can be passed to a compiled executable WAR when executing it:
+
+| Argument | Default | Description |
+|:---------|:--------|:------------|
+| -context | /       | The application context to deploy to |
+| -host    | 0.0.0.0 | The IP address to bind to |
+| -port    | 8080    | The TCP port the server listens on |
+
 
 Copyright & License
 -

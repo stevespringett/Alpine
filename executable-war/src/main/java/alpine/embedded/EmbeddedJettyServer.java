@@ -41,17 +41,23 @@ public class EmbeddedJettyServer {
 
     public static void main(String[] args) throws Exception {
 
+        final CliArgs cliArgs = new CliArgs(args);
+        final String contextPath = cliArgs.switchValue("-context", "/");
+        final String host = cliArgs.switchValue("-host", "0.0.0.0");
+        final int port = cliArgs.switchIntegerValue("-port", 8080);
+
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
 
-        Server server = new Server();
-        ServerConnector connector = new ServerConnector(server);
-        connector.setPort(8080);
+        final Server server = new Server();
+        final ServerConnector connector = new ServerConnector(server);
+        connector.setHost(host);
+        connector.setPort(port);
         server.setConnectors(new Connector[]{connector});
 
-        WebAppContext context = new WebAppContext();
+        final WebAppContext context = new WebAppContext();
         context.setServer(server);
-        context.setContextPath("/");
+        context.setContextPath(contextPath);
         context.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern", ".*/[^/]*taglibs.*\\.jar$");
         context.setAttribute("org.eclipse.jetty.containerInitializers", jspInitializers());
         context.setAttribute(InstanceManager.class.getName(), new SimpleInstanceManager());
@@ -62,8 +68,8 @@ public class EmbeddedJettyServer {
         context.getSystemClasspathPattern().add("org.slf4j.");
         context.getSystemClasspathPattern().add("org.apache.commons.logging.");
 
-        ProtectionDomain protectionDomain = EmbeddedJettyServer.class.getProtectionDomain();
-        URL location = protectionDomain.getCodeSource().getLocation();
+        final ProtectionDomain protectionDomain = EmbeddedJettyServer.class.getProtectionDomain();
+        final URL location = protectionDomain.getCodeSource().getLocation();
         context.setWar(location.toExternalForm());
 
         server.setHandler(context);
@@ -77,9 +83,9 @@ public class EmbeddedJettyServer {
     }
 
     private static List<ContainerInitializer> jspInitializers() {
-        JettyJasperInitializer sci = new JettyJasperInitializer();
-        ContainerInitializer initializer = new ContainerInitializer(sci, null);
-        List<ContainerInitializer> initializers = new ArrayList<>();
+        final JettyJasperInitializer sci = new JettyJasperInitializer();
+        final ContainerInitializer initializer = new ContainerInitializer(sci, null);
+        final List<ContainerInitializer> initializers = new ArrayList<>();
         initializers.add(initializer);
         return initializers;
     }
