@@ -62,7 +62,7 @@ The following command-line arguments can be passed to a compiled executable WAR 
 |:---------|:--------|:------------|
 | -context | /       | The application context to deploy to |
 | -host    | 0.0.0.0 | The IP address to bind to |
-| -port    | 8080    | The TCP port the server listens on |
+| -port    | 8080    | The TCP port to listens on |
 
 
 Copyright & License
