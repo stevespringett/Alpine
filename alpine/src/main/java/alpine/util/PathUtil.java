@@ -28,6 +28,11 @@ import java.io.File;
 public class PathUtil {
 
     /**
+     * Private constructor
+     */
+    private PathUtil() { }
+
+    /**
      * Resolves relative paths (currently only ~/ home directories).
      * @param path the path to resolve
      * @return the resolved path
