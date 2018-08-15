@@ -18,7 +18,7 @@
 package alpine;
 
 import alpine.logging.Logger;
-import alpine.util.SystemUtil;
+import alpine.util.PathUtil;
 import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.io.FileInputStream;
@@ -147,7 +147,7 @@ public class Config {
         LOGGER.info("Initializing Configuration");
         properties = new Properties();
 
-        final String alpineAppProp = System.getProperty(ALPINE_APP_PROP);
+        final String alpineAppProp = PathUtil.resolve(System.getProperty(ALPINE_APP_PROP));
         if (StringUtils.isNotBlank(alpineAppProp)) {
             LOGGER.info("Loading application properties from " + alpineAppProp);
             try (FileInputStream fileInputStream = new FileInputStream(new File(alpineAppProp))) {
@@ -254,10 +254,7 @@ public class Config {
      * @since 1.0.0
      */
     public File getDataDirectorty() {
-        String prop = getProperty(AlpineKey.DATA_DIRECTORY);
-        if (prop.startsWith("~" + File.separator)) {
-            prop = SystemUtil.getUserHome() + prop.substring(1);
-        }
+        final String prop = PathUtil.resolve(getProperty(AlpineKey.DATA_DIRECTORY));
         return new File(prop).getAbsoluteFile();
     }
 
@@ -346,10 +343,7 @@ public class Config {
             return;
         }
         for (String path: paths) {
-            if (path.startsWith("~" + File.separator)) {
-                path = SystemUtil.getUserHome() + path.substring(1);
-            }
-            expandClasspath(new File(path));
+            expandClasspath(new File(PathUtil.resolve(path)));
         }
     }
 
