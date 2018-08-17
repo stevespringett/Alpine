@@ -150,7 +150,7 @@
         <plugin.retirejs.indentSize>4</plugin.retirejs.indentSize>
 
         <!-- Software Analysis: CycloneDX -->
-        <maven.cyclonedx.plugin.version>1.1.1</maven.cyclonedx.plugin.version>
+        <maven.cyclonedx.plugin.version>1.1.2</maven.cyclonedx.plugin.version>
         <plugin.cyclonedx.includeCompileScope>true</plugin.cyclonedx.includeCompileScope>
         <plugin.cyclonedx.includeProvidedScope>true</plugin.cyclonedx.includeProvidedScope>
         <plugin.cyclonedx.includeRuntimeScope>true</plugin.cyclonedx.includeRuntimeScope>
@@ -186,7 +186,7 @@
         <lib.owasp.encoder.version>1.2.1</lib.owasp.encoder.version>
         <lib.owasp.security-logging.version>1.1.6</lib.owasp.security-logging.version>
         <lib.slf4j.version>1.7.25</lib.slf4j.version>
-        <lib.swagger.jersey.version>1.5.20</lib.swagger.jersey.version>
+        <lib.swagger.jersey.version>1.5.21</lib.swagger.jersey.version>
 
         <!-- Logback configuration - Used for Embedded Jetty profile -->
         <logback.configuration.file>${project.build.directory}/classes/logback.xml</logback.configuration.file>
