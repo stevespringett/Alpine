@@ -104,6 +104,7 @@
         <maven.versions.plugin.version>2.5</maven.versions.plugin.version>
         <maven.gpg.plugin.version>1.5</maven.gpg.plugin.version>
         <maven.enforcer.plugin.version>1.4.2</maven.enforcer.plugin.version>
+        <maven.uuidgenerator.plugin.version>1.0.1</maven.uuidgenerator.plugin.version>
 
         <!-- Software Security: Fortify SCA -->
         <maven.fortify.plugin.version>18.10</maven.fortify.plugin.version>
@@ -465,6 +466,20 @@
                         <phase>compile</phase>
                         <goals>
                             <goal>enhance</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>us.springett</groupId>
+                <artifactId>maven-uuid-generator</artifactId>
+                <version>${maven.uuidgenerator.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>generate-uuid</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>generate</goal>
                         </goals>
                     </execution>
                 </executions>

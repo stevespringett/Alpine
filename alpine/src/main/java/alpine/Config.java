@@ -219,6 +219,15 @@ public class Config {
     }
 
     /**
+     * Returns the Alpine UUID.
+     * @return the UUID unique to this build of Alpine
+     * @since 1.3.0
+     */
+    public String getFrameworkBuildUuid() {
+        return alpineVersionProperties.getProperty("uuid");
+    }
+
+    /**
      * Returns the Application component name.
      * @return the Application name
      * @since 1.0.0
@@ -243,6 +252,15 @@ public class Config {
      */
     public String getApplicationBuildTimestamp() {
         return applicationVersionProperties.getProperty("timestamp", "1970-01-01 00:00:00");
+    }
+
+    /**
+     * Returns the Application UUID.
+     * @return the UUID unique to this build of the application
+     * @since 1.3.0
+     */
+    public String getApplicationBuildUuid() {
+        return applicationVersionProperties.getProperty("uuid");
     }
 
     /**

@@ -18,6 +18,7 @@
 package alpine.model;
 
 import alpine.Config;
+import javax.inject.Singleton;
 import java.io.Serializable;
 
 /**
@@ -28,6 +29,7 @@ import java.io.Serializable;
  * @author Steve Springett
  * @since 1.0.0
  */
+@Singleton
 public class About implements Serializable {
 
     private static final long serialVersionUID = -7573425245706188307L;
@@ -35,6 +37,12 @@ public class About implements Serializable {
     private static final String APPLICATION = Config.getInstance().getApplicationName();
     private static final String VERSION = Config.getInstance().getApplicationVersion();
     private static final String TIMESTAMP = Config.getInstance().getApplicationBuildTimestamp();
+    private static final String UUID = Config.getInstance().getApplicationBuildUuid();
+
+    private static final String FRAMEWORK_NAME = Config.getInstance().getFrameworkName();
+    private static final String FRAMEWORK_VERSION = Config.getInstance().getFrameworkVersion();
+    private static final String FRAMEWORK_TIMESTAMP = Config.getInstance().getFrameworkBuildTimestamp();
+    private static final String FRAMEWORK_UUID = Config.getInstance().getFrameworkBuildUuid();
 
 
     public String getApplication() {
@@ -47,6 +55,33 @@ public class About implements Serializable {
 
     public String getTimestamp() {
         return TIMESTAMP;
+    }
+
+    public String getUuid() {
+        return UUID;
+    }
+
+    public Framework getFramework() {
+        return new Framework();
+    }
+
+    private static class Framework {
+
+        public String getName() {
+            return FRAMEWORK_NAME;
+        }
+
+        public String getVersion() {
+            return FRAMEWORK_VERSION;
+        }
+
+        public String getTimestamp() {
+            return FRAMEWORK_TIMESTAMP;
+        }
+
+        public String getUuid() {
+            return FRAMEWORK_UUID;
+        }
     }
 
 }
