@@ -23,6 +23,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 public class DbUtil {
 
@@ -138,6 +139,44 @@ public class DbUtil {
         } finally {
             close(stmt);
         }
+    }
+
+    public static ArrayList<String> getTableNames(Connection connection) throws SQLException {
+        ArrayList<String> tableNames = new ArrayList<>();
+        DatabaseMetaData databaseMetaData = connection.getMetaData();
+        ResultSet resultSet = databaseMetaData.getTables(null, null, null, new String[]{"TABLE"});
+        while(resultSet.next()) {
+            tableNames.add(resultSet.getString("TABLE_NAME"));
+        }
+        return tableNames;
+    }
+
+    public static boolean tableExists(Connection connection, String tableName) throws SQLException {
+        for (String s: getTableNames(connection)) {
+            if (s.equals(tableName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static ArrayList<String> getColumnNames(Connection connection, String tableName) throws SQLException {
+        ArrayList<String> columnNames = new ArrayList<>();
+        DatabaseMetaData databaseMetaData = connection.getMetaData();
+        ResultSet resultSet = databaseMetaData.getColumns(null, null, tableName, null);
+        while(resultSet.next()) {
+            columnNames.add(resultSet.getString("COLUMN_NAME"));
+        }
+        return columnNames;
+    }
+
+    public static boolean columnExists(Connection connection, String tableName, String columnName) throws SQLException {
+        for (String s: getColumnNames(connection, tableName)) {
+            if (s.equals(columnName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
