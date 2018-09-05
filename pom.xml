@@ -163,7 +163,7 @@
         <lib.bcrypt.version>0.4</lib.bcrypt.version>
         <lib.commons.collections4.version>4.2</lib.commons.collections4.version>
         <lib.commons.io.version>2.6</lib.commons.io.version>
-        <lib.commons.lang3.version>3.7</lib.commons.lang3.version>
+        <lib.commons.lang3.version>3.8</lib.commons.lang3.version>
         <lib.datanucleus-api-jdo.version>5.1.6</lib.datanucleus-api-jdo.version>
         <!-- Auto-generated classes have warnings which break build
              https://github.com/datanucleus/datanucleus-jdo-query/pull/10
@@ -174,7 +174,7 @@
         <lib.hikaricp.version>3.2.0</lib.hikaricp.version>
         <lib.javassist.version>3.22.0-GA</lib.javassist.version>
         <lib.jackson.version>2.9.6</lib.jackson.version>
-        <lib.javamail.version>1.6.1</lib.javamail.version>
+        <lib.javamail.version>1.6.2</lib.javamail.version>
         <lib.jdo.api.version>3.2.0-m8</lib.jdo.api.version>
         <lib.jersey.version>2.27</lib.jersey.version>
         <lib.jsp.api.version>2.2</lib.jsp.api.version>
@@ -184,7 +184,7 @@
         <lib.jsr353-spec.version>1.1.2</lib.jsr353-spec.version>
         <lib.jstl.version>1.2.5</lib.jstl.version>
         <lib.logback.version>1.2.3</lib.logback.version>
-        <lib.owasp.encoder.version>1.2.1</lib.owasp.encoder.version>
+        <lib.owasp.encoder.version>1.2.2</lib.owasp.encoder.version>
         <lib.owasp.security-logging.version>1.1.6</lib.owasp.security-logging.version>
         <lib.slf4j.version>1.7.25</lib.slf4j.version>
         <lib.swagger.jersey.version>1.5.21</lib.swagger.jersey.version>
