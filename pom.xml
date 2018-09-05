@@ -22,7 +22,7 @@
     <groupId>us.springett</groupId>
     <artifactId>alpine-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.3.0-SNAPSHOT</version>
+    <version>1.3.0</version>
 
     <modules>
         <module>alpine</module>
@@ -59,7 +59,7 @@
         <connection>scm:git:git@github.com:stevespringett/Alpine.git</connection>
         <url>https://github.com/stevespringett/Alpine.git</url>
         <developerConnection>scm:git:git@github.com:stevespringett/Alpine.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>alpine-parent-1.3.0</tag>
     </scm>
 
     <issueManagement>
@@ -125,15 +125,15 @@
         <plugin.dependency-check.analyzer.assemblyAnalyzerEnabled>false</plugin.dependency-check.analyzer.assemblyAnalyzerEnabled>
         <plugin.dependency-check.analyzer.autoconfAnalyzerEnabled>false</plugin.dependency-check.analyzer.autoconfAnalyzerEnabled>
         <plugin.dependency-check.analyzer.bundleAuditAnalyzerEnabled>false</plugin.dependency-check.analyzer.bundleAuditAnalyzerEnabled>
-        <plugin.dependency-check.analyzer.bundleAuditPath/>
+        <plugin.dependency-check.analyzer.bundleAuditPath />
         <plugin.dependency-check.analyzer.centralAnalyzerEnabled>true</plugin.dependency-check.analyzer.centralAnalyzerEnabled>
         <plugin.dependency-check.analyzer.cmakeAnalyzerEnabled>false</plugin.dependency-check.analyzer.cmakeAnalyzerEnabled>
         <plugin.dependency-check.analyzer.cocoapodsAnalyzerEnabled>false</plugin.dependency-check.analyzer.cocoapodsAnalyzerEnabled>
         <plugin.dependency-check.analyzer.composerAnalyzerEnabled>false</plugin.dependency-check.analyzer.composerAnalyzerEnabled>
         <plugin.dependency-check.analyzer.jarAnalyzer>true</plugin.dependency-check.analyzer.jarAnalyzer>
         <plugin.dependency-check.analyzer.nexusAnalyzerEnabled>false</plugin.dependency-check.analyzer.nexusAnalyzerEnabled>
-        <plugin.dependency-check.analyzer.nexusUrl/>
-        <plugin.dependency-check.analyzer.nexusUsesProxy/>
+        <plugin.dependency-check.analyzer.nexusUrl />
+        <plugin.dependency-check.analyzer.nexusUsesProxy />
         <plugin.dependency-check.analyzer.nodeAnalyzerEnabled>true</plugin.dependency-check.analyzer.nodeAnalyzerEnabled>
         <plugin.dependency-check.analyzer.nspAnalyzerEnabled>true</plugin.dependency-check.analyzer.nspAnalyzerEnabled>
         <plugin.dependency-check.analyzer.nuspecAnalyzerEnabled>false</plugin.dependency-check.analyzer.nuspecAnalyzerEnabled>
