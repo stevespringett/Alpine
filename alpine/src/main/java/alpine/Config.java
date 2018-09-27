@@ -105,6 +105,8 @@ public class Config {
         LDAP_AUTH_USERNAME_FMT   ("alpine.ldap.auth.username.format", null),
         LDAP_ATTRIBUTE_NAME      ("alpine.ldap.attribute.name",       "userPrincipalName"),
         LDAP_ATTRIBUTE_MAIL      ("alpine.ldap.attribute.mail",       "mail"),
+        LDAP_GROUPS_FILTER       ("alpine.ldap.groups.filter",        null),
+        LDAP_USER_GROUPS_FILTER  ("alpine.ldap.user.groups.filter",   null),
         HTTP_PROXY_ADDRESS       ("alpine.http.proxy.address",        null),
         HTTP_PROXY_PORT          ("alpine.http.proxy.port",           null),
         HTTP_PROXY_USERNAME      ("alpine.http.proxy.username",       null),

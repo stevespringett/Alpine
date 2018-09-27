@@ -36,6 +36,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -97,6 +98,10 @@ public class Team implements Serializable {
     @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "username ASC"))
     private List<ManagedUser> managedUsers;
 
+    @Persistent(mappedBy = "team", defaultFetchGroup = "true")
+    @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "dn ASC"))
+    private List<MappedLdapGroup> mappedLdapGroups;
+
     @Persistent(table = "TEAMS_PERMISSIONS", defaultFetchGroup = "true")
     @Join(column = "TEAM_ID")
     @Element(column = "PERMISSION_ID")
@@ -149,6 +154,14 @@ public class Team implements Serializable {
 
     public void setManagedUsers(List<ManagedUser> managedUsers) {
         this.managedUsers = managedUsers;
+    }
+
+    public List<MappedLdapGroup> getMappedLdapGroups() {
+        return mappedLdapGroups;
+    }
+
+    public void setMappedLdapGroups(List<MappedLdapGroup> mappedLdapGroups) {
+        this.mappedLdapGroups = mappedLdapGroups;
     }
 
     public List<Permission> getPermissions() {

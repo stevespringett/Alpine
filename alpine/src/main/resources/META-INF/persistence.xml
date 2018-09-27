@@ -27,6 +27,7 @@
         <class>alpine.model.InstalledUpgrades</class>
         <class>alpine.model.LdapUser</class>
         <class>alpine.model.ManagedUser</class>
+        <class>alpine.model.MappedLdapGroup</class>
         <class>alpine.model.Permission</class>
         <class>alpine.model.SchemaVersion</class>
         <class>alpine.model.Team</class>
