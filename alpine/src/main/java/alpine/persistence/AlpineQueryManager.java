@@ -22,14 +22,7 @@ import alpine.event.LdapSyncEvent;
 import alpine.event.framework.EventService;
 import alpine.event.framework.LoggableSubscriber;
 import alpine.event.framework.Subscriber;
-import alpine.model.ApiKey;
-import alpine.model.ConfigProperty;
-import alpine.model.EventServiceLog;
-import alpine.model.LdapUser;
-import alpine.model.ManagedUser;
-import alpine.model.Permission;
-import alpine.model.Team;
-import alpine.model.UserPrincipal;
+import alpine.model.*;
 import alpine.resources.AlpineRequest;
 import javax.jdo.Query;
 import java.sql.Timestamp;
@@ -523,6 +516,44 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
             }
         }
         return false;
+    }
+
+    /**
+     * Retrieves a MappedLdapGroup object for the specified Team and LDAP group.
+     * @return a MappedLdapGroup if found, or null if no mapping exists
+     * @since 1.4.0
+     */
+    @SuppressWarnings("unchecked")
+    public MappedLdapGroup getMappedLdapGroup(final Team team, final String dn) {
+        final Query query = pm.newQuery(MappedLdapGroup.class, "team == :team && dn == :dn");
+        final List<MappedLdapGroup> result = (List<MappedLdapGroup>) query.execute(team, dn);
+        return result.size() == 0 ? null : result.get(0);
+    }
+
+    /**
+     * Determines if the specified Team is mapped to the specified LDAP group.
+     * @return true if a mapping exists, false if not
+     * @since 1.4.0
+     */
+    public boolean isMapped(final Team team, final String dn) {
+        return getMappedLdapGroup(team, dn) != null;
+    }
+
+    /**
+     * Creates a MappedLdapGroup object.
+     * @param team The team to map
+     * @param dn the distinguished name of the LDAP group to map
+     * @return a MappedLdapGroup
+     * @since 1.4.0
+     */
+    public MappedLdapGroup createMappedLdapGroup(final Team team, final String dn) {
+        pm.currentTransaction().begin();
+        final MappedLdapGroup mapping = new MappedLdapGroup();
+        mapping.setTeam(team);
+        mapping.setDn(dn);
+        pm.makePersistent(mapping);
+        pm.currentTransaction().commit();
+        return getObjectById(MappedLdapGroup.class, mapping.getId());
     }
 
     /**

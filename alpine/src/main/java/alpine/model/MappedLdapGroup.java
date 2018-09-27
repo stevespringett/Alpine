@@ -49,6 +49,7 @@ public class MappedLdapGroup implements Serializable {
 
     @Persistent(defaultFetchGroup = "true")
     @Column(name = "TEAM_ID", allowsNull = "false")
+    @JsonIgnore
     private Team team;
 
     @Persistent

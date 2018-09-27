@@ -53,6 +53,7 @@ import java.util.UUID;
                 @Persistent(name = "apiKeys"),
                 @Persistent(name = "ldapUsers"),
                 @Persistent(name = "managedUsers"),
+                @Persistent(name = "mappedLdapGroups"),
                 @Persistent(name = "permissions")
         })
 })
@@ -98,7 +99,7 @@ public class Team implements Serializable {
     @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "username ASC"))
     private List<ManagedUser> managedUsers;
 
-    @Persistent(mappedBy = "team", defaultFetchGroup = "true")
+    @Persistent(mappedBy = "team")
     @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "dn ASC"))
     private List<MappedLdapGroup> mappedLdapGroups;
 
