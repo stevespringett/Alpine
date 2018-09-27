@@ -93,7 +93,7 @@ public class LdapAuthenticationService implements AuthenticationService {
         LdapConnectionWrapper ldap = new LdapConnectionWrapper();
         LdapContext ldapContext = null;
         try {
-            ldapContext = ldap.getLdapContext(username, password);
+            ldapContext = ldap.createLdapContext(username, password);
             return true;
         } catch (NamingException e) {
             return false;

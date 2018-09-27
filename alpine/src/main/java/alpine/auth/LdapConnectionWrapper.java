@@ -72,7 +72,7 @@ public class LdapConnectionWrapper {
      * @throws NamingException when unable to establish a connection
      * @since 1.4.0
      */
-    public LdapContext getLdapContext(String username, String password) throws NamingException {
+    public LdapContext createLdapContext(String username, String password) throws NamingException {
         if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
             throw new NamingException("Username or password cannot be empty or null");
         }
@@ -105,7 +105,7 @@ public class LdapConnectionWrapper {
      * @throws NamingException if an exception is thrown
      * @since 1.4.0
      */
-    public DirContext getDirContext() throws NamingException {
+    public DirContext createDirContext() throws NamingException {
         final Hashtable<String, String> env = new Hashtable<>();
         final String principalName = formatPrincipal(BIND_USERNAME);
         env.put(Context.SECURITY_PRINCIPAL, principalName);

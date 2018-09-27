@@ -57,7 +57,7 @@ public class LdapSyncTask implements Subscriber {
             final LdapConnectionWrapper ldap = new LdapConnectionWrapper();
             DirContext ctx = null;
             try (AlpineQueryManager qm = new AlpineQueryManager()) {
-                ctx = ldap.getDirContext();
+                ctx = ldap.createDirContext();
 
                 final String[] attributeFilter = {};
                 final SearchControls sc = new SearchControls();
