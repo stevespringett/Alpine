@@ -531,6 +531,17 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     }
 
     /**
+     * Retrieves a List of MappedLdapGroup objects for the specified Team.
+     * @return a List of MappedLdapGroup objects
+     * @since 1.4.0
+     */
+    @SuppressWarnings("unchecked")
+    public List<MappedLdapGroup> getMappedLdapGroups(final Team team) {
+        final Query query = pm.newQuery(MappedLdapGroup.class, "team == :team");
+        return (List<MappedLdapGroup>) query.execute(team);
+    }
+
+    /**
      * Determines if the specified Team is mapped to the specified LDAP group.
      * @return true if a mapping exists, false if not
      * @since 1.4.0
