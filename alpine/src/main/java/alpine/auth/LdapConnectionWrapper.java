@@ -25,6 +25,8 @@ import javax.naming.CommunicationException;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
@@ -32,6 +34,7 @@ import javax.naming.directory.SearchResult;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -58,7 +61,8 @@ public class LdapConnectionWrapper {
     public static final String ATTRIBUTE_MAIL = Config.getInstance().getProperty(Config.AlpineKey.LDAP_ATTRIBUTE_MAIL);
     public static final String ATTRIBUTE_NAME = Config.getInstance().getProperty(Config.AlpineKey.LDAP_ATTRIBUTE_NAME);
 
-    public static final boolean LDAP_CONFIGURED = (!LDAP_ENABLED || StringUtils.isBlank(LDAP_URL));
+    public static final boolean USER_PROVISIONING = Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.LDAP_USER_PROVISIONING);
+    public static final boolean LDAP_CONFIGURED = (LDAP_ENABLED && StringUtils.isNotBlank(LDAP_URL));
     private static final boolean IS_LDAP_SSLTLS = (LDAP_URL.startsWith("ldaps:"));
 
 
@@ -158,6 +162,73 @@ public class LdapConnectionWrapper {
         }
         closeQuietly(ne);
         return groupDns;
+    }
+
+    /**
+     * Performs a search for the specified username. Internally, this method queries on
+     * the attribute defined by {@link Config.AlpineKey#LDAP_ATTRIBUTE_NAME}.
+     * @param ctx the DirContext to use
+     * @param username the username to query on
+     * @return a list of SearchResult objects. If the username is found, the list should typically only contain one result.
+     * @throws NamingException if an exception is thrown
+     * @since 1.4.0
+     */
+    public List<SearchResult> searchForUsername(DirContext ctx, String username) throws NamingException {
+        final String[] attributeFilter = {};
+        final SearchControls sc = new SearchControls();
+        sc.setReturningAttributes(attributeFilter);
+        sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
+        final String searchFor = LdapConnectionWrapper.ATTRIBUTE_NAME + "=" + LdapConnectionWrapper.formatPrincipal(username);
+        return Collections.list(ctx.search(LdapConnectionWrapper.BASE_DN, searchFor, sc));
+    }
+
+    /**
+     * Retrieves an attribute by its name for the specified dn.
+     * @param ctx the DirContext to use
+     * @param dn the distinguished name of the entry to obtain the attribute value for
+     * @param attributeName the name of the attribute to return
+     * @return the value of the attribute, or null if not found
+     * @throws NamingException if an exception is thrown
+     * @since 1.4.0
+     */
+    public String getAttribute(DirContext ctx, String dn, String attributeName) throws NamingException {
+        final Attributes attributes = ctx.getAttributes(dn);
+        return getAttribute(attributes, attributeName);
+    }
+
+    /**
+     * Retrieves an attribute by its name for the specified search result.
+     * @param result the search result of the entry to obtain the attribute value for
+     * @param attributeName the name of the attribute to return
+     * @return the value of the attribute, or null if not found
+     * @throws NamingException if an exception is thrown
+     * @since 1.4.0
+     */
+    public String getAttribute(SearchResult result, String attributeName) throws NamingException {
+        return getAttribute(result.getAttributes(), attributeName);
+    }
+
+    /**
+     * Retrieves an attribute by its name.
+     * @param attributes the list of attributes to query on
+     * @param attributeName the name of the attribute to return
+     * @return the value of the attribute, or null if not found
+     * @throws NamingException if an exception is thrown
+     * @since 1.4.0
+     */
+    public String getAttribute(Attributes attributes, String attributeName) throws NamingException {
+        if (attributes == null || attributes.size() == 0) {
+            return null;
+        } else {
+            final Attribute attribute = attributes.get(attributeName);
+            if (attribute != null) {
+                final Object o = attribute.get();
+                if (o instanceof String) {
+                    return (String) attribute.get();
+                }
+            }
+        }
+        return null;
     }
 
     /**

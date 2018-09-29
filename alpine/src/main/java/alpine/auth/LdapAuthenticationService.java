@@ -17,11 +17,15 @@
  */
 package alpine.auth;
 
+import alpine.logging.Logger;
 import alpine.model.LdapUser;
 import alpine.persistence.AlpineQueryManager;
 import javax.naming.NamingException;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapContext;
 import java.security.Principal;
+import java.util.List;
 
 /**
  * Class that performs authentication against LDAP servers.
@@ -30,6 +34,8 @@ import java.security.Principal;
  * @since 1.0.0
  */
 public class LdapAuthenticationService implements AuthenticationService {
+
+    private static final Logger LOGGER = Logger.getLogger(LdapAuthenticationService.class);
 
     private String username;
     private String password;
@@ -73,6 +79,8 @@ public class LdapAuthenticationService implements AuthenticationService {
                 final LdapUser user = qm.getLdapUser(username);
                 if (user != null) {
                     return user;
+                } else if (LdapConnectionWrapper.USER_PROVISIONING) {
+                    return autoProvision(qm);
                 } else {
                     throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.UNMAPPED_ACCOUNT);
                 }
@@ -80,6 +88,39 @@ public class LdapAuthenticationService implements AuthenticationService {
         } else {
             throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.INVALID_CREDENTIALS);
         }
+    }
+
+    /**
+     * Automatically creates an LdapUser, sets the value of various LDAP attributes, and
+     * persists the user to the database.
+     * @param qm the query manager to use
+     * @return the persisted LdapUser object
+     * @throws AlpineAuthenticationException if an exception occurs
+     * @since 1.4.0
+     */
+    private LdapUser autoProvision(AlpineQueryManager qm) throws AlpineAuthenticationException {
+        LdapUser user = null;
+        final LdapConnectionWrapper ldap = new LdapConnectionWrapper();
+        DirContext dirContext = null;
+        try {
+            dirContext = ldap.createDirContext();
+            final List<SearchResult> results = ldap.searchForUsername(dirContext, username);
+            if (results != null && results.size() > 0) {
+                // Should only return 1 result, but just in case, get the very first one
+                final SearchResult result = results.get(0);
+                user = new LdapUser();
+                user.setUsername(username);
+                user.setDN(result.getNameInNamespace());
+                user.setEmail(ldap.getAttribute(result, LdapConnectionWrapper.ATTRIBUTE_MAIL));
+                user = qm.persist(user);
+            }
+        } catch (NamingException e) {
+            LOGGER.error("An error occurred while auto-provisioning an authenticated user", e);
+            throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.OTHER);
+        } finally {
+            ldap.closeQuietly(dirContext);
+        }
+        return user;
     }
 
     /**
@@ -98,11 +139,7 @@ public class LdapAuthenticationService implements AuthenticationService {
         } catch (NamingException e) {
             return false;
         } finally {
-            if (ldapContext != null) {
-                try {
-                    ldapContext.close();
-                } catch (NamingException e) { }
-            }
+            ldap.closeQuietly(ldapContext);
         }
     }
 

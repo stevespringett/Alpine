@@ -107,6 +107,7 @@ public class Config {
         LDAP_ATTRIBUTE_MAIL      ("alpine.ldap.attribute.mail",       "mail"),
         LDAP_GROUPS_FILTER       ("alpine.ldap.groups.filter",        null),
         LDAP_USER_GROUPS_FILTER  ("alpine.ldap.user.groups.filter",   null),
+        LDAP_USER_PROVISIONING   ("alpine.ldap.user.provisioning",    false),
         HTTP_PROXY_ADDRESS       ("alpine.http.proxy.address",        null),
         HTTP_PROXY_PORT          ("alpine.http.proxy.port",           null),
         HTTP_PROXY_USERNAME      ("alpine.http.proxy.username",       null),
