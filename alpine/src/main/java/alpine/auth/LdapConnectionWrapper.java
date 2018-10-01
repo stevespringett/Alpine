@@ -62,6 +62,8 @@ public class LdapConnectionWrapper {
     public static final String ATTRIBUTE_NAME = Config.getInstance().getProperty(Config.AlpineKey.LDAP_ATTRIBUTE_NAME);
 
     public static final boolean USER_PROVISIONING = Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.LDAP_USER_PROVISIONING);
+    public static final boolean TEAM_SYNCHRONIZATION = Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.LDAP_TEAM_SYNCHRONIZATION);
+
     public static final boolean LDAP_CONFIGURED = (LDAP_ENABLED && StringUtils.isNotBlank(LDAP_URL));
     private static final boolean IS_LDAP_SSLTLS = (LDAP_URL.startsWith("ldaps:"));
 

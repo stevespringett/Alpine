@@ -108,7 +108,12 @@ public class LdapSyncTask implements Subscriber {
                 user.setEmail(ldap.getAttribute(attributes, LdapConnectionWrapper.ATTRIBUTE_MAIL));
             }
         }
-        qm.updateLdapUser(user);
+        user = qm.updateLdapUser(user);
+        // Dynamically assign team membership (if enabled)
+        if (LdapConnectionWrapper.TEAM_SYNCHRONIZATION) {
+            List<String> groupDNs = ldap.getGroups(ctx, user);
+            qm.synchronizeTeamMembership(user, groupDNs);
+        }
     }
 
 }

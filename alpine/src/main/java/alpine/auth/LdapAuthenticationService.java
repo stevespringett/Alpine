@@ -113,6 +113,11 @@ public class LdapAuthenticationService implements AuthenticationService {
                 user.setDN(result.getNameInNamespace());
                 user.setEmail(ldap.getAttribute(result, LdapConnectionWrapper.ATTRIBUTE_MAIL));
                 user = qm.persist(user);
+                // Dynamically assign team membership (if enabled)
+                if (LdapConnectionWrapper.TEAM_SYNCHRONIZATION) {
+                    List<String> groupDNs = ldap.getGroups(dirContext, user);
+                    user = qm.synchronizeTeamMembership(user, groupDNs);
+                }
             }
         } catch (NamingException e) {
             LOGGER.error("An error occurred while auto-provisioning an authenticated user", e);
@@ -131,7 +136,7 @@ public class LdapAuthenticationService implements AuthenticationService {
      * @since 1.0.0
      */
     private boolean validateCredentials() {
-        LdapConnectionWrapper ldap = new LdapConnectionWrapper();
+        final LdapConnectionWrapper ldap = new LdapConnectionWrapper();
         LdapContext ldapContext = null;
         try {
             ldapContext = ldap.createLdapContext(username, password);

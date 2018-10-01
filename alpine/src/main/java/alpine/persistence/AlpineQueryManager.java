@@ -167,6 +167,42 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     }
 
     /**
+     * This method dynamically assigns team membership to the specified user from
+     * the list of LDAP group DN's the user is a member of. The method will look
+     * up any {@link MappedLdapGroup}s and ensure the user is only a member of the
+     * teams that have a mapping to an LDAP group for which the user is a member.
+     * @param user the LDAP user to sync team membership for
+     * @param groupDNs a list of LDAP group DNs the user is a member of
+     * @return a refreshed LdapUser object
+     * @since 1.4.0
+     */
+    public LdapUser synchronizeTeamMembership(final LdapUser user, final List<String> groupDNs) {
+        final List<Team> removeThese = new ArrayList<>();
+        if (user.getTeams() != null) {
+            for (Team team : user.getTeams()) {
+                if (team.getMappedLdapGroups() != null) {
+                    for (MappedLdapGroup mappedLdapGroup : team.getMappedLdapGroups()) {
+                        if (!groupDNs.contains(mappedLdapGroup.getDn())) {
+                            removeThese.add(team);
+                        }
+                    }
+                } else {
+                    removeThese.add(team);
+                }
+            }
+        }
+        for (Team team: removeThese) {
+            removeUserFromTeam(user, team);
+        }
+        for (String groupDN: groupDNs) {
+            for (MappedLdapGroup mappedLdapGroup: getMappedLdapGroups(groupDN)) {
+                addUserToTeam(user, mappedLdapGroup.getTeam());
+            }
+        }
+        return getObjectById(LdapUser.class, user.getId());
+    }
+
+    /**
      * Creates a new ManagedUser object.
      * @param username The username for the user
      * @param passwordHash The hashed password.
@@ -547,6 +583,17 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     public List<MappedLdapGroup> getMappedLdapGroups(final Team team) {
         final Query query = pm.newQuery(MappedLdapGroup.class, "team == :team");
         return (List<MappedLdapGroup>) query.execute(team);
+    }
+
+    /**
+     * Retrieves a List of MappedLdapGroup objects for the specified DN.
+     * @return a List of MappedLdapGroup objects
+     * @since 1.4.0
+     */
+    @SuppressWarnings("unchecked")
+    public List<MappedLdapGroup> getMappedLdapGroups(final String dn) {
+        final Query query = pm.newQuery(MappedLdapGroup.class, "dn == :dn");
+        return (List<MappedLdapGroup>) query.execute(dn);
     }
 
     /**

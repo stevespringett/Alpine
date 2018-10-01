@@ -108,6 +108,7 @@ public class Config {
         LDAP_GROUPS_FILTER       ("alpine.ldap.groups.filter",        null),
         LDAP_USER_GROUPS_FILTER  ("alpine.ldap.user.groups.filter",   null),
         LDAP_USER_PROVISIONING   ("alpine.ldap.user.provisioning",    false),
+        LDAP_TEAM_SYNCHRONIZATION("alpine.ldap.team.synchronization", false),
         HTTP_PROXY_ADDRESS       ("alpine.http.proxy.address",        null),
         HTTP_PROXY_PORT          ("alpine.http.proxy.port",           null),
         HTTP_PROXY_USERNAME      ("alpine.http.proxy.username",       null),
