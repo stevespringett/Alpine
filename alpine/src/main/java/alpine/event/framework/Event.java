@@ -19,6 +19,8 @@ package alpine.event.framework;
 
 import alpine.logging.Logger;
 
+import java.util.UUID;
+
 /**
  * The Event interface simply defines a 'type'. All Events should implement this
  * interface.
@@ -64,10 +66,23 @@ public interface Event {
      * @since 1.4.0
      */
     static boolean isEventBeingProcessed(ChainableEvent event) {
-        if (EventService.getInstance().isEventBeingProcessed(event)) {
+        return isEventBeingProcessed(event.getChainIdentifier());
+    }
+
+    /**
+     * This method provides convenience in not having to know (or care) about
+     * what {@link IEventService} implementation is used to process an event.
+     *
+     * This method supports both {@link EventService} and {@link SingleThreadedEventService}.
+     *
+     * @param chainIdentifier the UUID of the event to query
+     * @since 1.4.0
+     */
+    static boolean isEventBeingProcessed(UUID chainIdentifier) {
+        if (EventService.getInstance().isEventBeingProcessed(chainIdentifier)) {
             return true;
         }
-        if (SingleThreadedEventService.getInstance().isEventBeingProcessed(event)) {
+        if (SingleThreadedEventService.getInstance().isEventBeingProcessed(chainIdentifier)) {
             return true;
         }
         return false;

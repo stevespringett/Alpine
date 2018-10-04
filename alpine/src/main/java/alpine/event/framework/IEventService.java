@@ -17,6 +17,8 @@
  */
 package alpine.event.framework;
 
+import java.util.UUID;
+
 /**
  * Defines an EventService. All event services must be singletons and implement a static
  * getInstance() method.
@@ -82,6 +84,17 @@ public interface IEventService {
      * @since 1.4.0
      */
     boolean isEventBeingProcessed(ChainableEvent event);
+
+    /**
+     * Determines if the specified event is currently being processed. Processing may indicate the
+     * the subscriber task is in the queue and work has not started yet, or may indicate the task
+     * is currently being executed. When this event returns false, it does not indicate completion,
+     * only that there are no subscriber tasks waiting or working on the specified event.
+     * @param chainIdentifier the UUID of the event to query
+     * @return a boolean
+     * @since 1.4.0
+     */
+    boolean isEventBeingProcessed(UUID chainIdentifier);
 
 }
 

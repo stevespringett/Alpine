@@ -142,7 +142,15 @@ public abstract class BaseEventService implements IEventService {
      * @since 1.4.0
      */
     public synchronized boolean isEventBeingProcessed(ChainableEvent event) {
-        ArrayList<UUID> eventIdentifiers = chainTracker.get(event.getChainIdentifier());
+        return isEventBeingProcessed(event.getChainIdentifier());
+    }
+
+    /**
+     * {@inheritDoc}
+     * @since 1.4.0
+     */
+    public synchronized boolean isEventBeingProcessed(UUID chainIdentifier) {
+        ArrayList<UUID> eventIdentifiers = chainTracker.get(chainIdentifier);
         return eventIdentifiers != null && eventIdentifiers.size() != 0;
     }
 
