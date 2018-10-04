@@ -72,5 +72,16 @@ public interface IEventService {
      */
     void shutdown();
 
+    /**
+     * Determines if the specified event is currently being processed. Processing may indicate the
+     * the subscriber task is in the queue and work has not started yet, or may indicate the task
+     * is currently being executed. When this event returns false, it does not indicate completion,
+     * only that there are no subscriber tasks waiting or working on the specified event.
+     * @param event the event to query
+     * @return a boolean
+     * @since 1.4.0
+     */
+    boolean isEventBeingProcessed(ChainableEvent event);
+
 }
 

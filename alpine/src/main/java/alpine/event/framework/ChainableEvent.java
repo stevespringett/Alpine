@@ -17,6 +17,8 @@
  */
 package alpine.event.framework;
 
+import java.util.UUID;
+
 /**
  * The ChainableEvent interface defines methods necessary to support
  * an unbounded chain of callbacks and event between different
@@ -26,6 +28,25 @@ package alpine.event.framework;
  * @since 1.2.0
  */
 public interface ChainableEvent extends Event {
+
+    /**
+     * Returns the unique identifier for this event.
+     * @since 1.4.0
+     */
+    UUID getEventIdentifier();
+
+    /**
+     * Returns the unique identifier for the chain this event is a part of.
+     * @since 1.4.0
+     */
+    UUID getChainIdentifier();
+
+    /**
+     * Sets the unique identifier for the chain this event is a part of.
+     * @param chainIdentifier the UUID of the chain
+     * @since 1.4.0
+     */
+    void setChainIdentifier(UUID chainIdentifier);
 
     /**
      * Returns the optional callback event that should be processed if this event is successful.

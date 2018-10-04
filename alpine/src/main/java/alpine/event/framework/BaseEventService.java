@@ -25,6 +25,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -43,6 +44,7 @@ public abstract class BaseEventService implements IEventService {
 
     private Logger logger = Logger.getLogger(BaseEventService.class);
     private Map<Class<? extends Event>, ArrayList<Class<? extends Subscriber>>> subscriptionMap = new ConcurrentHashMap<>();
+    private Map<UUID, ArrayList<UUID>>chainTracker = new ConcurrentHashMap<>();
     private ExecutorService executor = Executors.newFixedThreadPool(1, new BasicThreadFactory.Builder()
             .namingPattern("Alpine-BaseEventService-%d")
             .uncaughtExceptionHandler(new LoggableUncaughtExceptionHandler())
@@ -79,6 +81,10 @@ public abstract class BaseEventService implements IEventService {
         }
         for (Class<? extends Subscriber> clazz: subscriberClasses) {
             logger.debug("Alerting subscriber " + clazz.getName());
+
+            if (event instanceof ChainableEvent) {
+                addTrackedEvent((ChainableEvent)event);
+            }
 
             // Check to see if the Event is Unblocked. If so, use a separate executor pool from normal events
             final ExecutorService executorService = event instanceof UnblockedEvent  ? dynamicExecutor : executor;
@@ -122,8 +128,40 @@ public abstract class BaseEventService implements IEventService {
                         }
                     }
                 }
+
+                if (event instanceof ChainableEvent) {
+                    removeTrackedEvent((ChainableEvent)event);
+                }
+
             });
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * @since 1.4.0
+     */
+    public synchronized boolean isEventBeingProcessed(ChainableEvent event) {
+        ArrayList<UUID> eventIdentifiers = chainTracker.get(event.getChainIdentifier());
+        return eventIdentifiers != null && eventIdentifiers.size() != 0;
+    }
+
+    private synchronized void addTrackedEvent(ChainableEvent event) {
+            ArrayList<UUID> eventIdentifiers = chainTracker.get(event.getChainIdentifier());
+            if (eventIdentifiers == null) {
+                eventIdentifiers = new ArrayList<>();
+            }
+            eventIdentifiers.add(event.getEventIdentifier());
+            chainTracker.put(event.getChainIdentifier(), eventIdentifiers);
+    }
+
+    private synchronized void removeTrackedEvent(ChainableEvent event) {
+        ArrayList<UUID> eventIdentifiers = chainTracker.get(event.getChainIdentifier());
+        if (eventIdentifiers == null) {
+            return;
+        }
+        eventIdentifiers.remove(event.getEventIdentifier());
+        chainTracker.put(event.getChainIdentifier(), eventIdentifiers);
     }
 
     /**

@@ -53,4 +53,23 @@ public interface Event {
             Logger.getLogger(Event.class).debug("No subscribers to inform from event: " + event.getClass().getName());
         }
     }
+
+    /**
+     * This method provides convenience in not having to know (or care) about
+     * what {@link IEventService} implementation is used to process an event.
+     *
+     * This method supports both {@link EventService} and {@link SingleThreadedEventService}.
+     *
+     * @param event the event to query
+     * @since 1.4.0
+     */
+    static boolean isEventBeingProcessed(ChainableEvent event) {
+        if (EventService.getInstance().isEventBeingProcessed(event)) {
+            return true;
+        }
+        if (SingleThreadedEventService.getInstance().isEventBeingProcessed(event)) {
+            return true;
+        }
+        return false;
+    }
 }
