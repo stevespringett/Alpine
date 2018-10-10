@@ -17,6 +17,7 @@
  */
 package alpine.auth;
 
+import alpine.Config;
 import alpine.logging.Logger;
 import alpine.model.LdapUser;
 import alpine.persistence.AlpineQueryManager;
@@ -118,6 +119,9 @@ public class LdapAuthenticationService implements AuthenticationService {
                     List<String> groupDNs = ldap.getGroups(dirContext, user);
                     user = qm.synchronizeTeamMembership(user, groupDNs);
                 }
+            } else {
+                LOGGER.warn("Could not find " + username + " in the directory while provisioning the user. Ensure '" + Config.AlpineKey.LDAP_ATTRIBUTE_NAME.getPropertyName() + "' is defined correctly");
+                throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.UNMAPPED_ACCOUNT);
             }
         } catch (NamingException e) {
             LOGGER.error("An error occurred while auto-provisioning an authenticated user", e);
