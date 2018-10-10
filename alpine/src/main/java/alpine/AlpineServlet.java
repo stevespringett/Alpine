@@ -122,6 +122,7 @@ public class AlpineServlet extends ServletContainer {
             final IntervalLoggerController wd = SecurityLoggingFactory.getControllerInstance();
             wd.start(interval * 1000); // Interval is defined in seconds
         }
+        LOGGER.info(Config.getInstance().getApplicationName() + " is ready");
     }
 
     /**
