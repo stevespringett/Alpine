@@ -25,9 +25,9 @@ import alpine.logging.Logger;
 import alpine.model.LdapUser;
 import alpine.persistence.AlpineQueryManager;
 import javax.naming.NamingException;
-import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.SearchResult;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -87,32 +87,24 @@ public class LdapSyncTask implements Subscriber {
      */
     private void sync(DirContext ctx, AlpineQueryManager qm, LdapConnectionWrapper ldap, LdapUser user) throws NamingException {
         LOGGER.debug("Syncing: " + user.getUsername());
-        if (user.getDN() == null || user.getDN().equals("INVALID")) {
-            final List<SearchResult> results = ldap.searchForUsername(ctx, user.getUsername());
-            if (results != null && results.size() > 0) {
-                // Should only return 1 result, but just in case, get the very first one
-                final SearchResult result = results.get(0);
-                user.setDN(result.getNameInNamespace());
-                user.setEmail(ldap.getAttribute(result, LdapConnectionWrapper.ATTRIBUTE_MAIL));
-            } else {
-                // This is an invalid user - a username that exists in the database that does not exist in LDAP
-                user.setDN("INVALID");
-                user.setEmail(null);
+        final SearchResult result = ldap.searchForSingleUsername(ctx, user.getUsername());
+        if (result != null) {
+            user.setDN(result.getNameInNamespace());
+            user.setEmail(ldap.getAttribute(result, LdapConnectionWrapper.ATTRIBUTE_MAIL));
+            user = qm.updateLdapUser(user);
+            // Dynamically assign team membership (if enabled)
+            if (LdapConnectionWrapper.TEAM_SYNCHRONIZATION) {
+                List<String> groupDNs = ldap.getGroups(ctx, user);
+                qm.synchronizeTeamMembership(user, groupDNs);
             }
         } else {
-            final Attributes attributes = ctx.getAttributes(user.getDN());
-            if (attributes == null || attributes.size() == 0) {
-                user.setDN("INVALID");
-                user.setEmail(null);
-            } else {
-                user.setEmail(ldap.getAttribute(attributes, LdapConnectionWrapper.ATTRIBUTE_MAIL));
+            // This is an invalid user - a username that exists in the database that does not exist in LDAP
+            user.setDN("INVALID");
+            user.setEmail(null);
+            user = qm.updateLdapUser(user);
+            if (LdapConnectionWrapper.TEAM_SYNCHRONIZATION) {
+                qm.synchronizeTeamMembership(user, new ArrayList<>());
             }
-        }
-        user = qm.updateLdapUser(user);
-        // Dynamically assign team membership (if enabled)
-        if (LdapConnectionWrapper.TEAM_SYNCHRONIZATION) {
-            List<String> groupDNs = ldap.getGroups(ctx, user);
-            qm.synchronizeTeamMembership(user, groupDNs);
         }
     }
 

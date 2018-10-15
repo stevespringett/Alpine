@@ -105,10 +105,8 @@ public class LdapAuthenticationService implements AuthenticationService {
         DirContext dirContext = null;
         try {
             dirContext = ldap.createDirContext();
-            final List<SearchResult> results = ldap.searchForUsername(dirContext, username);
-            if (results != null && results.size() > 0) {
-                // Should only return 1 result, but just in case, get the very first one
-                final SearchResult result = results.get(0);
+            final SearchResult result = ldap.searchForSingleUsername(dirContext, username);
+            if (result != null) {
                 user = new LdapUser();
                 user.setUsername(username);
                 user.setDN(result.getNameInNamespace());
@@ -141,15 +139,28 @@ public class LdapAuthenticationService implements AuthenticationService {
      */
     private boolean validateCredentials() {
         final LdapConnectionWrapper ldap = new LdapConnectionWrapper();
+        DirContext dirContext = null;
         LdapContext ldapContext = null;
-        try {
-            ldapContext = ldap.createLdapContext(username, password);
-            return true;
+        try (AlpineQueryManager qm = new AlpineQueryManager()) {
+            final LdapUser ldapUser = qm.getLdapUser(username);
+            if (ldapUser != null && ldapUser.getDN() != null && ldapUser.getDN().contains("=")) {
+                ldapContext = ldap.createLdapContext(ldapUser.getDN(), password);
+                return true;
+            } else {
+                dirContext = ldap.createDirContext();
+                final SearchResult result = ldap.searchForSingleUsername(dirContext, username);
+                if (result != null ) {
+                    ldapContext = ldap.createLdapContext(result.getNameInNamespace(), password);
+                    return true;
+                }
+            }
         } catch (NamingException e) {
-            return false;
+            LOGGER.debug("An error occurred while attempting to validate credentials", e);
         } finally {
             ldap.closeQuietly(ldapContext);
+            ldap.closeQuietly(dirContext);
         }
+        return false;
     }
 
 }

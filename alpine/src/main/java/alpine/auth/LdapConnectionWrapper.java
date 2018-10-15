@@ -20,6 +20,7 @@ package alpine.auth;
 import alpine.Config;
 import alpine.logging.Logger;
 import alpine.model.LdapUser;
+import alpine.validation.LdapStringSanitizer;
 import org.apache.commons.lang3.StringUtils;
 import javax.naming.CommunicationException;
 import javax.naming.Context;
@@ -56,7 +57,6 @@ public class LdapConnectionWrapper {
 
     public static final boolean LDAP_ENABLED = Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.LDAP_ENABLED);
     public static final String LDAP_URL = Config.getInstance().getProperty(Config.AlpineKey.LDAP_SERVER_URL);
-    public static final String DOMAIN_NAME = Config.getInstance().getProperty(Config.AlpineKey.LDAP_DOMAIN);
     public static final String BASE_DN = Config.getInstance().getProperty(Config.AlpineKey.LDAP_BASEDN);
     public static final String ATTRIBUTE_MAIL = Config.getInstance().getProperty(Config.AlpineKey.LDAP_ATTRIBUTE_MAIL);
     public static final String ATTRIBUTE_NAME = Config.getInstance().getProperty(Config.AlpineKey.LDAP_ATTRIBUTE_NAME);
@@ -72,23 +72,21 @@ public class LdapConnectionWrapper {
      * Asserts a users credentials. Returns an LdapContext if assertion is successful
      * or an exception for any other reason.
      *
-     * @param username the username to assert
+     * @param userDn the users DN to assert
      * @param password the password to assert
      * @return the LdapContext upon a successful connection
      * @throws NamingException when unable to establish a connection
      * @since 1.4.0
      */
-    public LdapContext createLdapContext(String username, String password) throws NamingException {
-        if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
+    public LdapContext createLdapContext(String userDn, String password) throws NamingException {
+        if (StringUtils.isEmpty(userDn) || StringUtils.isEmpty(password)) {
             throw new NamingException("Username or password cannot be empty or null");
         }
         final Hashtable<String, String> env = new Hashtable<>();
-        final String principalName = formatPrincipal(username);
-
         if (StringUtils.isNotBlank(LDAP_SECURITY_AUTH)) {
             env.put(Context.SECURITY_AUTHENTICATION, LDAP_SECURITY_AUTH);
         }
-        env.put(Context.SECURITY_PRINCIPAL, principalName);
+        env.put(Context.SECURITY_PRINCIPAL, userDn);
         env.put(Context.SECURITY_CREDENTIALS, password);
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         env.put(Context.PROVIDER_URL, LDAP_URL);
@@ -113,8 +111,7 @@ public class LdapConnectionWrapper {
      */
     public DirContext createDirContext() throws NamingException {
         final Hashtable<String, String> env = new Hashtable<>();
-        final String principalName = formatPrincipal(BIND_USERNAME);
-        env.put(Context.SECURITY_PRINCIPAL, principalName);
+        env.put(Context.SECURITY_PRINCIPAL, BIND_USERNAME);
         env.put(Context.SECURITY_CREDENTIALS, BIND_PASSWORD);
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         env.put(Context.PROVIDER_URL, LDAP_URL);
@@ -180,8 +177,29 @@ public class LdapConnectionWrapper {
         final SearchControls sc = new SearchControls();
         sc.setReturningAttributes(attributeFilter);
         sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
-        final String searchFor = LdapConnectionWrapper.ATTRIBUTE_NAME + "=" + LdapConnectionWrapper.formatPrincipal(username);
+        final String searchFor = LdapConnectionWrapper.ATTRIBUTE_NAME + "=" +
+                LdapStringSanitizer.sanitize(formatPrincipal(username));
         return Collections.list(ctx.search(LdapConnectionWrapper.BASE_DN, searchFor, sc));
+    }
+
+    /**
+     * Performs a search for the specified username. Internally, this method queries on
+     * the attribute defined by {@link Config.AlpineKey#LDAP_ATTRIBUTE_NAME}.
+     * @param ctx the DirContext to use
+     * @param username the username to query on
+     * @return a list of SearchResult objects. If the username is found, the list should typically only contain one result.
+     * @throws NamingException if an exception is thrown
+     * @since 1.4.0
+     */
+    public SearchResult searchForSingleUsername(DirContext ctx, String username) throws NamingException {
+        final List<SearchResult> results = searchForUsername(ctx, username);
+        if (results == null || results.size() == 0) {
+            return null;
+        } else if (results.size() == 1) {
+            return results.get(0);
+        } else {
+            throw new NamingException("Multiple entries in the directory contain the same username. This scenario is not supported");
+        }
     }
 
     /**
@@ -240,19 +258,13 @@ public class LdapConnectionWrapper {
      * Examples:
      *   alpine.ldap.auth.username.format=%s
      * 	 alpine.ldap.auth.username.format=%s@company.com
-     *   alpine.ldap.auth.username.format=uid=%s,ou=People,dc=company,dc=com
-     *   alpine.ldap.auth.username.format=userPrincipalName=%s,ou=People,dc=company,dc=com
      * @param username the username
      * @return a formatted user principal
      * @since 1.4.0
      */
-    public static String formatPrincipal(String username) {
+    private static String formatPrincipal(String username) {
         if  (StringUtils.isNotBlank(LDAP_AUTH_USERNAME_FMT)) {
             return String.format(LDAP_AUTH_USERNAME_FMT, username);
-        } else {
-            if (StringUtils.isNotBlank(DOMAIN_NAME)) {
-                return username + "@" + DOMAIN_NAME;
-            }
         }
         return username;
     }
