@@ -65,7 +65,7 @@ public class LdapConnectionWrapper {
     public static final boolean TEAM_SYNCHRONIZATION = Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.LDAP_TEAM_SYNCHRONIZATION);
 
     public static final boolean LDAP_CONFIGURED = (LDAP_ENABLED && StringUtils.isNotBlank(LDAP_URL));
-    private static final boolean IS_LDAP_SSLTLS = (LDAP_URL.startsWith("ldaps:"));
+    private static final boolean IS_LDAP_SSLTLS = (StringUtils.isNotBlank(LDAP_URL) && LDAP_URL.startsWith("ldaps:"));
 
 
     /**
