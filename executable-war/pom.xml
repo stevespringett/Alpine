@@ -21,7 +21,7 @@
 
     <groupId>us.springett</groupId>
     <artifactId>alpine-executable-war</artifactId>
-    <version>1.1.1</version>
+    <version>1.1.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Alpine Executable WAR</name>
@@ -52,7 +52,7 @@
         <connection>scm:git:git@github.com:stevespringett/Alpine.git</connection>
         <url>https://github.com/stevespringett/Alpine.git</url>
         <developerConnection>scm:git:git@github.com:stevespringett/Alpine.git</developerConnection>
-        <tag>alpine-executable-war-1.1.1</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <issueManagement>
