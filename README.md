@@ -123,7 +123,7 @@ Maven Usage
 <parent>
     <groupId>us.springett</groupId>
     <artifactId>alpine-parent</artifactId>
-    <version>1.4.0</version>
+    <version>1.4.1</version>
 </parent>
 
 <dependencies>
@@ -131,7 +131,7 @@ Maven Usage
     <dependency>
         <groupId>us.springett</groupId>
         <artifactId>alpine</artifactId>
-        <version>1.4.0</version>
+        <version>1.4.1</version>
     </dependency>
 </dependencies>
 ```
