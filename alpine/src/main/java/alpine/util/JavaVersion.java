@@ -29,21 +29,23 @@ import org.apache.commons.lang3.math.NumberUtils;
  */
 public class JavaVersion {
 
-    private static final String RUNTIME_VERSION = System.getProperty("java.runtime.version");
-    private static int major, minor, update, build;
-    static {
-        if (RUNTIME_VERSION.startsWith("1.")) {
-            final String[] javaVersionElements = RUNTIME_VERSION.split("\\.|_|-b");
+    private int major, minor, update;
+
+    public JavaVersion() {
+        this(System.getProperty("java.runtime.version"));
+    }
+
+    public JavaVersion(String versionString) {
+        if (versionString.startsWith("1.")) {
+            final String[] javaVersionElements = versionString.split("\\.|_|-|-b");
             major = NumberUtils.toInt(javaVersionElements[1]);
             minor = NumberUtils.toInt(javaVersionElements[2]);
             update = NumberUtils.toInt(javaVersionElements[3]);
-            build = NumberUtils.toInt(javaVersionElements[4]);
         } else {
-            final String[] javaVersionElements = RUNTIME_VERSION.split("\\.|\\+");
+            final String[] javaVersionElements = versionString.split("\\.|\\+");
             major = NumberUtils.toInt(javaVersionElements[0]);
             minor = NumberUtils.toInt(javaVersionElements[1]);
             update = NumberUtils.toInt(javaVersionElements[2]);
-            build = NumberUtils.toInt(javaVersionElements[3]);
         }
     }
 
@@ -59,17 +61,13 @@ public class JavaVersion {
         return update;
     }
 
-    public int getBuild() {
-        return build;
-    }
-
     /**
      * Returns a semantic version string of the version with the following format:
      * major.minor.update+build.
      */
     @Override
     public String toString() {
-        return major + "." + minor + "." + update + "+" + build;
+        return major + "." + minor + "." + update;
     }
 
 }
