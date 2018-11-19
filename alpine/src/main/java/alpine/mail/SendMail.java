@@ -184,6 +184,8 @@ public class SendMail {
                 throw new SendMailException("An error occurred while configuring trust managers", e);
             }
             props.put("mail.smtp.ssl.socketFactory", sf);
+        } else if (useStartTLS) {
+            props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
         }
         props.put("mail.smtp.host", host);
         props.put("mail.smtp.port", port);
@@ -195,7 +197,7 @@ public class SendMail {
             props.put("mail.smtp.auth.ntlm.domain", host);
         }
 
-        Session session = Session.getDefaultInstance(props, new javax.mail.Authenticator() {
+        Session session = Session.getInstance(props, new javax.mail.Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(username, password);
             }
