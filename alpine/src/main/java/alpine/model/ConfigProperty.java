@@ -39,20 +39,9 @@ import java.io.Serializable;
 @PersistenceCapable
 @Unique(members={"groupName", "propertyName"})
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ConfigProperty implements Serializable {
+public class ConfigProperty implements IConfigProperty, Serializable {
 
     private static final long serialVersionUID = 5286421336166302912L;
-
-    public enum PropertyType {
-        BOOLEAN,
-        INTEGER,
-        NUMBER,
-        STRING,
-        ENCRYPTEDSTRING,
-        TIMESTAMP,
-        URL,
-        UUID
-    }
 
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.NATIVE)
