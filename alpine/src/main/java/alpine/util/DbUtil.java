@@ -17,6 +17,10 @@
  */
 package alpine.util;
 
+import alpine.persistence.AbstractAlpineQueryManager;
+import org.datanucleus.PersistenceNucleusContext;
+import org.datanucleus.api.jdo.JDOPersistenceManagerFactory;
+import org.datanucleus.store.schema.SchemaAwareStoreManager;
 import javax.annotation.WillClose;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -24,6 +28,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Properties;
+import java.util.Set;
 
 public class DbUtil {
 
@@ -177,6 +184,16 @@ public class DbUtil {
             }
         }
         return false;
+    }
+
+    public static void createTable(AbstractAlpineQueryManager qm, Class... classes) {
+        JDOPersistenceManagerFactory pmf = (JDOPersistenceManagerFactory) qm.getPersistenceManager().getPersistenceManagerFactory();
+        final PersistenceNucleusContext ctx = pmf.getNucleusContext();
+        final Set<String> classNames = new HashSet<>();
+        for (Class clazz: classes) {
+            classNames.add(clazz.getCanonicalName());
+        }
+        ((SchemaAwareStoreManager)ctx.getStoreManager()).createSchemaForClasses(classNames, new Properties());
     }
 
 }
