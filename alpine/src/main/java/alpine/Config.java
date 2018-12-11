@@ -280,12 +280,25 @@ public class Config {
     }
 
     /**
-     * Return the configured value for the specified Key.
+     * Return the configured value for the specified Key. As of v1.4.3, this
+     * method will first check if the key has been specified as an environment
+     * variable. If it has, the method will return the value. If it hasn't
+     * been specified in the environment, it will retrieve the value (and optional
+     * default value) from the properties configuration.
+     *
+     * This method is Docker-friendly in that configuration can be specified via
+     * environment variables which is a common method of configuration when
+     * configuration files are not easily accessible.
+     *
      * @param key The Key to return the configuration for
      * @return a String of the value of the configuration
      * @since 1.0.0
      */
     public String getProperty(Key key) {
+        final String envVariable = getPropertyFromEnvironment(key);
+        if (envVariable != null) {
+            return envVariable;
+        }
         if (key.getDefaultValue() == null) {
             return properties.getProperty(key.getPropertyName());
         } else {
@@ -338,7 +351,9 @@ public class Config {
      * @param key The Key to return the configuration for
      * @return a String of the value of the configuration
      * @since 1.0.0
+     * @deprecated use {{@link #getProperty(Key)}}
      */
+    @Deprecated
     public String getProperty(String key) {
         return properties.getProperty(key);
     }
@@ -349,7 +364,9 @@ public class Config {
      * @param defaultValue The default value if the key cannot be found
      * @return a String of the value of the configuration
      * @since 1.0.0
+     * @deprecated use {{@link #getProperty(Key)}
      */
+    @Deprecated
     public String getProperty(String key, String defaultValue) {
         return properties.getProperty(key, defaultValue);
     }
@@ -387,6 +404,30 @@ public class Config {
                 LOGGER.error("Error expanding classpath", e);
             }
         }
+    }
+
+    /**
+     * Attempts to retrieve the key via environment variable. Property names are
+     * always upper case with periods replaced with underscores.
+     *
+     * alpine.worker.threads
+     *    becomes
+     * ALPINE_WORKER_THREADS
+     *
+     * @param key the key to retrieve from environment
+     * @return the value of the key (if set), null otherwise.
+     * @since 1.4.3
+     */
+    private String getPropertyFromEnvironment(Key key) {
+        final String envVariable = key.getPropertyName().toUpperCase().replace(".", "_");
+        try {
+            return StringUtils.trimToNull(System.getenv(envVariable));
+        } catch (SecurityException e) {
+            LOGGER.warn("A security exception prevented access to the environment variable. Using defaults.");
+        } catch (NullPointerException e) {
+            // Do nothing. The key was not specified in an environment variable. Continue along.
+        }
+        return null;
     }
 
     /**
