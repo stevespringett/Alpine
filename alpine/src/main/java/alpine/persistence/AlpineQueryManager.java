@@ -22,6 +22,7 @@ import alpine.event.LdapSyncEvent;
 import alpine.event.framework.EventService;
 import alpine.event.framework.LoggableSubscriber;
 import alpine.event.framework.Subscriber;
+import alpine.logging.Logger;
 import alpine.model.ApiKey;
 import alpine.model.ConfigProperty;
 import alpine.model.EventServiceLog;
@@ -47,6 +48,8 @@ import java.util.List;
  * @since 1.0.0
  */
 public class AlpineQueryManager extends AbstractAlpineQueryManager {
+
+    private static final Logger LOGGER = Logger.getLogger(AlpineQueryManager.class);
 
     /**
      * Default constructor.
@@ -177,25 +180,32 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @since 1.4.0
      */
     public LdapUser synchronizeTeamMembership(final LdapUser user, final List<String> groupDNs) {
+        LOGGER.debug("Synchronizing team membership for " + user.getUsername());
         final List<Team> removeThese = new ArrayList<>();
         if (user.getTeams() != null) {
             for (Team team : user.getTeams()) {
+                LOGGER.debug(user.getUsername() + " is a member of team: " + team.getName());
                 if (team.getMappedLdapGroups() != null) {
                     for (MappedLdapGroup mappedLdapGroup : team.getMappedLdapGroups()) {
+                        LOGGER.debug(mappedLdapGroup.getDn() + " is mapped to team: " + team.getName());
                         if (!groupDNs.contains(mappedLdapGroup.getDn())) {
+                            LOGGER.debug(mappedLdapGroup.getDn() + " is not identified in the List of group DNs specified. Queuing removal of membership for user " + user.getUsername());
                             removeThese.add(team);
                         }
                     }
                 } else {
+                    LOGGER.debug(team.getName() + " does not have any mapped LDAP groups. Queuing removal of " + user.getUsername() + " from team: " + team.getName());
                     removeThese.add(team);
                 }
             }
         }
         for (Team team: removeThese) {
+            LOGGER.debug("Removing user: " + user.getUsername() + " from team: " + team.getName());
             removeUserFromTeam(user, team);
         }
         for (String groupDN: groupDNs) {
             for (MappedLdapGroup mappedLdapGroup: getMappedLdapGroups(groupDN)) {
+                LOGGER.debug("Adding user: " + user.getUsername() + " to team: " + mappedLdapGroup.getTeam());
                 addUserToTeam(user, mappedLdapGroup.getTeam());
             }
         }
