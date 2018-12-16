@@ -26,6 +26,7 @@ import javax.naming.CommunicationException;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
+import javax.naming.PartialResultException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
@@ -130,13 +131,13 @@ public class LdapConnectionWrapper {
      * @since 1.4.0
      */
     public List<String> getGroups(DirContext dirContext, LdapUser ldapUser) throws NamingException {
-        List<String> groupDns = new ArrayList<>();
+        final List<String> groupDns = new ArrayList<>();
         final String searchFilter = variableSubstitution(USER_GROUPS_FILTER, ldapUser);
         final SearchControls sc = new SearchControls();
         sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
-        NamingEnumeration ne = dirContext.search(BASE_DN, searchFilter, sc);
-        while (ne != null && ne.hasMore()) {
-            SearchResult result = (SearchResult)ne.next();
+        final NamingEnumeration<SearchResult> ne = dirContext.search(BASE_DN, searchFilter, sc);
+        while (hasMoreEnum(ne)) {
+            final SearchResult result = ne.next();
             groupDns.add(result.getNameInNamespace());
         }
         closeQuietly(ne);
@@ -151,12 +152,12 @@ public class LdapConnectionWrapper {
      * @since 1.4.0
      */
     public List<String> getGroups(DirContext dirContext) throws NamingException {
-        List<String> groupDns = new ArrayList<>();
+        final List<String> groupDns = new ArrayList<>();
         final SearchControls sc = new SearchControls();
         sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
-        NamingEnumeration ne = dirContext.search(BASE_DN, GROUPS_FILTER, sc);
-        while (ne != null && ne.hasMore()) {
-            SearchResult result = (SearchResult)ne.next();
+        final NamingEnumeration<SearchResult> ne = dirContext.search(BASE_DN, GROUPS_FILTER, sc);
+        while (hasMoreEnum(ne)) {
+            final SearchResult result = ne.next();
             groupDns.add(result.getNameInNamespace());
         }
         closeQuietly(ne);
@@ -274,6 +275,30 @@ public class LdapConnectionWrapper {
             return null;
         }
         return s.replace("{USER_DN}", user.getDN());
+    }
+
+    /**
+     * Convenience method that wraps {@link NamingEnumeration#hasMore()} but ignores {@link PartialResultException}s
+     * that may be thrown as a result. This is typically an issue with a directory server that does not support
+     * {@link Context#REFERRAL} being set to 'ignore' (which is the default value).
+     *
+     * Issue: https://github.com/stevespringett/Alpine/issues/19
+     * @since 1.4.3
+     */
+    private boolean hasMoreEnum(NamingEnumeration<SearchResult> ne) throws NamingException {
+        if (ne == null) {
+            return false;
+        }
+        boolean hasMore = true;
+        try {
+            if (!ne.hasMore()) {
+                hasMore = false;
+            }
+        } catch (PartialResultException e) {
+            hasMore = false;
+            LOGGER.warn("Partial results returned. If this is an Active Directory server, try using port 3268 or 3269 in " + Config.AlpineKey.LDAP_SERVER_URL.name());
+        }
+        return hasMore;
     }
 
     /**
