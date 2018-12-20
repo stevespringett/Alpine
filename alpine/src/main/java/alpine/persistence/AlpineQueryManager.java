@@ -33,6 +33,8 @@ import alpine.model.Permission;
 import alpine.model.Team;
 import alpine.model.UserPrincipal;
 import alpine.resources.AlpineRequest;
+
+import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -56,6 +58,14 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      */
     public AlpineQueryManager() {
         super();
+    }
+
+    /**
+     * Constructs a new AlpineQueryManager.
+     * @param pm a PersistenceManager
+     */
+    public AlpineQueryManager(final PersistenceManager pm) {
+        super(pm);
     }
 
     /**

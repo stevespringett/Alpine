@@ -42,40 +42,6 @@ public class PersistenceManagerFactory implements ServletContextListener {
 
     private static final Logger LOGGER = Logger.getLogger(PersistenceManagerFactory.class);
 
-    // The following properties are used for unit tests
-    private static final Properties JDO_OVERRIDES;
-    static {
-        JDO_OVERRIDES = new Properties();
-        JDO_OVERRIDES.put("javax.jdo.option.ConnectionURL", "jdbc:h2:mem:alpine");
-        JDO_OVERRIDES.put("javax.jdo.option.ConnectionDriverName", "org.h2.Driver");
-        JDO_OVERRIDES.put("javax.jdo.option.ConnectionUserName", "sa");
-        JDO_OVERRIDES.put("javax.jdo.option.ConnectionPassword", "");
-        JDO_OVERRIDES.put("javax.jdo.option.Mapping", "h2");
-        JDO_OVERRIDES.put("datanucleus.connectionPoolingType", "HikariCP");
-        JDO_OVERRIDES.put("datanucleus.schema.autoCreateDatabase", "true");
-        JDO_OVERRIDES.put("datanucleus.schema.autoCreateTables", "true");
-        JDO_OVERRIDES.put("datanucleus.schema.autoCreateColumns", "true");
-        JDO_OVERRIDES.put("datanucleus.schema.autoCreateConstraints", "true");
-        JDO_OVERRIDES.put("datanucleus.generateSchema.database.mode", "create");
-        JDO_OVERRIDES.put("datanucleus.query.jdoql.allowAll", "true");
-    }
-
-    private static final Properties JDO_PROPERTIES;
-    static {
-        JDO_PROPERTIES = new Properties();
-        JDO_PROPERTIES.put("javax.jdo.option.ConnectionURL", Config.getInstance().getProperty(Config.AlpineKey.DATABASE_URL));
-        JDO_PROPERTIES.put("javax.jdo.option.ConnectionDriverName", Config.getInstance().getProperty(Config.AlpineKey.DATABASE_DRIVER));
-        JDO_PROPERTIES.put("javax.jdo.option.ConnectionUserName", Config.getInstance().getProperty(Config.AlpineKey.DATABASE_USERNAME));
-        JDO_PROPERTIES.put("javax.jdo.option.ConnectionPassword", Config.getInstance().getProperty(Config.AlpineKey.DATABASE_PASSWORD));
-        JDO_PROPERTIES.put("datanucleus.connectionPoolingType", "HikariCP");
-        JDO_PROPERTIES.put("datanucleus.schema.autoCreateDatabase", "true");
-        JDO_PROPERTIES.put("datanucleus.schema.autoCreateTables", "true");
-        JDO_PROPERTIES.put("datanucleus.schema.autoCreateColumns", "true");
-        JDO_PROPERTIES.put("datanucleus.schema.autoCreateConstraints", "true");
-        JDO_PROPERTIES.put("datanucleus.generateSchema.database.mode", "create");
-        JDO_PROPERTIES.put("datanucleus.query.jdoql.allowAll", "true");
-    }
-
     private static JDOPersistenceManagerFactory pmf;
 
     @Override
@@ -87,7 +53,7 @@ public class PersistenceManagerFactory implements ServletContextListener {
             Config.getInstance().expandClasspath(driverPath);
         }
 
-        pmf = (JDOPersistenceManagerFactory)JDOHelper.getPersistenceManagerFactory(JDO_PROPERTIES, "Alpine");
+        pmf = (JDOPersistenceManagerFactory)JDOHelper.getPersistenceManagerFactory(JdoProperties.get(), "Alpine");
 
         // Ensure that the UpgradeMetaProcessor and SchemaVersion tables are created NOW, not dynamically at runtime.
         final PersistenceNucleusContext ctx = pmf.getNucleusContext();
@@ -109,7 +75,7 @@ public class PersistenceManagerFactory implements ServletContextListener {
      */
     public static PersistenceManager createPersistenceManager() {
         if (Config.isUnitTestsEnabled()) {
-            pmf = (JDOPersistenceManagerFactory)JDOHelper.getPersistenceManagerFactory(JDO_OVERRIDES, "Alpine");
+            pmf = (JDOPersistenceManagerFactory)JDOHelper.getPersistenceManagerFactory(JdoProperties.unit(), "Alpine");
         }
         if (pmf == null) {
             throw new IllegalStateException("Context is not initialized yet.");
