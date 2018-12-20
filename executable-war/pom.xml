@@ -93,7 +93,7 @@
 
         <!-- Dependency Versions -->
         <lib.slf4j.version>1.7.25</lib.slf4j.version>
-        <lib.jetty.version>9.4.12.v20180830</lib.jetty.version>
+        <lib.jetty.version>9.4.14.v20181114</lib.jetty.version>
         <lib.logback.version>1.2.3</lib.logback.version>
     </properties>
 
