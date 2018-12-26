@@ -105,6 +105,7 @@
         <maven.gpg.plugin.version>1.6</maven.gpg.plugin.version>
         <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
         <maven.uuidgenerator.plugin.version>1.0.1</maven.uuidgenerator.plugin.version>
+        <maven.jacoco.plugin.version>0.8.2</maven.jacoco.plugin.version>
 
         <!-- Software Security: Fortify SCA -->
         <maven.fortify.plugin.version>18.20</maven.fortify.plugin.version>
@@ -483,6 +484,42 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${maven.jacoco.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>post-unit-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Sets the path to the file which contains the execution data. -->
+                            <dataFile>target/jacoco.exec</dataFile>
+                            <!-- Sets the output directory for the code coverage report. -->
+                            <outputDirectory>target/jacoco-ut</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <destFile>target/jacoco.exec</destFile>
+                </configuration>
             </plugin>
         </plugins>
 
