@@ -4,6 +4,7 @@ jdk: oraclejdk8
 env:
   global:
    - secure: "QT1L6W78HBwrygjOUk9c8pr3kPzSUlJ3PM5XqZQsLOFAXLoXJ4zQ8CeXm9MgvDZYnSS8k0WkhcbTMyCs2niDd4Ilav/7JDBXBKiHsaRRats7T17v1ObUaRKXNpUBxChPF57Y9yjTlYArLHbSwCQfLwusIxXHqKNI3xUqhHtsCVPmn5Z2jXK9PYcB42dVh/ax0kOvAEZYbsKShg4aje1z3nEmqGifkTiLZCHnNOkQ9o7X0ZePV8XBc99rmijYL3Si6WI1Oe8NKh9/fbunDFIDkSivxVJ1/UrgEONwxsHJQ7/w6XuxAkMQ84KC6cbQJ0ymH3CYeVxtflo85TUh150zyOxEImM30syRN6nAGYISCbEOOAnbWkdlNpvdPzSVjOLcYJmtQcLfxnvYCvxiNdDAC4cZsHxjjTYPJehG3wU18+N3JE8sdrkgr/XzZr/DLKc2IBMTtbYPD7Sza68ZP/LIjyHt9CuE/HUuduhxFukr7tRvtbRbVtd3oL1mep3bUcmwS1rFhe4b08MkM0BD2CQ6WZgYoFxJiCtRKT7zAirWsSIebdfXyLmuRH5yYL31t3BNtUkDL1FnMfK1eCkc82fCmlMSG+YqV7O/3yRlRWCltTOrAI/EDgFGW20ZBho+yf9RhZ92mUf8TH7qLT5zKHnKryE8lBEzMpaLckyU7SabXCE="
+   - secure: E/b1Py2L8TaCfHIBskdm0RgjcvPjKwjE7CTcKoiTR6TI4fSb2CKjBJBNRW2spFG825OttGKNoaWlIFBTMnXYGswUnuTfQlL/ngTct62nlMQ1H8YI2+2UQ61R2q9vbl5DeREzrXzHrSTX7qPx4m5rwCmvA5D7suKdzqgz7ToIQ6I=
 
 addons:
   coverity_scan:
@@ -17,6 +18,13 @@ addons:
 
 script:
   - mvn clean install
+
+before_install:
+- sudo apt-get install jq
+- wget -O ~/codacy-coverage-reporter-assembly.jar https://github.com/codacy/codacy-coverage-reporter/releases/download/4.0.5/codacy-coverage-reporter-4.0.5-assembly.jar
+
+after_success:
+- java -jar ~/codacy-coverage-reporter-assembly.jar report -l Java -r alpine/target/jacoco-ut/jacoco.xml
 
 notifications:
   webhooks:
