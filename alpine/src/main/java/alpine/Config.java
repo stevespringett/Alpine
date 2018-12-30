@@ -391,7 +391,7 @@ public class Config {
      * @since 1.0.0
      */
     public void expandClasspath(File... files) {
-        URLClassLoader urlClassLoader = (URLClassLoader)ClassLoader.getSystemClassLoader();
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
         Class<URLClassLoader> urlClass = URLClassLoader.class;
         for (File file: files) {
             LOGGER.info("Expanding classpath to include: " + file.getAbsolutePath());
@@ -399,7 +399,7 @@ public class Config {
             try {
                 Method method = urlClass.getDeclaredMethod("addURL", URL.class);
                 method.setAccessible(true);
-                method.invoke(urlClassLoader, fileUri.toURL());
+                method.invoke(classLoader, fileUri.toURL());
             } catch (MalformedURLException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                 LOGGER.error("Error expanding classpath", e);
             }
