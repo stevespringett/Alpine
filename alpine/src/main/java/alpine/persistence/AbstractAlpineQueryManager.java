@@ -21,6 +21,7 @@ import alpine.resources.AlpineRequest;
 import alpine.resources.OrderDirection;
 import alpine.resources.Pagination;
 import alpine.validation.RegexSequence;
+import org.apache.commons.collections4.CollectionUtils;
 import org.datanucleus.api.jdo.JDOQuery;
 import javax.jdo.FetchPlan;
 import javax.jdo.PersistenceManager;
@@ -553,6 +554,25 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
     @SuppressWarnings("unchecked")
     public <T> T getObjectByUuid(Class<T> clazz, String uuid, String fetchGroup) {
         return getObjectByUuid(clazz, UUID.fromString(uuid), fetchGroup);
+    }
+
+    /**
+     * Used to return the first record in a collection. This method is intended to be used
+     * to wrap {@link Query#execute()} and its derivatives.
+     * @param object a collection object (or anything that extends collection)
+     * @param <T> the type of object returned, or null if object was null, not a collection, or collection was empty
+     * @return 1.4.4
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T singleResult(Object object) {
+        if (object == null) {
+            return null;
+        }
+        if (object instanceof Collection) {
+            Collection<T> result = (Collection<T>)object;
+            return CollectionUtils.isEmpty(result) ? null : result.iterator().next();
+        }
+        return null;
     }
 
     /**
