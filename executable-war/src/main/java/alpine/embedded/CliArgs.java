@@ -28,22 +28,24 @@ import java.util.TreeSet;
  */
 public class CliArgs {
 
-    private String[] args = null;
-    private HashMap<String, Integer> switchIndexes = new HashMap<>();
-    private TreeSet<Integer> takenIndexes = new TreeSet<>();
+    private String[] args;
+    private final HashMap<String, Integer> switchIndexes = new HashMap<>();
+    private final TreeSet<Integer> takenIndexes = new TreeSet<>();
     //private List<String> targets = new ArrayList<>();
 
-    public CliArgs(String[] args) {
+    public CliArgs(final String[] args) {
         parse(args);
     }
 
-    public void parse(String[] arguments) {
-        this.args = arguments;
+    public void parse(final String[] arguments) {
+        if (arguments != null) {
+            this.args = arguments.clone();
+        }
         //locate switches.
         switchIndexes.clear();
         takenIndexes.clear();
         for (int i = 0; i < args.length; i++) {
-            if (args[i].startsWith("-")) {
+            if (args[i].charAt(0) == '-') {
                 switchIndexes.put(args[i], i);
                 takenIndexes.add(i);
             }
@@ -51,25 +53,30 @@ public class CliArgs {
     }
 
     public String[] args() {
-        return args;
+        if (args == null) {
+            return null;
+        } else {
+            return args.clone();
+        }
     }
 
-    public String arg(int index) {
+    public String arg(final int index) {
         return args[index];
     }
 
-    public boolean switchPresent(String switchName) {
+    public boolean switchPresent(final String switchName) {
         return switchIndexes.containsKey(switchName);
     }
 
-    public String switchValue(String switchName) {
+    public String switchValue(final String switchName) {
         return switchValue(switchName, null);
     }
 
-    public String switchValue(String switchName, String defaultValue) {
-        if (!switchIndexes.containsKey(switchName)) return defaultValue;
-
-        int switchIndex = switchIndexes.get(switchName);
+    public String switchValue(final String switchName, final String defaultValue) {
+        if (!switchIndexes.containsKey(switchName)) {
+            return defaultValue;
+        }
+        final int switchIndex = switchIndexes.get(switchName);
         if (switchIndex + 1 < args.length) {
             takenIndexes.add(switchIndex + 1);
             return args[switchIndex + 1];
@@ -77,50 +84,52 @@ public class CliArgs {
         return defaultValue;
     }
 
-    public Integer switchIntegerValue(String switchName) {
+    public Integer switchIntegerValue(final String switchName) {
         return switchIntegerValue(switchName, null);
     }
 
-    public Integer switchIntegerValue(String switchName, Integer defaultValue) {
-        String switchValue = switchValue(switchName, null);
-
-        if (switchValue == null) return defaultValue;
+    public Integer switchIntegerValue(final String switchName, final Integer defaultValue) {
+        final String switchValue = switchValue(switchName, null);
+        if (switchValue == null) {
+            return defaultValue;
+        }
         return Integer.parseInt(switchValue);
     }
 
-    public Long switchLongValue(String switchName) {
+    public Long switchLongValue(final String switchName) {
         return switchLongValue(switchName, null);
     }
 
-    public Long switchLongValue(String switchName, Long defaultValue) {
-        String switchValue = switchValue(switchName, null);
-
-        if (switchValue == null) return defaultValue;
+    public Long switchLongValue(final String switchName, final Long defaultValue) {
+        final String switchValue = switchValue(switchName, null);
+        if (switchValue == null) {
+            return defaultValue;
+        }
         return Long.parseLong(switchValue);
     }
 
-    public Double switchDoubleValue(String switchName) {
+    public Double switchDoubleValue(final String switchName) {
         return switchDoubleValue(switchName, null);
     }
 
-    public Double switchDoubleValue(String switchName, Double defaultValue) {
-        String switchValue = switchValue(switchName, null);
-
-        if (switchValue == null) return defaultValue;
+    public Double switchDoubleValue(final String switchName, final Double defaultValue) {
+        final String switchValue = switchValue(switchName, null);
+        if (switchValue == null) {
+            return defaultValue;
+        }
         return Double.parseDouble(switchValue);
     }
 
-    public String[] switchValues(String switchName) {
-        if (!switchIndexes.containsKey(switchName)) return new String[0];
-
-        int switchIndex = switchIndexes.get(switchName);
-
+    public String[] switchValues(final String switchName) {
+        if (!switchIndexes.containsKey(switchName)) {
+            return new String[0];
+        }
+        final int switchIndex = switchIndexes.get(switchName);
         int nextArgIndex = switchIndex + 1;
-        while (nextArgIndex < args.length && !args[nextArgIndex].startsWith("-")) {
+        while (nextArgIndex < args.length && args[nextArgIndex].charAt(0) != '-') {
             takenIndexes.add(nextArgIndex);
             nextArgIndex++;
         }
-
         String[] values = new String[nextArgIndex - switchIndex - 1];
         for (int j = 0; j < values.length; j++) {
             values[j] = args[switchIndex + j + 1];
@@ -128,15 +137,13 @@ public class CliArgs {
         return values;
     }
 
-    public <T> T switchPojo(Class<T> pojoClass) {
+    public <T> T switchPojo(final Class<T> pojoClass) {
         try {
-            T pojo = pojoClass.newInstance();
-
-            Field[] fields = pojoClass.getFields();
-            for (Field field : fields) {
-                Class fieldType = field.getType();
-                String fieldName = "-" + field.getName().replace('_', '-');
-
+            final T pojo = pojoClass.newInstance();
+            final Field[] fields = pojoClass.getFields();
+            for (final Field field : fields) {
+                final Class fieldType = field.getType();
+                final String fieldName = "-" + field.getName().replace('_', '-');
                 if (fieldType.equals(Boolean.class) || fieldType.equals(boolean.class)) {
                     field.set(pojo, switchPresent(fieldName));
                 } else if (fieldType.equals(String.class)) {
@@ -168,7 +175,7 @@ public class CliArgs {
                         field.set(pojo, switchDoubleValue(fieldName).floatValue());
                     }
                 } else if (fieldType.equals(String[].class)) {
-                    String[] values = switchValues(fieldName);
+                    final String[] values = switchValues(fieldName);
                     if (values.length != 0) {
                         field.set(pojo, values);
                     }

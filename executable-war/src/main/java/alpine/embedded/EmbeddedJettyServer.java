@@ -37,9 +37,15 @@ import java.util.List;
  * @author Steve Springett
  * @since 1.0.0
  */
-public class EmbeddedJettyServer {
+public final class EmbeddedJettyServer {
 
-    public static void main(String[] args) throws Exception {
+    /**
+     * Private constructor.
+     */
+    private EmbeddedJettyServer() {
+    }
+
+    public static void main(final String[] args) throws Exception {
 
         final CliArgs cliArgs = new CliArgs(args);
         final String contextPath = cliArgs.switchValue("-context", "/");
