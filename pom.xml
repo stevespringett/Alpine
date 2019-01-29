@@ -22,7 +22,7 @@
     <groupId>us.springett</groupId>
     <artifactId>alpine-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.4.4-SNAPSHOT</version>
+    <version>1.5.0-SNAPSHOT</version>
 
     <modules>
         <module>alpine</module>
@@ -162,6 +162,7 @@
         <!-- Dependency Versions -->
         <lib.alpine.executable.war.version>1.1.2</lib.alpine.executable.war.version>
         <lib.bcrypt.version>0.4</lib.bcrypt.version>
+        <lib.caffeine.version>2.6.2</lib.caffeine.version>
         <lib.commons.collections4.version>4.2</lib.commons.collections4.version>
         <lib.commons.io.version>2.6</lib.commons.io.version>
         <lib.commons.lang3.version>3.8.1</lib.commons.lang3.version>
@@ -392,13 +393,6 @@
             <artifactId>encoder-jsp</artifactId>
             <version>${lib.owasp.encoder.version}</version>
         </dependency>
-        <!-- Executable WAR with embedded Jetty -->
-        <dependency>
-            <groupId>us.springett</groupId>
-            <artifactId>alpine-executable-war</artifactId>
-            <version>${lib.alpine.executable.war.version}</version>
-            <scope>provided</scope>
-        </dependency>
         <!-- JavaMail API -->
         <dependency>
             <groupId>com.sun.mail</groupId>
@@ -410,6 +404,12 @@
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>jsr305</artifactId>
             <version>${lib.jsr305.version}</version>
+        </dependency>
+        <!-- Object cache -->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <version>${lib.caffeine.version}</version>
         </dependency>
         <!-- Unit Tests -->
         <dependency>
@@ -427,7 +427,7 @@
     </dependencies>
 
     <prerequisites>
-        <maven>3.1</maven>
+        <maven>3.2.1</maven>
     </prerequisites>
 
     <build>
@@ -451,6 +451,10 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven.surefire.plugin.version}</version>
+                <configuration>
+                    <reuseForks>false</reuseForks>
+                    <forkCount>1</forkCount>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.datanucleus</groupId>
@@ -822,6 +826,15 @@
                     <value>true</value>
                 </property>
             </activation>
+            <dependencies>
+                <!-- Executable WAR with embedded Jetty -->
+                <dependency>
+                    <groupId>us.springett</groupId>
+                    <artifactId>alpine-executable-war</artifactId>
+                    <version>${lib.alpine.executable.war.version}</version>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
             <build>
                 <defaultGoal>package</defaultGoal>
                 <plugins>
