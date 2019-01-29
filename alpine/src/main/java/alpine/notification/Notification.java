@@ -34,7 +34,7 @@ public final class Notification {
      * @param notification the Notification to dispatch
      * @since 1.3.0
      */
-    public static void dispatch(Notification notification) {
+    public static void dispatch(final Notification notification) {
         NotificationService.getInstance().publish(notification);
     }
 
@@ -101,7 +101,7 @@ public final class Notification {
         return scope;
     }
 
-    public void setScope(String scope) {
+    public void setScope(final String scope) {
         this.scope = scope;
     }
 
@@ -109,7 +109,7 @@ public final class Notification {
         return group;
     }
 
-    public void setGroup(String group) {
+    public void setGroup(final String group) {
         this.group = group;
     }
 
@@ -117,7 +117,7 @@ public final class Notification {
         return level;
     }
 
-    public void setLevel(NotificationLevel level) {
+    public void setLevel(final NotificationLevel level) {
         this.level = level;
     }
 
@@ -125,7 +125,7 @@ public final class Notification {
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(final String title) {
         this.title = title;
     }
 
@@ -133,7 +133,7 @@ public final class Notification {
         return content;
     }
 
-    public void setContent(String content) {
+    public void setContent(final String content) {
         this.content = content;
     }
 
@@ -141,7 +141,7 @@ public final class Notification {
         return timestamp;
     }
 
-    public void setTimestamp(LocalDateTime timestamp) {
+    public void setTimestamp(final LocalDateTime timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -149,7 +149,7 @@ public final class Notification {
         return subject;
     }
 
-    public void setSubject(Object subject) {
+    public void setSubject(final Object subject) {
         this.subject = subject;
     }
 }

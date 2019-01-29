@@ -40,7 +40,8 @@ public class AlpineRequest {
      * @param orderBy the field to order by
      * @param orderDirection the sorting direction
      */
-    public AlpineRequest(Principal principal, Pagination pagination, String filter, String orderBy, OrderDirection orderDirection) {
+    public AlpineRequest(final Principal principal, final Pagination pagination, final String filter,
+                         final String orderBy, final OrderDirection orderDirection) {
         this.principal = principal;
         this.pagination = pagination;
         this.filter = filter;

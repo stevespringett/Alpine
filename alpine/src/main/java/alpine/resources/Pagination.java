@@ -31,7 +31,7 @@ public class Pagination {
         NONE
     }
 
-    private Strategy strategy;
+    private final Strategy strategy;
     private int offset;
     private int limit;
 
@@ -42,7 +42,7 @@ public class Pagination {
      * @param o1 the offset or page number to use
      * @param o2 the number of results to limit a result-set to (aka, the size of the page)
      */
-    public Pagination(Strategy strategy, int o1, int o2) {
+    public Pagination(final Strategy strategy, final int o1, final int o2) {
         this.strategy = strategy;
         calculateStrategy(strategy, o1, o2);
     }
@@ -54,7 +54,7 @@ public class Pagination {
      * @param o1 the offset or page number to use
      * @param o2 the number of results to limit a result-set to (aka, the size of the page)
      */
-    public Pagination(Strategy strategy, String o1, String o2) {
+    public Pagination(final Strategy strategy, final String o1, final String o2) {
         this.strategy = strategy;
         if (Strategy.OFFSET == strategy) {
             calculateStrategy(strategy, parseIntegerFromParam(o1, 0), parseIntegerFromParam(o2, 100));
@@ -69,7 +69,7 @@ public class Pagination {
      * @param o1 the offset or page number to use
      * @param o2 the number of results to limit a result-set to (aka, the size of the page)
      */
-    private void calculateStrategy(Strategy strategy, int o1, int o2) {
+    private void calculateStrategy(final Strategy strategy, final int o1, final int o2) {
         if (Strategy.OFFSET == strategy) {
             this.offset = o1;
             this.limit = o2;
@@ -118,7 +118,7 @@ public class Pagination {
      * @param defaultValue the default value to use
      * @return an Integer
      */
-    private Integer parseIntegerFromParam(String value, int defaultValue) {
+    private Integer parseIntegerFromParam(final String value, final int defaultValue) {
         try {
             return Integer.valueOf(value);
         } catch (NumberFormatException | NullPointerException e) {

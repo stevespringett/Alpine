@@ -105,13 +105,13 @@ public final class BlacklistUrlFilter implements Filter {
 
         final String requestUri = req.getRequestURI();
         if (requestUri != null) {
-            for (String url: denyUrls) {
+            for (final String url: denyUrls) {
                 if (requestUri.startsWith(url.trim())) {
                     res.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     return;
                 }
             }
-            for (String url: ignoreUrls) {
+            for (final String url: ignoreUrls) {
                 if (requestUri.startsWith(url.trim())) {
                     res.setStatus(HttpServletResponse.SC_NOT_FOUND);
                     return;

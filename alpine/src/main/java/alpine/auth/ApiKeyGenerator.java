@@ -47,11 +47,11 @@ public final class ApiKeyGenerator {
      * @param chars the length of the API key to generate
      * @return a String representation of the API key
      */
-    public static String generate(int chars) {
+    public static String generate(final int chars) {
         final SecureRandom secureRandom = new SecureRandom();
         final char[] buff = new char[chars];
         for (int i = 0; i < chars; ++i) {
-            if ((i % 10) == 0) {
+            if (i % 10 == 0) {
                 secureRandom.setSeed(secureRandom.nextLong());
             }
             buff[i] = VALID_CHARACTERS[secureRandom.nextInt(VALID_CHARACTERS.length)];

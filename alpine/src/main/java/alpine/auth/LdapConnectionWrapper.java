@@ -65,8 +65,8 @@ public class LdapConnectionWrapper {
     public static final boolean USER_PROVISIONING = Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.LDAP_USER_PROVISIONING);
     public static final boolean TEAM_SYNCHRONIZATION = Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.LDAP_TEAM_SYNCHRONIZATION);
 
-    public static final boolean LDAP_CONFIGURED = (LDAP_ENABLED && StringUtils.isNotBlank(LDAP_URL));
-    private static final boolean IS_LDAP_SSLTLS = (StringUtils.isNotBlank(LDAP_URL) && LDAP_URL.startsWith("ldaps:"));
+    public static final boolean LDAP_CONFIGURED = LDAP_ENABLED && StringUtils.isNotBlank(LDAP_URL);
+    private static final boolean IS_LDAP_SSLTLS = StringUtils.isNotBlank(LDAP_URL) && LDAP_URL.startsWith("ldaps:");
 
 
     /**
@@ -79,7 +79,7 @@ public class LdapConnectionWrapper {
      * @throws NamingException when unable to establish a connection
      * @since 1.4.0
      */
-    public LdapContext createLdapContext(String userDn, String password) throws NamingException {
+    public LdapContext createLdapContext(final String userDn, final String password) throws NamingException {
         if (StringUtils.isEmpty(userDn) || StringUtils.isEmpty(password)) {
             throw new NamingException("Username or password cannot be empty or null");
         }
@@ -130,7 +130,7 @@ public class LdapConnectionWrapper {
      * @throws NamingException if an exception is thrown
      * @since 1.4.0
      */
-    public List<String> getGroups(DirContext dirContext, LdapUser ldapUser) throws NamingException {
+    public List<String> getGroups(final DirContext dirContext, final LdapUser ldapUser) throws NamingException {
         final List<String> groupDns = new ArrayList<>();
         final String searchFilter = variableSubstitution(USER_GROUPS_FILTER, ldapUser);
         final SearchControls sc = new SearchControls();
@@ -151,7 +151,7 @@ public class LdapConnectionWrapper {
      * @throws NamingException if an exception if thrown
      * @since 1.4.0
      */
-    public List<String> getGroups(DirContext dirContext) throws NamingException {
+    public List<String> getGroups(final DirContext dirContext) throws NamingException {
         final List<String> groupDns = new ArrayList<>();
         final SearchControls sc = new SearchControls();
         sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
@@ -173,7 +173,7 @@ public class LdapConnectionWrapper {
      * @throws NamingException if an exception is thrown
      * @since 1.4.0
      */
-    public List<SearchResult> searchForUsername(DirContext ctx, String username) throws NamingException {
+    public List<SearchResult> searchForUsername(final DirContext ctx, final String username) throws NamingException {
         final String[] attributeFilter = {};
         final SearchControls sc = new SearchControls();
         sc.setReturningAttributes(attributeFilter);
@@ -192,7 +192,7 @@ public class LdapConnectionWrapper {
      * @throws NamingException if an exception is thrown
      * @since 1.4.0
      */
-    public SearchResult searchForSingleUsername(DirContext ctx, String username) throws NamingException {
+    public SearchResult searchForSingleUsername(final DirContext ctx, final String username) throws NamingException {
         final List<SearchResult> results = searchForUsername(ctx, username);
         if (results == null || results.size() == 0) {
             return null;
@@ -212,7 +212,7 @@ public class LdapConnectionWrapper {
      * @throws NamingException if an exception is thrown
      * @since 1.4.0
      */
-    public String getAttribute(DirContext ctx, String dn, String attributeName) throws NamingException {
+    public String getAttribute(final DirContext ctx, final String dn, final String attributeName) throws NamingException {
         final Attributes attributes = ctx.getAttributes(dn);
         return getAttribute(attributes, attributeName);
     }
@@ -225,7 +225,7 @@ public class LdapConnectionWrapper {
      * @throws NamingException if an exception is thrown
      * @since 1.4.0
      */
-    public String getAttribute(SearchResult result, String attributeName) throws NamingException {
+    public String getAttribute(final SearchResult result, final String attributeName) throws NamingException {
         return getAttribute(result.getAttributes(), attributeName);
     }
 
@@ -237,7 +237,7 @@ public class LdapConnectionWrapper {
      * @throws NamingException if an exception is thrown
      * @since 1.4.0
      */
-    public String getAttribute(Attributes attributes, String attributeName) throws NamingException {
+    public String getAttribute(final Attributes attributes, final String attributeName) throws NamingException {
         if (attributes == null || attributes.size() == 0) {
             return null;
         } else {
@@ -263,14 +263,14 @@ public class LdapConnectionWrapper {
      * @return a formatted user principal
      * @since 1.4.0
      */
-    private static String formatPrincipal(String username) {
+    private static String formatPrincipal(final String username) {
         if  (StringUtils.isNotBlank(LDAP_AUTH_USERNAME_FMT)) {
             return String.format(LDAP_AUTH_USERNAME_FMT, username);
         }
         return username;
     }
 
-    private String variableSubstitution(String s, LdapUser user) {
+    private String variableSubstitution(final String s, final LdapUser user) {
         if (s == null) {
             return null;
         }
@@ -285,7 +285,7 @@ public class LdapConnectionWrapper {
      * Issue: https://github.com/stevespringett/Alpine/issues/19
      * @since 1.4.3
      */
-    private boolean hasMoreEnum(NamingEnumeration<SearchResult> ne) throws NamingException {
+    private boolean hasMoreEnum(final NamingEnumeration<SearchResult> ne) throws NamingException {
         if (ne == null) {
             return false;
         }

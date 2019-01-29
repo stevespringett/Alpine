@@ -22,11 +22,12 @@ import alpine.logging.Logger;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -134,7 +135,7 @@ public final class KeyManager {
      * @param keyType the type of key
      * @return a File representing the path to the key
      */
-    private File getKeyPath(KeyType keyType) {
+    private File getKeyPath(final KeyType keyType) {
         return new File(Config.getInstance().getDataDirectorty()
                 + File.separator
                 + "keys" + File.separator
@@ -146,7 +147,7 @@ public final class KeyManager {
      * @param key the type of key
      * @return a File representing the path to the key
      */
-    private File getKeyPath(Key key) {
+    private File getKeyPath(final Key key) {
         KeyType keyType = null;
         if (key instanceof PrivateKey) {
             keyType = KeyType.PRIVATE;
@@ -165,7 +166,7 @@ public final class KeyManager {
      * @throws IOException if the files cannot be written
      * @since 1.0.0
      */
-    public void save(KeyPair keyPair) throws IOException {
+    public void save(final KeyPair keyPair) throws IOException {
         LOGGER.info("Saving key pair");
         final PrivateKey privateKey = keyPair.getPrivate();
         final PublicKey publicKey = keyPair.getPublic();
@@ -174,7 +175,7 @@ public final class KeyManager {
         final File publicKeyFile = getKeyPath(publicKey);
         publicKeyFile.getParentFile().mkdirs(); // make directories if they do not exist
         final X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(publicKey.getEncoded());
-        try (FileOutputStream fos = new FileOutputStream(publicKeyFile)) {
+        try (OutputStream fos = Files.newOutputStream(publicKeyFile.toPath())) {
             fos.write(x509EncodedKeySpec.getEncoded());
         }
 
@@ -182,7 +183,7 @@ public final class KeyManager {
         final File privateKeyFile = getKeyPath(privateKey);
         privateKeyFile.getParentFile().mkdirs(); // make directories if they do not exist
         final PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(privateKey.getEncoded());
-        try (FileOutputStream fos = new FileOutputStream(privateKeyFile)) {
+        try (OutputStream fos = Files.newOutputStream(privateKeyFile.toPath())) {
             fos.write(pkcs8EncodedKeySpec.getEncoded());
         }
     }
@@ -194,10 +195,10 @@ public final class KeyManager {
      * @throws IOException if the file cannot be written
      * @since 1.0.0
      */
-    public void save(SecretKey key) throws IOException {
+    public void save(final SecretKey key) throws IOException {
         final File keyFile = getKeyPath(key);
         keyFile.getParentFile().mkdirs(); // make directories if they do not exist
-        try (FileOutputStream fos = new FileOutputStream(keyFile);
+        try (OutputStream fos = Files.newOutputStream(keyFile.toPath());
              ObjectOutputStream oout = new ObjectOutputStream(fos)) {
             oout.writeObject(key);
         }
@@ -217,11 +218,11 @@ public final class KeyManager {
         // Read Public Key
         final File filePublicKey = getKeyPath(KeyType.PUBLIC);
 
-        final byte[] encodedPrivateKey;
-        final byte[] encodedPublicKey;
+        byte[] encodedPrivateKey;
+        byte[] encodedPublicKey;
 
-        try (FileInputStream pvtfis = new FileInputStream(filePrivateKey);
-             FileInputStream pubfis = new FileInputStream(filePublicKey)) {
+        try (InputStream pvtfis = Files.newInputStream(filePrivateKey.toPath());
+             InputStream pubfis = Files.newInputStream(filePublicKey.toPath())) {
 
             encodedPrivateKey = new byte[(int) filePrivateKey.length()];
             pvtfis.read(encodedPrivateKey);
@@ -248,8 +249,8 @@ public final class KeyManager {
      */
     private SecretKey loadSecretKey() throws IOException, ClassNotFoundException {
         final File file = getKeyPath(KeyType.SECRET);
-        final SecretKey key;
-        try (FileInputStream fis = new FileInputStream(file);
+        SecretKey key;
+        try (InputStream fis = Files.newInputStream(file.toPath());
              ObjectInputStream ois = new ObjectInputStream(fis)) {
 
             key = (SecretKey) ois.readObject();
@@ -264,7 +265,7 @@ public final class KeyManager {
      * @since 1.0.0
      */
     public boolean keyPairExists() {
-        return (getKeyPath(KeyType.PUBLIC).exists() && getKeyPath(KeyType.PRIVATE).exists());
+        return getKeyPath(KeyType.PUBLIC).exists() && getKeyPath(KeyType.PRIVATE).exists();
     }
 
     /**

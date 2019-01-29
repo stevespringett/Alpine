@@ -29,8 +29,8 @@ import java.security.Principal;
  */
 public class ManagedUserAuthenticationService implements AuthenticationService {
 
-    private String username;
-    private String password;
+    private final String username;
+    private final String password;
 
     /**
      * Authentication service validates credentials against internally managed users.
@@ -38,7 +38,7 @@ public class ManagedUserAuthenticationService implements AuthenticationService {
      * @param password the asserted password
      * @since 1.0.0
      */
-    public ManagedUserAuthenticationService(String username, String password) {
+    public ManagedUserAuthenticationService(final String username, final String password) {
         this.username = username;
         this.password = password;
     }

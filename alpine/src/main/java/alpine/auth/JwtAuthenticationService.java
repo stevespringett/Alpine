@@ -37,13 +37,13 @@ import java.util.List;
  */
 public class JwtAuthenticationService implements AuthenticationService {
 
-    private String bearer = null;
+    private final String bearer;
 
     /**
      * Constructs a new JwtAuthenticationService.
      * @param request a ContainerRequest object to parse
      */
-    public JwtAuthenticationService(ContainerRequest request) {
+    public JwtAuthenticationService(final ContainerRequest request) {
         this.bearer = getAuthorizationToken(request);
     }
 
@@ -51,7 +51,7 @@ public class JwtAuthenticationService implements AuthenticationService {
      * {@inheritDoc}
      */
     public boolean isSpecified() {
-        return (bearer != null);
+        return bearer != null;
     }
 
     /**
@@ -69,7 +69,7 @@ public class JwtAuthenticationService implements AuthenticationService {
                     }
                     final ManagedUser managedUser = qm.getManagedUser(jwt.getSubject());
                     if (managedUser != null) {
-                        return (managedUser.isSuspended()) ? null : managedUser;
+                        return managedUser.isSuspended() ? null : managedUser;
                     }
                     final LdapUser ldapUser =  qm.getLdapUser(jwt.getSubject());
                     if (ldapUser != null) {
@@ -88,7 +88,7 @@ public class JwtAuthenticationService implements AuthenticationService {
      * @return the token if found, otherwise null
      * @since 1.0.0
      */
-    private String getAuthorizationToken(HttpHeaders headers) {
+    private String getAuthorizationToken(final HttpHeaders headers) {
         final List<String> header = headers.getRequestHeader("Authorization");
         if (header != null) {
             final String bearer = header.get(0);

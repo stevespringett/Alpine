@@ -42,7 +42,7 @@ import java.util.zip.GZIPOutputStream;
 @Provider
 public class GZipInterceptor implements ReaderInterceptor, WriterInterceptor {
 
-    private HttpHeaders httpHeaders;
+    private final HttpHeaders httpHeaders;
 
     /**
      * Constructor.

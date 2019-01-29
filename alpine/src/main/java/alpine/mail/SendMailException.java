@@ -32,7 +32,7 @@ public class SendMailException extends Exception {
      * @param message the detail message
      * @since 1.3.0
      */
-    public SendMailException(String message) {
+    public SendMailException(final String message) {
         super(message);
     }
 
@@ -42,7 +42,7 @@ public class SendMailException extends Exception {
      * @param cause the cause of the exception
      * @since 1.3.0
      */
-    public SendMailException(String message, Throwable cause) {
+    public SendMailException(final String message, final Throwable cause) {
         super(message, cause);
     }
 
@@ -51,7 +51,7 @@ public class SendMailException extends Exception {
      * @param cause the cause of the exception
      * @since 1.3.0
      */
-    public SendMailException(Throwable cause) {
+    public SendMailException(final Throwable cause) {
         super(cause);
     }
 

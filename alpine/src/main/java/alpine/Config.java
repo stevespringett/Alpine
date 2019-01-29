@@ -21,7 +21,6 @@ import alpine.logging.Logger;
 import alpine.util.PathUtil;
 import org.apache.commons.lang3.StringUtils;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,6 +30,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
 import java.util.Properties;
 
 /**
@@ -153,7 +153,7 @@ public class Config {
         final String alpineAppProp = PathUtil.resolve(System.getProperty(ALPINE_APP_PROP));
         if (StringUtils.isNotBlank(alpineAppProp)) {
             LOGGER.info("Loading application properties from " + alpineAppProp);
-            try (FileInputStream fileInputStream = new FileInputStream(new File(alpineAppProp))) {
+            try (InputStream fileInputStream = Files.newInputStream((new File(alpineAppProp)).toPath())) {
                 properties.load(fileInputStream);
             } catch (FileNotFoundException e) {
                 LOGGER.error("Could not find property file " + alpineAppProp);
@@ -163,7 +163,7 @@ public class Config {
         } else {
             LOGGER.info("System property " + ALPINE_APP_PROP + " not specified");
             LOGGER.info("Loading " + PROP_FILE + " from classpath");
-            try (InputStream in = this.getClass().getClassLoader().getResourceAsStream(PROP_FILE)) {
+            try (InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(PROP_FILE)) {
                 properties.load(in);
             } catch (IOException e) {
                 LOGGER.error("Unable to load " + PROP_FILE);
@@ -174,7 +174,7 @@ public class Config {
         }
 
         alpineVersionProperties = new Properties();
-        try (InputStream in = this.getClass().getClassLoader().getResourceAsStream(ALPINE_VERSION_PROP_FILE)) {
+        try (InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(ALPINE_VERSION_PROP_FILE)) {
             alpineVersionProperties.load(in);
         } catch (IOException e) {
             LOGGER.error("Unable to load " + ALPINE_VERSION_PROP_FILE);
@@ -184,7 +184,7 @@ public class Config {
         }
 
         applicationVersionProperties = new Properties();
-        try (InputStream in = this.getClass().getClassLoader().getResourceAsStream(APPLICATION_VERSION_PROP_FILE)) {
+        try (InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(APPLICATION_VERSION_PROP_FILE)) {
             applicationVersionProperties.load(in);
         } catch (IOException e) {
             LOGGER.error("Unable to load " + APPLICATION_VERSION_PROP_FILE);

@@ -30,9 +30,9 @@ import java.util.UUID;
  */
 public abstract class AbstractChainableEvent implements ChainableEvent {
 
-    private ArrayList<ChainLink> onSuccessChains = new ArrayList<>();
-    private ArrayList<ChainLink> onFailureChains = new ArrayList<>();
-    private UUID eventIdentifier = UUID.randomUUID();
+    private final ArrayList<ChainLink> onSuccessChains = new ArrayList<>();
+    private final ArrayList<ChainLink> onFailureChains = new ArrayList<>();
+    private final UUID eventIdentifier = UUID.randomUUID();
     private UUID chainIdentifier = UUID.randomUUID();
 
     /**

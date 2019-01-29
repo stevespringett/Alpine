@@ -34,7 +34,7 @@ public final class Logger {
     /**
      * The logging framework being used.
      */
-    private org.slf4j.Logger log;
+    private final org.slf4j.Logger log;
 
     /**
      * Create an instance of this class and initialize the underlying logging framework.
@@ -43,7 +43,7 @@ public final class Logger {
      *
      * @since 1.0.0
      */
-    public static Logger getLogger(Class<?> clazz) {
+    public static Logger getLogger(final Class<?> clazz) {
         return new Logger(clazz);
     }
 
@@ -53,7 +53,7 @@ public final class Logger {
      *
      * @since 1.0.0
      */
-    private Logger(Class<?> clazz) {
+    private Logger(final Class<?> clazz) {
         log = org.slf4j.LoggerFactory.getLogger(clazz);
     }
 
@@ -113,7 +113,7 @@ public final class Logger {
      * @param message the message string to be logged
      * @since 1.0.0
      */
-    public void info(String message) {
+    public void info(final String message) {
         log.info(message);
     }
 
@@ -124,7 +124,7 @@ public final class Logger {
      * @param throwable the exception (throwable) to log
      * @since 1.0.0
      */
-    public void info(String message, Throwable throwable) {
+    public void info(final String message, final Throwable throwable) {
         log.info(message, throwable);
     }
 
@@ -135,7 +135,7 @@ public final class Logger {
      * @param message the message string to be logged
      * @since 1.0.0
      */
-    public void info(Marker marker, String message) {
+    public void info(final Marker marker, final String message) {
         log.info(marker, message);
     }
 
@@ -147,7 +147,7 @@ public final class Logger {
      * @param object the argument
      * @since 1.0.0
      */
-    public void info(Marker marker, String message, Object object) {
+    public void info(final Marker marker, final String message, final Object object) {
         log.info(marker, message, object);
     }
 
@@ -160,7 +160,7 @@ public final class Logger {
      * @param o2 the second argument
      * @since 1.0.0
      */
-    public void info(Marker marker, String message, Object o1, Object o2) {
+    public void info(final Marker marker, final String message, final Object o1, final Object o2) {
         log.info(marker, message, o1, o1);
     }
 
@@ -172,7 +172,7 @@ public final class Logger {
      * @param objects a list of 3 or more arguments
      * @since 1.0.0
      */
-    public void info(Marker marker, String message, Object... objects) {
+    public void info(final Marker marker, final String message, final Object... objects) {
         log.info(marker, message, objects);
     }
 
@@ -184,7 +184,7 @@ public final class Logger {
      * @param throwable the exception (throwable) to log
      * @since 1.0.0
      */
-    public void info(Marker marker, String message, Throwable throwable) {
+    public void info(final Marker marker, final String message, final Throwable throwable) {
         log.info(marker, message, throwable);
     }
 
@@ -194,7 +194,7 @@ public final class Logger {
      * @param message the message string to be logged
      * @since 1.0.0
      */
-    public void debug(String message) {
+    public void debug(final String message) {
         log.debug(message);
     }
 
@@ -205,7 +205,7 @@ public final class Logger {
      * @param throwable the exception (throwable) to log
      * @since 1.0.0
      */
-    public void debug(String message, Throwable throwable) {
+    public void debug(final String message, final Throwable throwable) {
         log.debug(message, throwable);
     }
 
@@ -216,7 +216,7 @@ public final class Logger {
      * @param message the message string to be logged
      * @since 1.0.0
      */
-    public void debug(Marker marker, String message) {
+    public void debug(final Marker marker, final String message) {
         log.debug(marker, message);
     }
 
@@ -228,7 +228,7 @@ public final class Logger {
      * @param object the argument
      * @since 1.0.0
      */
-    public void debug(Marker marker, String message, Object object) {
+    public void debug(final Marker marker, final String message, final Object object) {
         log.debug(marker, message, object);
     }
 
@@ -241,7 +241,7 @@ public final class Logger {
      * @param o2 the second argument
      * @since 1.0.0
      */
-    public void debug(Marker marker, String message, Object o1, Object o2) {
+    public void debug(final Marker marker, final String message, final Object o1, final Object o2) {
         log.debug(marker, message, o1, o1);
     }
 
@@ -253,7 +253,7 @@ public final class Logger {
      * @param objects a list of 3 or more arguments
      * @since 1.0.0
      */
-    public void debug(Marker marker, String message, Object... objects) {
+    public void debug(final Marker marker, final String message, final Object... objects) {
         log.debug(marker, message, objects);
     }
 
@@ -265,7 +265,7 @@ public final class Logger {
      * @param throwable the exception (throwable) to log
      * @since 1.0.0
      */
-    public void debug(Marker marker, String message, Throwable throwable) {
+    public void debug(final Marker marker, final String message, final Throwable throwable) {
         log.debug(marker, message, throwable);
     }
 
@@ -275,7 +275,7 @@ public final class Logger {
      * @param message the message string to be logged
      * @since 1.0.0
      */
-    public void error(String message) {
+    public void error(final String message) {
         log.error(message);
     }
 
@@ -286,7 +286,7 @@ public final class Logger {
      * @param throwable the exception (throwable) to log
      * @since 1.0.0
      */
-    public void error(String message, Throwable throwable) {
+    public void error(final String message, final Throwable throwable) {
         log.error(message, throwable);
     }
 
@@ -297,7 +297,7 @@ public final class Logger {
      * @param message the message string to be logged
      * @since 1.0.0
      */
-    public void error(Marker marker, String message) {
+    public void error(final Marker marker, final String message) {
         log.error(marker, message);
     }
 
@@ -309,7 +309,7 @@ public final class Logger {
      * @param object the argument
      * @since 1.0.0
      */
-    public void error(Marker marker, String message, Object object) {
+    public void error(final Marker marker, final String message, final Object object) {
         log.error(marker, message, object);
     }
 
@@ -322,7 +322,7 @@ public final class Logger {
      * @param o2 the second argument
      * @since 1.0.0
      */
-    public void error(Marker marker, String message, Object o1, Object o2) {
+    public void error(final Marker marker, final String message, final Object o1, final Object o2) {
         log.error(marker, message, o1, o1);
     }
 
@@ -334,7 +334,7 @@ public final class Logger {
      * @param objects a list of 3 or more arguments
      * @since 1.0.0
      */
-    public void error(Marker marker, String message, Object... objects) {
+    public void error(final Marker marker, final String message, final Object... objects) {
         log.error(marker, message, objects);
     }
 
@@ -346,7 +346,7 @@ public final class Logger {
      * @param throwable the exception (throwable) to log
      * @since 1.0.0
      */
-    public void error(Marker marker, String message, Throwable throwable) {
+    public void error(final Marker marker, final String message, final Throwable throwable) {
         log.error(marker, message, throwable);
     }
 
@@ -356,7 +356,7 @@ public final class Logger {
      * @param message the message string to be logged
      * @since 1.0.0
      */
-    public void trace(String message) {
+    public void trace(final String message) {
         log.trace(message);
     }
 
@@ -367,7 +367,7 @@ public final class Logger {
      * @param throwable the exception (throwable) to log
      * @since 1.0.0
      */
-    public void trace(String message, Throwable throwable) {
+    public void trace(final String message, final Throwable throwable) {
         log.trace(message, throwable);
     }
 
@@ -378,7 +378,7 @@ public final class Logger {
      * @param message the message string to be logged
      * @since 1.0.0
      */
-    public void trace(Marker marker, String message) {
+    public void trace(final Marker marker, final String message) {
         log.trace(marker, message);
     }
 
@@ -390,7 +390,7 @@ public final class Logger {
      * @param object the argument
      * @since 1.0.0
      */
-    public void trace(Marker marker, String message, Object object) {
+    public void trace(final Marker marker, final String message, final Object object) {
         log.trace(marker, message, object);
     }
 
@@ -403,7 +403,7 @@ public final class Logger {
      * @param o2 the second argument
      * @since 1.0.0
      */
-    public void trace(Marker marker, String message, Object o1, Object o2) {
+    public void trace(final Marker marker, final String message, final Object o1, final Object o2) {
         log.trace(marker, message, o1, o1);
     }
 
@@ -415,7 +415,7 @@ public final class Logger {
      * @param objects a list of 3 or more arguments
      * @since 1.0.0
      */
-    public void trace(Marker marker, String message, Object... objects) {
+    public void trace(final Marker marker, final String message, final Object... objects) {
         log.trace(marker, message, objects);
     }
 
@@ -427,7 +427,7 @@ public final class Logger {
      * @param throwable the exception (throwable) to log
      * @since 1.0.0
      */
-    public void trace(Marker marker, String message, Throwable throwable) {
+    public void trace(final Marker marker, final String message, final Throwable throwable) {
         log.trace(marker, message, throwable);
     }
 
@@ -437,7 +437,7 @@ public final class Logger {
      * @param message the message string to be logged
      * @since 1.0.0
      */
-    public void warn(String message) {
+    public void warn(final String message) {
         log.warn(message);
     }
 
@@ -448,7 +448,7 @@ public final class Logger {
      * @param throwable the exception (throwable) to log
      * @since 1.0.0
      */
-    public void warn(String message, Throwable throwable) {
+    public void warn(final String message, final Throwable throwable) {
         log.warn(message, throwable);
     }
 
@@ -459,7 +459,7 @@ public final class Logger {
      * @param message the message string to be logged
      * @since 1.0.0
      */
-    public void warn(Marker marker, String message) {
+    public void warn(final Marker marker, final String message) {
         log.warn(marker, message);
     }
 
@@ -471,7 +471,7 @@ public final class Logger {
      * @param object the argument
      * @since 1.0.0
      */
-    public void warn(Marker marker, String message, Object object) {
+    public void warn(final Marker marker, final String message, final Object object) {
         log.warn(marker, message, object);
     }
 
@@ -484,7 +484,7 @@ public final class Logger {
      * @param o2 the second argument
      * @since 1.0.0
      */
-    public void warn(Marker marker, String message, Object o1, Object o2) {
+    public void warn(final Marker marker, final String message, final Object o1, final Object o2) {
         log.warn(marker, message, o1, o1);
     }
 
@@ -496,7 +496,7 @@ public final class Logger {
      * @param objects a list of 3 or more arguments
      * @since 1.0.0
      */
-    public void warn(Marker marker, String message, Object... objects) {
+    public void warn(final Marker marker, final String message, final Object... objects) {
         log.warn(marker, message, objects);
     }
 
@@ -508,7 +508,7 @@ public final class Logger {
      * @param throwable the exception (throwable) to log
      * @since 1.0.0
      */
-    public void warn(Marker marker, String message, Throwable throwable) {
+    public void warn(final Marker marker, final String message, final Throwable throwable) {
         log.warn(marker, message, throwable);
     }
 

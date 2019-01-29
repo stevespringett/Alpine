@@ -25,12 +25,12 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 /**
  * The FileSystemResourceServlet serves {@link StaticResource}s from the file system
@@ -83,12 +83,12 @@ public class FileSystemResourceServlet extends StaticResourceServlet {
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
 
-        String directory = config.getInitParameter("directory");
+        final String directory = config.getInitParameter("directory");
         if (StringUtils.isNotBlank(directory)) {
             this.directory = directory;
         }
 
-        String absolute = config.getInitParameter("absolute");
+        final String absolute = config.getInitParameter("absolute");
         if (StringUtils.isNotBlank(absolute)) {
             this.absolute = BooleanUtil.valueOf(absolute);
         }
@@ -110,7 +110,7 @@ public class FileSystemResourceServlet extends StaticResourceServlet {
         }
 
         final ServletContext context = request.getServletContext();
-        final File file = (absolute) ? new File(directory, name) : new File(context.getRealPath("/"), name).getAbsoluteFile();
+        final File file = absolute ? new File(directory, name) : new File(context.getRealPath("/"), name).getAbsoluteFile();
 
         return !file.exists() ? null : new StaticResource() {
             @Override
@@ -119,7 +119,7 @@ public class FileSystemResourceServlet extends StaticResourceServlet {
             }
             @Override
             public InputStream getInputStream() throws IOException {
-                return new FileInputStream(file);
+                return Files.newInputStream(file.toPath());
             }
             @Override
             public String getFileName() {

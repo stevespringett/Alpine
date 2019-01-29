@@ -21,6 +21,7 @@ import alpine.resources.AlpineRequest;
 import alpine.resources.OrderDirection;
 import alpine.resources.Pagination;
 import alpine.validation.RegexSequence;
+import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.collections4.CollectionUtils;
 import org.datanucleus.api.jdo.JDOQuery;
 import javax.jdo.FetchPlan;
@@ -242,7 +243,7 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
             // Check to see if the specified orderBy field is defined in the class being queried.
             boolean found = false;
             final org.datanucleus.store.query.Query iq = ((JDOQuery) query).getInternalQuery();
-            for (Field field: iq.getCandidateClass().getDeclaredFields()) {
+            for (final Field field: iq.getCandidateClass().getDeclaredFields()) {
                 if (orderBy.equals(field.getName())) {
                     found = true;
                     break;
@@ -265,7 +266,7 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      */
     public long getCount(final Query query) {
         //query.addExtension("datanucleus.query.resultSizeMethod", "count");
-        final String ordering = ((org.datanucleus.api.jdo.JDOQuery) query).getInternalQuery().getOrdering();
+        final String ordering = ((JDOQuery) query).getInternalQuery().getOrdering();
         query.setResult("count(id)");
         query.setOrdering(null);
         final long count = (Long) query.execute();
@@ -283,7 +284,7 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      * @since 1.0.0
      */
     public long getCount(final Query query, final Object p1) {
-        final String ordering = ((org.datanucleus.api.jdo.JDOQuery) query).getInternalQuery().getOrdering();
+        final String ordering = ((JDOQuery) query).getInternalQuery().getOrdering();
         query.setResult("count(id)");
         query.setOrdering(null);
         final long count = (Long) query.execute(p1);
@@ -302,7 +303,7 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      * @since 1.0.0
      */
     public long getCount(final Query query, final Object p1, final Object p2) {
-        final String ordering = ((org.datanucleus.api.jdo.JDOQuery) query).getInternalQuery().getOrdering();
+        final String ordering = ((JDOQuery) query).getInternalQuery().getOrdering();
         query.setResult("count(id)");
         query.setOrdering(null);
         final long count = (Long) query.execute(p1, p2);
@@ -322,7 +323,7 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      * @since 1.0.0
      */
     public long getCount(final Query query, final Object p1, final Object p2, final Object p3) {
-        final String ordering = ((org.datanucleus.api.jdo.JDOQuery) query).getInternalQuery().getOrdering();
+        final String ordering = ((JDOQuery) query).getInternalQuery().getOrdering();
         query.setResult("count(id)");
         query.setOrdering(null);
         final long count = (Long) query.execute(p1, p2, p3);
@@ -340,7 +341,7 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      * @since 1.0.0
      */
     public long getCount(final Query query, final Object... parameters) {
-        final String ordering = ((org.datanucleus.api.jdo.JDOQuery) query).getInternalQuery().getOrdering();
+        final String ordering = ((JDOQuery) query).getInternalQuery().getOrdering();
         query.setResult("count(id)");
         query.setOrdering(null);
         final long count = (Long) query.executeWithArray(parameters);
@@ -358,7 +359,7 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      * @since 1.0.0
      */
     public long getCount(final Query query, final Map parameters) {
-        final String ordering = ((org.datanucleus.api.jdo.JDOQuery) query).getInternalQuery().getOrdering();
+        final String ordering = ((JDOQuery) query).getInternalQuery().getOrdering();
         query.setResult("count(id)");
         query.setOrdering(null);
         final long count = (Long) query.executeWithMap(parameters);
@@ -511,7 +512,7 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
     public <T> T getObjectByUuid(Class<T> clazz, UUID uuid) {
         final Query query = pm.newQuery(clazz, "uuid == :uuid");
         final List<T> result = (List<T>) query.execute(uuid);
-        return result.size() == 0 ? null : result.get(0);
+        return Collections.isEmpty(result) ? null : result.get(0);
     }
 
     /**
@@ -569,7 +570,7 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
             return null;
         }
         if (object instanceof Collection) {
-            Collection<T> result = (Collection<T>)object;
+            final Collection<T> result = (Collection<T>)object;
             return CollectionUtils.isEmpty(result) ? null : result.iterator().next();
         }
         return null;

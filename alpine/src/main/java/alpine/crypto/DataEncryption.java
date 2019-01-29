@@ -48,23 +48,23 @@ public class DataEncryption {
      * @throws Exception a number of exceptions may be thrown
      * @since 1.3.0
      */
-    public static byte[] encryptAsBytes(SecretKey secretKey, String plainText) throws Exception {
-        byte[] clean = plainText.getBytes();
+    public static byte[] encryptAsBytes(final SecretKey secretKey, final String plainText) throws Exception {
+        final byte[] clean = plainText.getBytes();
 
         // Generating IV
         int ivSize = 16;
-        byte[] iv = new byte[ivSize];
-        SecureRandom random = new SecureRandom();
+        final byte[] iv = new byte[ivSize];
+        final SecureRandom random = new SecureRandom();
         random.nextBytes(iv);
-        IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
+        final IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
 
         // Encrypt
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        final Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec);
-        byte[] encrypted = cipher.doFinal(clean);
+        final byte[] encrypted = cipher.doFinal(clean);
 
         // Combine IV and encrypted parts
-        byte[] encryptedIVAndText = new byte[ivSize + encrypted.length];
+        final byte[] encryptedIVAndText = new byte[ivSize + encrypted.length];
         System.arraycopy(iv, 0, encryptedIVAndText, 0, ivSize);
         System.arraycopy(encrypted, 0, encryptedIVAndText, ivSize, encrypted.length);
 
@@ -78,8 +78,8 @@ public class DataEncryption {
      * @throws Exception a number of exceptions may be thrown
      * @since 1.3.0
      */
-    public static byte[] encryptAsBytes(String plainText) throws Exception {
-        SecretKey secretKey = KeyManager.getInstance().getSecretKey();
+    public static byte[] encryptAsBytes(final String plainText) throws Exception {
+        final SecretKey secretKey = KeyManager.getInstance().getSecretKey();
         return encryptAsBytes(secretKey, plainText);
     }
 
@@ -92,7 +92,7 @@ public class DataEncryption {
      * @throws Exception a number of exceptions may be thrown
      * @since 1.3.0
      */
-    public static String encryptAsString(SecretKey secretKey, String plainText) throws Exception {
+    public static String encryptAsString(final SecretKey secretKey, final String plainText) throws Exception {
         return Base64.getEncoder().encodeToString(encryptAsBytes(secretKey, plainText));
     }
 
@@ -104,7 +104,7 @@ public class DataEncryption {
      * @throws Exception a number of exceptions may be thrown
      * @since 1.3.0
      */
-    public static String encryptAsString(String plainText) throws Exception {
+    public static String encryptAsString(final String plainText) throws Exception {
         return Base64.getEncoder().encodeToString(encryptAsBytes(plainText));
     }
 
@@ -116,21 +116,21 @@ public class DataEncryption {
      * @throws Exception a number of exceptions may be thrown
      * @since 1.3.0
      */
-    public static byte[] decryptAsBytes(SecretKey secretKey, byte[] encryptedIvTextBytes) throws Exception {
+    public static byte[] decryptAsBytes(final SecretKey secretKey, final byte[] encryptedIvTextBytes) throws Exception {
         int ivSize = 16;
 
         // Extract IV
-        byte[] iv = new byte[ivSize];
+        final byte[] iv = new byte[ivSize];
         System.arraycopy(encryptedIvTextBytes, 0, iv, 0, iv.length);
-        IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
+        final IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
 
         // Extract encrypted bytes
-        int encryptedSize = encryptedIvTextBytes.length - ivSize;
-        byte[] encryptedBytes = new byte[encryptedSize];
+        final int encryptedSize = encryptedIvTextBytes.length - ivSize;
+        final byte[] encryptedBytes = new byte[encryptedSize];
         System.arraycopy(encryptedIvTextBytes, ivSize, encryptedBytes, 0, encryptedSize);
 
         // Decrypt
-        Cipher cipherDecrypt = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        final Cipher cipherDecrypt = Cipher.getInstance("AES/CBC/PKCS5Padding");
         cipherDecrypt.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec);
         return cipherDecrypt.doFinal(encryptedBytes);
     }
@@ -142,8 +142,8 @@ public class DataEncryption {
      * @throws Exception a number of exceptions may be thrown
      * @since 1.3.0
      */
-    public static byte[] decryptAsBytes(byte[] encryptedIvTextBytes) throws Exception {
-        SecretKey secretKey = KeyManager.getInstance().getSecretKey();
+    public static byte[] decryptAsBytes(final byte[] encryptedIvTextBytes) throws Exception {
+        final SecretKey secretKey = KeyManager.getInstance().getSecretKey();
         return decryptAsBytes(secretKey, encryptedIvTextBytes);
     }
 
@@ -158,7 +158,7 @@ public class DataEncryption {
      * @throws Exception a number of exceptions may be thrown
      * @since 1.3.0
      */
-    public static String decryptAsString(SecretKey secretKey, String encryptedText) throws Exception {
+    public static String decryptAsString(final SecretKey secretKey, final String encryptedText) throws Exception {
         return new String(decryptAsBytes(secretKey, Base64.getDecoder().decode(encryptedText)));
     }
 
@@ -171,7 +171,7 @@ public class DataEncryption {
      * @throws Exception a number of exceptions may be thrown
      * @since 1.3.0
      */
-    public static String decryptAsString(String encryptedText) throws Exception {
+    public static String decryptAsString(final String encryptedText) throws Exception {
         return new String(decryptAsBytes(Base64.getDecoder().decode(encryptedText)));
     }
 

@@ -62,7 +62,7 @@ public abstract class StaticResourceServlet extends HttpServlet {
 
     private void doRequest(HttpServletRequest request, HttpServletResponse response, boolean head) throws IOException {
         response.reset();
-        final StaticResource resource;
+        StaticResource resource;
 
         try {
             resource = getStaticResource(request);
@@ -118,11 +118,11 @@ public abstract class StaticResourceServlet extends HttpServlet {
         if (ifNoneMatch != null) {
             final String[] matches = ifNoneMatch.split("\\s*,\\s*");
             Arrays.sort(matches);
-            return (Arrays.binarySearch(matches, eTag) > -1 || Arrays.binarySearch(matches, "*") > -1);
+            return Arrays.binarySearch(matches, eTag) > -1 || Arrays.binarySearch(matches, "*") > -1;
         }
         else {
             final long ifModifiedSince = request.getDateHeader("If-Modified-Since");
-            return (ifModifiedSince + ONE_SECOND_IN_MILLIS > lastModified); // That second is because the header is in seconds, not millis.
+            return ifModifiedSince + ONE_SECOND_IN_MILLIS > lastModified; // That second is because the header is in seconds, not millis.
         }
     }
 

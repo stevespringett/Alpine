@@ -29,8 +29,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class ValidationException extends Exception {
 
-    private Object input;
-    private String message;
+    private final Object input;
+    private final String message;
 
     /**
      * Constructs a new ValidationException

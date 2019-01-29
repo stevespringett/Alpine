@@ -32,7 +32,7 @@ public class RelaxedX509TrustManager implements X509TrustManager {
         return null;
     }
 
-    public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException { }
+    public void checkClientTrusted(final X509Certificate[] arg0, final String arg1) throws CertificateException { }
 
-    public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException { }
+    public void checkServerTrusted(final X509Certificate[] arg0, final String arg1) throws CertificateException { }
 }

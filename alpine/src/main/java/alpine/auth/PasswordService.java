@@ -64,7 +64,7 @@ public final class PasswordService {
      * @return a hashed password
      * @since 1.0.0
      */
-    public static char[] createHash(char[] password) {
+    public static char[] createHash(final char[] password) {
         final char[] prehash = createSha512Hash(password);
         // Todo: remove String when Jbcrypt supports char[]
         return BCrypt.hashpw(new String(prehash), BCrypt.gensalt(ROUNDS)).toCharArray();
@@ -81,7 +81,7 @@ public final class PasswordService {
      * @return a hashed password
      * @since 1.0.0
      */
-    public static char[] createHash(char[] password, char[] salt) {
+    public static char[] createHash(final char[] password, final char[] salt) {
         final char[] prehash = createSha512Hash(password);
         // Todo: remove String when Jbcrypt supports char[]
         return BCrypt.hashpw(new String(prehash), new String(salt)).toCharArray();
@@ -95,7 +95,7 @@ public final class PasswordService {
      * @return true if assertedPassword matches the expected password of the ManangedUser, false if not
      * @since 1.0.0
      */
-    public static boolean matches(char[] assertedPassword, ManagedUser user) {
+    public static boolean matches(final char[] assertedPassword, final ManagedUser user) {
         final char[] prehash = createSha512Hash(assertedPassword);
         // Todo: remove String when Jbcrypt supports char[]
         return BCrypt.checkpw(new String(prehash), user.getPassword());
@@ -116,8 +116,8 @@ public final class PasswordService {
      * @return true if the password should be rehashed, false if not
      * @since 1.0.0
      */
-    public static boolean shouldRehash(char[] bcryptHash) {
-        final int rounds;
+    public static boolean shouldRehash(final char[] bcryptHash) {
+        int rounds;
         if (bcryptHash.length < 59) {
             return true;
         }
@@ -140,14 +140,14 @@ public final class PasswordService {
      * @return a char[] of the hashed password
      * @since 1.0.0
      */
-    private static char[] createSha512Hash(char[] password) {
+    private static char[] createSha512Hash(final char[] password) {
         try {
             final MessageDigest digest = MessageDigest.getInstance("SHA-512");
             digest.update(ByteUtil.toBytes(password));
             final byte[] byteData = digest.digest();
 
             final StringBuilder sb = new StringBuilder();
-            for (byte data : byteData) {
+            for (final byte data : byteData) {
                 sb.append(Integer.toString((data & 0xff) + 0x100, 16).substring(1));
             }
             final char[] hash = new char[128];

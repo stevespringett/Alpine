@@ -62,14 +62,14 @@ public final class NotificationService implements INotificationService {
      * {@inheritDoc}
      * @since 1.3.0
      */
-    public void publish(Notification notification) {
+    public void publish(final Notification notification) {
         LOGGER.debug("Dispatching notification: " + notification.getClass().toString());
         final ArrayList<Subscription> subscriptions = SUBSCRIPTION_MAP.get(notification.getClass());
         if (subscriptions == null) {
             LOGGER.debug("No subscribers to inform from notification: " + notification.getClass().getName());
             return;
         }
-        for (Subscription subscription: subscriptions) {
+        for (final Subscription subscription: subscriptions) {
             if (subscription.getScope() != null && subscription.getGroup() != null && subscription.getLevel() != null) { // subscription was the most specific
                 if (subscription.getScope().equals(notification.getScope()) && subscription.getGroup().equals(notification.getGroup()) && subscription.getLevel() == notification.getLevel()) {
                     alertSubscriber(notification, subscription.getSubscriber());
@@ -92,7 +92,7 @@ public final class NotificationService implements INotificationService {
         }
     }
 
-    private void alertSubscriber(Notification notification, Class<? extends Subscriber> subscriberClass) {
+    private void alertSubscriber(final Notification notification, final Class<? extends Subscriber> subscriberClass) {
         LOGGER.debug("Alerting subscriber " + subscriberClass.getName());
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -107,7 +107,7 @@ public final class NotificationService implements INotificationService {
      * {@inheritDoc}
      * @since 1.3.0
      */
-    public void subscribe(Class<? extends Notification> notificationClass, Subscription subscription) {
+    public void subscribe(final Class<? extends Notification> notificationClass, final Subscription subscription) {
         if (!SUBSCRIPTION_MAP.containsKey(notificationClass)) {
             SUBSCRIPTION_MAP.put(notificationClass, new ArrayList<>());
         }
@@ -121,7 +121,7 @@ public final class NotificationService implements INotificationService {
      * {@inheritDoc}
      * @since 1.3.0
      */
-    public void subscribe(Subscription subscription) {
+    public void subscribe(final Subscription subscription) {
         subscribe(Notification.class, subscription);
     }
 
@@ -129,8 +129,8 @@ public final class NotificationService implements INotificationService {
      * {@inheritDoc}
      * @since 1.3.0
      */
-    public void unsubscribe(Subscription subscription) {
-        for (ArrayList<Subscription> list : SUBSCRIPTION_MAP.values()) {
+    public void unsubscribe(final Subscription subscription) {
+        for (final ArrayList<Subscription> list : SUBSCRIPTION_MAP.values()) {
             list.remove(subscription);
         }
     }
@@ -139,7 +139,7 @@ public final class NotificationService implements INotificationService {
      * {@inheritDoc}
      * @since 1.3.0
      */
-    public boolean hasSubscriptions(Notification notification) {
+    public boolean hasSubscriptions(final Notification notification) {
         final ArrayList<Subscription> subscriptions = SUBSCRIPTION_MAP.get(notification.getClass());
         return subscriptions != null;
     }

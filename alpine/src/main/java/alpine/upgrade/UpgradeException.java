@@ -28,15 +28,15 @@ public class UpgradeException extends Exception {
     public UpgradeException() {
     }
 
-    public UpgradeException(String message) {
+    public UpgradeException(final String message) {
         super(message);
     }
 
-    public UpgradeException(String message, Throwable cause) {
+    public UpgradeException(final String message, final Throwable cause) {
         super(message, cause);
     }
 
-    public UpgradeException(Throwable cause) {
+    public UpgradeException(final Throwable cause) {
         super(cause);
     }
 }

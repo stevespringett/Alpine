@@ -59,7 +59,7 @@ public class JsonWebToken {
         }
     }
 
-    private Key key;
+    private final Key key;
     private String subject;
     private Date expiration;
 
@@ -72,7 +72,7 @@ public class JsonWebToken {
      * @param key the SecretKey to use in generating or validating the token
      * @since 1.0.0
      */
-    public JsonWebToken(SecretKey key) {
+    public JsonWebToken(final SecretKey key) {
         this.key = key;
     }
 
@@ -95,7 +95,7 @@ public class JsonWebToken {
      * @return a String representation of the generated token
      * @since 1.0.0
      */
-    public String createToken(Principal principal) {
+    public String createToken(final Principal principal) {
         return createToken(principal, null);
     }
 
@@ -108,7 +108,7 @@ public class JsonWebToken {
      * @return a String representation of the generated token
      * @since 1.1.0
      */
-    public String createToken(Principal principal, List<Permission> permissions) {
+    public String createToken(final Principal principal, final List<Permission> permissions) {
         final Date today = new Date();
         final JwtBuilder jwtBuilder = Jwts.builder();
         jwtBuilder.setSubject(principal.getName());
@@ -132,7 +132,7 @@ public class JsonWebToken {
      * @return a String representation of the generated token
      * @since 1.0.0
      */
-    public String createToken(Map<String, Object> claims) {
+    public String createToken(final Map<String, Object> claims) {
         final JwtBuilder jwtBuilder = Jwts.builder();
         jwtBuilder.setClaims(claims);
         return jwtBuilder.signWith(SignatureAlgorithm.HS256, key).compact();
@@ -146,7 +146,7 @@ public class JsonWebToken {
      * @return true if validation successful, false if not
      * @since 1.0.0
      */
-    public boolean validateToken(String token) {
+    public boolean validateToken(final String token) {
         try {
             final JwtParser jwtParser = Jwts.parser().setSigningKey(key);
             jwtParser.parse(token);
@@ -173,7 +173,7 @@ public class JsonWebToken {
      * @param days The number of dates to + offset
      * @return a future date
      */
-    private Date addDays(Date date, int days) {
+    private Date addDays(final Date date, final int days) {
         final Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         cal.add(Calendar.DATE, days); //minus number would decrement the days

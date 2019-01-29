@@ -34,15 +34,15 @@ public class Authenticator {
 
     private static final boolean LDAP_ENABLED = Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.LDAP_ENABLED);
 
-    private String username;
-    private String password;
+    private final String username;
+    private final String password;
 
     /**
      * Constructs a new Authenticator object.
      * @param username the username to assert
      * @param password the password to assert
      */
-    public Authenticator(String username, String password) {
+    public Authenticator(final String username, final String password) {
         this.username = username;
         this.password = password;
     }
@@ -66,7 +66,7 @@ public class Authenticator {
             // If LDAP is enabled, a second attempt to authenticate the credentials will be
             // made against LDAP so we skip this validation exception. However, if the ManagedUser does exist, 
             // return the correct error
-            if (!LDAP_ENABLED || (e.getCauseType() != AlpineAuthenticationException.CauseType.INVALID_CREDENTIALS)){
+            if (!LDAP_ENABLED || e.getCauseType() != AlpineAuthenticationException.CauseType.INVALID_CREDENTIALS) {
                 throw e;
             }
         }

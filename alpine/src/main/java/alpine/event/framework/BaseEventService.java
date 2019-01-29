@@ -43,8 +43,8 @@ import java.util.concurrent.Executors;
 public abstract class BaseEventService implements IEventService {
 
     private Logger logger = Logger.getLogger(BaseEventService.class);
-    private Map<Class<? extends Event>, ArrayList<Class<? extends Subscriber>>> subscriptionMap = new ConcurrentHashMap<>();
-    private Map<UUID, ArrayList<UUID>>chainTracker = new ConcurrentHashMap<>();
+    private final Map<Class<? extends Event>, ArrayList<Class<? extends Subscriber>>> subscriptionMap = new ConcurrentHashMap<>();
+    private final Map<UUID, ArrayList<UUID>>chainTracker = new ConcurrentHashMap<>();
     private ExecutorService executor = Executors.newFixedThreadPool(1, new BasicThreadFactory.Builder()
             .namingPattern("Alpine-BaseEventService-%d")
             .uncaughtExceptionHandler(new LoggableUncaughtExceptionHandler())

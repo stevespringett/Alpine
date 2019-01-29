@@ -104,7 +104,11 @@ public class SendMail {
     }
 
     public SendMail attachments(final File[] attachments) {
-        this.attachments = attachments;
+        if (attachments == null) {
+            this.attachments = null;
+        } else {
+            this.attachments = attachments.clone();
+        }
         return this;
     }
 
@@ -153,11 +157,11 @@ public class SendMail {
         return this;
     }
 
-    private Address parseAddress(String address) throws SendMailException {
+    private Address parseAddress(final String address) throws SendMailException {
         return parseAddress(new String[]{address})[0];
     }
 
-    private Address[] parseAddress(String[] addresses) throws SendMailException {
+    private Address[] parseAddress(final String[] addresses) throws SendMailException {
         final InternetAddress[] internetAddresses = new InternetAddress[addresses.length];
         for (int i=0; i<addresses.length; i++) {
             try {
@@ -170,7 +174,7 @@ public class SendMail {
     }
 
     public void send() throws SendMailException {
-        Properties props = new Properties();
+        final Properties props = new Properties();
         if (trustCert) {
             // This block will automatically allow the SendMail client to accept any certificate,
             // even self-signed ones not currently in the local keystore.
@@ -178,7 +182,7 @@ public class SendMail {
             try {
                 sf = new MailSSLSocketFactory();
                 sf.setTrustAllHosts(true);
-                TrustManager[] trustManagers = {new RelaxedX509TrustManager()};
+                final TrustManager[] trustManagers = {new RelaxedX509TrustManager()};
                 sf.setTrustManagers(trustManagers);
             } catch (GeneralSecurityException e) {
                 throw new SendMailException("An error occurred while configuring trust managers", e);
@@ -197,7 +201,7 @@ public class SendMail {
             props.put("mail.smtp.auth.ntlm.domain", host);
         }
 
-        Session session = Session.getInstance(props, new javax.mail.Authenticator() {
+        final Session session = Session.getInstance(props, new javax.mail.Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(username, password);
             }
@@ -205,7 +209,7 @@ public class SendMail {
 
         session.setDebug(debug);
         try {
-            Message message = new MimeMessage(session);
+            final Message message = new MimeMessage(session);
             message.setFrom(from);
             message.setRecipients(Message.RecipientType.TO, to);
 
@@ -222,9 +226,9 @@ public class SendMail {
             Multipart multipart = new MimeMultipart();
             multipart.addBodyPart(messageBodyPart);
 
-            for (File file : attachments) {
+            for (final File file : attachments) {
                 messageBodyPart = new MimeBodyPart();
-                DataSource source = new FileDataSource(file);
+                final DataSource source = new FileDataSource(file);
                 messageBodyPart.setDataHandler(new DataHandler(source));
                 messageBodyPart.setFileName(file.getName());
                 multipart.addBodyPart(messageBodyPart);

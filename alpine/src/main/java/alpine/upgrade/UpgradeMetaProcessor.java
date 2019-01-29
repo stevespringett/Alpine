@@ -38,14 +38,14 @@ public class UpgradeMetaProcessor {
 
     private final static Logger LOGGER = Logger.getLogger(UpgradeMetaProcessor.class);
 
-    private Connection connection;
+    private final Connection connection;
 
     /**
      * Constructs a new UpgradeMetaProcessor object
      * @param connection a SQL Connection object
      * @since 1.2.0
      */
-    public UpgradeMetaProcessor(Connection connection) {
+    public UpgradeMetaProcessor(final Connection connection) {
         this.connection = connection;
     }
 
@@ -56,7 +56,7 @@ public class UpgradeMetaProcessor {
      * @throws SQLException a SQLException
      * @since 1.2.0
      */
-    public boolean hasUpgradeRan(Class<? extends UpgradeItem> upgradeClass) throws SQLException {
+    public boolean hasUpgradeRan(final Class<? extends UpgradeItem> upgradeClass) throws SQLException {
         PreparedStatement statement = null;
         ResultSet results = null;
         try {
@@ -79,7 +79,7 @@ public class UpgradeMetaProcessor {
      * @throws SQLException a SQLException
      * @since 1.2.0
      */
-    public void installUpgrade(Class<? extends UpgradeItem> upgradeClass, long startTime, long endTime) throws SQLException {
+    public void installUpgrade(final Class<? extends UpgradeItem> upgradeClass, final long startTime, final long endTime) throws SQLException {
         PreparedStatement statement = null;
         try {
             statement = connection.prepareStatement("INSERT INTO \"INSTALLEDUPGRADES\" (\"UPGRADECLASS\", \"STARTTIME\", \"ENDTIME\") VALUES (?, ?, ?)");
@@ -136,7 +136,7 @@ public class UpgradeMetaProcessor {
             results = statement.executeQuery();
 
             if (results.next()) {
-                VersionComparator currentVersion = new VersionComparator(results.getString(1));
+                final VersionComparator currentVersion = new VersionComparator(results.getString(1));
                 if (version == null || currentVersion.isNewerThan(version)) {
                     return;
                 }

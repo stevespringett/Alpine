@@ -42,7 +42,7 @@ public class LdapSyncTask implements Subscriber {
     private static final Logger LOGGER = Logger.getLogger(LdapSyncTask.class);
 
     @Override
-    public void inform(Event e) {
+    public void inform(final Event e) {
 
         if (!LdapConnectionWrapper.LDAP_CONFIGURED) {
             return;
@@ -58,7 +58,7 @@ public class LdapSyncTask implements Subscriber {
                 if (event.getUsername() == null) {
                     // If username was null, we are going to sync all users
                     final List<LdapUser> users = qm.getLdapUsers();
-                    for (LdapUser user: users) {
+                    for (final LdapUser user: users) {
                         sync(ctx, qm, ldap, user);
                     }
                 } else {
@@ -85,7 +85,8 @@ public class LdapSyncTask implements Subscriber {
      * @param user the LdapUser instance to sync
      * @throws NamingException when a problem with the connection with the directory
      */
-    private void sync(DirContext ctx, AlpineQueryManager qm, LdapConnectionWrapper ldap, LdapUser user) throws NamingException {
+    private void sync(final DirContext ctx, final AlpineQueryManager qm, final LdapConnectionWrapper ldap,
+                      LdapUser user) throws NamingException {
         LOGGER.debug("Syncing: " + user.getUsername());
         final SearchResult result = ldap.searchForSingleUsername(ctx, user.getUsername());
         if (result != null) {
@@ -94,7 +95,7 @@ public class LdapSyncTask implements Subscriber {
             user = qm.updateLdapUser(user);
             // Dynamically assign team membership (if enabled)
             if (LdapConnectionWrapper.TEAM_SYNCHRONIZATION) {
-                List<String> groupDNs = ldap.getGroups(ctx, user);
+                final List<String> groupDNs = ldap.getGroups(ctx, user);
                 qm.synchronizeTeamMembership(user, groupDNs);
             }
         } else {

@@ -68,8 +68,8 @@ public class AuthorizationFilter implements ContainerRequestFilter {
 
             try (AlpineQueryManager qm = new AlpineQueryManager()) {
                 if (principal instanceof ApiKey) {
-                    ApiKey apiKey = (ApiKey)principal;
-                    for (String permission: permissions) {
+                    final ApiKey apiKey = (ApiKey)principal;
+                    for (final String permission: permissions) {
                         if (qm.hasPermission(apiKey, permission)) {
                             return;
                         }
@@ -88,7 +88,7 @@ public class AuthorizationFilter implements ContainerRequestFilter {
                         requestContext.abortWith(Response.status(Response.Status.FORBIDDEN).build());
                         return;
                     }
-                    for (String permission : permissions) {
+                    for (final String permission : permissions) {
                         if (qm.hasPermission(user, permission, true)) {
                             return;
                         }

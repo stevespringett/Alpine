@@ -33,7 +33,7 @@ import alpine.model.Permission;
 import alpine.model.Team;
 import alpine.model.UserPrincipal;
 import alpine.resources.AlpineRequest;
-
+import io.jsonwebtoken.lang.Collections;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import java.sql.Timestamp;
@@ -86,7 +86,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     public ApiKey getApiKey(final String key) {
         final Query query = pm.newQuery(ApiKey.class, "key == :key");
         final List<ApiKey> result = (List<ApiKey>) query.execute(key);
-        return result.size() == 0 ? null : result.get(0);
+        return Collections.isEmpty(result) ? null : result.get(0);
     }
 
     /**
@@ -133,7 +133,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     public LdapUser getLdapUser(final String username) {
         final Query query = pm.newQuery(LdapUser.class, "username == :username");
         final List<LdapUser> result = (List<LdapUser>) query.execute(username);
-        return result.size() == 0 ? null : result.get(0);
+        return Collections.isEmpty(result) ? null : result.get(0);
     }
 
     /**
@@ -193,10 +193,10 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
         LOGGER.debug("Synchronizing team membership for " + user.getUsername());
         final List<Team> removeThese = new ArrayList<>();
         if (user.getTeams() != null) {
-            for (Team team : user.getTeams()) {
+            for (final Team team : user.getTeams()) {
                 LOGGER.debug(user.getUsername() + " is a member of team: " + team.getName());
                 if (team.getMappedLdapGroups() != null) {
-                    for (MappedLdapGroup mappedLdapGroup : team.getMappedLdapGroups()) {
+                    for (final MappedLdapGroup mappedLdapGroup : team.getMappedLdapGroups()) {
                         LOGGER.debug(mappedLdapGroup.getDn() + " is mapped to team: " + team.getName());
                         if (!groupDNs.contains(mappedLdapGroup.getDn())) {
                             LOGGER.debug(mappedLdapGroup.getDn() + " is not identified in the List of group DNs specified. Queuing removal of membership for user " + user.getUsername());
@@ -209,12 +209,12 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
                 }
             }
         }
-        for (Team team: removeThese) {
+        for (final Team team: removeThese) {
             LOGGER.debug("Removing user: " + user.getUsername() + " from team: " + team.getName());
             removeUserFromTeam(user, team);
         }
-        for (String groupDN: groupDNs) {
-            for (MappedLdapGroup mappedLdapGroup: getMappedLdapGroups(groupDN)) {
+        for (final String groupDN: groupDNs) {
+            for (final MappedLdapGroup mappedLdapGroup: getMappedLdapGroups(groupDN)) {
                 LOGGER.debug("Adding user: " + user.getUsername() + " to team: " + mappedLdapGroup.getTeam());
                 addUserToTeam(user, mappedLdapGroup.getTeam());
             }
@@ -300,7 +300,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     public ManagedUser getManagedUser(final String username) {
         final Query query = pm.newQuery(ManagedUser.class, "username == :username");
         final List<ManagedUser> result = (List<ManagedUser>) query.execute(username);
-        return result.size() == 0 ? null : result.get(0);
+        return Collections.isEmpty(result) ? null : result.get(0);
     }
 
     /**
@@ -396,7 +396,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
         if (teams == null) {
             teams = new ArrayList<>();
         }
-        for (Team t: teams) {
+        for (final Team t: teams) {
             if (team.getUuid().equals(t.getUuid())) {
                 found = true;
             }
@@ -425,7 +425,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
             return false;
         }
         boolean found = false;
-        for (Team t: teams) {
+        for (final Team t: teams) {
             if (team.getUuid().equals(t.getUuid())) {
                 found = true;
             }
@@ -467,7 +467,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     public Permission getPermission(final String name) {
         final Query query = pm.newQuery(Permission.class, "name == :name");
         final List<Permission> result = (List<Permission>) query.execute(name);
-        return result.size() == 0 ? null : result.get(0);
+        return Collections.isEmpty(result) ? null : result.get(0);
     }
 
     /**
@@ -491,13 +491,13 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @since 1.1.0
      */
     public List<Permission> getEffectivePermissions(UserPrincipal user) {
-        LinkedHashSet<Permission> permissions = new LinkedHashSet<>();
+        final LinkedHashSet<Permission> permissions = new LinkedHashSet<>();
         if (user.getPermissions() != null) {
             permissions.addAll(user.getPermissions());
         }
         if (user.getTeams() != null) {
-            for (Team team: user.getTeams()) {
-                List<Permission> teamPermissions = getObjectById(Team.class, team.getId()).getPermissions();
+            for (final Team team: user.getTeams()) {
+                final List<Permission> teamPermissions = getObjectById(Team.class, team.getId()).getPermissions();
                 if (teamPermissions != null) {
                     permissions.addAll(teamPermissions);
                 }
@@ -526,19 +526,19 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @since 1.0.0
      */
     public boolean hasPermission(final UserPrincipal user, String permissionName, boolean includeTeams) {
-        final Query query;
+        Query query;
         if (user instanceof ManagedUser) {
             query = pm.newQuery(Permission.class, "name == :permissionName && managedUsers.contains(:user)");
         } else {
             query = pm.newQuery(Permission.class, "name == :permissionName && ldapUsers.contains(:user)");
         }
         query.setResult("count(id)");
-        long count = (Long) query.execute(permissionName, user);
+        final long count = (Long) query.execute(permissionName, user);
         if (count > 0) {
             return true;
         }
         if (includeTeams) {
-            for (Team team: user.getTeams()) {
+            for (final Team team: user.getTeams()) {
                 if (hasPermission(team, permissionName)) {
                     return true;
                 }
@@ -571,9 +571,9 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
         if (apiKey.getTeams() == null) {
             return false;
         }
-        for (Team team: apiKey.getTeams()) {
-            List<Permission> teamPermissions = getObjectById(Team.class, team.getId()).getPermissions();
-            for (Permission permission: teamPermissions) {
+        for (final Team team: apiKey.getTeams()) {
+            final List<Permission> teamPermissions = getObjectById(Team.class, team.getId()).getPermissions();
+            for (final Permission permission: teamPermissions) {
                 if (permission.getName().equals(permissionName)) {
                     return true;
                 }
@@ -591,7 +591,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     public MappedLdapGroup getMappedLdapGroup(final Team team, final String dn) {
         final Query query = pm.newQuery(MappedLdapGroup.class, "team == :team && dn == :dn");
         final List<MappedLdapGroup> result = (List<MappedLdapGroup>) query.execute(team, dn);
-        return result.size() == 0 ? null : result.get(0);
+        return Collections.isEmpty(result) ? null : result.get(0);
     }
 
     /**
@@ -693,7 +693,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
         final Query query = pm.newQuery(EventServiceLog.class, "eventClass == :clazz");
         query.setOrdering("completed desc");
         final List<EventServiceLog> result = (List<EventServiceLog>) query.execute(clazz);
-        return result.size() == 0 ? null : result.get(0);
+        return Collections.isEmpty(result) ? null : result.get(0);
     }
 
     /**
@@ -707,7 +707,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     public ConfigProperty getConfigProperty(final String groupName, final String propertyName) {
         final Query query = pm.newQuery(ConfigProperty.class, "groupName == :groupName && propertyName == :propertyName");
         final List<ConfigProperty> result = (List<ConfigProperty>) query.execute(groupName, propertyName);
-        return result.size() == 0 ? null : result.get(0);
+        return Collections.isEmpty(result) ? null : result.get(0);
     }
 
     /**

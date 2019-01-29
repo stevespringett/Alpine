@@ -26,14 +26,14 @@ public class ValidationTask {
     private String errorMessage;
     private boolean required;
 
-    public ValidationTask(Pattern pattern, String input, String errorMessage, boolean required) {
+    public ValidationTask(final Pattern pattern, final String input, final String errorMessage, final boolean required) {
         this.pattern = pattern;
         this.input = input;
         this.errorMessage = errorMessage;
         this.required = required;
     }
 
-    public ValidationTask(Pattern pattern, String input, String errorMessage) {
+    public ValidationTask(final Pattern pattern, final String input, final String errorMessage) {
         this(pattern, input, errorMessage, true);
     }
 

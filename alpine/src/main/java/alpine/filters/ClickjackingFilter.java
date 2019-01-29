@@ -76,9 +76,9 @@ public final class ClickjackingFilter implements Filter {
         final String mode = filterConfig.getInitParameter("mode");
         final String uri = filterConfig.getInitParameter("uri");
         if (StringUtils.isNotBlank(mode)) {
-            if (("ALLOW-FROM").equals(mode)) {
+            if ("ALLOW-FROM".equals(mode)) {
                 this.mode = mode + " " + uri;
-            } else if (("DENY").equals(mode) || ("SAMEORIGIN").equals(mode)) {
+            } else if ("DENY".equals(mode) || "SAMEORIGIN".equals(mode)) {
                 this.mode = mode;
             }
         }

@@ -74,7 +74,7 @@ public class LdapStringSanitizer {
             } else if (c >= 0x080) {
                 // higher-order 2, 3 and 4-byte UTF-8 chars
                 final byte[] utf8bytes = String.valueOf(c).getBytes(StandardCharsets.UTF_8);
-                for (byte b : utf8bytes) {
+                for (final byte b : utf8bytes) {
                     sb.append(String.format("\\%02x", b));
                 }
             }

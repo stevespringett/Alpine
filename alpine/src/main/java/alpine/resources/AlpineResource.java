@@ -26,6 +26,7 @@ import alpine.persistence.AlpineQueryManager;
 import alpine.validation.RegexSequence;
 import alpine.validation.ValidationException;
 import alpine.validation.ValidationTask;
+import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.server.validation.ValidationError;
 import org.owasp.security.logging.SecurityMarkers;
@@ -167,8 +168,8 @@ public abstract class AlpineResource {
     @SafeVarargs
     protected final List<ValidationError> contOnValidationError(final Set<ConstraintViolation<Object>>... violationsArray) {
         final List<ValidationError> errors = new ArrayList<>();
-        for (Set<ConstraintViolation<Object>> violations : violationsArray) {
-            for (ConstraintViolation violation : violations) {
+        for (final Set<ConstraintViolation<Object>> violations : violationsArray) {
+            for (final ConstraintViolation violation : violations) {
                 if (violation.getPropertyPath().iterator().next().getName() != null) {
                     final String path = violation.getPropertyPath() != null ? violation.getPropertyPath().toString() : null;
                     final String message = violation.getMessage() != null ? StringUtils.removeStart(violation.getMessage(), path + ".") : null;
@@ -204,7 +205,7 @@ public abstract class AlpineResource {
     @SafeVarargs
     protected final void failOnValidationError(final Set<ConstraintViolation<Object>>... violationsArray) {
         final List<ValidationError> errors = contOnValidationError(violationsArray);
-        if (errors.size() > 0) {
+        if (! Collections.isEmpty(errors)) {
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(errors).build());
         }
     }
@@ -229,7 +230,7 @@ public abstract class AlpineResource {
      */
     protected final List<ValidationException> contOnValidationError(final ValidationTask... validationTasks) {
         final List<ValidationException> errors = new ArrayList<>();
-        for (ValidationTask validationTask:  validationTasks) {
+        for (final ValidationTask validationTask:  validationTasks) {
             if (!validationTask.isRequired() && validationTask.getInput() == null) {
                 continue;
             }
@@ -260,7 +261,7 @@ public abstract class AlpineResource {
      */
     protected final void failOnValidationError(final ValidationTask... validationTasks) {
         final List<ValidationException> errors = contOnValidationError(validationTasks);
-        if (errors.size() > 0) {
+        if (! Collections.isEmpty(errors)) {
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(errors).build());
         }
     }
@@ -309,8 +310,8 @@ public abstract class AlpineResource {
      * @param params an array of one or more param names
      * @return the value of the param, or null if not found
      */
-    private String multiParam(MultivaluedMap<String, String> queryParams, String... params) {
-        for (String param: params) {
+    private String multiParam(final MultivaluedMap<String, String> queryParams, final String... params) {
+        for (final String param: params) {
             final String value = queryParams.getFirst(param);
             if (StringUtils.isNotBlank(value)) {
                 return value;
@@ -340,7 +341,7 @@ public abstract class AlpineResource {
      * @since 1.0.0
      */
     protected boolean isLdapUser() {
-        return (getPrincipal() instanceof LdapUser);
+        return getPrincipal() instanceof LdapUser;
     }
 
     /**
@@ -348,7 +349,7 @@ public abstract class AlpineResource {
      * @since 1.0.0
      */
     protected boolean isManagedUser() {
-        return (getPrincipal() instanceof ManagedUser);
+        return getPrincipal() instanceof ManagedUser;
     }
 
     /**
@@ -356,7 +357,7 @@ public abstract class AlpineResource {
      * @since 1.0.0
      */
     protected boolean isApiKey() {
-        return (getPrincipal() instanceof ApiKey);
+        return getPrincipal() instanceof ApiKey;
     }
 
     /**
@@ -366,7 +367,7 @@ public abstract class AlpineResource {
      * @return true if principal has permission assigned, false if not
      * @since 1.2.0
      */
-    protected boolean hasPermission(String permission) {
+    protected boolean hasPermission(final String permission) {
         if (getPrincipal() == null) {
             return false;
         }
@@ -391,7 +392,7 @@ public abstract class AlpineResource {
      * @param message the initial content of the event
      * @since 1.0.0
      */
-    protected void logSecurityEvent(Logger logger, Marker marker, String message) {
+    protected void logSecurityEvent(final Logger logger, final Marker marker, final String message) {
         if (!(SecurityMarkers.SECURITY_AUDIT == marker ||
               SecurityMarkers.SECURITY_SUCCESS == marker ||
               SecurityMarkers.SECURITY_FAILURE == marker)) {

@@ -31,7 +31,7 @@ import java.security.Principal;
  */
 public class ApiKeyAuthenticationService implements AuthenticationService {
 
-    private String assertedApiKey = null;
+    private final String assertedApiKey;
 
     /**
      * Given the specified ContainerRequest, the constructor retrieves a header
@@ -39,7 +39,7 @@ public class ApiKeyAuthenticationService implements AuthenticationService {
      * @param request the ContainerRequest object
      * @since 1.0.0
      */
-    public ApiKeyAuthenticationService(ContainerRequest request) {
+    public ApiKeyAuthenticationService(final ContainerRequest request) {
         this.assertedApiKey = request.getHeaderString("X-Api-Key");
     }
 
@@ -49,7 +49,7 @@ public class ApiKeyAuthenticationService implements AuthenticationService {
      * @since 1.0.0
      */
     public boolean isSpecified() {
-        return (assertedApiKey != null);
+        return assertedApiKey != null;
     }
 
     /**

@@ -40,14 +40,14 @@ public class AlpineAuthenticationException extends AuthenticationException {
         OTHER
     }
 
-    private CauseType causeType;
+    private final CauseType causeType;
     private Principal principal;
 
-    public AlpineAuthenticationException(CauseType causeType) {
+    public AlpineAuthenticationException(final CauseType causeType) {
         this.causeType = causeType;
     }
 
-    public AlpineAuthenticationException(CauseType causeType, Principal principal) {
+    public AlpineAuthenticationException(final CauseType causeType, final Principal principal) {
         this.principal = principal;
         this.causeType = causeType;
     }

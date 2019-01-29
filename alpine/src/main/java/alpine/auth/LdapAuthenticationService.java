@@ -38,8 +38,8 @@ public class LdapAuthenticationService implements AuthenticationService {
 
     private static final Logger LOGGER = Logger.getLogger(LdapAuthenticationService.class);
 
-    private String username;
-    private String password;
+    private final String username;
+    private final String password;
 
     /**
      * Authentication service validates credentials against a directory service (LDAP).
@@ -48,7 +48,7 @@ public class LdapAuthenticationService implements AuthenticationService {
      * @param password the asserted password
      * @since 1.0.0
      */
-    public LdapAuthenticationService(String username, String password) {
+    public LdapAuthenticationService(final String username, final String password) {
         this.username = username;
         this.password = password;
     }
@@ -99,7 +99,7 @@ public class LdapAuthenticationService implements AuthenticationService {
      * @throws AlpineAuthenticationException if an exception occurs
      * @since 1.4.0
      */
-    private LdapUser autoProvision(AlpineQueryManager qm) throws AlpineAuthenticationException {
+    private LdapUser autoProvision(final AlpineQueryManager qm) throws AlpineAuthenticationException {
         LdapUser user = null;
         final LdapConnectionWrapper ldap = new LdapConnectionWrapper();
         DirContext dirContext = null;
@@ -114,7 +114,7 @@ public class LdapAuthenticationService implements AuthenticationService {
                 user = qm.persist(user);
                 // Dynamically assign team membership (if enabled)
                 if (LdapConnectionWrapper.TEAM_SYNCHRONIZATION) {
-                    List<String> groupDNs = ldap.getGroups(dirContext, user);
+                    final List<String> groupDNs = ldap.getGroups(dirContext, user);
                     user = qm.synchronizeTeamMembership(user, groupDNs);
                 }
             } else {

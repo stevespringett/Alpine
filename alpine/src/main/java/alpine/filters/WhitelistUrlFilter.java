@@ -96,7 +96,7 @@ public final class WhitelistUrlFilter implements Filter {
         final String requestUri = req.getRequestURI();
         if (requestUri != null) {
             boolean allowed = false;
-            for (String url: allowUrls) {
+            for (final String url: allowUrls) {
                 if (requestUri.equals("/")) {
                     if (url.trim().equals("/")) {
                         allowed = true;

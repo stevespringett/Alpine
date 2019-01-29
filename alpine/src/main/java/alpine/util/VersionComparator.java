@@ -28,9 +28,9 @@ import java.util.regex.Pattern;
  */
 public class VersionComparator {
 
-    private int major;
-    private int minor;
-    private int revision;
+    private final int major;
+    private final int minor;
+    private final int revision;
     private boolean isSnapshot;
     private int prereleaseNumber;
 

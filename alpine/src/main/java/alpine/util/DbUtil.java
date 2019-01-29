@@ -40,7 +40,7 @@ public class DbUtil {
     private static final String ORACLE_PLATFORM_NAME = "Oracle";
     private static final String POSTGRESQL_PLATFORM_NAME = "PostgreSQL";
 
-    private static String platform = null;
+    private static String platform;
 
     public static void rollback(Connection connection) {
         try {
@@ -155,6 +155,7 @@ public class DbUtil {
         while(resultSet.next()) {
             tableNames.add(resultSet.getString("TABLE_NAME"));
         }
+        DbUtil.close(resultSet);
         return tableNames;
     }
 
@@ -174,6 +175,7 @@ public class DbUtil {
         while(resultSet.next()) {
             columnNames.add(resultSet.getString("COLUMN_NAME"));
         }
+        DbUtil.close(resultSet);
         return columnNames;
     }
 

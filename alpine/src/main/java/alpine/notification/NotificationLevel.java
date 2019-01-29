@@ -23,7 +23,7 @@ public enum NotificationLevel {
     ERROR(0);
 
     private int level;
-    NotificationLevel(int level) {
+    NotificationLevel(final int level) {
         this.level = level;
     }
 

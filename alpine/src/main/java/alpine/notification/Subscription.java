@@ -19,26 +19,26 @@ package alpine.notification;
 
 public class Subscription {
 
-    private Class<? extends Subscriber> subscriber;
+    private final Class<? extends Subscriber> subscriber;
     private String scope;
     private String group;
     private NotificationLevel level;
 
-    public Subscription(Class<? extends Subscriber> subscriber) {
+    public Subscription(final Class<? extends Subscriber> subscriber) {
         this.subscriber = subscriber;
     }
 
-    public Subscription(Class<? extends Subscriber> subscriber, String group) {
+    public Subscription(final Class<? extends Subscriber> subscriber, final String group) {
         this.subscriber = subscriber;
         this.group = group;
     }
 
-    public Subscription(Class<? extends Subscriber> subscriber, NotificationLevel level) {
+    public Subscription(final Class<? extends Subscriber> subscriber, final NotificationLevel level) {
         this.subscriber = subscriber;
         this.level = level;
     }
 
-    public Subscription(Class<? extends Subscriber> subscriber, String scope, String group, NotificationLevel level) {
+    public Subscription(final Class<? extends Subscriber> subscriber, final String scope, final String group, final NotificationLevel level) {
         this.subscriber = subscriber;
         this.scope = scope;
         this.group = group;
@@ -62,9 +62,9 @@ public class Subscription {
     }
 
     @Override
-    public boolean equals(Object object) {
+    public boolean equals(final Object object) {
         if (object instanceof Subscription) {
-            Subscription subscription = (Subscription)object;
+            final Subscription subscription = (Subscription)object;
             // Validate Scope
             if ((subscription.getScope() != null && !subscription.getScope().equals(this.scope))) {
                 return false;

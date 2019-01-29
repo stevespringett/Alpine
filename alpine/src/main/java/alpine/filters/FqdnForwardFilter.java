@@ -93,7 +93,7 @@ public final class FqdnForwardFilter implements Filter {
 
         res.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
 
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         sb.append("http");
         if (req.isSecure()) {
             sb.append("s");

@@ -39,7 +39,7 @@ public class UpgradeExecutor {
 
     private final static Logger LOGGER = Logger.getLogger(UpgradeExecutor.class);
 
-    private AlpineQueryManager qm;
+    private final AlpineQueryManager qm;
     private Connection connection;
 
     /**
@@ -48,9 +48,9 @@ public class UpgradeExecutor {
      * @param qm an AlpineQueryManager (or superclass) object
      * @since 1.2.0
      */
-    public UpgradeExecutor(AlpineQueryManager qm) {
+    public UpgradeExecutor(final AlpineQueryManager qm) {
         this.qm = qm;
-        JDOConnection jdoConnection = qm.getPersistenceManager().getDataStoreConnection();
+        final JDOConnection jdoConnection = qm.getPersistenceManager().getDataStoreConnection();
         if (jdoConnection != null) {
             if (jdoConnection.getNativeConnection() instanceof Connection) {
                 connection = (Connection)jdoConnection.getNativeConnection();
@@ -65,8 +65,8 @@ public class UpgradeExecutor {
      * @throws UpgradeException if errors are encountered
      * @since 1.2.0
      */
-    public void executeUpgrades(List<Class<? extends UpgradeItem>> classes) throws UpgradeException {
-        UpgradeMetaProcessor installedUpgrades = new UpgradeMetaProcessor(connection);
+    public void executeUpgrades(final List<Class<? extends UpgradeItem>> classes) throws UpgradeException {
+        final UpgradeMetaProcessor installedUpgrades = new UpgradeMetaProcessor(connection);
 
         DbUtil.initPlatformName(connection); // Initialize DbUtil
 
@@ -79,18 +79,18 @@ public class UpgradeExecutor {
             return;
         }
 
-        for (Class<? extends UpgradeItem> upgradeClass : classes) {
+        for (final Class<? extends UpgradeItem> upgradeClass : classes) {
             try {
                 @SuppressWarnings("unchecked")
-                Constructor constructor = upgradeClass.getConstructor();
-                UpgradeItem upgradeItem = (UpgradeItem) constructor.newInstance();
+                final Constructor constructor = upgradeClass.getConstructor();
+                final UpgradeItem upgradeItem = (UpgradeItem) constructor.newInstance();
 
                 if (upgradeItem.shouldUpgrade(qm, connection)) {
                     if (!installedUpgrades.hasUpgradeRan(upgradeClass)) {
                         LOGGER.info("Upgrade class " + upgradeClass.getName() + " about to run.");
-                        long startTime = System.currentTimeMillis();
+                        final long startTime = System.currentTimeMillis();
                         upgradeItem.executeUpgrade(qm, connection);
-                        long endTime = System.currentTimeMillis();
+                        final long endTime = System.currentTimeMillis();
                         installedUpgrades.installUpgrade(upgradeClass, startTime, endTime);
                         installedUpgrades.updateSchemaVersion(new VersionComparator(upgradeItem.getSchemaVersion()));
                         LOGGER.info("Completed running upgrade class " + upgradeClass.getName() + " in " + (endTime - startTime) + " ms.");

@@ -29,16 +29,16 @@ import java.sql.Connection;
  */
 public abstract class AbstractUpgradeItem implements UpgradeItem {
 
-    public boolean shouldUpgrade(AlpineQueryManager queryManager, Connection connection) {
-        UpgradeMetaProcessor installedUpgrades = new UpgradeMetaProcessor(connection);
-        VersionComparator currentVersion = installedUpgrades.getSchemaVersion();
+    public boolean shouldUpgrade(final AlpineQueryManager queryManager, final Connection connection) {
+        final UpgradeMetaProcessor installedUpgrades = new UpgradeMetaProcessor(connection);
+        final VersionComparator currentVersion = installedUpgrades.getSchemaVersion();
 
         // This should not happen, but if it does, something bad has already happened. do not proceed.
         if (currentVersion == null) {
             return false;
         }
 
-        VersionComparator version = new VersionComparator(this.getSchemaVersion());
+        final VersionComparator version = new VersionComparator(this.getSchemaVersion());
         return version.isNewerThan(currentVersion);
     }
 

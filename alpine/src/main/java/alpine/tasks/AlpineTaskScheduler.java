@@ -35,7 +35,7 @@ import java.util.TimerTask;
 public abstract class AlpineTaskScheduler {
 
     // Holds a list of all timers created during construction
-    private List<Timer> timers = new ArrayList<>();
+    private final List<Timer> timers = new ArrayList<>();
 
     /**
      * Schedules a repeating Event.
@@ -43,7 +43,7 @@ public abstract class AlpineTaskScheduler {
      * @param delay delay in milliseconds before task is to be executed.
      * @param period time in milliseconds between successive task executions.
      */
-    protected void scheduleEvent(Event event, long delay, long period) {
+    protected void scheduleEvent(final Event event, final long delay, final long period) {
         final Timer timer = new Timer();
         timer.schedule(new ScheduleEvent().event(event), delay, period);
         timers.add(timer);
@@ -60,7 +60,7 @@ public abstract class AlpineTaskScheduler {
          * @param event the Event to publish
          * @return a new ScheduleEvent instance
          */
-        public ScheduleEvent event(Event event) {
+        public ScheduleEvent event(final Event event) {
             this.event = event;
             return this;
         }
@@ -69,9 +69,11 @@ public abstract class AlpineTaskScheduler {
          * Publishes the Event specified in the constructor.
          * This method publishes to all {@link EventService}s.
          */
-        public synchronized void run() {
-            EventService.getInstance().publish(event);
-            SingleThreadedEventService.getInstance().publish(event);
+        public void run() {
+            synchronized (this) {
+                EventService.getInstance().publish(event);
+                SingleThreadedEventService.getInstance().publish(event);
+            }
         }
     }
 
@@ -79,7 +81,7 @@ public abstract class AlpineTaskScheduler {
      * Shuts town the TaskScheduler by canceling all scheduled events.
      */
     public void shutdown() {
-        for (Timer timer: timers) {
+        for (final Timer timer: timers) {
             timer.cancel();
         }
     }

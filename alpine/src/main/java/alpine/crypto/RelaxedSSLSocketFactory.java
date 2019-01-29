@@ -37,7 +37,7 @@ public class RelaxedSSLSocketFactory extends SSLSocketFactory {
 
     public RelaxedSSLSocketFactory() {
         try {
-            SSLContext ctx = SSLContext.getInstance("TLS");
+            final SSLContext ctx = SSLContext.getInstance("TLS");
             ctx.init(null, new TrustManager[] { new RelaxedX509TrustManager() }, new SecureRandom());
             socketFactory = ctx.getSocketFactory();
         } catch (Exception ex) {
@@ -61,27 +61,27 @@ public class RelaxedSSLSocketFactory extends SSLSocketFactory {
     }
 
     @Override
-    public Socket createSocket(Socket socket, String string, int i, boolean bln) throws IOException {
+    public Socket createSocket(final Socket socket, final String string, final int i, final boolean bln) throws IOException {
         return socketFactory.createSocket(socket, string, i, bln);
     }
 
     @Override
-    public Socket createSocket(String string, int i) throws IOException, UnknownHostException {
+    public Socket createSocket(final String string, final int i) throws IOException, UnknownHostException {
         return socketFactory.createSocket(string, i);
     }
 
     @Override
-    public Socket createSocket(String string, int i, InetAddress ia, int i1) throws IOException, UnknownHostException {
+    public Socket createSocket(final String string, final int i, final InetAddress ia, final int i1) throws IOException, UnknownHostException {
         return socketFactory.createSocket(string, i, ia, i1);
     }
 
     @Override
-    public Socket createSocket(InetAddress ia, int i) throws IOException {
+    public Socket createSocket(final InetAddress ia, final int i) throws IOException {
         return socketFactory.createSocket(ia, i);
     }
 
     @Override
-    public Socket createSocket(InetAddress ia, int i, InetAddress ia1, int i1) throws IOException {
+    public Socket createSocket(final InetAddress ia, final int i, final InetAddress ia1, int i1) throws IOException {
         return socketFactory.createSocket(ia, i, ia1, i1);
     }
 }

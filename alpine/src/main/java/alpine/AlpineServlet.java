@@ -19,6 +19,7 @@ package alpine;
 
 import alpine.crypto.KeyManager;
 import alpine.logging.Logger;
+import io.jsonwebtoken.lang.Collections;
 import io.swagger.jaxrs.config.SwaggerContextService;
 import io.swagger.models.Info;
 import io.swagger.models.Swagger;
@@ -76,9 +77,9 @@ public class AlpineServlet extends ServletContainer {
         final ServletContext servletContext = getServletContext();
         final ServletRegistration servletRegistration = servletContext.getServletRegistration(config.getServletName());
         final Collection<String> mappings = servletRegistration.getMappings();
-        if (mappings.size() > 0) {
+        if (! Collections.isEmpty(mappings)) {
             String baseUrl = mappings.iterator().next();
-            if (!baseUrl.startsWith("/")) {
+            if (baseUrl.charAt(0) != '/') {
                 baseUrl = "/" + baseUrl;
             }
             baseUrl = baseUrl.replace("/*", "").replaceAll("\\/$", "");
