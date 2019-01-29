@@ -56,6 +56,7 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
 
     /**
      * Specifies a non-default PersistenceManager to use.
+     * @param pm the JDO PersistenceManager to use
      * @since 1.4.3
      */
     public AbstractAlpineQueryManager(PersistenceManager pm) {
@@ -466,9 +467,11 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
         return pm.detachCopy(pm.getObjectById(clazz, id));
     }
 
+
     /**
      * Refreshes and detaches an objects.
      * @param pcs the instances to detach
+     * @param <T> the type to return
      * @return the detached instances
      * @since 1.3.0
      */
@@ -480,6 +483,7 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
     /**
      * Refreshes and detaches an objects.
      * @param pcs the instances to detach
+     * @param <T> the type to return
      * @return the detached instances
      * @since 1.3.0
      */

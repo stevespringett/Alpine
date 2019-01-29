@@ -63,6 +63,7 @@ public interface Event {
      * This method supports both {@link EventService} and {@link SingleThreadedEventService}.
      *
      * @param event the event to query
+     * @return returns true if event is being processed, false if not
      * @since 1.4.0
      */
     static boolean isEventBeingProcessed(ChainableEvent event) {
@@ -76,6 +77,7 @@ public interface Event {
      * This method supports both {@link EventService} and {@link SingleThreadedEventService}.
      *
      * @param chainIdentifier the UUID of the event to query
+     * @return returns true if event is being processed, false if not
      * @since 1.4.0
      */
     static boolean isEventBeingProcessed(UUID chainIdentifier) {

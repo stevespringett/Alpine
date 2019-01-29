@@ -31,12 +31,14 @@ public interface ChainableEvent extends Event {
 
     /**
      * Returns the unique identifier for this event.
+     * @return the unique identifier for this event
      * @since 1.4.0
      */
     UUID getEventIdentifier();
 
     /**
      * Returns the unique identifier for the chain this event is a part of.
+     * @return the unique identifier for the chain this event is a part of
      * @since 1.4.0
      */
     UUID getChainIdentifier();

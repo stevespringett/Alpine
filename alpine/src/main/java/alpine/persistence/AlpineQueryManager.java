@@ -584,6 +584,8 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
 
     /**
      * Retrieves a MappedLdapGroup object for the specified Team and LDAP group.
+     * @param team a Team object
+     * @param dn a String representation of Distinguished Name
      * @return a MappedLdapGroup if found, or null if no mapping exists
      * @since 1.4.0
      */
@@ -596,6 +598,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
 
     /**
      * Retrieves a List of MappedLdapGroup objects for the specified Team.
+     * @param team a Team object
      * @return a List of MappedLdapGroup objects
      * @since 1.4.0
      */
@@ -607,6 +610,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
 
     /**
      * Retrieves a List of MappedLdapGroup objects for the specified DN.
+     * @param dn a String representation of Distinguished Name
      * @return a List of MappedLdapGroup objects
      * @since 1.4.0
      */
@@ -618,6 +622,8 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
 
     /**
      * Determines if the specified Team is mapped to the specified LDAP group.
+     * @param team a Team object
+     * @param dn a String representation of Distinguished Name
      * @return true if a mapping exists, false if not
      * @since 1.4.0
      */
