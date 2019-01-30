@@ -35,7 +35,12 @@ public final class JdoProperties {
         properties.put("javax.jdo.option.ConnectionDriverName", Config.getInstance().getProperty(Config.AlpineKey.DATABASE_DRIVER));
         properties.put("javax.jdo.option.ConnectionUserName", Config.getInstance().getProperty(Config.AlpineKey.DATABASE_USERNAME));
         properties.put("javax.jdo.option.ConnectionPassword", Config.getInstance().getProperty(Config.AlpineKey.DATABASE_PASSWORD));
-        properties.put("datanucleus.connectionPoolingType", "HikariCP");
+        if (Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.DATABASE_POOL_ENABLED)) {
+            properties.put("datanucleus.connectionPoolingType", "HikariCP");
+            properties.put("datanucleus.connectionPool.maxPoolSize", Config.getInstance().getProperty(Config.AlpineKey.DATABASE_POOL_MAX_SIZE));
+            properties.put("datanucleus.connectionPool.idleTimeout", Config.getInstance().getProperty(Config.AlpineKey.DATABASE_POOL_IDLE_TIMEOUT));
+            properties.put("datanucleus.connectionPool.maxLifetime", Config.getInstance().getProperty(Config.AlpineKey.DATABASE_POOL_MAX_LIFETIME));
+        }
         properties.put("datanucleus.schema.autoCreateDatabase", "true");
         properties.put("datanucleus.schema.autoCreateTables", "true");
         properties.put("datanucleus.schema.autoCreateColumns", "true");
