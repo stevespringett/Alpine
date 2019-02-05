@@ -566,7 +566,8 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      * to wrap {@link Query#execute()} and its derivatives.
      * @param object a collection object (or anything that extends collection)
      * @param <T> the type of object returned, or null if object was null, not a collection, or collection was empty
-     * @return 1.4.4
+     * @return A single results
+     * @since 1.4.4
      */
     @SuppressWarnings("unchecked")
     public <T> T singleResult(Object object) {
