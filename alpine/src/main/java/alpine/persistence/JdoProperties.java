@@ -57,7 +57,6 @@ public final class JdoProperties {
         properties.put("javax.jdo.option.ConnectionUserName", "sa");
         properties.put("javax.jdo.option.ConnectionPassword", "");
         properties.put("javax.jdo.option.Mapping", "h2");
-        properties.put("datanucleus.connectionPoolingType", "HikariCP");
         properties.put("datanucleus.schema.autoCreateDatabase", "true");
         properties.put("datanucleus.schema.autoCreateTables", "true");
         properties.put("datanucleus.schema.autoCreateColumns", "true");
