@@ -83,6 +83,7 @@ public final class KeyManager {
      * Initializes the KeyManager
      */
     private void initialize() {
+        createKeysIfNotExist();
         if (keyPair == null) {
             try {
                 loadKeyPair();
@@ -96,6 +97,36 @@ public final class KeyManager {
                 loadSecretKey();
             } catch (IOException | ClassNotFoundException e) {
                 LOGGER.error("An error occurred loading secret key");
+                LOGGER.error(e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Checks if the keys exists. If not, they will be created.
+     */
+    private void createKeysIfNotExist() {
+        if (!keyPairExists()) {
+            try {
+                final KeyPair keyPair = generateKeyPair();
+                save(keyPair);
+            } catch (NoSuchAlgorithmException e) {
+                LOGGER.error("An error occurred generating new keypair");
+                LOGGER.error(e.getMessage());
+            } catch (IOException e) {
+                LOGGER.error("An error occurred saving newly generated keypair");
+                LOGGER.error(e.getMessage());
+            }
+        }
+        if (!secretKeyExists()) {
+            try {
+                final SecretKey secretKey = generateSecretKey();
+                save(secretKey);
+            } catch (NoSuchAlgorithmException e) {
+                LOGGER.error("An error occurred generating new secret key");
+                LOGGER.error(e.getMessage());
+            } catch (IOException e) {
+                LOGGER.error("An error occurred saving newly generated secret key");
                 LOGGER.error(e.getMessage());
             }
         }

@@ -29,14 +29,10 @@ import org.glassfish.jersey.servlet.ServletContainer;
 import org.owasp.security.logging.util.IntervalLoggerController;
 import org.owasp.security.logging.util.SecurityLoggingFactory;
 import org.owasp.security.logging.util.SecurityUtil;
-import javax.crypto.SecretKey;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
-import java.io.IOException;
-import java.security.KeyPair;
-import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 
 /**
@@ -88,31 +84,8 @@ public class AlpineServlet extends ServletContainer {
 
         new SwaggerContextService().withServletConfig(config).updateSwagger(swagger).initScanner();
 
-        final KeyManager keyManager = KeyManager.getInstance();
-        if (!keyManager.keyPairExists()) {
-            try {
-                final KeyPair keyPair = keyManager.generateKeyPair();
-                keyManager.save(keyPair);
-            } catch (NoSuchAlgorithmException e) {
-                LOGGER.error("An error occurred generating new keypair");
-                LOGGER.error(e.getMessage());
-            } catch (IOException e) {
-                LOGGER.error("An error occurred saving newly generated keypair");
-                LOGGER.error(e.getMessage());
-            }
-        }
-        if (!keyManager.secretKeyExists()) {
-            try {
-                final SecretKey secretKey = keyManager.generateSecretKey();
-                keyManager.save(secretKey);
-            } catch (NoSuchAlgorithmException e) {
-                LOGGER.error("An error occurred generating new secret key");
-                LOGGER.error(e.getMessage());
-            } catch (IOException e) {
-                LOGGER.error("An error occurred saving newly generated secret key");
-                LOGGER.error(e.getMessage());
-            }
-        }
+        // Initializes the KeyManager
+        KeyManager.getInstance();
 
         // Log all Java System Properties
         SecurityUtil.logJavaSystemProperties();
