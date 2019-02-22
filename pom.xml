@@ -126,15 +126,15 @@
         <plugin.dependency-check.analyzer.assemblyAnalyzerEnabled>false</plugin.dependency-check.analyzer.assemblyAnalyzerEnabled>
         <plugin.dependency-check.analyzer.autoconfAnalyzerEnabled>false</plugin.dependency-check.analyzer.autoconfAnalyzerEnabled>
         <plugin.dependency-check.analyzer.bundleAuditAnalyzerEnabled>false</plugin.dependency-check.analyzer.bundleAuditAnalyzerEnabled>
-        <plugin.dependency-check.analyzer.bundleAuditPath />
+        <plugin.dependency-check.analyzer.bundleAuditPath/>
         <plugin.dependency-check.analyzer.centralAnalyzerEnabled>true</plugin.dependency-check.analyzer.centralAnalyzerEnabled>
         <plugin.dependency-check.analyzer.cmakeAnalyzerEnabled>false</plugin.dependency-check.analyzer.cmakeAnalyzerEnabled>
         <plugin.dependency-check.analyzer.cocoapodsAnalyzerEnabled>false</plugin.dependency-check.analyzer.cocoapodsAnalyzerEnabled>
         <plugin.dependency-check.analyzer.composerAnalyzerEnabled>false</plugin.dependency-check.analyzer.composerAnalyzerEnabled>
         <plugin.dependency-check.analyzer.jarAnalyzer>true</plugin.dependency-check.analyzer.jarAnalyzer>
         <plugin.dependency-check.analyzer.nexusAnalyzerEnabled>false</plugin.dependency-check.analyzer.nexusAnalyzerEnabled>
-        <plugin.dependency-check.analyzer.nexusUrl />
-        <plugin.dependency-check.analyzer.nexusUsesProxy />
+        <plugin.dependency-check.analyzer.nexusUrl/>
+        <plugin.dependency-check.analyzer.nexusUsesProxy/>
         <plugin.dependency-check.analyzer.nodeAnalyzerEnabled>true</plugin.dependency-check.analyzer.nodeAnalyzerEnabled>
         <plugin.dependency-check.analyzer.nspAnalyzerEnabled>true</plugin.dependency-check.analyzer.nspAnalyzerEnabled>
         <plugin.dependency-check.analyzer.nuspecAnalyzerEnabled>false</plugin.dependency-check.analyzer.nuspecAnalyzerEnabled>
@@ -172,7 +172,7 @@
         <lib.datanucleus-jdo-query.version>5.0.6</lib.datanucleus-jdo-query.version>
         -->
         <lib.datanucleus.version>5.1.9</lib.datanucleus.version>
-        <lib.h2.version>1.4.197</lib.h2.version>
+        <lib.h2.version>1.4.198</lib.h2.version>
         <lib.hikaricp.version>3.3.1</lib.hikaricp.version>
         <lib.javassist.version>3.24.1-GA</lib.javassist.version>
         <lib.jackson.version>2.9.8</lib.jackson.version>
