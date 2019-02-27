@@ -35,7 +35,8 @@ import java.util.List;
  * @author Steve Springett
  * @since 1.2.0
  */
-public class UpgradeExecutor {
+@SuppressWarnings("unused")
+public class UpgradeExecutor implements AutoCloseable {
 
     private final static Logger LOGGER = Logger.getLogger(UpgradeExecutor.class);
 
@@ -108,4 +109,8 @@ public class UpgradeExecutor {
         }
     }
 
+    @Override
+    public void close() {
+        DbUtil.close(connection);
+    }
 }
