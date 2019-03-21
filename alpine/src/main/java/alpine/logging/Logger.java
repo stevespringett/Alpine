@@ -114,7 +114,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void info(final String message) {
-        log.info(message);
+        log.info(sanitize(message));
     }
 
     /**
@@ -125,7 +125,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void info(final String message, final Throwable throwable) {
-        log.info(message, throwable);
+        log.info(sanitize(message), throwable);
     }
 
     /**
@@ -136,7 +136,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void info(final Marker marker, final String message) {
-        log.info(marker, message);
+        log.info(marker, sanitize(message));
     }
 
     /**
@@ -148,7 +148,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void info(final Marker marker, final String message, final Object object) {
-        log.info(marker, message, object);
+        log.info(marker, sanitize(message), object);
     }
 
     /**
@@ -161,7 +161,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void info(final Marker marker, final String message, final Object o1, final Object o2) {
-        log.info(marker, message, o1, o1);
+        log.info(marker, sanitize(message), o1, o1);
     }
 
     /**
@@ -173,7 +173,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void info(final Marker marker, final String message, final Object... objects) {
-        log.info(marker, message, objects);
+        log.info(marker, sanitize(message), objects);
     }
 
     /**
@@ -185,7 +185,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void info(final Marker marker, final String message, final Throwable throwable) {
-        log.info(marker, message, throwable);
+        log.info(marker, sanitize(message), throwable);
     }
 
     /**
@@ -195,7 +195,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void debug(final String message) {
-        log.debug(message);
+        log.debug(sanitize(message));
     }
 
     /**
@@ -206,7 +206,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void debug(final String message, final Throwable throwable) {
-        log.debug(message, throwable);
+        log.debug(sanitize(message), throwable);
     }
 
     /**
@@ -217,7 +217,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void debug(final Marker marker, final String message) {
-        log.debug(marker, message);
+        log.debug(marker, sanitize(message));
     }
 
     /**
@@ -229,7 +229,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void debug(final Marker marker, final String message, final Object object) {
-        log.debug(marker, message, object);
+        log.debug(marker, sanitize(message), object);
     }
 
     /**
@@ -242,7 +242,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void debug(final Marker marker, final String message, final Object o1, final Object o2) {
-        log.debug(marker, message, o1, o1);
+        log.debug(marker, sanitize(message), o1, o1);
     }
 
     /**
@@ -254,7 +254,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void debug(final Marker marker, final String message, final Object... objects) {
-        log.debug(marker, message, objects);
+        log.debug(marker, sanitize(message), objects);
     }
 
     /**
@@ -266,7 +266,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void debug(final Marker marker, final String message, final Throwable throwable) {
-        log.debug(marker, message, throwable);
+        log.debug(marker, sanitize(message), throwable);
     }
 
     /**
@@ -276,7 +276,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void error(final String message) {
-        log.error(message);
+        log.error(sanitize(message));
     }
 
     /**
@@ -287,7 +287,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void error(final String message, final Throwable throwable) {
-        log.error(message, throwable);
+        log.error(sanitize(message), throwable);
     }
 
     /**
@@ -298,7 +298,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void error(final Marker marker, final String message) {
-        log.error(marker, message);
+        log.error(marker, sanitize(message));
     }
 
     /**
@@ -310,7 +310,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void error(final Marker marker, final String message, final Object object) {
-        log.error(marker, message, object);
+        log.error(marker, sanitize(message), object);
     }
 
     /**
@@ -323,7 +323,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void error(final Marker marker, final String message, final Object o1, final Object o2) {
-        log.error(marker, message, o1, o1);
+        log.error(marker, sanitize(message), o1, o1);
     }
 
     /**
@@ -335,7 +335,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void error(final Marker marker, final String message, final Object... objects) {
-        log.error(marker, message, objects);
+        log.error(marker, sanitize(message), objects);
     }
 
     /**
@@ -347,7 +347,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void error(final Marker marker, final String message, final Throwable throwable) {
-        log.error(marker, message, throwable);
+        log.error(marker, sanitize(message), throwable);
     }
 
     /**
@@ -357,7 +357,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void trace(final String message) {
-        log.trace(message);
+        log.trace(sanitize(message));
     }
 
     /**
@@ -368,7 +368,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void trace(final String message, final Throwable throwable) {
-        log.trace(message, throwable);
+        log.trace(sanitize(message), throwable);
     }
 
     /**
@@ -379,7 +379,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void trace(final Marker marker, final String message) {
-        log.trace(marker, message);
+        log.trace(marker, sanitize(message));
     }
 
     /**
@@ -391,7 +391,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void trace(final Marker marker, final String message, final Object object) {
-        log.trace(marker, message, object);
+        log.trace(marker, sanitize(message), object);
     }
 
     /**
@@ -404,7 +404,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void trace(final Marker marker, final String message, final Object o1, final Object o2) {
-        log.trace(marker, message, o1, o1);
+        log.trace(marker, sanitize(message), o1, o1);
     }
 
     /**
@@ -416,7 +416,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void trace(final Marker marker, final String message, final Object... objects) {
-        log.trace(marker, message, objects);
+        log.trace(marker, sanitize(message), objects);
     }
 
     /**
@@ -428,7 +428,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void trace(final Marker marker, final String message, final Throwable throwable) {
-        log.trace(marker, message, throwable);
+        log.trace(marker, sanitize(message), throwable);
     }
 
     /**
@@ -438,7 +438,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void warn(final String message) {
-        log.warn(message);
+        log.warn(sanitize(message));
     }
 
     /**
@@ -449,7 +449,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void warn(final String message, final Throwable throwable) {
-        log.warn(message, throwable);
+        log.warn(sanitize(message), throwable);
     }
 
     /**
@@ -460,7 +460,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void warn(final Marker marker, final String message) {
-        log.warn(marker, message);
+        log.warn(marker, sanitize(message));
     }
 
     /**
@@ -472,7 +472,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void warn(final Marker marker, final String message, final Object object) {
-        log.warn(marker, message, object);
+        log.warn(marker, sanitize(message), object);
     }
 
     /**
@@ -485,7 +485,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void warn(final Marker marker, final String message, final Object o1, final Object o2) {
-        log.warn(marker, message, o1, o1);
+        log.warn(marker, sanitize(message), o1, o1);
     }
 
     /**
@@ -497,7 +497,7 @@ public final class Logger {
      * @since 1.0.0
      */
     public void warn(final Marker marker, final String message, final Object... objects) {
-        log.warn(marker, message, objects);
+        log.warn(marker, sanitize(message), objects);
     }
 
     /**
@@ -509,7 +509,16 @@ public final class Logger {
      * @since 1.0.0
      */
     public void warn(final Marker marker, final String message, final Throwable throwable) {
-        log.warn(marker, message, throwable);
+        log.warn(marker, sanitize(message), throwable);
     }
 
+    /**
+     * Prevents possibility of CRLF injection.
+     * @param message the message to sanitize
+     * @return the sanitized message
+     * @since 1.5.0
+     */
+    private String sanitize(String message) {
+        return message.replaceAll("[\r\n]","");
+    }
 }
