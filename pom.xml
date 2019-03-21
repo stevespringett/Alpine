@@ -116,33 +116,17 @@
         <plugin.fortify.sca.source.version>${maven.compiler.source}</plugin.fortify.sca.source.version>
         <plugin.fortify.sca.findbugs>false</plugin.fortify.sca.findbugs>
 
-        <!-- Software Security: OWASP Dependency-Check -->
-        <maven.dependency-check.plugin.version>3.3.2</maven.dependency-check.plugin.version>
-        <plugin.dependency-check.autoUpdate>true</plugin.dependency-check.autoUpdate>
-        <plugin.dependency-check.format>ALL</plugin.dependency-check.format>
-        <plugin.dependency-check.skipTestScope>true</plugin.dependency-check.skipTestScope>
-        <plugin.dependency-check.suppressionFile>${env.DEPENDENCY-CHECK_SUPPRESSION}</plugin.dependency-check.suppressionFile>
-        <plugin.dependency-check.analyzer.archiveAnalyzerEnabled>false</plugin.dependency-check.analyzer.archiveAnalyzerEnabled>
-        <plugin.dependency-check.analyzer.assemblyAnalyzerEnabled>false</plugin.dependency-check.analyzer.assemblyAnalyzerEnabled>
-        <plugin.dependency-check.analyzer.autoconfAnalyzerEnabled>false</plugin.dependency-check.analyzer.autoconfAnalyzerEnabled>
-        <plugin.dependency-check.analyzer.bundleAuditAnalyzerEnabled>false</plugin.dependency-check.analyzer.bundleAuditAnalyzerEnabled>
-        <plugin.dependency-check.analyzer.bundleAuditPath/>
-        <plugin.dependency-check.analyzer.centralAnalyzerEnabled>true</plugin.dependency-check.analyzer.centralAnalyzerEnabled>
-        <plugin.dependency-check.analyzer.cmakeAnalyzerEnabled>false</plugin.dependency-check.analyzer.cmakeAnalyzerEnabled>
-        <plugin.dependency-check.analyzer.cocoapodsAnalyzerEnabled>false</plugin.dependency-check.analyzer.cocoapodsAnalyzerEnabled>
-        <plugin.dependency-check.analyzer.composerAnalyzerEnabled>false</plugin.dependency-check.analyzer.composerAnalyzerEnabled>
-        <plugin.dependency-check.analyzer.jarAnalyzer>true</plugin.dependency-check.analyzer.jarAnalyzer>
-        <plugin.dependency-check.analyzer.nexusAnalyzerEnabled>false</plugin.dependency-check.analyzer.nexusAnalyzerEnabled>
-        <plugin.dependency-check.analyzer.nexusUrl/>
-        <plugin.dependency-check.analyzer.nexusUsesProxy/>
-        <plugin.dependency-check.analyzer.nodeAnalyzerEnabled>true</plugin.dependency-check.analyzer.nodeAnalyzerEnabled>
-        <plugin.dependency-check.analyzer.nspAnalyzerEnabled>true</plugin.dependency-check.analyzer.nspAnalyzerEnabled>
-        <plugin.dependency-check.analyzer.nuspecAnalyzerEnabled>false</plugin.dependency-check.analyzer.nuspecAnalyzerEnabled>
-        <plugin.dependency-check.analyzer.opensslAnalyzerEnabled>false</plugin.dependency-check.analyzer.opensslAnalyzerEnabled>
-        <plugin.dependency-check.analyzer.pyDistributionAnalyzerEnabled>false</plugin.dependency-check.analyzer.pyDistributionAnalyzerEnabled>
-        <plugin.dependency-check.analyzer.pyPackageAnalyzerEnabled>false</plugin.dependency-check.analyzer.pyPackageAnalyzerEnabled>
-        <plugin.dependency-check.analyzer.rubygemsAnalyzerEnabled>false</plugin.dependency-check.analyzer.rubygemsAnalyzerEnabled>
-        <plugin.dependency-check.analyzer.swiftPackageManagerAnalyzerEnabled>false</plugin.dependency-check.analyzer.swiftPackageManagerAnalyzerEnabled>
+        <!-- Sonatype OSS Index -->
+        <maven.ossindex.plugin.version>3.0.4</maven.ossindex.plugin.version>
+        <plugin.ossindex.authId>ossindex</plugin.ossindex.authId>
+        <plugin.ossindex.cvssScoreThreshold>0.0</plugin.ossindex.cvssScoreThreshold>
+        <plugin.ossindex.excludeCoordinatesCsv></plugin.ossindex.excludeCoordinatesCsv>
+        <plugin.ossindex.excludeVulnerabilityIdsCsv></plugin.ossindex.excludeVulnerabilityIdsCsv>
+        <plugin.ossindex.fail>true</plugin.ossindex.fail>
+        <plugin.ossindex.reportFile>${project.build.directory}/ossindex.json</plugin.ossindex.reportFile>
+        <plugin.ossindex.scope>compile</plugin.ossindex.scope>
+        <plugin.ossindex.skip>false</plugin.ossindex.skip>
+        <plugin.ossindex.transitive>true</plugin.ossindex.transitive>
 
         <!-- Software Security: Retire.js -->
         <maven.retirejs.plugin.version>3.0.1</maven.retirejs.plugin.version>
@@ -427,7 +411,7 @@
     </dependencies>
 
     <prerequisites>
-        <maven>3.2.1</maven>
+        <maven>3.3.9</maven>
     </prerequisites>
 
     <build>
@@ -619,7 +603,7 @@
         <profile>
             <id>component-analysis</id>
             <!-- Activate this profile to check third-party components for known vulnerabilities
-                 using OWASP Dependency-Check and Retire.js. -->
+                 using Sonatype  OSS Index and Retire.js. -->
             <activation>
                 <property>
                     <name>env.ACTIVATE_COMPONENT_ANALYSIS</name>
@@ -631,37 +615,29 @@
                 <pluginManagement>
                     <plugins>
                         <plugin>
-                            <groupId>org.owasp</groupId>
-                            <artifactId>dependency-check-maven</artifactId>
-                            <version>${maven.dependency-check.plugin.version}</version>
+                            <groupId>org.sonatype.ossindex.maven</groupId>
+                            <artifactId>ossindex-maven-plugin</artifactId>
+                            <version>${maven.ossindex.plugin.version}</version>
                             <configuration>
-                                <autoUpdate>${plugin.dependency-check.autoUpdate}</autoUpdate>
-                                <format>${plugin.dependency-check.format}</format>
-                                <skipTestScope>${plugin.dependency-check.skipTestScope}</skipTestScope>
-                                <suppressionFile>${plugin.dependency-check.suppressionFile}</suppressionFile>
-                                <!-- Analyzer Configuration -->
-                                <archiveAnalyzerEnabled>${plugin.dependency-check.analyzer.archiveAnalyzerEnabled}</archiveAnalyzerEnabled>
-                                <assemblyAnalyzerEnabled>${plugin.dependency-check.analyzer.assemblyAnalyzerEnabled}</assemblyAnalyzerEnabled>
-                                <autoconfAnalyzerEnabled>${plugin.dependency-check.analyzer.autoconfAnalyzerEnabled}</autoconfAnalyzerEnabled>
-                                <bundleAuditAnalyzerEnabled>${plugin.dependency-check.analyzer.bundleAuditAnalyzerEnabled}</bundleAuditAnalyzerEnabled>
-                                <bundleAuditPath>${plugin.dependency-check.analyzer.bundleAuditPath}</bundleAuditPath>
-                                <centralAnalyzerEnabled>${plugin.dependency-check.analyzer.centralAnalyzerEnabled}</centralAnalyzerEnabled>
-                                <cmakeAnalyzerEnabled>${plugin.dependency-check.analyzer.cmakeAnalyzerEnabled}</cmakeAnalyzerEnabled>
-                                <cocoapodsAnalyzerEnabled>${plugin.dependency-check.analyzer.cocoapodsAnalyzerEnabled}</cocoapodsAnalyzerEnabled>
-                                <composerAnalyzerEnabled>${plugin.dependency-check.analyzer.composerAnalyzerEnabled}</composerAnalyzerEnabled>
-                                <jarAnalyzerEnabled>${plugin.dependency-check.analyzer.jarAnalyzer}</jarAnalyzerEnabled>
-                                <nexusAnalyzerEnabled>${plugin.dependency-check.analyzer.nexusAnalyzerEnabled}</nexusAnalyzerEnabled>
-                                <nexusUrl>${plugin.dependency-check.analyzer.nexusUrl}</nexusUrl>
-                                <nexusUsesProxy>${plugin.dependency-check.analyzer.nexusUsesProxy}</nexusUsesProxy>
-                                <nodeAnalyzerEnabled>${plugin.dependency-check.analyzer.nodeAnalyzerEnabled}</nodeAnalyzerEnabled>
-                                <nspAnalyzerEnabled>${plugin.dependency-check.analyzer.nspAnalyzerEnabled}</nspAnalyzerEnabled>
-                                <nuspecAnalyzerEnabled>${plugin.dependency-check.analyzer.nuspecAnalyzerEnabled}</nuspecAnalyzerEnabled>
-                                <opensslAnalyzerEnabled>${plugin.dependency-check.analyzer.opensslAnalyzerEnabled}</opensslAnalyzerEnabled>
-                                <pyDistributionAnalyzerEnabled>${plugin.dependency-check.analyzer.pyDistributionAnalyzerEnabled}</pyDistributionAnalyzerEnabled>
-                                <pyPackageAnalyzerEnabled>${plugin.dependency-check.analyzer.pyPackageAnalyzerEnabled}</pyPackageAnalyzerEnabled>
-                                <rubygemsAnalyzerEnabled>${plugin.dependency-check.analyzer.rubygemsAnalyzerEnabled}</rubygemsAnalyzerEnabled>
-                                <swiftPackageManagerAnalyzerEnabled>${plugin.dependency-check.analyzer.swiftPackageManagerAnalyzerEnabled}</swiftPackageManagerAnalyzerEnabled>
+                                <authId>${plugin.ossindex.authId}</authId>
+                                <cvssScoreThreshold>${plugin.ossindex.cvssScoreThreshold}</cvssScoreThreshold>
+                                <excludeCoordinatesCsv>${plugin.ossindex.excludeCoordinatesCsv}</excludeCoordinatesCsv>
+                                <excludeVulnerabilityIdsCsv>${plugin.ossindex.excludeVulnerabilityIdsCsv}</excludeVulnerabilityIdsCsv>
+                                <fail>${plugin.ossindex.fail}</fail>
+                                <reportFile>${plugin.ossindex.reportFile}</reportFile>
+                                <scope>${plugin.ossindex.scope}</scope>
+                                <skip>${plugin.ossindex.skip}</skip>
+                                <transitive>${plugin.ossindex.transitive}</transitive>
                             </configuration>
+                            <executions>
+                                <execution>
+                                    <id>audit-dependencies</id>
+                                    <phase>validate</phase>
+                                    <goals>
+                                        <goal>audit</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
                         </plugin>
                     </plugins>
                 </pluginManagement>
@@ -722,15 +698,26 @@
                         </executions>
                     </plugin>
                     <plugin>
-                        <groupId>org.owasp</groupId>
-                        <artifactId>dependency-check-maven</artifactId>
-                        <version>${maven.dependency-check.plugin.version}</version>
+                        <groupId>org.sonatype.ossindex.maven</groupId>
+                        <artifactId>ossindex-maven-plugin</artifactId>
+                        <version>${maven.ossindex.plugin.version}</version>
+                        <configuration>
+                            <authId>${plugin.ossindex.authId}</authId>
+                            <cvssScoreThreshold>${plugin.ossindex.cvssScoreThreshold}</cvssScoreThreshold>
+                            <excludeCoordinatesCsv>${plugin.ossindex.excludeCoordinatesCsv}</excludeCoordinatesCsv>
+                            <excludeVulnerabilityIdsCsv>${plugin.ossindex.excludeVulnerabilityIdsCsv}</excludeVulnerabilityIdsCsv>
+                            <fail>${plugin.ossindex.fail}</fail>
+                            <reportFile>${plugin.ossindex.reportFile}</reportFile>
+                            <scope>${plugin.ossindex.scope}</scope>
+                            <skip>${plugin.ossindex.skip}</skip>
+                            <transitive>${plugin.ossindex.transitive}</transitive>
+                        </configuration>
                         <executions>
                             <execution>
-                                <id>dependency-check</id>
+                                <id>audit-dependencies</id>
                                 <phase>test</phase>
                                 <goals>
-                                    <goal>check</goal>
+                                    <goal>audit</goal>
                                 </goals>
                             </execution>
                         </executions>
@@ -755,64 +742,6 @@
                             <includeSystemScope>${plugin.cyclonedx.includeSystemScope}</includeSystemScope>
                             <includeTestScope>${plugin.cyclonedx.includeTestScope}</includeTestScope>
                         </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-site-plugin</artifactId>
-                        <version>${maven.site.plugin.version}</version>
-                        <configuration>
-                            <reportPlugins combine.children="override">
-                                <plugin>
-                                    <groupId>org.owasp</groupId>
-                                    <artifactId>dependency-check-maven</artifactId>
-                                    <version>${maven.dependency-check.plugin.version}</version>
-                                    <configuration>
-                                        <autoUpdate>${plugin.dependency-check.autoUpdate}</autoUpdate>
-                                        <format>${plugin.dependency-check.format}</format>
-                                        <skipTestScope>${plugin.dependency-check.skipTestScope}</skipTestScope>
-                                        <suppressionFile>${plugin.dependency-check.suppressionFile}</suppressionFile>
-                                        <!-- Analyzer Configuration -->
-                                        <archiveAnalyzerEnabled>${plugin.dependency-check.analyzer.archiveAnalyzerEnabled}</archiveAnalyzerEnabled>
-                                        <assemblyAnalyzerEnabled>${plugin.dependency-check.analyzer.assemblyAnalyzerEnabled}</assemblyAnalyzerEnabled>
-                                        <autoconfAnalyzerEnabled>${plugin.dependency-check.analyzer.autoconfAnalyzerEnabled}</autoconfAnalyzerEnabled>
-                                        <bundleAuditAnalyzerEnabled>${plugin.dependency-check.analyzer.bundleAuditAnalyzerEnabled}</bundleAuditAnalyzerEnabled>
-                                        <bundleAuditPath>${plugin.dependency-check.analyzer.bundleAuditPath}</bundleAuditPath>
-                                        <centralAnalyzerEnabled>${plugin.dependency-check.analyzer.centralAnalyzerEnabled}</centralAnalyzerEnabled>
-                                        <cmakeAnalyzerEnabled>${plugin.dependency-check.analyzer.cmakeAnalyzerEnabled}</cmakeAnalyzerEnabled>
-                                        <cocoapodsAnalyzerEnabled>${plugin.dependency-check.analyzer.cocoapodsAnalyzerEnabled}</cocoapodsAnalyzerEnabled>
-                                        <composerAnalyzerEnabled>${plugin.dependency-check.analyzer.composerAnalyzerEnabled}</composerAnalyzerEnabled>
-                                        <jarAnalyzer>${plugin.dependency-check.analyzer.jarAnalyzer}</jarAnalyzer>
-                                        <nexusAnalyzerEnabled>${plugin.dependency-check.analyzer.nexusAnalyzerEnabled}</nexusAnalyzerEnabled>
-                                        <nexusUrl>${plugin.dependency-check.analyzer.nexusUrl}</nexusUrl>
-                                        <nexusUsesProxy>${plugin.dependency-check.analyzer.nexusUsesProxy}</nexusUsesProxy>
-                                        <nodeAnalyzerEnabled>${plugin.dependency-check.analyzer.nodeAnalyzerEnabled}</nodeAnalyzerEnabled>
-                                        <nspAnalyzerEnabled>${plugin.dependency-check.analyzer.nspAnalyzerEnabled}</nspAnalyzerEnabled>
-                                        <nuspecAnalyzerEnabled>${plugin.dependency-check.analyzer.nuspecAnalyzerEnabled}</nuspecAnalyzerEnabled>
-                                        <opensslAnalyzerEnabled>${plugin.dependency-check.analyzer.opensslAnalyzerEnabled}</opensslAnalyzerEnabled>
-                                        <pyDistributionAnalyzerEnabled>${plugin.dependency-check.analyzer.pyDistributionAnalyzerEnabled}</pyDistributionAnalyzerEnabled>
-                                        <pyPackageAnalyzerEnabled>${plugin.dependency-check.analyzer.pyPackageAnalyzerEnabled}</pyPackageAnalyzerEnabled>
-                                        <rubygemsAnalyzerEnabled>${plugin.dependency-check.analyzer.rubygemsAnalyzerEnabled}</rubygemsAnalyzerEnabled>
-                                        <swiftPackageManagerAnalyzerEnabled>${plugin.dependency-check.analyzer.swiftPackageManagerAnalyzerEnabled}</swiftPackageManagerAnalyzerEnabled>
-                                    </configuration>
-                                    <reportSets>
-                                        <reportSet>
-                                            <reports>
-                                                <report>aggregate</report>
-                                            </reports>
-                                        </reportSet>
-                                    </reportSets>
-                                </plugin>
-                            </reportPlugins>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>dependency-check</id>
-                                <phase>site</phase>
-                                <goals>
-                                    <goal>site</goal>
-                                </goals>
-                            </execution>
-                        </executions>
                     </plugin>
                 </plugins>
             </build>

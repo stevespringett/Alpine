@@ -102,7 +102,7 @@ Build Features
 
 These build-time features are inherited simply by using the Alpine pom
 * Simplifies dependency management. Simply including Alpine as a dependency is all that's required
-* Analysis of third-party components for known vulnerabilities via OWASP Dependency-Check & Retire.js
+* Analysis of third-party components for known vulnerabilities via Sonatype OSS Index & Retire.js
 * Automatic creation of CycloneDX BoM incorporating all direct and transitive dependencies used
 * Support for HPE Fortify Source Code Analyzer (SCA) (requires Fortify license to use)
 * Alpine apps are automatically built as WARs
