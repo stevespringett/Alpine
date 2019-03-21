@@ -6,7 +6,7 @@
 [![License][license-image]][license-url]
 [![Join the chat at https://gitter.im/java-alpine/Lobby](https://badges.gitter.im/java-alpine/Lobby.svg)](https://gitter.im/java-alpine/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 ![Static Analysis][fortify-image]
-[![Component Analysis][odc-image]][odc-url]
+[![Component Analysis][sca-image]][sca-url]
 <img src="http://stevespringett.github.io/alpine/images/Alpine.svg" width="300" align="right">
 
 Alpine
@@ -190,5 +190,5 @@ the [NOTICE.txt](https://github.com/stevespringett/alpine/blob/master/NOTICE.txt
   [license-image]: https://img.shields.io/badge/license-apache%20v2-brightgreen.svg
   [license-url]: https://github.com/stevespringett/alpine/blob/master/LICENSE.txt
   [fortify-image]: https://img.shields.io/badge/static%20analysis-fortify%20sca-blue.svg
-  [odc-image]: https://img.shields.io/badge/component%20analysis-owasp%20dependency--check-blue.svg
-  [odc-url]: https://www.owasp.org/index.php/OWASP_Dependency_Check
+  [sca-image]: https://img.shields.io/badge/component%20analysis-oss%20index-blue.svg
+  [sca-url]: https://ossindex.sonatype.org/
