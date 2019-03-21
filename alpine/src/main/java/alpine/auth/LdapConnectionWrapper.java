@@ -274,7 +274,7 @@ public class LdapConnectionWrapper {
         if (s == null) {
             return null;
         }
-        return s.replace("{USER_DN}", user.getDN());
+        return s.replace("{USER_DN}", LdapStringSanitizer.sanitize(user.getDN()));
     }
 
     /**
