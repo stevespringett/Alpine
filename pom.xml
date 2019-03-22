@@ -146,7 +146,7 @@
         <!-- Dependency Versions -->
         <lib.alpine.executable.war.version>1.1.2</lib.alpine.executable.war.version>
         <lib.bcrypt.version>0.4</lib.bcrypt.version>
-        <lib.caffeine.version>2.6.2</lib.caffeine.version>
+        <lib.caffeine.version>2.7.0</lib.caffeine.version>
         <lib.commons.collections4.version>4.3</lib.commons.collections4.version>
         <lib.commons.io.version>2.6</lib.commons.io.version>
         <lib.commons.lang3.version>3.8.1</lib.commons.lang3.version>
@@ -156,7 +156,7 @@
         <lib.datanucleus-jdo-query.version>5.0.6</lib.datanucleus-jdo-query.version>
         -->
         <lib.datanucleus.version>5.1.9</lib.datanucleus.version>
-        <lib.h2.version>1.4.198</lib.h2.version>
+        <lib.h2.version>1.4.199</lib.h2.version>
         <lib.hikaricp.version>3.3.1</lib.hikaricp.version>
         <lib.javassist.version>3.24.1-GA</lib.javassist.version>
         <lib.jackson.version>2.9.8</lib.jackson.version>
@@ -173,7 +173,7 @@
         <lib.owasp.encoder.version>1.2.2</lib.owasp.encoder.version>
         <lib.owasp.security-logging.version>1.1.6</lib.owasp.security-logging.version>
         <lib.slf4j.version>1.7.25</lib.slf4j.version>
-        <lib.swagger.jersey.version>1.5.21</lib.swagger.jersey.version>
+        <lib.swagger.jersey.version>1.5.22</lib.swagger.jersey.version>
 
         <!-- Logback configuration - Used for Embedded Jetty profile -->
         <logback.configuration.file>${project.build.directory}/classes/logback.xml</logback.configuration.file>
@@ -452,7 +452,7 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <phase>compile</phase>
+                        <phase>process-classes</phase>
                         <goals>
                             <goal>enhance</goal>
                         </goals>
