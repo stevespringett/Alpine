@@ -155,6 +155,7 @@
              https://github.com/datanucleus/datanucleus-jdo-query/pull/10
         <lib.datanucleus-jdo-query.version>5.0.6</lib.datanucleus-jdo-query.version>
         -->
+        <!-- TODO: Upgrade Datanucleus when https://github.com/datanucleus/datanucleus-rdbms/issues/321 is resolved -->
         <lib.datanucleus.version>5.1.9</lib.datanucleus.version>
         <lib.h2.version>1.4.199</lib.h2.version>
         <lib.hikaricp.version>3.3.1</lib.hikaricp.version>
