@@ -31,6 +31,7 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.annotations.Unique;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -81,7 +82,7 @@ public class Team implements Serializable {
 
     @Persistent
     @Column(name = "NAME", jdbcType = "VARCHAR", length = 50, allowsNull = "false")
-    @NotNull
+    @NotBlank
     @Size(min = 1, max = 255)
     @Pattern(regexp = "[\\P{Cc}]+", message = "The team name must not contain control characters")
     private String name;

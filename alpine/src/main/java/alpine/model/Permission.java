@@ -27,6 +27,7 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.annotations.Unique;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -52,7 +53,7 @@ public class Permission implements Serializable {
     @Persistent
     @Unique(name = "PERMISSION_IDX")
     @Column(name = "NAME", allowsNull = "false")
-    @NotNull
+    @NotBlank
     @Size(min = 1, max = 255)
     @Pattern(regexp = RegexSequence.Definition.WORD_CHARS, message = "The permission name must contain only alpha and/or numeric characters")
     private String name;

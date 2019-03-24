@@ -24,7 +24,7 @@ import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -47,7 +47,7 @@ public class SchemaVersion implements Serializable {
 
     @Persistent
     @Column(name = "VERSION")
-    @NotNull
+    @NotBlank
     @Size(min = 1, max = 255)
     @Pattern(regexp = "[\\P{Cc}]+", message = "The version must not contain control characters")
     private String version;

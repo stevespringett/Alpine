@@ -25,6 +25,7 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.annotations.Unique;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -50,14 +51,14 @@ public class ConfigProperty implements IConfigProperty, Serializable {
 
     @Persistent
     @Column(name = "GROUPNAME", allowsNull = "false")
-    @NotNull
+    @NotBlank
     @Size(min = 1, max = 255)
     @Pattern(regexp = "[\\P{Cc}]+", message = "The groupName must not contain control characters")
     private String groupName;
 
     @Persistent
     @Column(name = "PROPERTYNAME", allowsNull = "false")
-    @NotNull
+    @NotBlank
     @Size(min = 1, max = 255)
     @Pattern(regexp = "[\\P{Cc}]+", message = "The propertyName must not contain control characters")
     private String propertyName;

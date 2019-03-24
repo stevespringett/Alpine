@@ -29,7 +29,7 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.annotations.Unique;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -56,14 +56,14 @@ public class LdapUser implements Serializable, Principal, UserPrincipal {
     @Persistent
     @Unique(name = "LDAPUSER_USERNAME_IDX")
     @Column(name = "USERNAME")
-    @NotNull
+    @NotBlank
     @Size(min = 1, max = 255)
     @Pattern(regexp = "[\\P{Cc}]+", message = "The username must not contain control characters")
     private String username;
 
     @Persistent
     @Column(name = "DN", allowsNull = "false")
-    @NotNull
+    @NotBlank
     @Size(min = 1, max = 255)
     @Pattern(regexp = "[\\P{Cc}]+", message = "The distinguished name must not contain control characters")
     private String dn;

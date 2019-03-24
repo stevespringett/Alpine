@@ -24,7 +24,7 @@ import javax.jdo.annotations.Index;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
@@ -47,7 +47,7 @@ public class EventServiceLog implements Serializable {
     @Persistent
     @Index(name = "SUBSCRIBERCLASS_IDX")
     @Column(name = "SUBSCRIBERCLASS", allowsNull = "false")
-    @NotNull
+    @NotBlank
     private String subscriberClass;
 
     @Persistent
