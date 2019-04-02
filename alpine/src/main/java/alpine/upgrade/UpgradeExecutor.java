@@ -36,12 +36,11 @@ import java.util.List;
  * @since 1.2.0
  */
 @SuppressWarnings("unused")
-public class UpgradeExecutor implements AutoCloseable {
+public class UpgradeExecutor {
 
     private final static Logger LOGGER = Logger.getLogger(UpgradeExecutor.class);
 
     private final AlpineQueryManager qm;
-    private Connection connection;
 
     /**
      * Constructs a new UpgradeExecutor object.
@@ -51,12 +50,6 @@ public class UpgradeExecutor implements AutoCloseable {
      */
     public UpgradeExecutor(final AlpineQueryManager qm) {
         this.qm = qm;
-        final JDOConnection jdoConnection = qm.getPersistenceManager().getDataStoreConnection();
-        if (jdoConnection != null) {
-            if (jdoConnection.getNativeConnection() instanceof Connection) {
-                connection = (Connection)jdoConnection.getNativeConnection();
-            }
-        }
     }
 
     /**
@@ -67,8 +60,8 @@ public class UpgradeExecutor implements AutoCloseable {
      * @since 1.2.0
      */
     public void executeUpgrades(final List<Class<? extends UpgradeItem>> classes) throws UpgradeException {
+        final Connection connection = getConnection(qm);
         final UpgradeMetaProcessor installedUpgrades = new UpgradeMetaProcessor(connection);
-
         DbUtil.initPlatformName(connection); // Initialize DbUtil
 
         // First, we need to ensure the schema table is populated on a clean install
@@ -109,8 +102,16 @@ public class UpgradeExecutor implements AutoCloseable {
         }
     }
 
-    @Override
-    public void close() {
-        DbUtil.close(connection);
+    /**
+     * This connection should never be closed.
+     */
+    private Connection getConnection(AlpineQueryManager aqm) {
+        final JDOConnection jdoConnection = aqm.getPersistenceManager().getDataStoreConnection();
+        if (jdoConnection != null) {
+            if (jdoConnection.getNativeConnection() instanceof Connection) {
+                return (Connection)jdoConnection.getNativeConnection();
+            }
+        }
+        return null;
     }
 }
