@@ -92,8 +92,8 @@
         <maven.shade.plugin.version>3.1.1</maven.shade.plugin.version>
 
         <!-- Dependency Versions -->
-        <lib.slf4j.version>1.7.25</lib.slf4j.version>
-        <lib.jetty.version>9.4.14.v20181114</lib.jetty.version>
+        <lib.slf4j.version>1.7.26</lib.slf4j.version>
+        <lib.jetty.version>9.4.17.v20190418</lib.jetty.version>
         <lib.logback.version>1.2.3</lib.logback.version>
     </properties>
 
