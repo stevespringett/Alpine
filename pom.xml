@@ -85,7 +85,7 @@
 
     <properties>
         <!-- Maven Build Properties -->
-        <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
+        <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -158,7 +158,7 @@
         <lib.datanucleus.version>5.2.1</lib.datanucleus.version>
         <lib.h2.version>1.4.199</lib.h2.version>
         <lib.hikaricp.version>3.3.1</lib.hikaricp.version>
-        <lib.javassist.version>3.24.1-GA</lib.javassist.version>
+        <lib.javassist.version>3.25.0-GA</lib.javassist.version>
         <lib.jackson.version>2.9.8</lib.jackson.version>
         <lib.javamail.version>1.6.2</lib.javamail.version>
         <lib.jdo.api.version>3.2.0-m12</lib.jdo.api.version>
@@ -200,7 +200,7 @@
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-api</artifactId>
-            <version>8.0</version>
+            <version>8.0.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
