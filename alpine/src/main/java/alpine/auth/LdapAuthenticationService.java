@@ -75,14 +75,18 @@ public class LdapAuthenticationService implements AuthenticationService {
      * @since 1.0.0
      */
     public Principal authenticate() throws AlpineAuthenticationException {
+        LOGGER.debug("Attempting to authenticate user: " + username);
         if (validateCredentials()) {
             try (AlpineQueryManager qm = new AlpineQueryManager()) {
                 final LdapUser user = qm.getLdapUser(username);
                 if (user != null) {
+                    LOGGER.debug("Attempting to authenticate user: " + username);
                     return user;
                 } else if (LdapConnectionWrapper.USER_PROVISIONING) {
+                    LOGGER.debug("The user (" + username + ") authenticated successfully but the account the account has not been provisioned");
                     return autoProvision(qm);
                 } else {
+                    LOGGER.debug("The user (" + username + ") is unmapped and user provisioning is not enabled");
                     throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.UNMAPPED_ACCOUNT);
                 }
             }
@@ -100,6 +104,7 @@ public class LdapAuthenticationService implements AuthenticationService {
      * @since 1.4.0
      */
     private LdapUser autoProvision(final AlpineQueryManager qm) throws AlpineAuthenticationException {
+        LOGGER.debug("Provisioning: " + username);
         LdapUser user = null;
         final LdapConnectionWrapper ldap = new LdapConnectionWrapper();
         DirContext dirContext = null;
@@ -138,6 +143,7 @@ public class LdapAuthenticationService implements AuthenticationService {
      * @since 1.0.0
      */
     private boolean validateCredentials() {
+        LOGGER.debug("Validating credentials for: " + username);
         final LdapConnectionWrapper ldap = new LdapConnectionWrapper();
         DirContext dirContext = null;
         LdapContext ldapContext = null;
@@ -145,12 +151,14 @@ public class LdapAuthenticationService implements AuthenticationService {
             final LdapUser ldapUser = qm.getLdapUser(username);
             if (ldapUser != null && ldapUser.getDN() != null && ldapUser.getDN().contains("=")) {
                 ldapContext = ldap.createLdapContext(ldapUser.getDN(), password);
+                LOGGER.debug("The supplied credentials are valid for: " + username);
                 return true;
             } else {
                 dirContext = ldap.createDirContext();
                 final SearchResult result = ldap.searchForSingleUsername(dirContext, username);
                 if (result != null ) {
                     ldapContext = ldap.createLdapContext(result.getNameInNamespace(), password);
+                    LOGGER.debug("The supplied credentials are invalid for: " + username);
                     return true;
                 }
             }

@@ -80,6 +80,7 @@ public class LdapConnectionWrapper {
      * @since 1.4.0
      */
     public LdapContext createLdapContext(final String userDn, final String password) throws NamingException {
+        LOGGER.debug("Creating LDAP context for: " +userDn);
         if (StringUtils.isEmpty(userDn) || StringUtils.isEmpty(password)) {
             throw new NamingException("Username or password cannot be empty or null");
         }
@@ -111,6 +112,7 @@ public class LdapConnectionWrapper {
      * @since 1.4.0
      */
     public DirContext createDirContext() throws NamingException {
+        LOGGER.debug("Creating directory service context (DirContext)");
         final Hashtable<String, String> env = new Hashtable<>();
         env.put(Context.SECURITY_PRINCIPAL, BIND_USERNAME);
         env.put(Context.SECURITY_CREDENTIALS, BIND_PASSWORD);
@@ -131,6 +133,7 @@ public class LdapConnectionWrapper {
      * @since 1.4.0
      */
     public List<String> getGroups(final DirContext dirContext, final LdapUser ldapUser) throws NamingException {
+        LOGGER.debug("Retrieving groups for: " + ldapUser.getDN());
         final List<String> groupDns = new ArrayList<>();
         final String searchFilter = variableSubstitution(USER_GROUPS_FILTER, ldapUser);
         final SearchControls sc = new SearchControls();
@@ -139,6 +142,7 @@ public class LdapConnectionWrapper {
         while (hasMoreEnum(ne)) {
             final SearchResult result = ne.next();
             groupDns.add(result.getNameInNamespace());
+            LOGGER.debug("Found group: " + result.getNameInNamespace() + " for user: " + ldapUser.getDN());
         }
         closeQuietly(ne);
         return groupDns;
@@ -152,6 +156,7 @@ public class LdapConnectionWrapper {
      * @since 1.4.0
      */
     public List<String> getGroups(final DirContext dirContext) throws NamingException {
+        LOGGER.debug("Retrieving all groups");
         final List<String> groupDns = new ArrayList<>();
         final SearchControls sc = new SearchControls();
         sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
@@ -159,6 +164,7 @@ public class LdapConnectionWrapper {
         while (hasMoreEnum(ne)) {
             final SearchResult result = ne.next();
             groupDns.add(result.getNameInNamespace());
+            LOGGER.debug("Found group: " + result.getNameInNamespace());
         }
         closeQuietly(ne);
         return groupDns;
@@ -174,12 +180,14 @@ public class LdapConnectionWrapper {
      * @since 1.4.0
      */
     public List<SearchResult> searchForUsername(final DirContext ctx, final String username) throws NamingException {
+        LOGGER.debug("Performing a directory search for: " + username);
         final String[] attributeFilter = {};
         final SearchControls sc = new SearchControls();
         sc.setReturningAttributes(attributeFilter);
         sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
         final String searchFor = LdapConnectionWrapper.ATTRIBUTE_NAME + "=" +
                 LdapStringSanitizer.sanitize(formatPrincipal(username));
+        LOGGER.debug("Searching for: " + searchFor);
         return Collections.list(ctx.search(LdapConnectionWrapper.BASE_DN, searchFor, sc));
     }
 
@@ -195,8 +203,10 @@ public class LdapConnectionWrapper {
     public SearchResult searchForSingleUsername(final DirContext ctx, final String username) throws NamingException {
         final List<SearchResult> results = searchForUsername(ctx, username);
         if (results == null || results.size() == 0) {
+            LOGGER.debug("Search for (" + username + ") did not produce any results");
             return null;
         } else if (results.size() == 1) {
+            LOGGER.debug("Search for (" + username + ") produced a result");
             return results.get(0);
         } else {
             throw new NamingException("Multiple entries in the directory contain the same username. This scenario is not supported");

@@ -81,6 +81,7 @@ public class FileSystemResourceServlet extends StaticResourceServlet {
      */
     @Override
     public void init(ServletConfig config) throws ServletException {
+        LOGGER.info("Initializing filesystem resource servlet");
         super.init(config);
 
         final String directory = config.getInitParameter("directory");

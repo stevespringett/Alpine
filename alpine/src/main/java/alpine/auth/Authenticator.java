@@ -18,6 +18,7 @@
 package alpine.auth;
 
 import alpine.Config;
+import alpine.logging.Logger;
 import java.security.Principal;
 
 /**
@@ -32,6 +33,7 @@ import java.security.Principal;
  */
 public class Authenticator {
 
+    private static final Logger LOGGER = Logger.getLogger(Authenticator.class);
     private static final boolean LDAP_ENABLED = Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.LDAP_ENABLED);
 
     private final String username;
@@ -56,6 +58,7 @@ public class Authenticator {
      * @since 1.0.0
      */
     public Principal authenticate() throws AlpineAuthenticationException {
+        LOGGER.debug("Attempting to authenticate user: " + username);
         final ManagedUserAuthenticationService userService = new ManagedUserAuthenticationService(username, password);
         try{
 	        final Principal principal = userService.authenticate();
