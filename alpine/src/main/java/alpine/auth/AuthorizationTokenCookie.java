@@ -30,4 +30,11 @@ public class AuthorizationTokenCookie extends AlpineCookie {
         super(COOKIE_NAME, token);
     }
 
+    public AuthorizationTokenCookie(String token, String path) {
+        super(COOKIE_NAME, token, path, null);
+    }
+
+    public AuthorizationTokenCookie(String token, String path, String domain) {
+        super(COOKIE_NAME, token, path, domain);
+    }
 }
