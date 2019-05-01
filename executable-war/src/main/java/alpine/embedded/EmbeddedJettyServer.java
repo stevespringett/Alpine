@@ -23,10 +23,16 @@ import org.eclipse.jetty.annotations.ServletContainerInitializersStarter;
 import org.eclipse.jetty.apache.jsp.JettyJasperInitializer;
 import org.eclipse.jetty.plus.annotation.ContainerInitializer;
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.servlet.ErrorPageErrorHandler;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.slf4j.bridge.SLF4JBridgeHandler;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.net.URL;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
@@ -59,11 +65,14 @@ public final class EmbeddedJettyServer {
         final ServerConnector connector = new ServerConnector(server);
         connector.setHost(host);
         connector.setPort(port);
+        disableServerVersionHeader(connector);
         server.setConnectors(new Connector[]{connector});
 
         final WebAppContext context = new WebAppContext();
         context.setServer(server);
         context.setContextPath(contextPath);
+        context.setErrorHandler(new ErrorHandler());
+        context.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
         context.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern", ".*/[^/]*taglibs.*\\.jar$");
         context.setAttribute("org.eclipse.jetty.containerInitializers", jspInitializers());
         context.setAttribute(InstanceManager.class.getName(), new SimpleInstanceManager());
@@ -79,6 +88,7 @@ public final class EmbeddedJettyServer {
         context.setWar(location.toExternalForm());
 
         server.setHandler(context);
+        server.addBean(new ErrorHandler());
         try {
             server.start();
             server.join();
@@ -94,6 +104,23 @@ public final class EmbeddedJettyServer {
         final List<ContainerInitializer> initializers = new ArrayList<>();
         initializers.add(initializer);
         return initializers;
+    }
+
+    private static void disableServerVersionHeader(Connector connector) {
+        connector.getConnectionFactories().stream()
+                .filter(cf -> cf instanceof HttpConnectionFactory)
+                .forEach(cf -> ((HttpConnectionFactory) cf)
+                        .getHttpConfiguration().setSendServerVersion(false));
+    }
+
+    /**
+     * Dummy error handler that disables any error pages or jetty related messages and an empty page with a status code.
+     */
+    static class ErrorHandler extends ErrorPageErrorHandler {
+        @Override
+        public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
+            response.setStatus(response.getStatus());
+        }
     }
 
 }
