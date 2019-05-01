@@ -52,7 +52,6 @@ public final class EmbeddedJettyServer {
     }
 
     public static void main(final String[] args) throws Exception {
-
         final CliArgs cliArgs = new CliArgs(args);
         final String contextPath = cliArgs.switchValue("-context", "/");
         final String host = cliArgs.switchValue("-host", "0.0.0.0");
@@ -91,6 +90,7 @@ public final class EmbeddedJettyServer {
         server.addBean(new ErrorHandler());
         try {
             server.start();
+            addJettyShutdownHook(server);
             server.join();
         } catch (Exception e) {
             e.printStackTrace();
@@ -116,11 +116,24 @@ public final class EmbeddedJettyServer {
     /**
      * Dummy error handler that disables any error pages or jetty related messages and an empty page with a status code.
      */
-    static class ErrorHandler extends ErrorPageErrorHandler {
+    private static class ErrorHandler extends ErrorPageErrorHandler {
         @Override
         public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
             response.setStatus(response.getStatus());
         }
     }
 
+    private static void addJettyShutdownHook(final Server server) {
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                try {
+                    System.out.println("Shutting down application");
+                    server.stop();
+                } catch (Exception e) {
+                    //System.err.println("Exception occurred shutting down: " + e.getMessage());
+                }
+            }
+        });
+    }
 }
