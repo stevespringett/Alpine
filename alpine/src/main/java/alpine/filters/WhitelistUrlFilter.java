@@ -98,7 +98,7 @@ public final class WhitelistUrlFilter implements Filter {
             boolean allowed = false;
             for (final String url: allowUrls) {
                 if (requestUri.equals("/")) {
-                    if (url.trim().equals("/")) {
+                    if (url.trim().equals("/") || (url.trim().equals("/index.jsp")) || (url.trim().equals("/index.html"))) {
                         allowed = true;
                     }
                 } else if (requestUri.startsWith(url.trim())) {
