@@ -176,7 +176,11 @@ public class Config {
             LOGGER.info("System property " + ALPINE_APP_PROP + " not specified");
             LOGGER.info("Loading " + PROP_FILE + " from classpath");
             try (InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(PROP_FILE)) {
-                properties.load(in);
+                if (in != null) {
+                    properties.load(in);
+                } else {
+                    LOGGER.error("Unable to load (resourceStream is null) " + PROP_FILE);
+                }
             } catch (IOException e) {
                 LOGGER.error("Unable to load " + PROP_FILE);
             }
@@ -197,7 +201,11 @@ public class Config {
 
         applicationVersionProperties = new Properties();
         try (InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(APPLICATION_VERSION_PROP_FILE)) {
-            applicationVersionProperties.load(in);
+            if (in != null) {
+                applicationVersionProperties.load(in);
+            } else {
+                LOGGER.error("Unable to load (resourceStream is null) " + APPLICATION_VERSION_PROP_FILE);
+            }
         } catch (IOException e) {
             LOGGER.error("Unable to load " + APPLICATION_VERSION_PROP_FILE);
         }
