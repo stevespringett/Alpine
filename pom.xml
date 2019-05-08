@@ -175,6 +175,9 @@
         <lib.owasp.security-logging.version>1.1.6</lib.owasp.security-logging.version>
         <lib.slf4j.version>1.7.25</lib.slf4j.version>
         <lib.swagger.jersey.version>1.5.22</lib.swagger.jersey.version>
+        <!-- Unit test libraries -->
+        <lib.junit.version>4.12</lib.junit.version>
+        <lib.mockito.version>2.27.0</lib.mockito.version>
 
         <!-- Logback configuration - Used for Embedded Jetty profile -->
         <logback.configuration.file>${project.build.directory}/classes/logback.xml</logback.configuration.file>
@@ -400,13 +403,19 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
+            <version>${lib.junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.test-framework.providers</groupId>
             <artifactId>jersey-test-framework-provider-grizzly2</artifactId>
             <version>${lib.jersey.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${lib.mockito.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
