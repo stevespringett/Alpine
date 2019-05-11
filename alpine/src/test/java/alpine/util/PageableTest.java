@@ -48,6 +48,11 @@ public class PageableTest {
             }
             Assert.assertEquals(i, pageable.getCurrentPage());
             pageable.nextPage();
+            if (i <= 12) {
+                Assert.assertFalse(pageable.isPaginationComplete());
+            } else if (i == 13) {
+                Assert.assertTrue(pageable.isPaginationComplete());
+            }
         }
     }
 }
