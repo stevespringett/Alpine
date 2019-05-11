@@ -123,8 +123,9 @@ public class Pageable<T> {
     public void nextPage() {
         if (hasMorePages()) {
             setCurrentPage(currentPage + 1);
+        } else {
+            currentPage = -1;
         }
-        currentPage = -1;
     }
 
     /**
