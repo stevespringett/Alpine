@@ -66,7 +66,7 @@ public class About implements Serializable {
         return new Framework();
     }
 
-    private static class Framework {
+    public static class Framework {
 
         public String getName() {
             return FRAMEWORK_NAME;
