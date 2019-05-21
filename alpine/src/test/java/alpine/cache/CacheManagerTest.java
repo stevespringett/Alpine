@@ -18,26 +18,23 @@
  */
 package alpine.cache;
 
-import java.util.concurrent.TimeUnit;
+import org.junit.Assert;
+import org.junit.Test;
 
-/**
- * Provides an implementation of a per-class object cache. CacheManager will
- * automatically evoke objects from cache after 60 minutes and holds a maximum
- * of 1000 objects (per-object type).
- * @since 1.5.0
- */
-public final class CacheManager extends AbstractCacheManager {
+public class CacheManagerTest {
 
-    private static final CacheManager INSTANCE = new CacheManager();
-
-    /**
-     * Private constructor.
-     */
-    private CacheManager() {
-        super(60, TimeUnit.MINUTES, 1000);
-    }
-
-    public static CacheManager getInstance() {
-        return INSTANCE;
+    @Test
+    public void putGetMaintTest() {
+        CacheManager cacheManager = CacheManager.getInstance();
+        for (int i = 1; i <= 1100; i++) {
+            cacheManager.put("key-" + i , "value-" + i);
+        }
+        cacheManager.maintenance(String.class);
+        for (int i = 1; i <= 100; i++) {
+            Assert.assertNull(cacheManager.get(String.class, "key-" + i));
+        }
+        for (int i = 101; i <= 1100; i++) {
+            Assert.assertEquals("value-" + i, cacheManager.get(String.class, "key-" + i));
+        }
     }
 }
