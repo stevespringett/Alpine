@@ -56,6 +56,8 @@ public class LdapConnectionWrapper {
     private static final String LDAP_AUTH_USERNAME_FMT = Config.getInstance().getProperty(Config.AlpineKey.LDAP_AUTH_USERNAME_FMT);
     private static final String USER_GROUPS_FILTER = Config.getInstance().getProperty(Config.AlpineKey.LDAP_USER_GROUPS_FILTER);
     private static final String GROUPS_FILTER = Config.getInstance().getProperty(Config.AlpineKey.LDAP_GROUPS_FILTER);
+    private static final String GROUPS_SEARCH_FILTER = Config.getInstance().getProperty(Config.AlpineKey.LDAP_GROUPS_SEARCH_FILTER);
+    private static final String USERS_SEARCH_FILTER = Config.getInstance().getProperty(Config.AlpineKey.LDAP_USERS_SEARCH_FILTER);
 
     public static final boolean LDAP_ENABLED = Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.LDAP_ENABLED);
     public static final String LDAP_URL = Config.getInstance().getProperty(Config.AlpineKey.LDAP_SERVER_URL);
@@ -169,6 +171,60 @@ public class LdapConnectionWrapper {
         }
         closeQuietly(ne);
         return groupDns;
+    }
+
+    /**
+     * Retrieves a list of all the groups in the directory that match the specified groupName.
+     * This is a convenience method which wraps {@link #search(DirContext, String, String)}.
+     * @param dirContext a DirContext
+     * @param groupName the name (or partial name) of the group to to search for
+     * @return A list of Strings representing the fully qualified DN of each group
+     * @throws NamingException if an exception if thrown
+     * @since 1.5.0
+     */
+    public List<String> searchForGroupName(final DirContext dirContext, String groupName) throws NamingException {
+        return search(dirContext, LdapConnectionWrapper.GROUPS_SEARCH_FILTER, groupName);
+    }
+
+    /**
+     * Retrieves a list of all the users in the directory that match the specified userName.
+     * This is a convenience method which wraps {@link #search(DirContext, String, String)}.
+     * @param dirContext a DirContext
+     * @param userName the name (or partial name) of the user to to search for
+     * @return A list of Strings representing the fully qualified DN of each username
+     * @throws NamingException if an exception if thrown
+     * @since 1.5.0
+     */
+    public List<String> searchForUserName(final DirContext dirContext, String userName) throws NamingException {
+        return search(dirContext, LdapConnectionWrapper.USERS_SEARCH_FILTER, userName);
+    }
+
+    /**
+     * Retrieves a list of all the entries in the directory that match the specified filter and searchTerm
+     * @param dirContext a DirContext
+     * @param filter a pre-defined ldap filter containing a {SEARCH_TERM} as a placeholder
+     * @param searchTerm the search term to query on
+     * @return A list of Strings representing the fully qualified DN of each group
+     * @throws NamingException if an exception if thrown
+     * @since 1.5.0
+     */
+    public List<String> search(final DirContext dirContext, final String filter, final String searchTerm) throws NamingException {
+        LOGGER.debug("Searching / filter: " + filter + " searchTerm: " + searchTerm);
+        final List<String> entityDns = new ArrayList<>();
+        final String[] attributeFilter = {};
+        final SearchControls sc = new SearchControls();
+        sc.setReturningAttributes(attributeFilter);
+        sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
+        final String searchFor = searchTermSubstitution(filter, searchTerm);
+        LOGGER.debug("Searching for: " + searchFor);
+        final NamingEnumeration<SearchResult> ne = dirContext.search(LdapConnectionWrapper.BASE_DN, searchFor, sc);
+        while (hasMoreEnum(ne)) {
+            final SearchResult result = ne.next();
+            entityDns.add(result.getNameInNamespace());
+            LOGGER.debug("Found: " + result.getNameInNamespace());
+        }
+        closeQuietly(ne);
+        return entityDns;
     }
 
     /**
@@ -286,6 +342,16 @@ public class LdapConnectionWrapper {
             return null;
         }
         return s.replace("{USER_DN}", LdapStringSanitizer.sanitize(user.getDN()));
+    }
+
+    private String searchTermSubstitution(final String ldapFilter, String searchTerm) {
+        if (ldapFilter == null) {
+            return null;
+        }
+        if (searchTerm == null) {
+            searchTerm = "";
+        }
+        return ldapFilter.replace("{SEARCH_TERM}", LdapStringSanitizer.sanitize(searchTerm));
     }
 
     /**

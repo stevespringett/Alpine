@@ -111,6 +111,8 @@ public class Config {
         LDAP_ATTRIBUTE_MAIL       ("alpine.ldap.attribute.mail",        "mail"),
         LDAP_GROUPS_FILTER        ("alpine.ldap.groups.filter",         null),
         LDAP_USER_GROUPS_FILTER   ("alpine.ldap.user.groups.filter",    null),
+        LDAP_GROUPS_SEARCH_FILTER ("alpine.ldap.groups.search.filter",  null),
+        LDAP_USERS_SEARCH_FILTER  ("alpine.ldap.users.search.filter",   null),
         LDAP_USER_PROVISIONING    ("alpine.ldap.user.provisioning",     false),
         LDAP_TEAM_SYNCHRONIZATION ("alpine.ldap.team.synchronization",  false),
         HTTP_PROXY_ADDRESS        ("alpine.http.proxy.address",         null),
