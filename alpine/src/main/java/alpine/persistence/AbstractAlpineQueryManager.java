@@ -241,12 +241,13 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
             final long end = begin + pagination.getLimit();
             query.setRange(begin, end);
         }
-        if (orderBy != null && RegexSequence.Pattern.ALPHA_NUMERIC.matcher(orderBy).matches() && orderDirection != OrderDirection.UNSPECIFIED) {
+        if (orderBy != null && RegexSequence.Pattern.STRING_IDENTIFIER.matcher(orderBy).matches() && orderDirection != OrderDirection.UNSPECIFIED) {
             // Check to see if the specified orderBy field is defined in the class being queried.
             boolean found = false;
             final org.datanucleus.store.query.Query iq = ((JDOQuery) query).getInternalQuery();
+            final String candidateField = orderBy.contains(".") ? orderBy.substring(0, orderBy.indexOf('.')) : orderBy;
             for (final Field field: iq.getCandidateClass().getDeclaredFields()) {
-                if (orderBy.equals(field.getName())) {
+                if (candidateField.equals(field.getName())) {
                     found = true;
                     break;
                 }

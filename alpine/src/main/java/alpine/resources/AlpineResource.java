@@ -281,7 +281,7 @@ public abstract class AlpineResource {
         final OrderDirection orderDirection;
         String orderBy = multiParam(queryParams, "orderBy", "sortName");
 
-        if (StringUtils.isBlank(orderBy) || !RegexSequence.Pattern.ALPHA_NUMERIC.matcher(orderBy).matches()) {
+        if (StringUtils.isBlank(orderBy) || !RegexSequence.Pattern.STRING_IDENTIFIER.matcher(orderBy).matches()) {
             orderBy = null;
         }
 
