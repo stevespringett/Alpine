@@ -177,7 +177,7 @@
         <lib.swagger.jersey.version>1.5.22</lib.swagger.jersey.version>
         <!-- Unit test libraries -->
         <lib.junit.version>4.12</lib.junit.version>
-        <lib.mockito.version>2.27.0</lib.mockito.version>
+        <lib.mockito.version>2.28.2</lib.mockito.version>
 
         <!-- Logback configuration - Used for Embedded Jetty profile -->
         <logback.configuration.file>${project.build.directory}/classes/logback.xml</logback.configuration.file>
