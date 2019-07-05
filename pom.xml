@@ -121,8 +121,8 @@
         <maven.ossindex.plugin.version>3.0.4</maven.ossindex.plugin.version>
         <plugin.ossindex.authId>ossindex</plugin.ossindex.authId>
         <plugin.ossindex.cvssScoreThreshold>0.0</plugin.ossindex.cvssScoreThreshold>
-        <plugin.ossindex.excludeCoordinatesCsv />
-        <plugin.ossindex.excludeVulnerabilityIdsCsv />
+        <plugin.ossindex.excludeCoordinatesCsv/>
+        <plugin.ossindex.excludeVulnerabilityIdsCsv/>
         <plugin.ossindex.fail>true</plugin.ossindex.fail>
         <plugin.ossindex.reportFile>${project.build.directory}/ossindex.json</plugin.ossindex.reportFile>
         <plugin.ossindex.scope>compile</plugin.ossindex.scope>
@@ -160,7 +160,7 @@
         <lib.h2.version>1.4.199</lib.h2.version>
         <lib.hikaricp.version>3.3.1</lib.hikaricp.version>
         <lib.javassist.version>3.25.0-GA</lib.javassist.version>
-        <lib.jackson.version>2.9.9</lib.jackson.version>
+        <lib.jackson.version>2.9.9.1</lib.jackson.version>
         <lib.javamail.version>1.6.2</lib.javamail.version>
         <lib.jdo.api.version>3.2.0-m12</lib.jdo.api.version>
         <lib.jersey.version>2.28</lib.jersey.version>
