@@ -97,12 +97,13 @@ public final class WhitelistUrlFilter implements Filter {
         final String requestUri = req.getRequestURI();
         if (requestUri != null) {
             boolean allowed = false;
+            final String requestUrlExcludingContext = requestUri.substring(req.getContextPath().length());
             for (final String url: allowUrls) {
-                if (requestUri.equals("/")) {
+                if (requestUrlExcludingContext.equals("/")) {
                     if (url.trim().equals("/") || (url.trim().equals("/index.jsp")) || (url.trim().equals("/index.html"))) {
                         allowed = true;
                     }
-                } else if (requestUri.startsWith(url.trim())) {
+                } else if (requestUrlExcludingContext.startsWith(url.trim())) {
                     allowed = true;
                 }
             }
