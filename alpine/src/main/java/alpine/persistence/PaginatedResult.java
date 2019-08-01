@@ -103,21 +103,21 @@ public class PaginatedResult implements Serializable {
 
     /**
      * Specifies a Collection of objects from the result.
-     * @param object a Collection of objects from the result.
+     * @param collection a Collection of objects from the result.
      * @since 1.0.0
      */
-    public void setObjects(Collection<?> object) {
-        this.objects = objects;
+    public void setObjects(Collection<?> collection) {
+        this.objects = collection;
     }
 
     /**
      * Fluent. Specifies a Collection of objects from the result.
-     * @param object a Collection of objects from the result.
+     * @param collection a Collection of objects from the result.
      * @return the current PaginatedResult instance
      * @since 1.0.0
      */
-    public PaginatedResult objects(Collection<?> object) {
-        this.objects = objects;
+    public PaginatedResult objects(Collection<?> collection) {
+        this.objects = collection;
         return this;
     }
 
