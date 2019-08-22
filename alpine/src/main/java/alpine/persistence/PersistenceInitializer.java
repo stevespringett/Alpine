@@ -69,6 +69,7 @@ public class PersistenceInitializer implements ServletContextListener {
                 "-tcp",
                 "-tcpPort", String.valueOf(port),
                 "-tcpAllowOthers",
+                "-ifNotExists"
         };
         try {
             LOGGER.info("Attempting to start database service");
