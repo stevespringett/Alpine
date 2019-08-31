@@ -33,6 +33,7 @@ public class AlpineCookie extends NewCookie {
      * @param value   the value of the cookie.
      * @param path    the URI path for which the cookie is valid.
      * @param domain  the host domain for which the cookie is valid.
+     * @param version the version
      * @param maxAge  the maximum age of the cookie in seconds.
      * @throws IllegalArgumentException if name is {@code null}.
      * @since 1.5.0
