@@ -72,11 +72,7 @@
                             <goal>jar</goal>
                         </goals>
                         <configuration>
-                            <!--
-                            <additionalOptions>
-                                <additionalOption>${javadoc.opts}</additionalOption>
-                            </additionalOptions>
-                            -->
+                            <source>8</source>
                             <javadocExecutable>${java.home}/../bin/javadoc</javadocExecutable>
                         </configuration>
                     </execution>
