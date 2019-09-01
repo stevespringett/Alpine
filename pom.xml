@@ -23,7 +23,7 @@
     <groupId>us.springett</groupId>
     <artifactId>alpine-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.5.1-SNAPSHOT</version>
+    <version>1.6.0-SNAPSHOT</version>
 
     <modules>
         <module>alpine</module>
@@ -162,6 +162,9 @@
         <lib.javassist.version>3.25.0-GA</lib.javassist.version>
         <lib.jackson.version>2.9.9</lib.jackson.version>
         <lib.javamail.version>1.6.2</lib.javamail.version>
+        <lib.jaxb.api.version>2.3.1</lib.jaxb.api.version>
+        <lib.jaxb.core.version>2.3.0.1</lib.jaxb.core.version>
+        <lib.jaxb.impl.version>2.3.2</lib.jaxb.impl.version>
         <lib.jdo.api.version>3.2.0-m12</lib.jdo.api.version>
         <lib.jersey.version>2.29</lib.jersey.version>
         <lib.jsp.api.version>2.2</lib.jsp.api.version>
@@ -202,27 +205,6 @@
         </dependency>
         <!-- Server architecture -->
         <dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-api</artifactId>
-            <version>8.0.1</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <version>2.3.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-core</artifactId>
-            <version>2.3.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-            <version>2.3.2</version>
-        </dependency>
-        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>4.0.1</version>
@@ -252,6 +234,22 @@
             <groupId>org.glassfish.jersey.inject</groupId>
             <artifactId>jersey-hk2</artifactId>
             <version>${lib.jersey.version}</version>
+        </dependency>
+        <!-- JAXB -->
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>${lib.jaxb.api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-core</artifactId>
+            <version>${lib.jaxb.core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>${lib.jaxb.impl.version}</version>
         </dependency>
         <!-- JSON API specification and default implementation of JSR 353 -->
         <dependency>
