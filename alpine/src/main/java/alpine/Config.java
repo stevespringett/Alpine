@@ -20,6 +20,7 @@ package alpine;
 
 import alpine.logging.Logger;
 import alpine.util.PathUtil;
+import alpine.util.SystemUtil;
 import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -54,16 +55,27 @@ public class Config {
 
     static {
         LOGGER.info(StringUtils.repeat("-", 80));
+        LOGGER.info("OS Name:      " + SystemUtil.getOsName());
+        LOGGER.info("OS Version:   " + SystemUtil.getOsVersion());
+        LOGGER.info("OS Arch:      " + SystemUtil.getOsArchitecture());
+        LOGGER.info("CPU Cores:    " + SystemUtil.getCpuCores());
+        LOGGER.info("Java Vendor:  " + SystemUtil.getJavaVendor());
+        LOGGER.info("Java Version: " + SystemUtil.getJavaVersion());
+        LOGGER.info("Java Home:    " + SystemUtil.getJavaHome());
+        LOGGER.info("Java Temp:    " + SystemUtil.getJavaTempDir());
+        LOGGER.info("User:         " + SystemUtil.getUserName());
+        LOGGER.info("User Home:    " + SystemUtil.getUserHome());
+        LOGGER.info(StringUtils.repeat("-", 80));
         INSTANCE = new Config();
         INSTANCE.init();
         LOGGER.info(StringUtils.repeat("-", 80));
-        LOGGER.info("Application: " + INSTANCE.getApplicationName());
-        LOGGER.info("Version:     " + INSTANCE.getApplicationVersion());
-        LOGGER.info("Built-on:    " + INSTANCE.getApplicationBuildTimestamp());
+        LOGGER.info("Application:  " + INSTANCE.getApplicationName());
+        LOGGER.info("Version:      " + INSTANCE.getApplicationVersion());
+        LOGGER.info("Built-on:     " + INSTANCE.getApplicationBuildTimestamp());
         LOGGER.info(StringUtils.repeat("-", 80));
-        LOGGER.info("Framework:   " + INSTANCE.getFrameworkName());
-        LOGGER.info("Version :    " + INSTANCE.getFrameworkVersion());
-        LOGGER.info("Built-on:    " + INSTANCE.getFrameworkBuildTimestamp());
+        LOGGER.info("Framework:    " + INSTANCE.getFrameworkName());
+        LOGGER.info("Version :     " + INSTANCE.getFrameworkVersion());
+        LOGGER.info("Built-on:     " + INSTANCE.getFrameworkBuildTimestamp());
         LOGGER.info(StringUtils.repeat("-", 80));
     }
 
