@@ -160,7 +160,7 @@
         <lib.h2.version>1.4.199</lib.h2.version>
         <lib.hikaricp.version>3.4.0</lib.hikaricp.version>
         <lib.javassist.version>3.25.0-GA</lib.javassist.version>
-        <lib.jackson.version>2.9.9</lib.jackson.version>
+        <lib.jackson.version>2.10.0.pr3</lib.jackson.version>
         <lib.javamail.version>1.6.2</lib.javamail.version>
         <lib.jaxb.api.version>2.3.1</lib.jaxb.api.version>
         <lib.jaxb.core.version>2.3.0.1</lib.jaxb.core.version>
@@ -339,7 +339,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.9.9.1</version> <!-- TODO: out of sync release. Put var back when project is synced again -->
+            <version>2.10.0.pr3</version> <!-- TODO: out of sync release. Put var back when project is synced again -->
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
