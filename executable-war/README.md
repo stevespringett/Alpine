@@ -24,7 +24,7 @@ Configure the Maven POM with the Alpine Embedded WAR dependency and configure th
     <dependency>
         <groupId>us.springett</groupId>
         <artifactId>alpine-executable-war</artifactId>
-        <version>1.2.0</version>
+        <version>1.2.1</version>
         <scope>provided</scope>
     </dependency>
 </dependencies>
