@@ -86,16 +86,16 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!-- Maven Plugin Versions -->
-        <maven.compiler.plugin.version>3.8.0</maven.compiler.plugin.version>
+        <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
         <maven.resources.plugin.version>3.1.0</maven.resources.plugin.version>
-        <maven.jar.plugin.version>3.1.1</maven.jar.plugin.version>
-        <maven.source.plugin.version>3.0.1</maven.source.plugin.version>
-        <maven.javadoc.plugin.version>3.1.0</maven.javadoc.plugin.version>
+        <maven.jar.plugin.version>3.1.2</maven.jar.plugin.version>
+        <maven.source.plugin.version>3.1.0</maven.source.plugin.version>
+        <maven.javadoc.plugin.version>3.1.1</maven.javadoc.plugin.version>
         <maven.shade.plugin.version>3.2.1</maven.shade.plugin.version>
 
         <!-- Dependency Versions -->
-        <lib.slf4j.version>1.7.26</lib.slf4j.version>
-        <lib.jetty.version>9.4.18.v20190429</lib.jetty.version>
+        <lib.slf4j.version>1.7.28</lib.slf4j.version>
+        <lib.jetty.version>9.4.20.v20190813</lib.jetty.version>
         <lib.logback.version>1.2.3</lib.logback.version>
     </properties>
 
@@ -236,11 +236,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <quiet>true</quiet>
-                </configuration>
+                <version>${maven.javadoc.plugin.version}</version>
                 <executions>
                     <execution>
+                        <id>attach-javadocs</id>
                         <goals>
                             <goal>jar</goal>
                         </goals>
