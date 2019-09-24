@@ -137,43 +137,6 @@ Maven Usage
 </dependencies>
 ```
 
-Why 'Alpine'
--
-Alt-right American politics has devised many insults against liberal thought
-and the people who practice it. The term 'snowflake' is often applied to 
-such people as a derogatory insult in the absence of their own critical 
-thinking ability. Although a creative term, it's highly ineffective and
-does nothing to address global concerns. So 'Alpine' is the public celebration
-of being a 'snowflake', named after the blankets of snow that cover the French
-Alps. Besides, 'Alpine' has a certain je ne sais quoi to it.
-
-Open source is truly one of the great liberal ideals. So Alpine is released
-with an equally liberal Apache 2.0 license.
-
-Alpine is also the brand name of high-end car audio equipment, a hobby I was
-passionate about in my teens and twenties when I built many systems and often
-competed in various sound-offs in Illinois and Wisconsin. The name is nostalgic
-and brings to me a certain joy.
-
-Alpine is not affiliated with the Docker container image by the same name. It's
-interesting that both projects have minimalism as a goal, but this is merely
-coincidence.
-
-Is Alpine For You
--
-My opinions are just that, mine. They will evolve over time. However, my belief
-in sticking with open standards and not having to conform to the conventions of
-a specific framework will likely never change. Alpine is lightweight, 
-standards-based, and framework-free. If this appeals to you, give Alpine a try. 
-
-Projects Using Alpine
--
-If your open source or commercial project is using Alpine, feel free to add its
-name:
-
-* [Hakbot Origin Controller](https://github.com/hakbot/hakbot-origin-controller)
-* [OWASP Dependency-Track](https://dependencytrack.org)
-
 Copyright & License
 -
 
