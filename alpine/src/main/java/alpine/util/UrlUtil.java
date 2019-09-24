@@ -50,7 +50,7 @@ public class UrlUtil {
      * Ensures that trailing slashes in URLs are removed.
      * @param url The URL to normalize
      * @return a URL without trailing slashes
-     * @throws MalformedURLException
+     * @throws MalformedURLException when a URL is invalid
      */
     public static URL normalize(URL url) throws MalformedURLException {
         return new URL(normalize(url.toExternalForm()));
