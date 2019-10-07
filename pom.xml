@@ -118,7 +118,7 @@
         <plugin.fortify.sca.findbugs>false</plugin.fortify.sca.findbugs>
 
         <!-- Sonatype OSS Index -->
-        <maven.ossindex.plugin.version>3.0.4</maven.ossindex.plugin.version>
+        <maven.ossindex.plugin.version>3.1.0</maven.ossindex.plugin.version>
         <plugin.ossindex.authId>ossindex</plugin.ossindex.authId>
         <plugin.ossindex.cvssScoreThreshold>0.0</plugin.ossindex.cvssScoreThreshold>
         <plugin.ossindex.excludeCoordinatesCsv />
