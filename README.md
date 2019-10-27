@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/stevespringett/Alpine.svg?branch=master)](https://travis-ci.org/stevespringett/Alpine)
+[![Build Status](https://github.com/stevespringett/Alpine/workflows/Maven%20CI/badge.svg)](https://github.com/stevespringett/Alpine/actions?workflow=Maven+CI)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/us.springett/alpine-parent/badge.svg)](https://maven-badges.herokuapp.com/maven-central/us.springett/alpine-parent)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/cefa2866cbc24deeb7fbc83b8f71ad60)](https://www.codacy.com/app/stevespringett/Alpine?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=stevespringett/Alpine&amp;utm_campaign=Badge_Grade)
 [![Dependency Status](https://img.shields.io/librariesio/github/stevespringett/Alpine.svg)](https://libraries.io/github/stevespringett/Alpine)
