@@ -1,4 +1,4 @@
-name: Java CI
+name: Maven CI
 
 on: [push]
 
@@ -13,5 +13,11 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
+    - name: Install tools
+      run:
+        - sudo apt-get install jq
+        - wget -O ~/codacy-coverage-reporter-assembly.jar https://github.com/codacy/codacy-coverage-reporter/releases/download/4.0.5/codacy-coverage-reporter-4.0.5-assembly.jar
     - name: Build with Maven
-      run: mvn package --file pom.xml
+      run: mvn clean install
+    - name: Publish test coverage
+      run: java -jar ~/codacy-coverage-reporter-assembly.jar report -l Java -r alpine/target/jacoco-ut/jacoco.xml
