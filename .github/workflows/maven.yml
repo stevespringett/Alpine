@@ -14,9 +14,9 @@ jobs:
       with:
         java-version: 1.8
     - name: Install tools
-      run:
-        - sudo apt-get install jq
-        - wget -O ~/codacy-coverage-reporter-assembly.jar https://github.com/codacy/codacy-coverage-reporter/releases/download/4.0.5/codacy-coverage-reporter-4.0.5-assembly.jar
+      run: |
+        sudo apt-get install jq
+        wget -O ~/codacy-coverage-reporter-assembly.jar https://github.com/codacy/codacy-coverage-reporter/releases/download/4.0.5/codacy-coverage-reporter-4.0.5-assembly.jar
     - name: Build with Maven
       run: mvn clean install
     - name: Publish test coverage
