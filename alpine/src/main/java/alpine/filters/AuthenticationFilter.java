@@ -23,9 +23,9 @@ import alpine.auth.JwtAuthenticationService;
 import alpine.logging.Logger;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.owasp.security.logging.SecurityMarkers;
-
 import javax.annotation.Priority;
 import javax.naming.AuthenticationException;
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -50,7 +50,10 @@ public class AuthenticationFilter implements ContainerRequestFilter {
     public void filter(ContainerRequestContext requestContext) {
         if (requestContext instanceof ContainerRequest) {
             final ContainerRequest request = (ContainerRequest) requestContext;
-
+            // Bypass authentication for CORS preflight
+            if (HttpMethod.OPTIONS.equals(request.getMethod())) {
+                return;
+            }
             // Bypass authentication for swagger
             if (request.getRequestUri().getPath().contains("/api/swagger")) {
                 return;
