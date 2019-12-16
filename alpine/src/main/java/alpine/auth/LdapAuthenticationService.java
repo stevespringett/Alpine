@@ -84,7 +84,7 @@ public class LdapAuthenticationService implements AuthenticationService {
                     LOGGER.debug("Attempting to authenticate user: " + username);
                     return user;
                 } else if (LdapConnectionWrapper.USER_PROVISIONING) {
-                    LOGGER.debug("The user (" + username + ") authenticated successfully but the account the account has not been provisioned");
+                    LOGGER.debug("The user (" + username + ") authenticated successfully but the account has not been provisioned");
                     return autoProvision(qm);
                 } else {
                     LOGGER.debug("The user (" + username + ") is unmapped and user provisioning is not enabled");
