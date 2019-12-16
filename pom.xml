@@ -106,7 +106,7 @@
         <maven.gpg.plugin.version>1.6</maven.gpg.plugin.version>
         <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
         <maven.uuidgenerator.plugin.version>1.0.1</maven.uuidgenerator.plugin.version>
-        <maven.jacoco.plugin.version>0.8.4</maven.jacoco.plugin.version>
+        <maven.jacoco.plugin.version>0.8.5</maven.jacoco.plugin.version>
 
         <!-- Software Security: Fortify SCA -->
         <maven.fortify.plugin.version>18.20</maven.fortify.plugin.version>
