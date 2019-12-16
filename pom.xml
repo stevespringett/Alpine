@@ -137,7 +137,7 @@
         <plugin.retirejs.indentSize>4</plugin.retirejs.indentSize>
 
         <!-- Software Analysis: CycloneDX -->
-        <maven.cyclonedx.plugin.version>1.4.1</maven.cyclonedx.plugin.version>
+        <maven.cyclonedx.plugin.version>1.5.1</maven.cyclonedx.plugin.version>
         <plugin.cyclonedx.includeCompileScope>true</plugin.cyclonedx.includeCompileScope>
         <plugin.cyclonedx.includeProvidedScope>true</plugin.cyclonedx.includeProvidedScope>
         <plugin.cyclonedx.includeRuntimeScope>true</plugin.cyclonedx.includeRuntimeScope>
