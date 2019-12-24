@@ -137,12 +137,13 @@
         <plugin.retirejs.indentSize>4</plugin.retirejs.indentSize>
 
         <!-- Software Analysis: CycloneDX -->
-        <maven.cyclonedx.plugin.version>1.4.1</maven.cyclonedx.plugin.version>
+        <maven.cyclonedx.plugin.version>1.5.1</maven.cyclonedx.plugin.version>
         <plugin.cyclonedx.includeCompileScope>true</plugin.cyclonedx.includeCompileScope>
         <plugin.cyclonedx.includeProvidedScope>true</plugin.cyclonedx.includeProvidedScope>
         <plugin.cyclonedx.includeRuntimeScope>true</plugin.cyclonedx.includeRuntimeScope>
         <plugin.cyclonedx.includeSystemScope>true</plugin.cyclonedx.includeSystemScope>
         <plugin.cyclonedx.includeTestScope>false</plugin.cyclonedx.includeTestScope>
+        <plugin.cyclonedx.includeDependencyGraph>true</plugin.cyclonedx.includeDependencyGraph>
 
         <!-- Dependency Versions -->
         <lib.alpine.executable.war.version>1.2.2</lib.alpine.executable.war.version>
@@ -770,6 +771,7 @@
                             <includeRuntimeScope>${plugin.cyclonedx.includeRuntimeScope}</includeRuntimeScope>
                             <includeSystemScope>${plugin.cyclonedx.includeSystemScope}</includeSystemScope>
                             <includeTestScope>${plugin.cyclonedx.includeTestScope}</includeTestScope>
+                            <includeDependencyGraph>${plugin.cyclonedx.includeDependencyGraph}</includeDependencyGraph>
                         </configuration>
                     </plugin>
                 </plugins>
