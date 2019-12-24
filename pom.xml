@@ -441,7 +441,7 @@
     </dependencies>
 
     <prerequisites>
-        <maven>3.3.9</maven>
+        <maven>3.6.0</maven>
     </prerequisites>
 
     <build>
