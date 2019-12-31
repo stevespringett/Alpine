@@ -84,7 +84,9 @@ public abstract class BaseEventService implements IEventService {
             logger.debug("Alerting subscriber " + clazz.getName());
 
             if (event instanceof ChainableEvent) {
-                addTrackedEvent((ChainableEvent)event);
+                if (! addTrackedEvent((ChainableEvent)event)) {
+                    return;
+                };
             }
 
             // Check to see if the Event is Unblocked. If so, use a separate executor pool from normal events
@@ -155,13 +157,25 @@ public abstract class BaseEventService implements IEventService {
         return eventIdentifiers != null && eventIdentifiers.size() != 0;
     }
 
-    private synchronized void addTrackedEvent(ChainableEvent event) {
+    private synchronized boolean addTrackedEvent(ChainableEvent event) {
             ArrayList<UUID> eventIdentifiers = chainTracker.get(event.getChainIdentifier());
             if (eventIdentifiers == null) {
                 eventIdentifiers = new ArrayList<>();
             }
+            if (event instanceof SingletonCapableEvent) {
+                final SingletonCapableEvent sEvent = (SingletonCapableEvent)event;
+                // Check is this is a singleton event where only a
+                // single occurrence should be running at a given time
+                if (sEvent.isSingleton()) {
+                    if (! eventIdentifiers.isEmpty()) {
+                        logger.info("An singleton event (" + sEvent.getClass().getSimpleName() + ") was received but another singleton event of the same type is already in progress. Skipping.");
+                        return false;
+                    }
+                }
+            }
             eventIdentifiers.add(event.getEventIdentifier());
             chainTracker.put(event.getChainIdentifier(), eventIdentifiers);
+            return true;
     }
 
     private synchronized void removeTrackedEvent(ChainableEvent event) {
@@ -170,7 +184,9 @@ public abstract class BaseEventService implements IEventService {
             return;
         }
         eventIdentifiers.remove(event.getEventIdentifier());
-        chainTracker.put(event.getChainIdentifier(), eventIdentifiers);
+        if (eventIdentifiers.isEmpty()) {
+            chainTracker.remove(event.getChainIdentifier());
+        }
     }
 
     /**
