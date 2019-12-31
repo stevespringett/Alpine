@@ -18,6 +18,16 @@
  */
 package alpine.event.framework;
 
+/**
+ * This class makes it possible to specify event types which should only
+ * be processed sequentially (one at a time). This works in conjunction
+ * with the {@link #chainIdentifier}. In order for a SingletonCapableEvent
+ * to instruct singleton behavior, {@link #isSingleton} should be 'true'
+ * and a static chainIdentifier should be specified.
+ *
+ * @author Steve Springett
+ * @since 1.7.0
+ */
 public abstract class SingletonCapableEvent extends AbstractChainableEvent {
 
     private boolean isSingleton = false;
