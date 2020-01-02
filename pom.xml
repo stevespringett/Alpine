@@ -180,7 +180,7 @@
         <lib.slf4j.version>1.7.30</lib.slf4j.version>
         <lib.swagger.jersey.version>1.6.0</lib.swagger.jersey.version>
         <!-- Unit test libraries -->
-        <lib.junit.version>4.12</lib.junit.version>
+        <lib.junit.version>4.13</lib.junit.version>
         <lib.mockito.version>3.2.4</lib.mockito.version>
 
         <!-- Logback configuration - Used for Embedded Jetty profile -->
