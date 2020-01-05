@@ -51,7 +51,7 @@ public class LdapConnectionWrapper {
     private static final Logger LOGGER = Logger.getLogger(LdapConnectionWrapper.class);
 
     private static final String BIND_USERNAME = Config.getInstance().getProperty(Config.AlpineKey.LDAP_BIND_USERNAME);
-    private static final String BIND_PASSWORD = Config.getInstance().getProperty(Config.AlpineKey.LDAP_BIND_PASSWORD);
+    private static final String BIND_PASSWORD = Config.getInstance().getPropertyOrFile(Config.AlpineKey.LDAP_BIND_PASSWORD);
     private static final String LDAP_SECURITY_AUTH = Config.getInstance().getProperty(Config.AlpineKey.LDAP_SECURITY_AUTH);
     private static final String LDAP_AUTH_USERNAME_FMT = Config.getInstance().getProperty(Config.AlpineKey.LDAP_AUTH_USERNAME_FMT);
     private static final String USER_GROUPS_FILTER = Config.getInstance().getProperty(Config.AlpineKey.LDAP_USER_GROUPS_FILTER);

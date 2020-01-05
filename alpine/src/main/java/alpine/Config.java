@@ -18,10 +18,6 @@
  */
 package alpine;
 
-import alpine.logging.Logger;
-import alpine.util.PathUtil;
-import alpine.util.SystemUtil;
-import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -34,6 +30,12 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.util.Properties;
+
+import org.apache.commons.lang3.StringUtils;
+
+import alpine.logging.Logger;
+import alpine.util.PathUtil;
+import alpine.util.SystemUtil;
 
 /**
  * The Config class is responsible for reading the application.properties file.
@@ -105,6 +107,7 @@ public class Config {
         DATABASE_DRIVER_PATH      ("alpine.database.driver.path",       null),
         DATABASE_USERNAME         ("alpine.database.username",          "sa"),
         DATABASE_PASSWORD         ("alpine.database.password",          ""),
+        DATABASE_PASSWORD_FILE    ("alpine.database.password_file",     ""),
         DATABASE_POOL_ENABLED     ("alpine.database.pool.enabled",      true),
         DATABASE_POOL_MAX_SIZE    ("alpine.database.pool.max.size",     10),
         DATABASE_POOL_IDLE_TIMEOUT("alpine.database.pool.idle.timeout", 600000),
@@ -118,6 +121,7 @@ public class Config {
         LDAP_SECURITY_AUTH        ("alpine.ldap.security.auth",         null),
         LDAP_BIND_USERNAME        ("alpine.ldap.bind.username",         null),
         LDAP_BIND_PASSWORD        ("alpine.ldap.bind.password",         null),
+        LDAP_BIND_PASSWORD_FILE   ("alpine.ldap.bind.password_file",    null),
         LDAP_AUTH_USERNAME_FMT    ("alpine.ldap.auth.username.format",  null),
         LDAP_ATTRIBUTE_NAME       ("alpine.ldap.attribute.name",        "userPrincipalName"),
         LDAP_ATTRIBUTE_MAIL       ("alpine.ldap.attribute.mail",        "mail"),
@@ -131,6 +135,7 @@ public class Config {
         HTTP_PROXY_PORT           ("alpine.http.proxy.port",            null),
         HTTP_PROXY_USERNAME       ("alpine.http.proxy.username",        null),
         HTTP_PROXY_PASSWORD       ("alpine.http.proxy.password",        null),
+        HTTP_PROXY_PASSWORD_FILE  ("alpine.http.proxy.password_file",   null),
         CORS_ENABLED              ("alpine.cors.enabled",               true),
         CORS_ALLOW_ORIGIN         ("alpine.cors.allow.origin",          "*"),
         CORS_ALLOW_METHODS        ("alpine.cors.allow.methods",         "GET POST PUT DELETE OPTIONS"),
@@ -340,6 +345,35 @@ public class Config {
         }
     }
 
+    /**
+     * Check if key with _FILE postfix appended is a defined property name,
+     * either in the environment or in the properties configuration. If yes,
+     * the named file is read and its content will be the key's value. 
+     *
+     * This method is defined so that passwords can be read from docker secret.
+     *
+     * @param key The Key to return the configuration for
+     * @return a String of the value of the configuration
+     * @since 1.7.0
+     */
+    public String getPropertyOrFile(Key key) {
+    	final AlpineKey fileKey = AlpineKey.valueOf(key.toString()+"_FILE");
+    	final String filePath = getProperty(fileKey);
+    	final String prop = getProperty(key);
+        if (filePath != "") {
+        	if (prop != "") {
+        		LOGGER.warn(fileKey.getPropertyName() + " hides property " + key.getPropertyName());
+        	}
+        	try {
+				return new String(Files.readAllBytes(new File(filePath).toPath())).replaceAll("\\s+", "");
+			} catch (IOException e) {
+        		LOGGER.error(filePath + " file doesn't exist or not readable.");
+        		return null;
+			}
+        }
+        return prop;
+    }
+    
     /**
      * Return the configured value for the specified Key.
      * @param key The Key to return the configuration for
