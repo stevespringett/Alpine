@@ -356,12 +356,12 @@ public class Config {
      * @return a String of the value of the configuration
      * @since 1.7.0
      */
-    public String getPropertyOrFile(Key key) {
+    public String getPropertyOrFile(AlpineKey key) {
     	final AlpineKey fileKey = AlpineKey.valueOf(key.toString()+"_FILE");
     	final String filePath = getProperty(fileKey);
     	final String prop = getProperty(key);
-        if (filePath != "") {
-        	if (prop != "") {
+        if (filePath != null && filePath != "") {
+        	if (prop != null && prop != String.valueOf(key.getDefaultValue())) {
         		LOGGER.warn(fileKey.getPropertyName() + " hides property " + key.getPropertyName());
         	}
         	try {
