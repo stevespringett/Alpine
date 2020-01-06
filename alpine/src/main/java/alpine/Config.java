@@ -348,7 +348,7 @@ public class Config {
     /**
      * Check if key with _FILE postfix appended is a defined property name,
      * either in the environment or in the properties configuration. If yes,
-     * the named file is read and its content will be the key's value. 
+     * the named file is read and its content will be the key's value.
      *
      * This method is defined so that passwords can be read from docker secret.
      *
@@ -360,8 +360,8 @@ public class Config {
     	final AlpineKey fileKey = AlpineKey.valueOf(key.toString()+"_FILE");
     	final String filePath = getProperty(fileKey);
     	final String prop = getProperty(key);
-        if (filePath != null && filePath != "") {
-        	if (prop != null && prop != String.valueOf(key.getDefaultValue())) {
+        if (filePath != null && !filePath.equals("")) {
+        	if (prop != null && !prop.equals(String.valueOf(key.getDefaultValue()))) {
         		LOGGER.warn(fileKey.getPropertyName() + " hides property " + key.getPropertyName());
         	}
         	try {
@@ -373,7 +373,7 @@ public class Config {
         }
         return prop;
     }
-    
+
     /**
      * Return the configured value for the specified Key.
      * @param key The Key to return the configuration for
