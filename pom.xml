@@ -23,7 +23,7 @@
     <groupId>us.springett</groupId>
     <artifactId>alpine-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.7.0</version>
+    <version>1.7.1-SNAPSHOT</version>
 
     <modules>
         <module>alpine</module>
@@ -60,7 +60,7 @@
         <connection>scm:git:git@github.com:stevespringett/Alpine.git</connection>
         <url>https://github.com/stevespringett/Alpine.git</url>
         <developerConnection>scm:git:git@github.com:stevespringett/Alpine.git</developerConnection>
-        <tag>alpine-parent-1.7.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <issueManagement>
