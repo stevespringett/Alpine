@@ -360,7 +360,7 @@ public class Config {
     	final AlpineKey fileKey = AlpineKey.valueOf(key.toString()+"_FILE");
     	final String filePath = getProperty(fileKey);
     	final String prop = getProperty(key);
-        if (filePath != null && !filePath.equals("")) {
+        if (StringUtils.isNotBlank(filePath)) {
         	if (prop != null && !prop.equals(String.valueOf(key.getDefaultValue()))) {
         		LOGGER.warn(fileKey.getPropertyName() + " hides property " + key.getPropertyName());
         	}
