@@ -107,7 +107,7 @@ public class Config {
         DATABASE_DRIVER_PATH      ("alpine.database.driver.path",       null),
         DATABASE_USERNAME         ("alpine.database.username",          "sa"),
         DATABASE_PASSWORD         ("alpine.database.password",          ""),
-        DATABASE_PASSWORD_FILE    ("alpine.database.password_file",     ""),
+        DATABASE_PASSWORD_FILE    ("alpine.database.password.file",     null),
         DATABASE_POOL_ENABLED     ("alpine.database.pool.enabled",      true),
         DATABASE_POOL_MAX_SIZE    ("alpine.database.pool.max.size",     10),
         DATABASE_POOL_IDLE_TIMEOUT("alpine.database.pool.idle.timeout", 600000),
@@ -121,7 +121,7 @@ public class Config {
         LDAP_SECURITY_AUTH        ("alpine.ldap.security.auth",         null),
         LDAP_BIND_USERNAME        ("alpine.ldap.bind.username",         null),
         LDAP_BIND_PASSWORD        ("alpine.ldap.bind.password",         null),
-        LDAP_BIND_PASSWORD_FILE   ("alpine.ldap.bind.password_file",    null),
+        LDAP_BIND_PASSWORD_FILE   ("alpine.ldap.bind.password.file",    null),
         LDAP_AUTH_USERNAME_FMT    ("alpine.ldap.auth.username.format",  null),
         LDAP_ATTRIBUTE_NAME       ("alpine.ldap.attribute.name",        "userPrincipalName"),
         LDAP_ATTRIBUTE_MAIL       ("alpine.ldap.attribute.mail",        "mail"),
@@ -135,7 +135,7 @@ public class Config {
         HTTP_PROXY_PORT           ("alpine.http.proxy.port",            null),
         HTTP_PROXY_USERNAME       ("alpine.http.proxy.username",        null),
         HTTP_PROXY_PASSWORD       ("alpine.http.proxy.password",        null),
-        HTTP_PROXY_PASSWORD_FILE  ("alpine.http.proxy.password_file",   null),
+        HTTP_PROXY_PASSWORD_FILE  ("alpine.http.proxy.password.file",   null),
         CORS_ENABLED              ("alpine.cors.enabled",               true),
         CORS_ALLOW_ORIGIN         ("alpine.cors.allow.origin",          "*"),
         CORS_ALLOW_METHODS        ("alpine.cors.allow.methods",         "GET POST PUT DELETE OPTIONS"),
@@ -362,10 +362,10 @@ public class Config {
     	final String prop = getProperty(key);
         if (StringUtils.isNotBlank(filePath)) {
         	if (prop != null && !prop.equals(String.valueOf(key.getDefaultValue()))) {
-        		LOGGER.warn(fileKey.getPropertyName() + " hides property " + key.getPropertyName());
+        		LOGGER.warn(fileKey.getPropertyName() + " overrides value from property " + key.getPropertyName());
         	}
         	try {
-				return new String(Files.readAllBytes(new File(filePath).toPath())).replaceAll("\\s+", "");
+				return new String(Files.readAllBytes(new File(PathUtil.resolve(filePath)).toPath())).replaceAll("\\s+", "");
 			} catch (IOException e) {
         		LOGGER.error(filePath + " file doesn't exist or not readable.");
         		return null;
