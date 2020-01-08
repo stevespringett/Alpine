@@ -136,8 +136,8 @@
         <plugin.retirejs.detail>true</plugin.retirejs.detail>
         <plugin.retirejs.indentSize>4</plugin.retirejs.indentSize>
 
-        <!-- Software Analysis: CycloneDX -->
-        <maven.cyclonedx.plugin.version>1.5.1</maven.cyclonedx.plugin.version>
+        <!-- CycloneDX SBOM Creation -->
+        <maven.cyclonedx.plugin.version>1.6.0</maven.cyclonedx.plugin.version>
         <plugin.cyclonedx.includeCompileScope>true</plugin.cyclonedx.includeCompileScope>
         <plugin.cyclonedx.includeProvidedScope>true</plugin.cyclonedx.includeProvidedScope>
         <plugin.cyclonedx.includeRuntimeScope>true</plugin.cyclonedx.includeRuntimeScope>
@@ -504,6 +504,28 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.cyclonedx</groupId>
+                <artifactId>cyclonedx-maven-plugin</artifactId>
+                <version>${maven.cyclonedx.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>cyclonedx-aggregate</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>makeAggregateBom</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <includeCompileScope>${plugin.cyclonedx.includeCompileScope}</includeCompileScope>
+                    <includeProvidedScope>${plugin.cyclonedx.includeProvidedScope}</includeProvidedScope>
+                    <includeRuntimeScope>${plugin.cyclonedx.includeRuntimeScope}</includeRuntimeScope>
+                    <includeSystemScope>${plugin.cyclonedx.includeSystemScope}</includeSystemScope>
+                    <includeTestScope>${plugin.cyclonedx.includeTestScope}</includeTestScope>
+                    <includeDependencyGraph>${plugin.cyclonedx.includeDependencyGraph}</includeDependencyGraph>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${maven.jacoco.plugin.version}</version>
@@ -751,28 +773,6 @@
                                 </goals>
                             </execution>
                         </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.cyclonedx</groupId>
-                        <artifactId>cyclonedx-maven-plugin</artifactId>
-                        <version>${maven.cyclonedx.plugin.version}</version>
-                        <executions>
-                            <execution>
-                                <id>cyclonedx-aggregate</id>
-                                <phase>test</phase>
-                                <goals>
-                                    <goal>makeAggregateBom</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <includeCompileScope>${plugin.cyclonedx.includeCompileScope}</includeCompileScope>
-                            <includeProvidedScope>${plugin.cyclonedx.includeProvidedScope}</includeProvidedScope>
-                            <includeRuntimeScope>${plugin.cyclonedx.includeRuntimeScope}</includeRuntimeScope>
-                            <includeSystemScope>${plugin.cyclonedx.includeSystemScope}</includeSystemScope>
-                            <includeTestScope>${plugin.cyclonedx.includeTestScope}</includeTestScope>
-                            <includeDependencyGraph>${plugin.cyclonedx.includeDependencyGraph}</includeDependencyGraph>
-                        </configuration>
                     </plugin>
                 </plugins>
             </build>
