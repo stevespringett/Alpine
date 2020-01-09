@@ -57,12 +57,18 @@ import java.io.IOException;
  *
  * </pre>
  *
+ * Optionally, the forwardTo parameter can be specified to instruct the
+ * WhitelistUrlFilter to forward the request to a URL of another Servlet,
+ * JSP, or HTML file should the originally requested URL not be whitelisted.
+ * This may be necessary in some Single Page Applications (SPA).
+ *
  * @author Steve Springett
  * @since 1.0.0
  */
 public final class WhitelistUrlFilter implements Filter {
 
     private String[] allowUrls = {};
+    private String forwardTo = null;
 
     /**
      * Initialize "allowUrls" parameter from web.xml.
@@ -75,6 +81,11 @@ public final class WhitelistUrlFilter implements Filter {
         final String allowParam = filterConfig.getInitParameter("allowUrls");
         if (StringUtils.isNotBlank(allowParam)) {
             this.allowUrls = allowParam.split(",");
+        }
+
+        final String forwardToParam = filterConfig.getInitParameter("forwardTo");
+        if (StringUtils.isNotBlank(forwardToParam)) {
+            this.forwardTo = forwardToParam;
         }
 
     }
@@ -108,7 +119,11 @@ public final class WhitelistUrlFilter implements Filter {
                 }
             }
             if (!allowed) {
-                res.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                if (forwardTo != null) {
+                    req.getRequestDispatcher(forwardTo).forward(request, response);
+                } else {
+                    res.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                }
                 return;
             }
         }
