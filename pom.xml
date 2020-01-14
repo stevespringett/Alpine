@@ -204,6 +204,11 @@
             <artifactId>commons-collections4</artifactId>
             <version>${lib.commons.collections4.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>${lib.jersey.version}</version>
+        </dependency>
         <!-- Server architecture -->
         <dependency>
             <groupId>javax.servlet</groupId>

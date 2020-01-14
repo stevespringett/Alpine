@@ -30,6 +30,7 @@ import alpine.model.EventServiceLog;
 import alpine.model.LdapUser;
 import alpine.model.ManagedUser;
 import alpine.model.MappedLdapGroup;
+import alpine.model.OidcUser;
 import alpine.model.Permission;
 import alpine.model.Team;
 import alpine.model.UserPrincipal;
@@ -121,6 +122,33 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
         pm.makePersistent(apiKey);
         pm.currentTransaction().commit();
         return pm.getObjectById(ApiKey.class, apiKey.getId());
+    }
+
+    /**
+     *
+     * @param username Name of the user to retrieve
+     * @return an OidcUser
+     * @since 1.8.0
+     */
+    public OidcUser getOidcUser(final String username) {
+        final Query query = pm.newQuery(OidcUser.class, "username == :username");
+        final List<OidcUser> result = (List<OidcUser>) query.execute(username);
+        return Collections.isEmpty(result) ? null : result.get(0);
+    }
+
+    /**
+     *
+     * @param username Name of the user to create
+     * @return the created OidcUser
+     * @since 1.8.0
+     */
+    public OidcUser createOidcUser(final String username) {
+        pm.currentTransaction().begin();
+        final OidcUser user = new OidcUser();
+        user.setUsername(username);
+        pm.makePersistent(user);
+        pm.currentTransaction().commit();
+        return getObjectById(OidcUser.class, user.getId());
     }
 
     /**
