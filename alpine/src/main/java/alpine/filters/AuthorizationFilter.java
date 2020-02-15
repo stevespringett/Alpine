@@ -20,10 +20,7 @@ package alpine.filters;
 
 import alpine.auth.PermissionRequired;
 import alpine.logging.Logger;
-import alpine.model.ApiKey;
-import alpine.model.LdapUser;
-import alpine.model.ManagedUser;
-import alpine.model.UserPrincipal;
+import alpine.model.*;
 import alpine.persistence.AlpineQueryManager;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.owasp.security.logging.SecurityMarkers;
@@ -83,6 +80,8 @@ public class AuthorizationFilter implements ContainerRequestFilter {
                         user = qm.getManagedUser(((ManagedUser) principal).getUsername());
                     } else if (principal instanceof LdapUser) {
                         user = qm.getLdapUser(((LdapUser) principal).getUsername());
+                    } else if (principal instanceof OidcUser) {
+                        user = qm.getOidcUser(((OidcUser) principal).getUsername());
                     }
                     if (user == null) {
                         LOGGER.info(SecurityMarkers.SECURITY_FAILURE, "A request was made but the system in unable to find the user principal");

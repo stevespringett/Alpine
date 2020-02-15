@@ -20,9 +20,12 @@ package alpine.filters;
 
 import alpine.auth.ApiKeyAuthenticationService;
 import alpine.auth.JwtAuthenticationService;
+import alpine.auth.OidcAuthenticationService;
+import alpine.auth.OidcConfiguration;
 import alpine.logging.Logger;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.owasp.security.logging.SecurityMarkers;
+
 import javax.annotation.Priority;
 import javax.naming.AuthenticationException;
 import javax.ws.rs.HttpMethod;
@@ -36,8 +39,8 @@ import java.security.Principal;
  * A filter that ensures that all calls going through this filter are
  * authenticated. Exceptions are made for swagger URLs.
  *
- * @see AuthenticationFeature
  * @author Steve Springett
+ * @see AuthenticationFeature
  * @since 1.0.0
  */
 @Priority(Priorities.AUTHENTICATION)
@@ -67,6 +70,18 @@ public class AuthenticationFilter implements ContainerRequestFilter {
                     principal = apiKeyAuthService.authenticate();
                 } catch (AuthenticationException e) {
                     LOGGER.info(SecurityMarkers.SECURITY_FAILURE, "Invalid API key asserted");
+                    requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+                    return;
+                }
+            }
+
+            // TODO: Resolve conflict with JwtAuthenticationService
+            final OidcAuthenticationService oidcAuthService = new OidcAuthenticationService(OidcConfiguration.getInstance(), request);
+            if (oidcAuthService.isSpecified()) {
+                try {
+                    principal = oidcAuthService.authenticate();
+                } catch (AuthenticationException e) {
+                    LOGGER.info(SecurityMarkers.SECURITY_FAILURE, "OIDC authentication failed");
                     requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
                     return;
                 }
