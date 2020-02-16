@@ -137,18 +137,15 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     }
 
     /**
-     *
-     * @param username Name of the user to create
-     * @return the created OidcUser
+     * Returns a complete list of all OidcUser objects, in ascending order by username.
+     * @return a list of OidcUser
      * @since 1.8.0
      */
-    public OidcUser createOidcUser(final String username) {
-        pm.currentTransaction().begin();
-        final OidcUser user = new OidcUser();
-        user.setUsername(username);
-        pm.makePersistent(user);
-        pm.currentTransaction().commit();
-        return getObjectById(OidcUser.class, user.getId());
+    @SuppressWarnings("unchecked")
+    public List<OidcUser> getOidcUsers() {
+        final Query query = pm.newQuery(OidcUser.class);
+        query.setOrdering("username asc");
+        return (List<OidcUser>) query.execute();
     }
 
     /**

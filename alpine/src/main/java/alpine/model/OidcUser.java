@@ -1,9 +1,7 @@
 package alpine.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.io.Serializable;
-import java.security.Principal;
-import java.util.List;
+
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.Element;
 import javax.jdo.annotations.Extension;
@@ -17,6 +15,9 @@ import javax.jdo.annotations.Unique;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
+import java.security.Principal;
+import java.util.List;
 
 /**
  * @since 1.8.0
@@ -107,5 +108,5 @@ public class OidcUser implements Serializable, Principal, UserPrincipal {
     public String getName() {
         return getUsername();
     }
-
+    
 }

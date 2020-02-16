@@ -20,6 +20,9 @@ public class OidcConfiguration {
 
     private static final String CONFIGURATION_CACHE_KEY = "OIDC_CONFIGURATION";
 
+    @JsonProperty("issuer")
+    private String issuer;
+
     @JsonProperty("authorization_endpoint")
     private String authorizationEndpointUri;
 
@@ -53,6 +56,14 @@ public class OidcConfiguration {
         CacheManager.getInstance().put(CONFIGURATION_CACHE_KEY, configuration);
 
         return configuration;
+    }
+
+    public String getIssuer() {
+        return issuer;
+    }
+
+    public void setIssuer(final String issuer) {
+        this.issuer = issuer;
     }
 
     public String getAuthorizationEndpointUri() {

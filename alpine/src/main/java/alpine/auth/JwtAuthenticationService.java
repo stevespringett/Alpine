@@ -103,7 +103,7 @@ public class JwtAuthenticationService implements AuthenticationService {
         final List<String> header = headers.getRequestHeader("Authorization");
         if (header != null) {
             final String bearer = header.get(0);
-            if (bearer != null) {
+            if (bearer != null && bearer.startsWith("Bearer ")) {
                 return bearer.substring("Bearer ".length());
             }
         }

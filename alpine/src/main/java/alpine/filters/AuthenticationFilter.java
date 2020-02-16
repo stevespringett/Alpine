@@ -81,7 +81,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
                 try {
                     principal = oidcAuthService.authenticate();
                 } catch (AuthenticationException e) {
-                    LOGGER.info(SecurityMarkers.SECURITY_FAILURE, "OIDC authentication failed");
+                    LOGGER.info(SecurityMarkers.SECURITY_FAILURE, "OIDC authentication failed: " + e.getMessage());
                     requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
                     return;
                 }

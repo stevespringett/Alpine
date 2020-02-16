@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class OidcUserInfo {
@@ -14,7 +15,10 @@ public class OidcUserInfo {
     @JsonProperty("email")
     private String email;
 
-    private Map<String, Object> claims;
+    @JsonProperty("email_verified")
+    private Boolean emailVerified;
+
+    private Map<String, Object> claims = new HashMap<>();
 
     public String getSubject() {
         return subject;
@@ -30,6 +34,14 @@ public class OidcUserInfo {
 
     public void setEmail(final String email) {
         this.email = email;
+    }
+
+    public Boolean isEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(final Boolean emailVerified) {
+        this.emailVerified = emailVerified;
     }
 
     @JsonAnyGetter

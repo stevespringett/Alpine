@@ -7,6 +7,7 @@ import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SigningKeyResolver;
 import org.apache.commons.codec.binary.Base64;
+import sun.security.rsa.RSAPublicKeyImpl;
 
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.MediaType;
@@ -14,7 +15,6 @@ import java.math.BigInteger;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 
@@ -44,10 +44,12 @@ public class OidcSigningKeyResolver implements SigningKeyResolver {
     }
 
     private Key resolveSigningKey(final SignatureAlgorithm sigAlg, final String keyId) {
-        // TODO: Potentially sanitize algorithm name and key ID before using them as cache key
-        final String cacheKey = String.format("OIDC_JWK_%s_%s", sigAlg.getValue(), keyId);
+        // TODO: Potentially sanitize key ID before using it in cache key
+        final String cacheKey = String.format("OIDC_SIGNINGKEY_%s", keyId);
 
-        PublicKey signingKey = CacheManager.getInstance().get(PublicKey.class, cacheKey);
+        // FIXME: Find a generic way to retrieve and store public keys in cache
+        // The Cache only uses effective classes, so we can't just .get(PublicKey.class, cacheKey) here
+        RSAPublicKeyImpl signingKey = CacheManager.getInstance().get(RSAPublicKeyImpl.class, cacheKey);
 
         if (signingKey != null) {
             LOGGER.info(String.format("Signing key for alg %s and key ID %s loaded from cache", sigAlg, keyId));
@@ -60,8 +62,9 @@ public class OidcSigningKeyResolver implements SigningKeyResolver {
                 .get(JwkSet.class);
 
         final Jwk signingJwk = jwkSet.getKeys().stream()
-                .filter(jwk -> jwk.getAlgorithm().equals(sigAlg.getValue()))
-                .filter(jwk -> jwk.getKeyId().equals(keyId))
+                .filter(jwk -> "sig".equals(jwk.getUse()))
+                .filter(jwk -> sigAlg.getValue().equals(jwk.getAlgorithm()))
+                .filter(jwk -> keyId.equals(jwk.getKeyId()))
                 .findAny()
                 .orElseThrow(() -> new IllegalStateException(String.format("No key for alg %s and key ID %s found", sigAlg, keyId)));
 
@@ -69,8 +72,9 @@ public class OidcSigningKeyResolver implements SigningKeyResolver {
             final KeyFactory keyFactory = KeyFactory.getInstance(sigAlg.getFamilyName());
             final BigInteger modulus = new BigInteger(1, Base64.decodeBase64(signingJwk.getModulus()));
             final BigInteger exponent = new BigInteger(1, Base64.decodeBase64(signingJwk.getExponent()));
+            signingKey = (RSAPublicKeyImpl) keyFactory.generatePublic(new RSAPublicKeySpec(modulus, exponent));
 
-            signingKey = keyFactory.generatePublic(new RSAPublicKeySpec(modulus, exponent));
+            LOGGER.info(String.format("Storing signing key for alg %s and key ID %s in cache", sigAlg, keyId));
             CacheManager.getInstance().put(cacheKey, signingKey);
 
             return signingKey;

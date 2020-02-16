@@ -133,7 +133,7 @@ public class Config {
         LDAP_TEAM_SYNCHRONIZATION ("alpine.ldap.team.synchronization",  false),
         OIDC_ENABLED              ("alpine.oidc.enabled",               false),
         OIDC_DISCOVERY_URI        ("alpine.oidc.discovery.uri",         null),
-        OIDC_USERNAME_CLAIM       ("alpine.oidc.username.claim",       "sub"),
+        OIDC_USERNAME_CLAIM       ("alpine.oidc.username.claim",        "sub"),
         OIDC_USER_PROVISIONING    ("alpine.oidc.user.provisioning",     false),
         HTTP_PROXY_ADDRESS        ("alpine.http.proxy.address",         null),
         HTTP_PROXY_PORT           ("alpine.http.proxy.port",            null),
