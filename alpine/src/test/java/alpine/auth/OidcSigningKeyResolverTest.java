@@ -3,6 +3,8 @@ package alpine.auth;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import io.jsonwebtoken.impl.DefaultJwsHeader;
+import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
+import org.bouncycastle.jcajce.provider.asymmetric.rsa.BCRSAPublicKey;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -10,7 +12,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import sun.security.rsa.RSAPublicKeyImpl;
 import wiremock.org.apache.http.HttpHeaders;
 import wiremock.org.apache.http.HttpStatus;
 import wiremock.org.apache.http.entity.ContentType;
@@ -28,7 +29,9 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class OidcSigningKeyResolverTest {
 
-    private static final String KEY_ID = "kewiQq9jiC84CvSsJYOB-N6A8WFLSV20Mb-y7IlWDSQ";
+    private static final String KEY_ID_RSA = "NonwCYtciyjpcpoVssnDyg6N-ImnQ2vvLg7tSghSBpo";
+
+    private static final String KEY_ID_EC = "uK_CfONSQO2SB9FCUOPRv4g8k2uAYmDDnXUy15CEqOs";
 
     private static final String OIDC_CONFIGURATION_PATH = "/oidc-config";
 
@@ -54,26 +57,35 @@ public class OidcSigningKeyResolverTest {
                                 "{\n" +
                                 "  \"keys\": [\n" +
                                 "    {\n" +
+                                "      \"kid\": \"NonwCYtciyjpcpoVssnDyg6N-ImnQ2vvLg7tSghSBpo\",\n" +
                                 "      \"kty\": \"RSA\",\n" +
-                                "      \"kid\": \"kewiQq9jiC84CvSsJYOB-N6A8WFLSV20Mb-y7IlWDSQ\",\n" +
-                                "      \"e\": \"AQAB\",\n" +
-                                "      \"n\": \"5RyvCSgBoOGNE03CMcJ9Bzo1JDvsU8XgddvRuJtdJAIq5zJ8fiUEGCnMfAZI4of36YXBuBalIycqkgxrRkSOENRUCWN45bf8xsQCcQ8zZxozu0St4w5S-aC7N7UTTarPZTp4BZH8ttUm-VnK4aEdMx9L3Izo0hxaJ135undTuA6gQpK-0nVsm6tRVq4akDe3OhC-7b2h6z7GWJX1SD4sAD3iaq4LZa8y1mvBBz6AIM9co8R-vU1_CduxKQc3KxCnqKALbEKXm0mTGsXha9aNv3pLNRNs_J-cCjBpb1EXAe_7qOURTiIHdv8_sdjcFTJ0OTeLWywuSf7mD0Wpx2LKcD6ImENbyq5IBuR1e2ghnh5Y9H33cuQ0FRni8ikq5W3xP3HSMfwlayhIAJN_WnmbhENRU-m2_hDPiD9JYF2CrQneLkE3kcazSdtarPbg9ZDiydHbKWCV-X7HxxIKEr9N7P1V5HKatF4ZUrG60e3eBnRyccPwmT66i9NYyrcy1_ZNN8D1DY8xh9kflUDy4dSYu4R7AEWxNJWQQov525v0MjD5FNAS03rpk4SuW3Mt7IP73m-_BpmIhW3LZsnmfd8xHRjf0M9veyJD0--ETGmh8t3_CXh3I3R9IbcSEntUl_2lCvc_6B-m8W-t2nZr4wvOq9-iaTQXAn1Au6EaOYWvDRE\",\n" +
+                                "      \"alg\": \"RS256\",\n" +
                                 "      \"use\": \"sig\",\n" +
-                                "      \"alg\": \"RS256\"\n" +
+                                "      \"n\": \"hsuiIdOIbaO81QXIvWZAeo3tuqlDO8TsJGUBWaNtIQcloPtNFG4CUTxsdeUUhD6R_n8H95OZ2aGKFp42vzLgcpynBqVnK4Dw_cwQ0cSUjTqNhlOXA5koBKWJ_HRXQu5Cw7FQjty9CH90ytU1aVh-A9Ns7p5NVqeQu1PC8EPaui-IPcJ6lon1GomfQI9DrsKYANwToHe6_pFqztlDKc8tG9XYcgbAsPooVvrdk7vPMtK4sciat6zslZaQCbQf9QXTSwPTI33sqZGJXJe0ZdrQtCYogwyXyZYH0gWncmqLyQn-VUfKwcn3Anx1Uwtn8C93pPMJS_iDt2ZgAEp3KXAR3w\",\n" +
+                                "      \"e\": \"AQAB\"\n" +
+                                "    },\n" +
+                                "    {\n" +
+                                "      \"kid\": \"uK_CfONSQO2SB9FCUOPRv4g8k2uAYmDDnXUy15CEqOs\",\n" +
+                                "      \"kty\": \"EC\",\n" +
+                                "      \"alg\": \"ES384\",\n" +
+                                "      \"use\": \"sig\",\n" +
+                                "      \"crv\": \"P-384\",\n" +
+                                "      \"x\": \"RpKjA_K7HvyEyaj-PSHTnW0oJt1D9qI-WOlDy_BRaN01K38PpgELT3djZC8xioSz\",\n" +
+                                "      \"y\": \"S5-Mq8SOCSuxgfr2jnrkN-E06o8StX0J7mtAMtNg1HaSPuzfdfXSCzr8Yw5ZXyLm\"\n" +
                                 "    }\n" +
                                 "  ]\n" +
                                 "}")));
     }
 
     @Test
-    public void shouldResolveMatchingSigningKeyAndStoreItInCache() {
+    public void shouldResolveMatchingRsaSigningKeyAndStoreItInCache() {
         final DefaultJwsHeader header = new DefaultJwsHeader();
         header.setAlgorithm("RS256");
-        header.setKeyId(KEY_ID);
+        header.setKeyId(KEY_ID_RSA);
 
         final Key key = signingKeyResolver.resolveSigningKey(header, "");
         assertThat(key.getAlgorithm()).isEqualTo("RSA");
-        assertThat(key).isInstanceOf(RSAPublicKeyImpl.class);
+        assertThat(key).isInstanceOf(BCRSAPublicKey.class);
 
         // Verify that the key was cached and not requested twice
         final Key secondKey = signingKeyResolver.resolveSigningKey(header, "");
@@ -82,7 +94,23 @@ public class OidcSigningKeyResolverTest {
     }
 
     @Test
-    public void shouldThrowExceptionWhenNoMatchingSigningKeyCanBeFound() {
+    public void shouldResolveMatchingEcSigningKeyAndStoreItInCache() {
+        final DefaultJwsHeader header = new DefaultJwsHeader();
+        header.setAlgorithm("ES384");
+        header.setKeyId(KEY_ID_EC);
+
+        final Key key = signingKeyResolver.resolveSigningKey(header, "");
+        assertThat(key.getAlgorithm()).isEqualTo("EC");
+        assertThat(key).isInstanceOf(BCECPublicKey.class);
+
+        // Verify that the key was cached and not requested twice
+        final Key secondKey = signingKeyResolver.resolveSigningKey(header, "");
+        assertThat(secondKey).isEqualTo(key);
+        WireMock.verify(1, getRequestedFor(urlPathEqualTo(OIDC_CONFIGURATION_PATH)));
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenNoMatchingSigningKeyCouldBeFound() {
         final DefaultJwsHeader header = new DefaultJwsHeader();
         header.setAlgorithm("RS256");
         header.setKeyId("another_key_id");

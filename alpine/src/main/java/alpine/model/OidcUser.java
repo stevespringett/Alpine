@@ -104,9 +104,17 @@ public class OidcUser implements Serializable, Principal, UserPrincipal {
         this.permissions = permissions;
     }
 
+    /**
+     * Do not use - only here to satisfy Principal implementation requirement.
+     *
+     * @return the value of {@link #getUsername()}
+     * @deprecated use {@link OidcUser#getUsername()}
+     */
+    @Deprecated
+    @JsonIgnore
     @Override
     public String getName() {
         return getUsername();
     }
-    
+
 }

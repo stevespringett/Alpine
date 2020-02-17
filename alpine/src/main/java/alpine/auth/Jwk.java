@@ -1,15 +1,24 @@
 package alpine.auth;
 
+import alpine.json.Base64EncodedBigIntegerDeserializer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import java.math.BigInteger;
 
 /**
- * TODO: Support multiple formats, not only RSA
- *
+ * @see <a href="https://tools.ietf.org/html/draft-ietf-jose-json-web-key-00#section-4.2">JWK Key Object Format</a>
  * @since 1.8.0
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Jwk {
+
+    @JsonProperty("use")
+    private String use;
+
+    @JsonProperty("alg")
+    private String algorithm;
 
     @JsonProperty("kty")
     private String keyType;
@@ -17,17 +26,55 @@ public class Jwk {
     @JsonProperty("kid")
     private String keyId;
 
+    /**
+     * Exponent value for the RSA public key.
+     */
     @JsonProperty("e")
-    private String exponent;
+    @JsonDeserialize(using = Base64EncodedBigIntegerDeserializer.class)
+    private BigInteger exponent;
 
+    /**
+     * Modulus value for the RSA public key.
+     */
     @JsonProperty("n")
-    private String modulus;
+    @JsonDeserialize(using = Base64EncodedBigIntegerDeserializer.class)
+    private BigInteger modulus;
 
-    @JsonProperty("use")
-    private String use;
+    /**
+     * Cryptographic curve used with the key.
+     */
+    @JsonProperty("crv")
+    private String curve;
 
-    @JsonProperty("alg")
-    private String algorithm;
+    /**
+     * X coordinate for the elliptic curve point.
+     */
+    @JsonProperty("x")
+    @JsonDeserialize(using = Base64EncodedBigIntegerDeserializer.class)
+    private BigInteger x;
+
+    /**
+     * Y coordinate for the elliptic curve point.
+     */
+    @JsonProperty("y")
+    @JsonDeserialize(using = Base64EncodedBigIntegerDeserializer.class)
+    private BigInteger y;
+
+    public String getUse() {
+        return use;
+    }
+
+    public void setUse(final String use) {
+        this.use = use;
+    }
+
+    public String getAlgorithm() {
+        return algorithm;
+    }
+
+    public void setAlgorithm(final String algorithm) {
+        this.algorithm = algorithm;
+    }
 
     public String getKeyType() {
         return keyType;
@@ -45,35 +92,44 @@ public class Jwk {
         this.keyId = keyId;
     }
 
-    public String getExponent() {
+    public BigInteger getExponent() {
         return exponent;
     }
 
-    public void setExponent(final String exponent) {
+    public void setExponent(final BigInteger exponent) {
         this.exponent = exponent;
     }
 
-    public String getModulus() {
+    public BigInteger getModulus() {
         return modulus;
     }
 
-    public void setModulus(final String modulus) {
+    public void setModulus(final BigInteger modulus) {
         this.modulus = modulus;
     }
 
-    public String getUse() {
-        return use;
+    public String getCurve() {
+        return curve;
     }
 
-    public void setUse(final String use) {
-        this.use = use;
+    public void setCurve(final String curve) {
+        this.curve = curve;
     }
 
-    public String getAlgorithm() {
-        return algorithm;
+    public BigInteger getX() {
+        return x;
     }
 
-    public void setAlgorithm(final String algorithm) {
-        this.algorithm = algorithm;
+    public void setX(final BigInteger x) {
+        this.x = x;
     }
+
+    public BigInteger getY() {
+        return y;
+    }
+
+    public void setY(final BigInteger y) {
+        this.y = y;
+    }
+
 }
