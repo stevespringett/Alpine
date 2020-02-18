@@ -7,14 +7,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SigningKeyResolver;
-import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
-import org.bouncycastle.jcajce.provider.asymmetric.rsa.BCRSAPublicKey;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.MediaType;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -26,7 +18,15 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.InvalidParameterSpecException;
 import java.security.spec.KeySpec;
 import java.security.spec.RSAPublicKeySpec;
+import java.util.NoSuchElementException;
 import java.util.Optional;
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.core.MediaType;
+import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
+import org.bouncycastle.jcajce.provider.asymmetric.rsa.BCRSAPublicKey;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 /**
  * A {@link SigningKeyResolver} that resolves signing keys from a remote authorization server.
@@ -76,7 +76,7 @@ public class OidcSigningKeyResolver implements SigningKeyResolver {
                 .filter(jwk -> signatureAlgorithm.getValue().equals(jwk.getAlgorithm()))
                 .filter(jwk -> keyId.equals(jwk.getKeyId()))
                 .findAny()
-                .orElseThrow(() -> new IllegalStateException(String.format("No key for alg %s and key ID %s found", signatureAlgorithm, keyId)));
+                .orElseThrow(() -> new NoSuchElementException(String.format("No key for alg %s and key ID %s found", signatureAlgorithm, keyId)));
 
         final KeyFactory keyFactory = getKeyFactory(signatureAlgorithm);
         final KeySpec keySpec = getKeySpec(signingJwk, signatureAlgorithm);
@@ -96,12 +96,13 @@ public class OidcSigningKeyResolver implements SigningKeyResolver {
 
     private Optional<PublicKey> loadSigningKeyFromCache(final SignatureAlgorithm sigAlg, final String keyId) {
         final PublicKey publicKey;
+
         if (sigAlg.isRsa()) {
             publicKey = CacheManager.getInstance().get(BCRSAPublicKey.class, getCacheKey(keyId));
         } else if (sigAlg.isEllipticCurve()) {
             publicKey = CacheManager.getInstance().get(BCECPublicKey.class, getCacheKey(keyId));
         } else {
-            return Optional.empty();
+            throw new UnsupportedOperationException(String.format("Signature algorithm %s is not supported", sigAlg.getValue()));
         }
 
         return Optional.ofNullable(publicKey);
@@ -114,7 +115,8 @@ public class OidcSigningKeyResolver implements SigningKeyResolver {
     /**
      * @param signatureAlgorithm Algorithm to get a {@link KeyFactory} for
      * @return A {@link KeyFactory} for the given algorithm
-     * @see <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html#KeyFactory">KeyFactory Algorithms</a>
+     * @see <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html#KeyFactory">KeyFactory
+     *         Algorithms</a>
      */
     private KeyFactory getKeyFactory(final SignatureAlgorithm signatureAlgorithm) {
         try {
@@ -123,8 +125,7 @@ public class OidcSigningKeyResolver implements SigningKeyResolver {
             } else if (signatureAlgorithm.isEllipticCurve()) {
                 return KeyFactory.getInstance("EC", BouncyCastleProvider.PROVIDER_NAME);
             } else {
-                // TODO: Exception handling
-                throw new RuntimeException();
+                throw new UnsupportedOperationException(String.format("Signature algorithm %s is not supported", signatureAlgorithm.getValue()));
             }
         } catch (NoSuchProviderException | NoSuchAlgorithmException e) {
             // TODO: Exception handling
@@ -146,8 +147,7 @@ public class OidcSigningKeyResolver implements SigningKeyResolver {
                 throw new IllegalStateException(e);
             }
         } else {
-            // TODO: Exception handling
-            throw new IllegalStateException(String.format("Signature algorithm %s is not supported", signatureAlgorithm));
+            throw new UnsupportedOperationException(String.format("Signature algorithm %s is not supported", signatureAlgorithm.getValue()));
         }
     }
 

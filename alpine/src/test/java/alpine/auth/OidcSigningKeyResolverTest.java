@@ -3,6 +3,8 @@ package alpine.auth;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import io.jsonwebtoken.impl.DefaultJwsHeader;
+import java.security.Key;
+import java.util.NoSuchElementException;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
 import org.bouncycastle.jcajce.provider.asymmetric.rsa.BCRSAPublicKey;
 import org.junit.Before;
@@ -16,7 +18,6 @@ import wiremock.org.apache.http.HttpHeaders;
 import wiremock.org.apache.http.HttpStatus;
 import wiremock.org.apache.http.entity.ContentType;
 
-import java.security.Key;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
@@ -115,7 +116,7 @@ public class OidcSigningKeyResolverTest {
         header.setAlgorithm("RS256");
         header.setKeyId("another_key_id");
 
-        assertThatExceptionOfType(IllegalStateException.class)
+        assertThatExceptionOfType(NoSuchElementException.class)
                 .isThrownBy(() -> signingKeyResolver.resolveSigningKey(header, ""));
     }
 

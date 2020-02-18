@@ -11,8 +11,9 @@ import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
-import org.glassfish.jersey.server.ContainerRequest;
-
+import java.security.Principal;
+import java.util.Collections;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import javax.naming.AuthenticationException;
 import javax.ws.rs.ProcessingException;
@@ -20,9 +21,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import java.security.Principal;
-import java.util.Collections;
-import java.util.Optional;
+import org.glassfish.jersey.server.ContainerRequest;
 
 /**
  * TODO: Investigate if merging with {@link JwtAuthenticationService} is possible
@@ -33,24 +32,29 @@ public class OidcAuthenticationService implements AuthenticationService {
 
     private static final Logger LOGGER = Logger.getLogger(OidcAuthenticationService.class);
 
-    private static final String USERNAME_CLAIM = Config.getInstance().getProperty(Config.AlpineKey.OIDC_USERNAME_CLAIM);
-
+    private final Config config;
     private final OidcConfiguration oidcConfiguration;
-
+    private final OidcSigningKeyResolver signingKeyResolver;
     private final String accessToken;
 
     public OidcAuthenticationService(final OidcConfiguration oidcConfiguration, final ContainerRequest request) {
-        this(oidcConfiguration, extractAccessToken(request));
+        this(Config.getInstance(), oidcConfiguration, new OidcSigningKeyResolver(oidcConfiguration), extractAccessToken(request));
     }
 
-    OidcAuthenticationService(final OidcConfiguration oidcConfiguration, final String accessToken) {
+    /**
+     * Constructor for unit tests
+     */
+    OidcAuthenticationService(final Config config, final OidcConfiguration oidcConfiguration,
+                              final OidcSigningKeyResolver signingKeyResolver, final String accessToken) {
+        this.config = config;
         this.oidcConfiguration = oidcConfiguration;
+        this.signingKeyResolver = signingKeyResolver;
         this.accessToken = accessToken;
     }
 
     @Override
     public boolean isSpecified() {
-        return Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.OIDC_ENABLED)
+        return config.getPropertyAsBoolean(Config.AlpineKey.OIDC_ENABLED)
                 && accessToken != null;
     }
 
@@ -59,7 +63,7 @@ public class OidcAuthenticationService implements AuthenticationService {
     public Principal authenticate() throws AuthenticationException {
         final JwtParser jwtParser = Jwts.parser()
                 .requireIssuer(oidcConfiguration.getIssuer())
-                .setSigningKeyResolver(new OidcSigningKeyResolver(oidcConfiguration));
+                .setSigningKeyResolver(signingKeyResolver);
 
         if (!jwtParser.isSigned(accessToken)) {
             throw new AuthenticationException("Access token is not signed");
@@ -70,10 +74,11 @@ public class OidcAuthenticationService implements AuthenticationService {
 
         try {
             accessTokenClaims = jwtParser.parseClaimsJws(accessToken);
-            username = accessTokenClaims.getBody().get(USERNAME_CLAIM, String.class);
+            username = accessTokenClaims.getBody().get(config.getProperty(Config.AlpineKey.OIDC_USERNAME_CLAIM), String.class);
 
             if (username == null) {
-                throw new AuthenticationException(String.format("username claim %s not found in token", USERNAME_CLAIM));
+                throw new AuthenticationException(String.format("username claim \"%s\" not found",
+                        config.getProperty(Config.AlpineKey.OIDC_USERNAME_CLAIM)));
             }
         } catch (ExpiredJwtException e) {
             throw new AuthenticationException("Access token is expired");
