@@ -6,6 +6,8 @@ import alpine.logging.Logger;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.MediaType;
 
@@ -18,7 +20,7 @@ public class OidcConfiguration {
 
     private static final Logger LOGGER = Logger.getLogger(OidcConfiguration.class);
 
-    private static final String CONFIGURATION_CACHE_KEY = "OIDC_CONFIGURATION";
+    static final String CONFIGURATION_CACHE_KEY = "OIDC_CONFIGURATION";
 
     @JsonProperty("issuer")
     private String issuer;
@@ -37,22 +39,37 @@ public class OidcConfiguration {
 
     // TODO: Move this logic to a separate class
     public static OidcConfiguration getInstance() {
+        if (!Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.OIDC_ENABLED)) {
+            LOGGER.error("Cannot resolve OIDC configzuration: OIDC is disabled");
+            return null;
+        }
+
         return getConfiguration(Config.getInstance().getProperty(Config.AlpineKey.OIDC_DISCOVERY_URI));
     }
 
     static OidcConfiguration getConfiguration(final String discoveryUri) {
+        if (discoveryUri == null) {
+            LOGGER.error("Cannot resolve OIDC configuration: No discovery URI provided");
+            return null;
+        }
+
         OidcConfiguration configuration = CacheManager.getInstance().get(OidcConfiguration.class, CONFIGURATION_CACHE_KEY);
         if (configuration != null) {
-            LOGGER.info("OIDC configuration loaded from cache");
+            LOGGER.debug("OIDC configuration loaded from cache");
             return configuration;
         }
 
-        LOGGER.info("Loading OIDC configuration from " + discoveryUri);
-        configuration = ClientBuilder.newClient().target(discoveryUri)
-                .request(MediaType.APPLICATION_JSON)
-                .get(OidcConfiguration.class);
+        LOGGER.debug("Loading OIDC configuration from " + discoveryUri);
+        try {
+            configuration = ClientBuilder.newClient().target(discoveryUri)
+                    .request(MediaType.APPLICATION_JSON)
+                    .get(OidcConfiguration.class);
+        } catch (WebApplicationException | ProcessingException e) {
+            LOGGER.error("Failed to load OIDC configuration from " + discoveryUri + ": " + e.getMessage());
+            return null;
+        }
 
-        LOGGER.info("Storing OIDC configuration in cache");
+        LOGGER.debug("Storing OIDC configuration in cache");
         CacheManager.getInstance().put(CONFIGURATION_CACHE_KEY, configuration);
 
         return configuration;
