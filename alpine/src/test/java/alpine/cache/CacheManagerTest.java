@@ -37,4 +37,16 @@ public class CacheManagerTest {
             Assert.assertEquals("value-" + i, cacheManager.get(String.class, "key-" + i));
         }
     }
+
+    @Test
+    public void removeTest() {
+        CacheManager cacheManager = CacheManager.getInstance();
+
+        cacheManager.put("CacheManagerTest.removeTest", "testValue");
+        Assert.assertEquals("testValue", cacheManager.get(String.class, "CacheManagerTest.removeTest"));
+
+        cacheManager.remove(String.class, "CacheManagerTest.removeTest");
+        Assert.assertNull(cacheManager.get(String.class, "CacheManagerTest.removeTest"));
+    }
+
 }

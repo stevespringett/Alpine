@@ -93,6 +93,18 @@ public abstract class AbstractCacheManager {
     }
 
     /**
+     * Remove an object from cache.
+     * @param clazz the class of the object to remove from cache
+     * @param key the unique identifier of the object to remove from cache
+     */
+    public void remove(final Class clazz, final String key) {
+        Cache<String, Object> cache = typeMap.get(clazz);
+        if (cache != null) {
+            cache.invalidate(key);
+        }
+    }
+
+    /**
      * Performs maintenance on the cache. Maintenance is automatically carried out
      * and use of this method is normally not required. However, if maintenance
      * must be performed immediately, use of this method may be called.
