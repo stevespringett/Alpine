@@ -2,6 +2,7 @@ package alpine.auth;
 
 import alpine.cache.CacheManager;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import wiremock.org.apache.http.HttpHeaders;
@@ -21,6 +22,12 @@ public class OidcConfigurationTest {
 
     @Rule
     public WireMockRule wireMockRule = new WireMockRule();
+
+    @After
+    public void tearDown() {
+        // Remove configs from cache to keep testing environment clean
+        CacheManager.getInstance().remove(OidcConfiguration.class, OidcConfiguration.CONFIGURATION_CACHE_KEY);
+    }
 
     @Test
     public void getConfigurationShouldReturnNullWhenDiscoveryUriIsNull() {
@@ -73,6 +80,7 @@ public class OidcConfigurationTest {
                                 "}")));
 
         final OidcConfiguration oidcConfiguration = OidcConfiguration.getConfiguration(wireMockRule.url(OIDC_CONFIGURATION_PATH));
+        assertThat(oidcConfiguration).isNotNull();
         assertThat(oidcConfiguration.getIssuer()).isEqualTo("https://gitlab.com");
         assertThat(oidcConfiguration.getAuthorizationEndpointUri()).isEqualTo("https://gitlab.com/oauth/authorize");
         assertThat(oidcConfiguration.getTokenEndpointUri()).isEqualTo("https://gitlab.com/oauth/token");
