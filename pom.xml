@@ -147,7 +147,6 @@
 
         <!-- Dependency Versions -->
         <lib.alpine.executable.war.version>1.2.2</lib.alpine.executable.war.version>
-        <lib.bouncycastle.version>1.64</lib.bouncycastle.version>
         <lib.bcrypt.version>0.4</lib.bcrypt.version>
         <lib.caffeine.version>2.8.0</lib.caffeine.version>
         <lib.commons.collections4.version>4.4</lib.commons.collections4.version>
@@ -343,12 +342,6 @@
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>
             <version>${lib.bcrypt.version}</version>
-        </dependency>
-        <!-- Crypto -->
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
-            <version>${lib.bouncycastle.version}</version>
         </dependency>
         <!-- JAX-RS JSON -->
         <dependency>
