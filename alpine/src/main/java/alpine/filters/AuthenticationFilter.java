@@ -20,8 +20,6 @@ package alpine.filters;
 
 import alpine.auth.ApiKeyAuthenticationService;
 import alpine.auth.JwtAuthenticationService;
-import alpine.auth.OidcAuthenticationService;
-import alpine.auth.OidcConfiguration;
 import alpine.logging.Logger;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.owasp.security.logging.SecurityMarkers;
@@ -70,18 +68,6 @@ public class AuthenticationFilter implements ContainerRequestFilter {
                     principal = apiKeyAuthService.authenticate();
                 } catch (AuthenticationException e) {
                     LOGGER.info(SecurityMarkers.SECURITY_FAILURE, "Invalid API key asserted");
-                    requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
-                    return;
-                }
-            }
-
-            // TODO: Resolve conflict with JwtAuthenticationService
-            final OidcAuthenticationService oidcAuthService = new OidcAuthenticationService(OidcConfiguration.getInstance(), request);
-            if (oidcAuthService.isSpecified()) {
-                try {
-                    principal = oidcAuthService.authenticate();
-                } catch (AuthenticationException e) {
-                    LOGGER.info(SecurityMarkers.SECURITY_FAILURE, "OIDC authentication failed: " + e.getMessage());
                     requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
                     return;
                 }

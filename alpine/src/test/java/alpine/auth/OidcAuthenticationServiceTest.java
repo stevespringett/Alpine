@@ -1,59 +1,58 @@
 package alpine.auth;
 
 import alpine.Config;
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
 public class OidcAuthenticationServiceTest {
 
-    @Mock
-    private Config configMock;
+    @Rule
+    public WireMockRule wireMockRule = new WireMockRule();
 
-    @Mock
+    private Config configMock;
     private OidcConfiguration oidcConfigurationMock;
 
-    @Mock
-    private OidcSigningKeyResolver signingKeyResolverMock;
+    @Before
+    public void setUp() {
+        configMock = mock(Config.class);
+        oidcConfigurationMock = mock(OidcConfiguration.class);
+    }
 
     @Test
     public void isSpecifiedShouldReturnFalseWhenOidcIsDisabled() {
         when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_ENABLED)))
                 .thenReturn(false);
 
-        final OidcAuthenticationService authenticationService =
-                new OidcAuthenticationService(configMock, oidcConfigurationMock, signingKeyResolverMock, "");
+        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, "accessToken");
 
-        assertThat(authenticationService.isSpecified()).isFalse();
+        assertThat(authService.isSpecified()).isFalse();
     }
 
     @Test
-    public void isSpecifiedShouldReturnFalseWhenRequestDoesntContainAccessToken() {
+    public void isSpecifiedShouldReturnFalseWhenAccessTokenIsNull() {
         when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_ENABLED)))
                 .thenReturn(true);
 
-        final OidcAuthenticationService authenticationService =
-                new OidcAuthenticationService(configMock, oidcConfigurationMock, signingKeyResolverMock, null);
+        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, null);
 
-        assertThat(authenticationService.isSpecified()).isFalse();
+        assertThat(authService.isSpecified()).isFalse();
     }
 
     @Test
-    public void isSpecifiedShouldReturnTrueWhenOidcIsEnabledAndAccessTokenIsProvided() {
+    public void isSpecifiedShouldReturnTrueWhenOidcIsEnabledAndAccessTokenIsNotNull() {
         when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_ENABLED)))
                 .thenReturn(true);
 
-        final OidcAuthenticationService authenticationService =
-                new OidcAuthenticationService(configMock, oidcConfigurationMock, signingKeyResolverMock, "a");
+        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, "accessToken");
 
-        assertThat(authenticationService.isSpecified()).isTrue();
+        assertThat(authService.isSpecified()).isTrue();
     }
 
 }
