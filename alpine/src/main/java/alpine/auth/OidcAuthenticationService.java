@@ -91,7 +91,12 @@ public class OidcAuthenticationService implements AuthenticationService {
         user.setEmail(userInfo.getEmail());
         user = qm.persist(user);
 
-        // TODO: Team synchronization with access token roles?
+        if (config.getPropertyAsBoolean(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION)) {
+            final String teamsClaim = config.getProperty(Config.AlpineKey.OIDC_TEAMS_CLAIM);
+            if (teamsClaim != null) {
+                // TODO: Perform team synchronization
+            }
+        }
 
         return user;
     }
