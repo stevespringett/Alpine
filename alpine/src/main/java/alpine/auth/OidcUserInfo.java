@@ -7,6 +7,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @see <a href="https://openid.net/specs/openid-connect-core-1_0.html#UserInfoResponse">OpenID Connect specification: UserInfo Response</a>
+ * @since 1.8.0
+ */
 public class OidcUserInfo {
 
     @JsonProperty("sub")
@@ -14,9 +18,6 @@ public class OidcUserInfo {
 
     @JsonProperty("email")
     private String email;
-
-    @JsonProperty("email_verified")
-    private Boolean emailVerified;
 
     private Map<String, Object> claims = new HashMap<>();
 
@@ -34,14 +35,6 @@ public class OidcUserInfo {
 
     public void setEmail(final String email) {
         this.email = email;
-    }
-
-    public Boolean isEmailVerified() {
-        return emailVerified;
-    }
-
-    public void setEmailVerified(final Boolean emailVerified) {
-        this.emailVerified = emailVerified;
     }
 
     @JsonAnyGetter

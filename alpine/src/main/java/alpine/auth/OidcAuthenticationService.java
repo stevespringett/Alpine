@@ -25,7 +25,7 @@ public class OidcAuthenticationService implements AuthenticationService {
     private final String accessToken;
 
     public OidcAuthenticationService(final String accessToken) {
-        this(Config.getInstance(), OidcConfiguration.getInstance(), accessToken);
+        this(Config.getInstance(), OidcConfigurationResolver.getInstance().resolve(), accessToken);
     }
 
     /**
@@ -40,6 +40,7 @@ public class OidcAuthenticationService implements AuthenticationService {
     @Override
     public boolean isSpecified() {
         return config.getPropertyAsBoolean(Config.AlpineKey.OIDC_ENABLED)
+                && oidcConfiguration != null
                 && accessToken != null;
     }
 
@@ -59,27 +60,30 @@ public class OidcAuthenticationService implements AuthenticationService {
             if (e.getResponse().getStatus() == 401) {
                 throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.INVALID_CREDENTIALS);
             }
+            LOGGER.error("An error occurred requesting the OIDC UserInfo", e);
             throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.OTHER);
         } catch (ProcessingException e) {
+            LOGGER.error("An error occurred while processing the OIDC UserInfo response", e);
             throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.OTHER);
         }
 
-        final String username = userInfo.getClaim(config.getProperty(Config.AlpineKey.OIDC_USERNAME_CLAIM), String.class);
+        final String usernameClaim = config.getProperty(Config.AlpineKey.OIDC_USERNAME_CLAIM);
+        final String username = userInfo.getClaim(usernameClaim, String.class);
         if (username == null) {
-            LOGGER.error("Configured OIDC username claim does not exist");
+            LOGGER.error("The configured OIDC username claim (" + usernameClaim + ") could not be found in UserInfo");
             throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.OTHER);
         }
 
         try (final AlpineQueryManager qm = new AlpineQueryManager()) {
             final OidcUser user = qm.getOidcUser(username);
             if (user != null) {
-                LOGGER.info(String.format("Attempting to authenticate user: %s", username));
+                LOGGER.debug("Attempting to authenticate user: " + username);
                 return user;
-            } else if (Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.OIDC_USER_PROVISIONING)) {
-                LOGGER.info(String.format("The user (%s) authenticated successfully but the account has not been provisioned", username));
+            } else if (config.getPropertyAsBoolean(Config.AlpineKey.OIDC_USER_PROVISIONING)) {
+                LOGGER.debug("The user (" + username + ") authenticated successfully but the account has not been provisioned");
                 return autoProvision(qm, username, userInfo);
             } else {
-                LOGGER.error(String.format("The user (%s) is unmapped and user provisioning is not enabled", username));
+                LOGGER.debug("The user (" + username + ") is unmapped and user provisioning is not enabled");
                 throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.UNMAPPED_ACCOUNT);
             }
         }
@@ -92,6 +96,8 @@ public class OidcAuthenticationService implements AuthenticationService {
         user = qm.persist(user);
 
         if (config.getPropertyAsBoolean(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION)) {
+            LOGGER.debug("Synchronizing teams for user " + username);
+
             final String teamsClaim = config.getProperty(Config.AlpineKey.OIDC_TEAMS_CLAIM);
             if (teamsClaim != null) {
                 // TODO: Perform team synchronization
