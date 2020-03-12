@@ -1,6 +1,7 @@
 package alpine.auth;
 
 import alpine.cache.CacheManager;
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.junit.After;
 import org.junit.Rule;
@@ -10,6 +11,7 @@ import wiremock.org.apache.http.HttpStatus;
 import wiremock.org.apache.http.entity.ContentType;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class OidcConfigurationResolverTest {
@@ -17,7 +19,7 @@ public class OidcConfigurationResolverTest {
     private static final String OIDC_CONFIGURATION_PATH = "/.well-known/openid-configuration";
 
     @Rule
-    public WireMockRule wireMockRule = new WireMockRule();
+    public WireMockRule wireMockRule = new WireMockRule(options().dynamicPort());
 
     @After
     public void tearDown() {

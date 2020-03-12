@@ -18,6 +18,7 @@ import javax.jdo.PersistenceManager;
 import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.eq;
@@ -31,7 +32,7 @@ public class OidcAuthenticationServiceTest {
     private static final String ACCESS_TOKEN = "accessToken";
 
     @Rule
-    public WireMockRule wireMockRule = new WireMockRule();
+    public WireMockRule wireMockRule = new WireMockRule(options().dynamicPort());
 
     private Config configMock;
     private OidcConfiguration oidcConfigurationMock;
