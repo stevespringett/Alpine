@@ -29,6 +29,11 @@ public class OidcConfigurationResolver {
         return INSTANCE;
     }
 
+    /**
+     * Resolve the OpenID Connect configuration either from a remote authorization server or from cache.
+     *
+     * @return The resolved {@link OidcConfiguration} or {@code null}, when resolving was not possible
+     */
     @Nullable
     public OidcConfiguration resolve() {
         if (discoveryUri == null) {

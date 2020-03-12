@@ -161,9 +161,9 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
                 LOGGER.debug(user.getUsername() + " is a member of team: " + team.getName());
                 if (team.getMappedOidcGroups() != null) {
                     for (final MappedOidcGroup mappedOidcGroup : team.getMappedOidcGroups()) {
-                        LOGGER.debug(mappedOidcGroup.getGroup() + " is mapped to team: " + team.getName());
-                        if (!groups.contains(mappedOidcGroup.getGroup())) {
-                            LOGGER.debug(mappedOidcGroup.getGroup() + " is not identified in the List of groups specified. Queuing removal of membership for user " + user.getUsername());
+                        LOGGER.debug(mappedOidcGroup.getGroupName() + " is mapped to team: " + team.getName());
+                        if (!groups.contains(mappedOidcGroup.getGroupName())) {
+                            LOGGER.debug(mappedOidcGroup.getGroupName() + " is not identified in the List of groups specified. Queuing removal of membership for user " + user.getUsername());
                             removeThese.add(team);
                         }
                     }
@@ -718,27 +718,64 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     /**
      * Creates a MappedOidcGroup object.
      * @param team The team to map
-     * @param group the group to map
+     * @param groupName The name of the OIDC group to map
      * @return a MappedOidcGroup
      * @since 1.8.0
      */
-    public MappedOidcGroup createMappedOidcGroup(final Team team, final String group) {
+    public MappedOidcGroup createMappedOidcGroup(final Team team, final String groupName) {
         pm.currentTransaction().begin();
         final MappedOidcGroup mapping = new MappedOidcGroup();
         mapping.setTeam(team);
-        mapping.setGroup(group);
+        mapping.setGroupName(groupName);
         pm.makePersistent(mapping);
         pm.currentTransaction().commit();
         return getObjectById(MappedOidcGroup.class, mapping.getId());
     }
 
     /**
+     * Retrieves a MappedOidcGroup object for the specified Team and OIDC group.
+     * @param team a Team object
+     * @param groupName Name of the OIDC group
+     * @return a MappedOidcGroup if found, or null if no mapping exists
      * @since 1.8.0
      */
-    @SuppressWarnings("unchecked")
-    public List<MappedOidcGroup> getMappedOidcGroups(final String group) {
-        final Query query = pm.newQuery(MappedOidcGroup.class, "group == :group");
-        return (List<MappedOidcGroup>) query.execute(group);
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public MappedOidcGroup getMappedOidcGroup(final Team team, final String groupName) {
+        final Query query = pm.newQuery(MappedOidcGroup.class, "team == :team && groupName == :groupName");
+        final List<MappedOidcGroup> result = (List<MappedOidcGroup>) query.execute(team, groupName);
+        return Collections.isEmpty(result) ? null : result.get(0);
+    }
+
+    /**
+     * Retrieves a List of MappedOidcGroup objects for the specified Team.
+     * @param team a Team object
+     * @return a List of MappedOidcGroup objects
+     * @since 1.8.0
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public List<MappedOidcGroup> getMappedOidcGroups(final Team team) {
+        final Query query = pm.newQuery(MappedOidcGroup.class, "team == :team");
+        return (List<MappedOidcGroup>) query.execute(team);
+    }
+
+    /**
+     * @since 1.8.0
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public List<MappedOidcGroup> getMappedOidcGroups(final String groupName) {
+        final Query query = pm.newQuery(MappedOidcGroup.class, "groupName == :groupName");
+        return (List<MappedOidcGroup>) query.execute(groupName);
+    }
+
+    /**
+     * Determines if the specified Team is mapped to the specified OIDC group.
+     * @param team a Team object
+     * @param group a String representation of Distinguished Name
+     * @return true if a mapping exists, false if not
+     * @since 1.8.0
+     */
+    public boolean isOidcGroupMapped(final Team team, final String group) {
+        return getMappedOidcGroup(team, group) != null;
     }
 
     /**

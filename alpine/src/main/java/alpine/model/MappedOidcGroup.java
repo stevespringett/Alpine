@@ -16,11 +16,13 @@ import javax.validation.constraints.Size;
 import java.util.UUID;
 
 /**
+ * Persistable object representing a OpenID Connect group mapped to a Team.
+ *
  * @since 1.8.0
  */
 @PersistenceCapable
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Unique(members = {"team", "group"})
+@Unique(members = {"team", "groupName"})
 public class MappedOidcGroup {
 
     @PrimaryKey
@@ -34,11 +36,11 @@ public class MappedOidcGroup {
     private Team team;
 
     @Persistent
-    @Column(name = "GROUP", jdbcType = "VARCHAR", length = 1024, allowsNull = "false")
+    @Column(name = "GROUP_NAME", jdbcType = "VARCHAR", length = 1024, allowsNull = "false")
     @NotBlank
     @Size(min = 1, max = 255)
-    @Pattern(regexp = "[\\P{Cc}]+", message = "The group must not contain control characters")
-    private String group;
+    @Pattern(regexp = "[\\P{Cc}]+", message = "The group name must not contain control characters")
+    private String groupName;
 
     @Persistent(customValueStrategy = "uuid")
     @Unique(name = "MAPPEDOIDCGROUP_UUID_IDX")
@@ -50,7 +52,7 @@ public class MappedOidcGroup {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(final long id) {
         this.id = id;
     }
 
@@ -58,23 +60,23 @@ public class MappedOidcGroup {
         return team;
     }
 
-    public void setTeam(Team team) {
+    public void setTeam(final Team team) {
         this.team = team;
     }
 
-    public String getGroup() {
-        return group;
+    public String getGroupName() {
+        return groupName;
     }
 
-    public void setGroup(String group) {
-        this.group = group;
+    public void setGroupName(final String groupName) {
+        this.groupName = groupName;
     }
 
     public UUID getUuid() {
         return uuid;
     }
 
-    public void setUuid(UUID uuid) {
+    public void setUuid(final UUID uuid) {
         this.uuid = uuid;
     }
 
