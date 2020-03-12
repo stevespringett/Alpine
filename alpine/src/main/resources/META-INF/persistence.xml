@@ -29,6 +29,7 @@
         <class>alpine.model.ManagedUser</class>
         <class>alpine.model.OidcUser</class>
         <class>alpine.model.MappedLdapGroup</class>
+        <class>alpine.model.MappedOidcGroup</class>
         <class>alpine.model.Permission</class>
         <class>alpine.model.SchemaVersion</class>
         <class>alpine.model.Team</class>

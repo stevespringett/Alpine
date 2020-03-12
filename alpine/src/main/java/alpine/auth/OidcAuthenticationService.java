@@ -12,6 +12,7 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import java.security.Principal;
+import java.util.List;
 
 /**
  * @since 1.8.0
@@ -89,7 +90,7 @@ public class OidcAuthenticationService implements AuthenticationService {
         }
     }
 
-    OidcUser autoProvision(final AlpineQueryManager qm, final String username, final OidcUserInfo userInfo) {
+    private OidcUser autoProvision(final AlpineQueryManager qm, final String username, final OidcUserInfo userInfo) {
         OidcUser user = new OidcUser();
         user.setUsername(username);
         user.setEmail(userInfo.getEmail());
@@ -97,14 +98,29 @@ public class OidcAuthenticationService implements AuthenticationService {
 
         if (config.getPropertyAsBoolean(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION)) {
             LOGGER.debug("Synchronizing teams for user " + username);
-
-            final String teamsClaim = config.getProperty(Config.AlpineKey.OIDC_TEAMS_CLAIM);
-            if (teamsClaim != null) {
-                // TODO: Perform team synchronization
-            }
+            return synchronizeTeams(qm, user, userInfo);
         }
 
         return user;
+    }
+
+    private OidcUser synchronizeTeams(final AlpineQueryManager qm, final OidcUser user, final OidcUserInfo userInfo) {
+        final String teamsClaim = config.getProperty(Config.AlpineKey.OIDC_TEAMS_CLAIM);
+        if (teamsClaim == null) {
+            LOGGER.error("Synchronizing teams for user " + user.getUsername() + " failed: Synchronization is enabled, but no teams claim is configured");
+            return user;
+        }
+
+        final List<String> groups;
+        try {
+            //noinspection unchecked
+            groups = userInfo.getClaim(teamsClaim, List.class);
+        } catch (ClassCastException e) {
+            LOGGER.error("Synchronizing teams for user " + user.getUsername() + " failed: Teams claim is not a list", e);
+            return user;
+        }
+
+        return qm.synchronizeTeamMembership(user, groups);
     }
 
 }

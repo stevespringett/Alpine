@@ -30,6 +30,7 @@ import alpine.model.EventServiceLog;
 import alpine.model.LdapUser;
 import alpine.model.ManagedUser;
 import alpine.model.MappedLdapGroup;
+import alpine.model.MappedOidcGroup;
 import alpine.model.OidcUser;
 import alpine.model.Permission;
 import alpine.model.Team;
@@ -146,6 +147,46 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
         final Query query = pm.newQuery(OidcUser.class);
         query.setOrdering("username asc");
         return (List<OidcUser>) query.execute();
+    }
+
+    /**
+     * @since 1.8.0
+     */
+    public OidcUser synchronizeTeamMembership(final OidcUser user, final List<String> groups) {
+        LOGGER.debug("Synchronizing team membership for " + user.getUsername());
+        final List<Team> removeThese = new ArrayList<>();
+
+        if (user.getTeams() != null) {
+            for (final Team team : user.getTeams()) {
+                LOGGER.debug(user.getUsername() + " is a member of team: " + team.getName());
+                if (team.getMappedOidcGroups() != null) {
+                    for (final MappedOidcGroup mappedOidcGroup : team.getMappedOidcGroups()) {
+                        LOGGER.debug(mappedOidcGroup.getGroup() + " is mapped to team: " + team.getName());
+                        if (!groups.contains(mappedOidcGroup.getGroup())) {
+                            LOGGER.debug(mappedOidcGroup.getGroup() + " is not identified in the List of groups specified. Queuing removal of membership for user " + user.getUsername());
+                            removeThese.add(team);
+                        }
+                    }
+                } else {
+                    LOGGER.debug(team.getName() + " does not have any mapped OIDC groups. Queuing removal of " + user.getUsername() + " from team: " + team.getName());
+                    removeThese.add(team);
+                }
+            }
+        }
+
+        for (final Team team: removeThese) {
+            LOGGER.debug("Removing user: " + user.getUsername() + " from team: " + team.getName());
+            removeUserFromTeam(user, team);
+        }
+
+        for (final String group : groups) {
+            for (final MappedOidcGroup mappedOidcGroup : getMappedOidcGroups(group)) {
+                LOGGER.debug("Adding user: " + user.getUsername() + " to team: " + mappedOidcGroup.getTeam());
+                addUserToTeam(user, mappedOidcGroup.getTeam());
+            }
+        }
+
+        return getObjectById(OidcUser.class, user.getId());
     }
 
     /**
@@ -672,6 +713,32 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
         pm.makePersistent(mapping);
         pm.currentTransaction().commit();
         return getObjectById(MappedLdapGroup.class, mapping.getId());
+    }
+
+    /**
+     * Creates a MappedOidcGroup object.
+     * @param team The team to map
+     * @param group the group to map
+     * @return a MappedOidcGroup
+     * @since 1.8.0
+     */
+    public MappedOidcGroup createMappedOidcGroup(final Team team, final String group) {
+        pm.currentTransaction().begin();
+        final MappedOidcGroup mapping = new MappedOidcGroup();
+        mapping.setTeam(team);
+        mapping.setGroup(group);
+        pm.makePersistent(mapping);
+        pm.currentTransaction().commit();
+        return getObjectById(MappedOidcGroup.class, mapping.getId());
+    }
+
+    /**
+     * @since 1.8.0
+     */
+    @SuppressWarnings("unchecked")
+    public List<MappedOidcGroup> getMappedOidcGroups(final String group) {
+        final Query query = pm.newQuery(MappedOidcGroup.class, "group == :group");
+        return (List<MappedOidcGroup>) query.execute(group);
     }
 
     /**
