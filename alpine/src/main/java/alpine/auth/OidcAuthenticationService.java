@@ -78,6 +78,10 @@ public class OidcAuthenticationService implements AuthenticationService {
             final OidcUser user = qm.getOidcUser(username);
             if (user != null) {
                 LOGGER.debug("Attempting to authenticate user: " + username);
+                if (config.getPropertyAsBoolean(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION) &&
+                        config.getPropertyAsBoolean(Config.AlpineKey.OIDC_ALWAYS_SYNC_TEAMS)) {
+                    return synchronizeTeams(qm, user, userInfo);
+                }
                 return user;
             } else if (config.getPropertyAsBoolean(Config.AlpineKey.OIDC_USER_PROVISIONING)) {
                 LOGGER.debug("The user (" + username + ") authenticated successfully but the account has not been provisioned");

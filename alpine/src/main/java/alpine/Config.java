@@ -136,6 +136,7 @@ public class Config {
         OIDC_USERNAME_CLAIM       ("alpine.oidc.username.claim",       "sub"),
         OIDC_USER_PROVISIONING    ("alpine.oidc.user.provisioning",    false),
         OIDC_TEAM_SYNCHRONIZATION ("alpine.oidc.team.synchronization", false),
+        OIDC_ALWAYS_SYNC_TEAMS    ("alpine.oidc.always.sync.teams",    false),
         OIDC_TEAMS_CLAIM          ("alpine.oidc.teams.claim",       "groups"),
         HTTP_PROXY_ADDRESS        ("alpine.http.proxy.address",         null),
         HTTP_PROXY_PORT           ("alpine.http.proxy.port",            null),

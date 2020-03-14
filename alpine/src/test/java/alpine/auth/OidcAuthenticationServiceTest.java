@@ -1,7 +1,9 @@
 package alpine.auth;
 
 import alpine.Config;
+import alpine.model.MappedOidcGroup;
 import alpine.model.OidcUser;
+import alpine.model.Team;
 import alpine.persistence.AlpineQueryManager;
 import alpine.persistence.PersistenceManagerFactory;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
@@ -64,6 +66,14 @@ public class OidcAuthenticationServiceTest {
         final List<OidcUser> users = (List<OidcUser>) persistenceManager.newQuery(OidcUser.class).execute();
         if (users != null) {
             persistenceManager.deletePersistentAll(users);
+        }
+        final List<MappedOidcGroup> mappedGroups = (List<MappedOidcGroup>) persistenceManager.newQuery(MappedOidcGroup.class).execute();
+        if (mappedGroups != null) {
+            persistenceManager.deletePersistentAll(mappedGroups);
+        }
+        final List<Team> teams = (List<Team>) persistenceManager.newQuery(Team.class).execute();
+        if (teams != null) {
+            persistenceManager.deletePersistentAll(teams);
         }
     }
 
@@ -201,6 +211,54 @@ public class OidcAuthenticationServiceTest {
         assertThat(authenticatedUser.getUsername()).isEqualTo(existingUser.getUsername());
         assertThat(authenticatedUser.getSubjectIdentifier()).isEqualTo(existingUser.getSubjectIdentifier());
         assertThat(authenticatedUser.getEmail()).isEqualTo(existingUser.getEmail());
+        assertThat(authenticatedUser.getTeams()).isNullOrEmpty();
+        assertThat(authenticatedUser.getPermissions()).isNullOrEmpty();
+    }
+
+    @Test
+    public void authenticateShouldSynchronizeTeamsWhenUserAlreadyExistsAndAlwaysSyncTeamsIsEnabled() throws AlpineAuthenticationException {
+        when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION)))
+                .thenReturn(true);
+        when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_ALWAYS_SYNC_TEAMS)))
+                .thenReturn(true);
+        when(configMock.getProperty(eq(Config.AlpineKey.OIDC_TEAMS_CLAIM)))
+                .thenReturn("groups");
+
+        wireMockRule.stubFor(get(urlPathEqualTo(OIDC_USERINFO_PATH))
+                .willReturn(aResponse()
+                        .withStatus(HttpStatus.SC_OK)
+                        .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+                        .withBody("" +
+                                "{" +
+                                "    \"sub\": \"subject\", " +
+                                "    \"email\": \"subject@mail.local\", " +
+                                "    \"" + USERNAMCE_CLAIM + "\": \"username\", " +
+                                "    \"groups\": [\"groupName\"]" +
+                                "}")));
+
+        Team teamToSync;
+        try (final AlpineQueryManager qm = new AlpineQueryManager()) {
+            final OidcUser existingUser = new OidcUser();
+            existingUser.setUsername("username");
+            existingUser.setSubjectIdentifier("subject");
+            existingUser.setEmail("subject@mail.local");
+            qm.persist(existingUser);
+
+            teamToSync = new Team();
+            teamToSync.setName("teamName");
+            teamToSync = qm.persist(teamToSync);
+
+            MappedOidcGroup mappedGroup = new MappedOidcGroup();
+            mappedGroup.setGroupName("groupName");
+            mappedGroup.setTeam(teamToSync);
+            qm.persist(mappedGroup);
+        }
+
+        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN);
+
+        final OidcUser authenticatedUser = (OidcUser) authService.authenticate();
+        assertThat(authenticatedUser.getTeams()).hasSize(1);
+        assertThat(authenticatedUser.getTeams().get(0).getName()).isEqualTo("teamName");
     }
 
     @Test
@@ -250,6 +308,8 @@ public class OidcAuthenticationServiceTest {
         assertThat(provisionedUser.getUsername()).isEqualTo("username");
         assertThat(provisionedUser.getSubjectIdentifier()).isEqualTo("subject");
         assertThat(provisionedUser.getEmail()).isEqualTo("subject@mail.local");
+        assertThat(provisionedUser.getTeams()).isNullOrEmpty();
+        assertThat(provisionedUser.getPermissions()).isNullOrEmpty();
     }
 
 }
