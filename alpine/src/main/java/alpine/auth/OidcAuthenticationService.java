@@ -4,6 +4,7 @@ import alpine.Config;
 import alpine.logging.Logger;
 import alpine.model.OidcUser;
 import alpine.persistence.AlpineQueryManager;
+import alpine.util.OidcUtil;
 
 import javax.annotation.Nullable;
 import javax.ws.rs.ProcessingException;
@@ -40,9 +41,7 @@ public class OidcAuthenticationService implements AuthenticationService {
 
     @Override
     public boolean isSpecified() {
-        return config.getPropertyAsBoolean(Config.AlpineKey.OIDC_ENABLED)
-                && oidcConfiguration != null
-                && accessToken != null;
+        return OidcUtil.isOidcAvailable(config, oidcConfiguration) && accessToken != null;
     }
 
     @Nullable
