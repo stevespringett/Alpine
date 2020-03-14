@@ -111,7 +111,7 @@ public class Team implements Serializable {
     private List<MappedLdapGroup> mappedLdapGroups;
 
     @Persistent(mappedBy = "team")
-    @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "group ASC"))
+    @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "groupName ASC"))
     private List<MappedOidcGroup> mappedOidcGroups;
 
     @Persistent(table = "TEAMS_PERMISSIONS", defaultFetchGroup = "true")

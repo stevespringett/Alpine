@@ -71,6 +71,11 @@ public class Permission implements Serializable {
     @Persistent(mappedBy = "permissions")
     @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "username ASC"))
     @JsonIgnore
+    private List<OidcUser> oidcUsers;
+
+    @Persistent(mappedBy = "permissions")
+    @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "username ASC"))
+    @JsonIgnore
     private List<LdapUser> ldapUsers;
 
     @Persistent(mappedBy = "permissions")
@@ -108,6 +113,14 @@ public class Permission implements Serializable {
 
     public void setTeams(List<Team> teams) {
         this.teams = teams;
+    }
+
+    public List<OidcUser> getOidcUsers() {
+        return oidcUsers;
+    }
+
+    public void setOidcUsers(List<OidcUser> oidcUsers) {
+        this.oidcUsers = oidcUsers;
     }
 
     public List<LdapUser> getLdapUsers() {

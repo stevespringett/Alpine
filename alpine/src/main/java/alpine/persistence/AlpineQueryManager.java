@@ -384,18 +384,22 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
 
     /**
      * Resolves a UserPrincipal. Default order resolution is to first match
-     * on ManagedUser then on LdapUser. This may be configurable in a future
-     * release.
+     * on ManagedUser then on LdapUser and finally on OidcUser. This may be
+     * configurable in a future release.
      * @param username the username of the principal to retrieve
      * @return a UserPrincipal if found, null if not found
      * @since 1.0.0
      */
     public UserPrincipal getUserPrincipal(String username) {
-        final UserPrincipal principal = getManagedUser(username);
+        UserPrincipal principal = getManagedUser(username);
         if (principal != null) {
             return principal;
         }
-        return getLdapUser(username);
+        principal = getLdapUser(username);
+        if (principal != null) {
+            return principal;
+        }
+        return getOidcUser(username);
     }
 
     /**

@@ -1,6 +1,7 @@
 package alpine.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.Element;
@@ -23,6 +24,7 @@ import java.util.List;
  * @since 1.8.0
  */
 @PersistenceCapable
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class OidcUser implements Serializable, Principal, UserPrincipal {
 
     @PrimaryKey

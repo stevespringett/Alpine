@@ -21,6 +21,7 @@ package alpine.auth;
 import alpine.crypto.KeyManager;
 import alpine.model.LdapUser;
 import alpine.model.ManagedUser;
+import alpine.model.OidcUser;
 import alpine.persistence.AlpineQueryManager;
 import org.glassfish.jersey.server.ContainerRequest;
 import javax.naming.AuthenticationException;
@@ -77,6 +78,10 @@ public class JwtAuthenticationService implements AuthenticationService {
                     final LdapUser ldapUser =  qm.getLdapUser(jwt.getSubject());
                     if (ldapUser != null) {
                         return ldapUser;
+                    }
+                    final OidcUser oidcUser = qm.getOidcUser(jwt.getSubject());
+                    if (oidcUser != null) {
+                        return oidcUser;
                     }
                 }
             }
