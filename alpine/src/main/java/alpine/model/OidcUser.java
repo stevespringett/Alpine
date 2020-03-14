@@ -40,6 +40,13 @@ public class OidcUser implements Serializable, Principal, UserPrincipal {
     @Pattern(regexp = "[\\P{Cc}]+", message = "The username must not contain control characters")
     private String username;
 
+    @Persistent
+    @Column(name = "SUBJECT_IDENTIFIER", allowsNull = "false")
+    @NotBlank
+    @Size(min = 1, max = 255)
+    @Pattern(regexp = "[\\P{Cc}]+", message = "The subject identifier must not contain control characters")
+    private String subjectIdentifier;
+
     @Size(max = 255)
     @Pattern(regexp = "[\\P{Cc}]+", message = "The email address must not contain control characters")
     private String email;
@@ -74,6 +81,14 @@ public class OidcUser implements Serializable, Principal, UserPrincipal {
     @Override
     public void setUsername(final String username) {
         this.username = username;
+    }
+
+    public String getSubjectIdentifier() {
+        return subjectIdentifier;
+    }
+
+    public void setSubjectIdentifier(final String subjectIdentifier) {
+        this.subjectIdentifier = subjectIdentifier;
     }
 
     @Override

@@ -93,6 +93,7 @@ public class OidcAuthenticationService implements AuthenticationService {
     private OidcUser autoProvision(final AlpineQueryManager qm, final String username, final OidcUserInfo userInfo) {
         OidcUser user = new OidcUser();
         user.setUsername(username);
+        user.setSubjectIdentifier(userInfo.getSubject());
         user.setEmail(userInfo.getEmail());
         user = qm.persist(user);
 

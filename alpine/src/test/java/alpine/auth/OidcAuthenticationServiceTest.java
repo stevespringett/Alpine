@@ -190,6 +190,7 @@ public class OidcAuthenticationServiceTest {
         try (final AlpineQueryManager qm = new AlpineQueryManager()) {
             existingUser = new OidcUser();
             existingUser.setUsername("username");
+            existingUser.setSubjectIdentifier("subject");
             existingUser.setEmail("subject@mail.local");
             existingUser = qm.persist(existingUser);
         }
@@ -198,6 +199,7 @@ public class OidcAuthenticationServiceTest {
         assertThat(authenticatedUser).isNotNull();
         assertThat(authenticatedUser.getId()).isEqualTo(existingUser.getId());
         assertThat(authenticatedUser.getUsername()).isEqualTo(existingUser.getUsername());
+        assertThat(authenticatedUser.getSubjectIdentifier()).isEqualTo(existingUser.getSubjectIdentifier());
         assertThat(authenticatedUser.getEmail()).isEqualTo(existingUser.getEmail());
     }
 
@@ -246,6 +248,7 @@ public class OidcAuthenticationServiceTest {
         final OidcUser provisionedUser = (OidcUser) authService.authenticate();
         assertThat(provisionedUser).isNotNull();
         assertThat(provisionedUser.getUsername()).isEqualTo("username");
+        assertThat(provisionedUser.getSubjectIdentifier()).isEqualTo("subject");
         assertThat(provisionedUser.getEmail()).isEqualTo("subject@mail.local");
     }
 
