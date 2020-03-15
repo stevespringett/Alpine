@@ -21,6 +21,8 @@ import java.security.Principal;
 import java.util.List;
 
 /**
+ * Persistable object representing an OpenID Connect user.
+ *
  * @since 1.8.0
  */
 @PersistenceCapable

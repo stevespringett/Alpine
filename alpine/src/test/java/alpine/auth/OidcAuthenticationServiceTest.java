@@ -2,6 +2,7 @@ package alpine.auth;
 
 import alpine.Config;
 import alpine.model.MappedOidcGroup;
+import alpine.model.OidcGroup;
 import alpine.model.OidcUser;
 import alpine.model.Team;
 import alpine.persistence.AlpineQueryManager;
@@ -244,12 +245,16 @@ public class OidcAuthenticationServiceTest {
             existingUser.setEmail("subject@mail.local");
             qm.persist(existingUser);
 
+            OidcGroup group = new OidcGroup();
+            group.setName("groupName");
+            group = qm.persist(group);
+
             teamToSync = new Team();
             teamToSync.setName("teamName");
             teamToSync = qm.persist(teamToSync);
 
             MappedOidcGroup mappedGroup = new MappedOidcGroup();
-            mappedGroup.setGroupName("groupName");
+            mappedGroup.setGroup(group);
             mappedGroup.setTeam(teamToSync);
             qm.persist(mappedGroup);
         }

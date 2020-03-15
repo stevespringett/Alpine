@@ -31,6 +31,7 @@ import alpine.model.LdapUser;
 import alpine.model.ManagedUser;
 import alpine.model.MappedLdapGroup;
 import alpine.model.MappedOidcGroup;
+import alpine.model.OidcGroup;
 import alpine.model.OidcUser;
 import alpine.model.Permission;
 import alpine.model.Team;
@@ -131,6 +132,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @return an OidcUser
      * @since 1.8.0
      */
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public OidcUser getOidcUser(final String username) {
         final Query query = pm.newQuery(OidcUser.class, "username == :username");
         final List<OidcUser> result = (List<OidcUser>) query.execute(username);
@@ -142,7 +144,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @return a list of OidcUser
      * @since 1.8.0
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public List<OidcUser> getOidcUsers() {
         final Query query = pm.newQuery(OidcUser.class);
         query.setOrdering("username asc");
@@ -152,8 +154,40 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     /**
      * @since 1.8.0
      */
-    public OidcUser synchronizeTeamMembership(final OidcUser user, final List<String> groups) {
-        LOGGER.debug("Synchronizing team membership for " + user.getUsername());
+    public OidcGroup createOidcGroup(final String name) {
+        pm.currentTransaction().begin();
+        final OidcGroup group = new OidcGroup();
+        group.setName(name);
+        pm.makePersistent(group);
+        pm.currentTransaction().commit();
+        return getObjectByUuid(OidcGroup.class, group.getUuid());
+    }
+
+    /**
+     * @since 1.8.0
+     */
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public List<OidcGroup> getOidcGroups() {
+        final Query query = pm.newQuery(OidcGroup.class);
+        query.setOrdering("name asc");
+        return (List<OidcGroup>) query.execute();
+    }
+
+    /**
+     * @since 1.8.0
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public OidcGroup getOidcGroup(final String name) {
+        final Query query = pm.newQuery(OidcGroup.class, "name == :name");
+        final List<OidcGroup> result = (List<OidcGroup>) query.execute(name);
+        return Collections.isEmpty(result) ? null : result.get(0);
+    }
+
+    /**
+     * @since 1.8.0
+     */
+    public OidcUser synchronizeTeamMembership(final OidcUser user, final List<String> groupNames) {
+        LOGGER.debug("Synchronizing team membership for OpenID Connect user " + user.getUsername());
         final List<Team> removeThese = new ArrayList<>();
 
         if (user.getTeams() != null) {
@@ -161,25 +195,31 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
                 LOGGER.debug(user.getUsername() + " is a member of team: " + team.getName());
                 if (team.getMappedOidcGroups() != null) {
                     for (final MappedOidcGroup mappedOidcGroup : team.getMappedOidcGroups()) {
-                        LOGGER.debug(mappedOidcGroup.getGroupName() + " is mapped to team: " + team.getName());
-                        if (!groups.contains(mappedOidcGroup.getGroupName())) {
-                            LOGGER.debug(mappedOidcGroup.getGroupName() + " is not identified in the List of groups specified. Queuing removal of membership for user " + user.getUsername());
+                        LOGGER.debug(mappedOidcGroup.getGroup().getName() + " is mapped to team: " + team.getName());
+                        if (!groupNames.contains(mappedOidcGroup.getGroup().getName())) {
+                            LOGGER.debug(mappedOidcGroup.getGroup().getName() + " is not identified in the List of groups specified. Queuing removal of membership for user " + user.getUsername());
                             removeThese.add(team);
                         }
                     }
                 } else {
-                    LOGGER.debug(team.getName() + " does not have any mapped OIDC groups. Queuing removal of " + user.getUsername() + " from team: " + team.getName());
+                    LOGGER.debug(team.getName() + " does not have any mapped OpenID Connect groups. Queuing removal of " + user.getUsername() + " from team: " + team.getName());
                     removeThese.add(team);
                 }
             }
         }
 
-        for (final Team team: removeThese) {
+        for (final Team team : removeThese) {
             LOGGER.debug("Removing user: " + user.getUsername() + " from team: " + team.getName());
             removeUserFromTeam(user, team);
         }
 
-        for (final String group : groups) {
+        for (final String groupName : groupNames) {
+            final OidcGroup group = getOidcGroup(groupName);
+            if (group == null) {
+                LOGGER.debug("Unknown OpenID Connect group " + groupName);
+                continue;
+            }
+
             for (final MappedOidcGroup mappedOidcGroup : getMappedOidcGroups(group)) {
                 LOGGER.debug("Adding user: " + user.getUsername() + " to team: " + mappedOidcGroup.getTeam());
                 addUserToTeam(user, mappedOidcGroup.getTeam());
@@ -722,15 +762,15 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     /**
      * Creates a MappedOidcGroup object.
      * @param team The team to map
-     * @param groupName The name of the OIDC group to map
+     * @param group The OIDC group to map
      * @return a MappedOidcGroup
      * @since 1.8.0
      */
-    public MappedOidcGroup createMappedOidcGroup(final Team team, final String groupName) {
+    public MappedOidcGroup createMappedOidcGroup(final Team team, final OidcGroup group) {
         pm.currentTransaction().begin();
         final MappedOidcGroup mapping = new MappedOidcGroup();
         mapping.setTeam(team);
-        mapping.setGroupName(groupName);
+        mapping.setGroup(group);
         pm.makePersistent(mapping);
         pm.currentTransaction().commit();
         return getObjectById(MappedOidcGroup.class, mapping.getId());
@@ -739,14 +779,14 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     /**
      * Retrieves a MappedOidcGroup object for the specified Team and OIDC group.
      * @param team a Team object
-     * @param groupName Name of the OIDC group
+     * @param group a OidcGroup object
      * @return a MappedOidcGroup if found, or null if no mapping exists
      * @since 1.8.0
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public MappedOidcGroup getMappedOidcGroup(final Team team, final String groupName) {
-        final Query query = pm.newQuery(MappedOidcGroup.class, "team == :team && groupName == :groupName");
-        final List<MappedOidcGroup> result = (List<MappedOidcGroup>) query.execute(team, groupName);
+    public MappedOidcGroup getMappedOidcGroup(final Team team, final OidcGroup group) {
+        final Query query = pm.newQuery(MappedOidcGroup.class, "team == :team && group == :group");
+        final List<MappedOidcGroup> result = (List<MappedOidcGroup>) query.execute(team, group);
         return Collections.isEmpty(result) ? null : result.get(0);
     }
 
@@ -766,19 +806,19 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @since 1.8.0
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<MappedOidcGroup> getMappedOidcGroups(final String groupName) {
-        final Query query = pm.newQuery(MappedOidcGroup.class, "groupName == :groupName");
-        return (List<MappedOidcGroup>) query.execute(groupName);
+    public List<MappedOidcGroup> getMappedOidcGroups(final OidcGroup group) {
+        final Query query = pm.newQuery(MappedOidcGroup.class, "group == :group");
+        return (List<MappedOidcGroup>) query.execute(group);
     }
 
     /**
      * Determines if the specified Team is mapped to the specified OIDC group.
      * @param team a Team object
-     * @param group a String representation of Distinguished Name
+     * @param group a OidcGroup object
      * @return true if a mapping exists, false if not
      * @since 1.8.0
      */
-    public boolean isOidcGroupMapped(final Team team, final String group) {
+    public boolean isOidcGroupMapped(final Team team, final OidcGroup group) {
         return getMappedOidcGroup(team, group) != null;
     }
 
