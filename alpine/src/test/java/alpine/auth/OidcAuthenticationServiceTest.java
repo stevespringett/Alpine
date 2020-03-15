@@ -72,6 +72,10 @@ public class OidcAuthenticationServiceTest {
         if (mappedGroups != null) {
             persistenceManager.deletePersistentAll(mappedGroups);
         }
+        final List<OidcGroup> groups = (List<OidcGroup>) persistenceManager.newQuery(OidcGroup.class).execute();
+        if (users != null) {
+            persistenceManager.deletePersistentAll(groups);
+        }
         final List<Team> teams = (List<Team>) persistenceManager.newQuery(Team.class).execute();
         if (teams != null) {
             persistenceManager.deletePersistentAll(teams);
