@@ -34,7 +34,6 @@ public class MappedOidcGroup {
 
     @Persistent(defaultFetchGroup = "true")
     @Column(name = "GROUP_ID")
-    @JsonIgnore
     private OidcGroup group;
 
     @Persistent(customValueStrategy = "uuid")
