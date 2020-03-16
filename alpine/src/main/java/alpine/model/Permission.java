@@ -20,6 +20,8 @@ package alpine.model;
 
 import alpine.validation.RegexSequence;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.Extension;
 import javax.jdo.annotations.IdGeneratorStrategy;
@@ -42,6 +44,7 @@ import java.util.List;
  * @since 1.0.0
  */
 @PersistenceCapable
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Permission implements Serializable {
 
     private static final long serialVersionUID = 1420020753285692448L;
