@@ -23,7 +23,6 @@ import alpine.auth.JwtAuthenticationService;
 import alpine.logging.Logger;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.owasp.security.logging.SecurityMarkers;
-
 import javax.annotation.Priority;
 import javax.naming.AuthenticationException;
 import javax.ws.rs.HttpMethod;
@@ -37,8 +36,8 @@ import java.security.Principal;
  * A filter that ensures that all calls going through this filter are
  * authenticated. Exceptions are made for swagger URLs.
  *
- * @author Steve Springett
  * @see AuthenticationFeature
+ * @author Steve Springett
  * @since 1.0.0
  */
 @Priority(Priorities.AUTHENTICATION)
