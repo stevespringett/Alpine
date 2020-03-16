@@ -207,21 +207,13 @@
                     <version>${maven.cyclonedx.plugin.version}</version>
                     <executions>
                         <execution>
-                            <id>cyclonedx-aggregate</id>
+                            <id>cyclonedx</id>
                             <phase>package</phase>
                             <goals>
-                                <goal>makeAggregateBom</goal>
+                                <goal>makeBom</goal>
                             </goals>
                         </execution>
                     </executions>
-                    <configuration>
-                        <includeCompileScope>${plugin.cyclonedx.includeCompileScope}</includeCompileScope>
-                        <includeProvidedScope>${plugin.cyclonedx.includeProvidedScope}</includeProvidedScope>
-                        <includeRuntimeScope>${plugin.cyclonedx.includeRuntimeScope}</includeRuntimeScope>
-                        <includeSystemScope>${plugin.cyclonedx.includeSystemScope}</includeSystemScope>
-                        <includeTestScope>${plugin.cyclonedx.includeTestScope}</includeTestScope>
-                        <includeDependencyGraph>${plugin.cyclonedx.includeDependencyGraph}</includeDependencyGraph>
-                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
