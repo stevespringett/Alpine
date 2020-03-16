@@ -69,8 +69,8 @@
     </issueManagement>
 
     <ciManagement>
-        <system>travis-ci</system>
-        <url>https://travis-ci.org/stevespringett/Alpine</url>
+        <system>GitHub-Actions</system>
+        <url>https://github.com/stevespringett/Alpine/actions</url>
     </ciManagement>
 
     <distributionManagement>
