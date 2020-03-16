@@ -127,8 +127,9 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     }
 
     /**
-     *
-     * @param username Name of the user to retrieve
+     * Retrieves an OidcUser containing the specified username. If the username
+     * does not exist, returns null.
+     * @param username The username to retrieve
      * @return an OidcUser
      * @since 1.8.0
      */
@@ -152,6 +153,8 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     }
 
     /**
+     * Creates a OidcGroup.
+     * @param name Name of the group to create
      * @since 1.8.0
      */
     public OidcGroup createOidcGroup(final String name) {
@@ -164,6 +167,8 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     }
 
     /**
+     * Returns a complete list of all OidcGroup objects, in ascending order by name.
+     * @return a list of OidcGroup
      * @since 1.8.0
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
@@ -174,6 +179,9 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     }
 
     /**
+     * Returns an OidcGroup containing the specified name. If the name
+     * does not exist, returns null.
+     * @param name Name of the group to retrieve
      * @since 1.8.0
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -184,6 +192,13 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     }
 
     /**
+     * This method dynamically assigns team membership to the specified user from
+     * the list of OpenID Connect groups the user is a member of. The method will look
+     * up any {@link MappedOidcGroup}s and ensure the user is only a member of the
+     * teams that have a mapping to an OpenID Connect group for which the user is a member.
+     * @param user the OpenID Connect user to sync team membership for
+     * @param groupNames a list of OpenID Connect groups the user is a member of
+     * @return a refreshed OidcUser object
      * @since 1.8.0
      */
     public OidcUser synchronizeTeamMembership(final OidcUser user, final List<String> groupNames) {
@@ -792,7 +807,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
 
     /**
      * Retrieves a List of MappedOidcGroup objects for the specified Team.
-     * @param team a Team object
+     * @param team The team to retrieve mappings for
      * @return a List of MappedOidcGroup objects
      * @since 1.8.0
      */
@@ -803,6 +818,9 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     }
 
     /**
+     * Retrieves a List of MappedOidcGroup objects for the specified group.
+     * @param group The group to retrieve mappings for
+     * @return a List of MappedOidcGroup objects
      * @since 1.8.0
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -812,7 +830,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     }
 
     /**
-     * Determines if the specified Team is mapped to the specified OIDC group.
+     * Determines if the specified Team is mapped to the specified OpenID Connect group.
      * @param team a Team object
      * @param group a OidcGroup object
      * @return true if a mapping exists, false if not
