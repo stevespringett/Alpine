@@ -69,8 +69,8 @@
     </issueManagement>
 
     <ciManagement>
-        <system>travis-ci</system>
-        <url>https://travis-ci.org/stevespringett/Alpine</url>
+        <system>GitHub-Actions</system>
+        <url>https://github.com/stevespringett/Alpine/actions</url>
     </ciManagement>
 
     <distributionManagement>
@@ -95,8 +95,8 @@
 
         <!-- Maven Plugin Versions -->
         <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
-        <maven.dependency.plugin.version>3.1.1</maven.dependency.plugin.version>
-        <maven.javadoc.plugin.version>3.1.1</maven.javadoc.plugin.version>
+        <maven.dependency.plugin.version>3.1.2</maven.dependency.plugin.version>
+        <maven.javadoc.plugin.version>3.2.0</maven.javadoc.plugin.version>
         <maven.site.plugin.version>3.7.1</maven.site.plugin.version>
         <maven.source.plugin.version>3.2.1</maven.source.plugin.version>
         <maven.surefire.plugin.version>2.22.2</maven.surefire.plugin.version>
@@ -146,28 +146,28 @@
         <plugin.cyclonedx.includeDependencyGraph>true</plugin.cyclonedx.includeDependencyGraph>
 
         <!-- Dependency Versions -->
-        <lib.alpine.executable.war.version>1.2.2</lib.alpine.executable.war.version>
+        <lib.alpine.executable.war.version>1.2.3</lib.alpine.executable.war.version>
         <lib.bcrypt.version>0.4</lib.bcrypt.version>
-        <lib.caffeine.version>2.8.0</lib.caffeine.version>
+        <lib.caffeine.version>2.8.1</lib.caffeine.version>
         <lib.commons.collections4.version>4.4</lib.commons.collections4.version>
         <lib.commons.io.version>2.6</lib.commons.io.version>
         <lib.commons.lang3.version>3.9</lib.commons.lang3.version>
-        <lib.datanucleus-api-jdo.version>5.2.2</lib.datanucleus-api-jdo.version>
+        <lib.datanucleus-api-jdo.version>5.2.3</lib.datanucleus-api-jdo.version>
         <!-- Auto-generated classes have warnings which break build
              https://github.com/datanucleus/datanucleus-jdo-query/pull/10
         <lib.datanucleus-jdo-query.version>5.0.6</lib.datanucleus-jdo-query.version>
         -->
-        <lib.datanucleus.version>5.2.1</lib.datanucleus.version>
+        <lib.datanucleus.version>5.2.2</lib.datanucleus.version>
         <lib.h2.version>1.4.200</lib.h2.version>
-        <lib.hikaricp.version>3.3.1</lib.hikaricp.version>
+        <lib.hikaricp.version>3.4.2</lib.hikaricp.version>
         <lib.javassist.version>3.26.0-GA</lib.javassist.version>
-        <lib.jackson.version>2.10.2</lib.jackson.version>
+        <lib.jackson.version>2.10.3</lib.jackson.version>
         <lib.javamail.version>1.6.2</lib.javamail.version>
         <lib.jaxb.api.version>2.3.1</lib.jaxb.api.version>
         <lib.jaxb.core.version>2.3.0.1</lib.jaxb.core.version>
         <lib.jaxb.impl.version>2.3.2</lib.jaxb.impl.version>
-        <lib.jdo.api.version>3.2.0-m12</lib.jdo.api.version>
-        <lib.jersey.version>2.29.1</lib.jersey.version>
+        <lib.jdo.api.version>3.2.0-m13</lib.jdo.api.version>
+        <lib.jersey.version>2.30.1</lib.jersey.version>
         <lib.jsp.api.version>2.2</lib.jsp.api.version>
         <lib.jsonwebtoken.version>0.9.1</lib.jsonwebtoken.version>
         <lib.jsr305.version>3.0.2</lib.jsr305.version>
@@ -181,9 +181,10 @@
         <lib.swagger.jersey.version>1.6.0</lib.swagger.jersey.version>
         <!-- Unit test libraries -->
         <lib.junit.version>4.13</lib.junit.version>
-        <lib.mockito.version>3.2.4</lib.mockito.version>
+        <lib.mockito.version>3.3.3</lib.mockito.version>
         <lib.assertj.version>3.15.0</lib.assertj.version>
         <lib.wiremock.version>2.26.0</lib.wiremock.version>
+        <lib.mockito.version>3.3.3</lib.mockito.version>
 
         <!-- Logback configuration - Used for Embedded Jetty profile -->
         <logback.configuration.file>${project.build.directory}/classes/logback.xml</logback.configuration.file>

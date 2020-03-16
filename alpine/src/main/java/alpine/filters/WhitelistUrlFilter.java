@@ -28,6 +28,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * WhitelistUrlFilter is a configurable Servlet Filter that can prevent access to
@@ -68,6 +69,7 @@ import java.io.IOException;
 public final class WhitelistUrlFilter implements Filter {
 
     private String[] allowUrls = {};
+    private String[] forwardExcludes = {};
     private String forwardTo = null;
 
     /**
@@ -81,6 +83,11 @@ public final class WhitelistUrlFilter implements Filter {
         final String allowParam = filterConfig.getInitParameter("allowUrls");
         if (StringUtils.isNotBlank(allowParam)) {
             this.allowUrls = allowParam.split(",");
+        }
+
+        final String forwardExcludesParam = filterConfig.getInitParameter("forwardExcludes");
+        if (StringUtils.isNotBlank(forwardExcludesParam)) {
+            this.forwardExcludes = forwardExcludesParam.split(",");
         }
 
         final String forwardToParam = filterConfig.getInitParameter("forwardTo");
@@ -120,6 +127,18 @@ public final class WhitelistUrlFilter implements Filter {
             }
             if (!allowed) {
                 if (forwardTo != null) {
+                    for (final String url: allowUrls) {
+                        if (forwardExcludes != null && Arrays.stream(forwardExcludes).anyMatch(url::equals)) {
+                            break;
+                        }
+                        final int occurrence = requestUrlExcludingContext.indexOf(url);
+                        if (occurrence > -1) {
+                            final String queryString = (req.getQueryString() == null) ? "" : "?" + req.getQueryString();
+                            final String resourceUrl = requestUrlExcludingContext.substring(occurrence) + queryString;
+                            req.getRequestDispatcher(resourceUrl).forward(request, response);
+                            return;
+                        }
+                    }
                     req.getRequestDispatcher(forwardTo).forward(request, response);
                 } else {
                     res.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -128,6 +147,10 @@ public final class WhitelistUrlFilter implements Filter {
             }
         }
         chain.doFilter(request, response);
+    }
+
+    private boolean isExcludedForwardPath(String url) {
+        return Arrays.stream(forwardExcludes).anyMatch(url::equals);
     }
 
 
