@@ -62,8 +62,8 @@
     </issueManagement>
 
     <ciManagement>
-        <system>travis-ci</system>
-        <url>https://travis-ci.org/stevespringett/Alpine</url>
+        <system>GitHub-Actions</system>
+        <url>https://github.com/stevespringett/Alpine/actions</url>
     </ciManagement>
 
     <distributionManagement>
@@ -95,8 +95,17 @@
 
         <!-- Dependency Versions -->
         <lib.slf4j.version>1.7.30</lib.slf4j.version>
-        <lib.jetty.version>9.4.24.v20191120</lib.jetty.version>
+        <lib.jetty.version>9.4.27.v20200227</lib.jetty.version>
         <lib.logback.version>1.2.3</lib.logback.version>
+
+        <!-- CycloneDX SBOM Creation -->
+        <maven.cyclonedx.plugin.version>1.6.4</maven.cyclonedx.plugin.version>
+        <plugin.cyclonedx.includeCompileScope>true</plugin.cyclonedx.includeCompileScope>
+        <plugin.cyclonedx.includeProvidedScope>true</plugin.cyclonedx.includeProvidedScope>
+        <plugin.cyclonedx.includeRuntimeScope>true</plugin.cyclonedx.includeRuntimeScope>
+        <plugin.cyclonedx.includeSystemScope>true</plugin.cyclonedx.includeSystemScope>
+        <plugin.cyclonedx.includeTestScope>false</plugin.cyclonedx.includeTestScope>
+        <plugin.cyclonedx.includeDependencyGraph>true</plugin.cyclonedx.includeDependencyGraph>
     </properties>
 
     <dependencies>
@@ -191,6 +200,28 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>${maven.javadoc.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.cyclonedx</groupId>
+                    <artifactId>cyclonedx-maven-plugin</artifactId>
+                    <version>${maven.cyclonedx.plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>cyclonedx-aggregate</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>makeAggregateBom</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <includeCompileScope>${plugin.cyclonedx.includeCompileScope}</includeCompileScope>
+                        <includeProvidedScope>${plugin.cyclonedx.includeProvidedScope}</includeProvidedScope>
+                        <includeRuntimeScope>${plugin.cyclonedx.includeRuntimeScope}</includeRuntimeScope>
+                        <includeSystemScope>${plugin.cyclonedx.includeSystemScope}</includeSystemScope>
+                        <includeTestScope>${plugin.cyclonedx.includeTestScope}</includeTestScope>
+                        <includeDependencyGraph>${plugin.cyclonedx.includeDependencyGraph}</includeDependencyGraph>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
