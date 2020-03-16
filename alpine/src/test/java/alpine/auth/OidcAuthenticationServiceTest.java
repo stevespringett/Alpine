@@ -18,6 +18,7 @@ import wiremock.org.apache.http.HttpStatus;
 import wiremock.org.apache.http.entity.ContentType;
 
 import javax.jdo.PersistenceManager;
+import java.util.Collections;
 import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -319,6 +320,129 @@ public class OidcAuthenticationServiceTest {
         assertThat(provisionedUser.getEmail()).isEqualTo("subject@mail.local");
         assertThat(provisionedUser.getTeams()).isNullOrEmpty();
         assertThat(provisionedUser.getPermissions()).isNullOrEmpty();
+    }
+
+    @Test
+    public void synchronizeTeamsShouldReturnUserWhenNoTeamsClaimWasConfigured() {
+        when(configMock.getProperty(eq(Config.AlpineKey.OIDC_TEAMS_CLAIM)))
+                .thenReturn(null);
+
+        final OidcUser oidcUser = new OidcUser();
+
+        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN);
+
+        assertThat(authService.synchronizeTeams(null, oidcUser, null)).isEqualTo(oidcUser);
+    }
+
+    @Test
+    public void synchronizeTeamsShouldReturnUserWhenTeamsClaimIsNotAList() {
+        when(configMock.getProperty(eq(Config.AlpineKey.OIDC_TEAMS_CLAIM)))
+                .thenReturn("teams");
+
+        final OidcUserInfo userInfo = new OidcUserInfo();
+        userInfo.setClaim("teams", "not-a-list");
+
+        final OidcUser oidcUser = new OidcUser();
+
+        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN);
+
+        assertThat(authService.synchronizeTeams(null, oidcUser, userInfo)).isEqualTo(oidcUser);
+    }
+
+    @Test
+    public void synchronizeTeamsShouldAddNewTeamMemberships() {
+        when(configMock.getProperty(eq(Config.AlpineKey.OIDC_TEAMS_CLAIM)))
+                .thenReturn("teams");
+
+        final OidcUserInfo userInfo = new OidcUserInfo();
+        userInfo.setClaim("teams", Collections.singletonList("groupName"));
+
+        try (final AlpineQueryManager qm = new AlpineQueryManager()) {
+            OidcUser oidcUser = new OidcUser();
+            oidcUser.setUsername("username");
+            oidcUser.setSubjectIdentifier("subject");
+            oidcUser = qm.persist(oidcUser);
+
+            OidcGroup group = new OidcGroup();
+            group.setName("groupName");
+            group = qm.persist(group);
+
+            Team team = new Team();
+            team.setName("teamName");
+            team = qm.persist(team);
+
+            final MappedOidcGroup mappedGroup = new MappedOidcGroup();
+            mappedGroup.setGroup(group);
+            mappedGroup.setTeam(team);
+            qm.persist(mappedGroup);
+
+            final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN);
+
+            oidcUser = authService.synchronizeTeams(qm, oidcUser, userInfo);
+            assertThat(oidcUser.getTeams()).hasSize(1);
+            assertThat(oidcUser.getTeams().get(0).getName()).isEqualTo("teamName");
+        }
+    }
+
+    @Test
+    public void synchronizeTeamsShouldRemoveOutdatedTeamMemberships() {
+        when(configMock.getProperty(eq(Config.AlpineKey.OIDC_TEAMS_CLAIM)))
+                .thenReturn("teams");
+
+        final OidcUserInfo userInfo = new OidcUserInfo();
+        userInfo.setClaim("teams", Collections.emptyList());
+
+        try (final AlpineQueryManager qm = new AlpineQueryManager()) {
+            OidcUser oidcUser = new OidcUser();
+            oidcUser.setUsername("username");
+            oidcUser.setSubjectIdentifier("subject");
+            oidcUser = qm.persist(oidcUser);
+
+            OidcGroup group = new OidcGroup();
+            group.setName("groupName");
+            group = qm.persist(group);
+
+            Team team = new Team();
+            team.setName("teamName");
+            team.setOidcUsers(Collections.singletonList(oidcUser));
+            team = qm.persist(team);
+
+            final MappedOidcGroup mappedGroup = new MappedOidcGroup();
+            mappedGroup.setGroup(group);
+            mappedGroup.setTeam(team);
+            qm.persist(mappedGroup);
+
+            final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN);
+
+            oidcUser = authService.synchronizeTeams(qm, oidcUser, userInfo);
+            assertThat(oidcUser.getTeams()).isNullOrEmpty();
+        }
+    }
+
+    @Test
+    public void synchronizeTeamsShouldRemoveMembershipsOfUnmappedTeams() {
+        when(configMock.getProperty(eq(Config.AlpineKey.OIDC_TEAMS_CLAIM)))
+                .thenReturn("teams");
+
+        final OidcUserInfo userInfo = new OidcUserInfo();
+        userInfo.setClaim("teams", Collections.singletonList("groupName"));
+
+        try (final AlpineQueryManager qm = new AlpineQueryManager()) {
+            OidcUser oidcUser = new OidcUser();
+            oidcUser.setUsername("username");
+            oidcUser.setSubjectIdentifier("subject");
+            oidcUser = qm.persist(oidcUser);
+
+            Team team = new Team();
+            team.setName("teamName");
+            team.setOidcUsers(Collections.singletonList(oidcUser));
+            qm.persist(team);
+
+            final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN);
+
+            oidcUser = authService.synchronizeTeams(qm, oidcUser, userInfo);
+            assertThat(oidcUser.getTeams()).isNullOrEmpty();
+        }
     }
 
 }

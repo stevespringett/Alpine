@@ -108,7 +108,7 @@ public class OidcAuthenticationService implements AuthenticationService {
         return user;
     }
 
-    private OidcUser synchronizeTeams(final AlpineQueryManager qm, final OidcUser user, final OidcUserInfo userInfo) {
+    OidcUser synchronizeTeams(final AlpineQueryManager qm, final OidcUser user, final OidcUserInfo userInfo) {
         final String teamsClaim = config.getProperty(Config.AlpineKey.OIDC_TEAMS_CLAIM);
         if (teamsClaim == null) {
             LOGGER.error("Synchronizing teams for user " + user.getUsername() + " failed: Synchronization is enabled, but no teams claim is configured");

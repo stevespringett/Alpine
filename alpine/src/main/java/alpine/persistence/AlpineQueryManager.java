@@ -193,7 +193,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
         if (user.getTeams() != null) {
             for (final Team team : user.getTeams()) {
                 LOGGER.debug(user.getUsername() + " is a member of team: " + team.getName());
-                if (team.getMappedOidcGroups() != null) {
+                if (team.getMappedOidcGroups() != null && !team.getMappedOidcGroups().isEmpty()) {
                     for (final MappedOidcGroup mappedOidcGroup : team.getMappedOidcGroups()) {
                         LOGGER.debug(mappedOidcGroup.getGroup().getName() + " is mapped to team: " + team.getName());
                         if (!groupNames.contains(mappedOidcGroup.getGroup().getName())) {

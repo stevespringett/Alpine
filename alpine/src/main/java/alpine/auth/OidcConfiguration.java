@@ -10,8 +10,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OidcConfiguration {
 
-    static final String CONFIGURATION_CACHE_KEY = "OIDC_CONFIGURATION";
-
     @JsonProperty("issuer")
     private String issuer;
 
