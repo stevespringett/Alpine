@@ -78,8 +78,7 @@ public class OidcAuthenticationService implements AuthenticationService {
             final OidcUser user = qm.getOidcUser(username);
             if (user != null) {
                 LOGGER.debug("Attempting to authenticate user: " + username);
-                if (config.getPropertyAsBoolean(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION) &&
-                        config.getPropertyAsBoolean(Config.AlpineKey.OIDC_ALWAYS_SYNC_TEAMS)) {
+                if (config.getPropertyAsBoolean(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION)) {
                     return synchronizeTeams(qm, user, userInfo);
                 }
                 return user;

@@ -222,10 +222,8 @@ public class OidcAuthenticationServiceTest {
     }
 
     @Test
-    public void authenticateShouldSynchronizeTeamsWhenUserAlreadyExistsAndAlwaysSyncTeamsIsEnabled() throws AlpineAuthenticationException {
+    public void authenticateShouldSynchronizeTeamsWhenUserAlreadyExistsAndTeamSynchronizationIsEnabled() throws AlpineAuthenticationException {
         when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION)))
-                .thenReturn(true);
-        when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_ALWAYS_SYNC_TEAMS)))
                 .thenReturn(true);
         when(configMock.getProperty(eq(Config.AlpineKey.OIDC_TEAMS_CLAIM)))
                 .thenReturn("groups");
