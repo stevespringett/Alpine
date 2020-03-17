@@ -23,7 +23,7 @@
     <groupId>us.springett</groupId>
     <artifactId>alpine-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.7.2-SNAPSHOT</version>
+    <version>1.7.3-SNAPSHOT</version>
 
     <modules>
         <module>alpine</module>
@@ -159,7 +159,7 @@
         -->
         <lib.datanucleus.version>5.2.2</lib.datanucleus.version>
         <lib.h2.version>1.4.200</lib.h2.version>
-        <lib.hikaricp.version>3.4.2</lib.hikaricp.version>
+        <lib.hikaricp.version>3.3.1</lib.hikaricp.version>
         <lib.javassist.version>3.26.0-GA</lib.javassist.version>
         <lib.jackson.version>2.10.3</lib.jackson.version>
         <lib.javamail.version>1.6.2</lib.javamail.version>
@@ -167,7 +167,7 @@
         <lib.jaxb.core.version>2.3.0.1</lib.jaxb.core.version>
         <lib.jaxb.impl.version>2.3.2</lib.jaxb.impl.version>
         <lib.jdo.api.version>3.2.0-m13</lib.jdo.api.version>
-        <lib.jersey.version>2.30.1</lib.jersey.version>
+        <lib.jersey.version>2.29.1</lib.jersey.version>
         <lib.jsp.api.version>2.2</lib.jsp.api.version>
         <lib.jsonwebtoken.version>0.9.1</lib.jsonwebtoken.version>
         <lib.jsr305.version>3.0.2</lib.jsr305.version>
