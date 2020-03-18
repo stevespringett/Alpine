@@ -123,6 +123,11 @@ public class OidcAuthenticationService implements AuthenticationService {
             return user;
         }
 
+        if (groups == null) {
+            LOGGER.error("Synchronizing teams for user " + user.getUsername() + " failed: Teams claim " + teamsClaim + " does not exist");
+            return user;
+        }
+
         return qm.synchronizeTeamMembership(user, groups);
     }
 

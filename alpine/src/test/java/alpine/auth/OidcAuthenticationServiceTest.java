@@ -348,6 +348,20 @@ public class OidcAuthenticationServiceTest {
     }
 
     @Test
+    public void synchronizeTeamsShouldReturnUserWhenTeamsClaimDoesNotExist() {
+        when(configMock.getProperty(eq(Config.AlpineKey.OIDC_TEAMS_CLAIM)))
+                .thenReturn("teams");
+
+        final OidcUserInfo userInfo = new OidcUserInfo();
+
+        final OidcUser oidcUser = new OidcUser();
+
+        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN);
+
+        assertThat(authService.synchronizeTeams(null, oidcUser, userInfo)).isEqualTo(oidcUser);
+    }
+
+    @Test
     public void synchronizeTeamsShouldAddNewTeamMemberships() {
         when(configMock.getProperty(eq(Config.AlpineKey.OIDC_TEAMS_CLAIM)))
                 .thenReturn("teams");
