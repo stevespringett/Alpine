@@ -655,8 +655,10 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
         Query query;
         if (user instanceof ManagedUser) {
             query = pm.newQuery(Permission.class, "name == :permissionName && managedUsers.contains(:user)");
-        } else {
+        } else if (user instanceof LdapUser) {
             query = pm.newQuery(Permission.class, "name == :permissionName && ldapUsers.contains(:user)");
+        } else {
+            query = pm.newQuery(Permission.class, "name == :permissionName && oidcUsers.contains(:user)");
         }
         query.setResult("count(id)");
         final long count = (Long) query.execute(permissionName, user);
