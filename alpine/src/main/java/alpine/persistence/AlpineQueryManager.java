@@ -167,6 +167,20 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     }
 
     /**
+     * Updates a OidcGroup.
+     * @param oidcGroup The group to update
+     * @return a refreshed OidcGroup
+     * @since 1.8.0
+     */
+    public OidcGroup updateOidcGroup(final OidcGroup oidcGroup) {
+        final OidcGroup oidcGroupToUpdate = getObjectByUuid(OidcGroup.class, oidcGroup.getUuid());
+        pm.currentTransaction().begin();
+        oidcGroupToUpdate.setName(oidcGroup.getName());
+        pm.currentTransaction().commit();
+        return pm.getObjectById(OidcGroup.class, oidcGroupToUpdate.getId());
+    }
+
+    /**
      * Returns a complete list of all OidcGroup objects, in ascending order by name.
      * @return a list of OidcGroup
      * @since 1.8.0
