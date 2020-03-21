@@ -33,7 +33,7 @@ public class MappedOidcGroup {
     private Team team;
 
     @Persistent(defaultFetchGroup = "true")
-    @Column(name = "GROUP_ID")
+    @Column(name = "GROUP_ID", allowsNull = "false")
     private OidcGroup group;
 
     @Persistent(customValueStrategy = "uuid")
