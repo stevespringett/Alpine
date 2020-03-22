@@ -15,8 +15,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class OidcConfigurationResolverTest {
 
-    private static final String OIDC_CONFIGURATION_PATH = "/.well-known/openid-configuration";
-
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(options().dynamicPort());
 
@@ -27,7 +25,7 @@ public class OidcConfigurationResolverTest {
     }
 
     @Test
-    public void resolveShouldReturnNullWhenDiscoveryUriIsNull() {
+    public void resolveShouldReturnNullWhenAuthorityIsNull() {
         assertThat(new OidcConfigurationResolver(null).resolve()).isNull();
     }
 
@@ -36,34 +34,34 @@ public class OidcConfigurationResolverTest {
         final OidcConfiguration cachedConfiguration = new OidcConfiguration();
         CacheManager.getInstance().put(OidcConfigurationResolver.CONFIGURATION_CACHE_KEY, cachedConfiguration);
 
-        assertThat(new OidcConfigurationResolver(wireMockRule.url(OIDC_CONFIGURATION_PATH)).resolve()).isEqualTo(cachedConfiguration);
+        assertThat(new OidcConfigurationResolver(wireMockRule.baseUrl()).resolve()).isEqualTo(cachedConfiguration);
     }
 
     @Test
     public void resolveShouldReturnNullWhenServerRespondsWithNon200StatusCode() {
-        wireMockRule.stubFor(get(urlPathEqualTo(OIDC_CONFIGURATION_PATH))
+        wireMockRule.stubFor(get(urlPathEqualTo(OidcConfigurationResolver.OPENID_CONFIGURATION_PATH))
                 .willReturn(aResponse()
                         .withStatus(HttpStatus.SC_NOT_FOUND)));
 
-        assertThat(new OidcConfigurationResolver(wireMockRule.url(OIDC_CONFIGURATION_PATH)).resolve()).isNull();
-        verify(getRequestedFor(urlPathEqualTo(OIDC_CONFIGURATION_PATH)));
+        assertThat(new OidcConfigurationResolver(wireMockRule.baseUrl()).resolve()).isNull();
+        verify(getRequestedFor(urlPathEqualTo(OidcConfigurationResolver.OPENID_CONFIGURATION_PATH)));
     }
 
     @Test
     public void resolveShouldReturnNullWhenServerRespondsWithInvalidJson() {
-        wireMockRule.stubFor(get(urlPathEqualTo(OIDC_CONFIGURATION_PATH))
+        wireMockRule.stubFor(get(urlPathEqualTo(OidcConfigurationResolver.OPENID_CONFIGURATION_PATH))
                 .willReturn(aResponse()
                         .withStatus(HttpStatus.SC_OK)
                         .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
                         .withBody("<?xml version=\"1.0\" ?>")));
 
-        assertThat(new OidcConfigurationResolver(wireMockRule.url(OIDC_CONFIGURATION_PATH)).resolve()).isNull();
-        verify(getRequestedFor(urlPathEqualTo(OIDC_CONFIGURATION_PATH)));
+        assertThat(new OidcConfigurationResolver(wireMockRule.baseUrl()).resolve()).isNull();
+        verify(getRequestedFor(urlPathEqualTo(OidcConfigurationResolver.OPENID_CONFIGURATION_PATH)));
     }
 
     @Test
     public void resolveShouldReturnConfigurationAndStoreItInCache() {
-        wireMockRule.stubFor(get(urlPathEqualTo(OIDC_CONFIGURATION_PATH))
+        wireMockRule.stubFor(get(urlPathEqualTo(OidcConfigurationResolver.OPENID_CONFIGURATION_PATH))
                 .willReturn(aResponse()
                         .withStatus(HttpStatus.SC_OK)
                         .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
@@ -76,7 +74,7 @@ public class OidcConfigurationResolverTest {
                                 "  \"jwks_uri\": \"https://gitlab.com/oauth/discovery/keys\"\n" +
                                 "}")));
 
-        final OidcConfiguration oidcConfiguration = new OidcConfigurationResolver(wireMockRule.url(OIDC_CONFIGURATION_PATH)).resolve();
+        final OidcConfiguration oidcConfiguration = new OidcConfigurationResolver(wireMockRule.baseUrl()).resolve();
         assertThat(oidcConfiguration).isNotNull();
         assertThat(oidcConfiguration.getIssuer()).isEqualTo("https://gitlab.com");
         assertThat(oidcConfiguration.getAuthorizationEndpointUri()).isEqualTo("https://gitlab.com/oauth/authorize");
@@ -85,10 +83,10 @@ public class OidcConfigurationResolverTest {
         assertThat(oidcConfiguration.getJwksUri()).isEqualTo("https://gitlab.com/oauth/discovery/keys");
 
         // On the next invocation, the configuration should be loaded from cache
-        assertThat(new OidcConfigurationResolver(wireMockRule.url(OIDC_CONFIGURATION_PATH)).resolve()).isEqualTo(oidcConfiguration);
+        assertThat(new OidcConfigurationResolver(wireMockRule.baseUrl()).resolve()).isEqualTo(oidcConfiguration);
 
         // Only one request should've been made
-        verify(1, getRequestedFor(urlPathEqualTo(OIDC_CONFIGURATION_PATH)));
+        verify(1, getRequestedFor(urlPathEqualTo(OidcConfigurationResolver.OPENID_CONFIGURATION_PATH)));
     }
 
 }
