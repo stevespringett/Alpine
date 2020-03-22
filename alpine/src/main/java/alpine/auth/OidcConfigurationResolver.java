@@ -15,15 +15,15 @@ import javax.ws.rs.core.MediaType;
  */
 public class OidcConfigurationResolver {
 
-    private static final OidcConfigurationResolver INSTANCE = new OidcConfigurationResolver(Config.getInstance().getProperty(Config.AlpineKey.OIDC_AUTHORITY));
+    private static final OidcConfigurationResolver INSTANCE = new OidcConfigurationResolver(Config.getInstance().getProperty(Config.AlpineKey.OIDC_ISSUER));
     private static final Logger LOGGER = Logger.getLogger(OidcConfigurationResolver.class);
     static final String OPENID_CONFIGURATION_PATH = "/.well-known/openid-configuration";
     static final String CONFIGURATION_CACHE_KEY = "OIDC_CONFIGURATION";
 
-    private final String authority;
+    private final String issuer;
 
-    OidcConfigurationResolver(final String authority) {
-        this.authority = authority;
+    OidcConfigurationResolver(final String issuer) {
+        this.issuer = issuer;
     }
 
     public static OidcConfigurationResolver getInstance() {
@@ -37,8 +37,8 @@ public class OidcConfigurationResolver {
      */
     @Nullable
     public OidcConfiguration resolve() {
-        if (authority == null) {
-            LOGGER.error("Cannot resolve OIDC configuration: No authority provided");
+        if (issuer == null) {
+            LOGGER.error("Cannot resolve OIDC configuration: No issuer provided");
             return null;
         }
 
@@ -48,14 +48,14 @@ public class OidcConfigurationResolver {
             return configuration;
         }
 
-        LOGGER.debug("Loading OIDC configuration from " + authority);
+        LOGGER.debug("Loading OIDC configuration for issuer " + issuer);
         try {
-            configuration = ClientBuilder.newClient().target(authority)
+            configuration = ClientBuilder.newClient().target(issuer)
                     .path(OPENID_CONFIGURATION_PATH)
                     .request(MediaType.APPLICATION_JSON)
                     .get(OidcConfiguration.class);
         } catch (WebApplicationException | ProcessingException e) {
-            LOGGER.error("Failed to load OIDC configuration from " + authority + ": " + e.getMessage());
+            LOGGER.error("Failed to load OIDC configuration from issuer " + issuer + ": " + e.getMessage());
             return null;
         }
 
