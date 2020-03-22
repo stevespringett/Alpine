@@ -155,6 +155,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     /**
      * Creates a OidcGroup.
      * @param name Name of the group to create
+     * @return a OidcGroup
      * @since 1.8.0
      */
     public OidcGroup createOidcGroup(final String name) {
@@ -196,6 +197,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * Returns an OidcGroup containing the specified name. If the name
      * does not exist, returns null.
      * @param name Name of the group to retrieve
+     * @return an OidcGroup
      * @since 1.8.0
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
