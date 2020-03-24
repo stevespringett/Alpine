@@ -21,6 +21,8 @@ package alpine.auth;
 import alpine.Config;
 import alpine.crypto.KeyManager;
 import alpine.logging.Logger;
+import alpine.model.LdapUser;
+import alpine.model.OidcUser;
 import alpine.model.Permission;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -114,7 +116,7 @@ public class JsonWebToken {
      * @since 1.1.0
      */
     public String createToken(final Principal principal, final List<Permission> permissions) {
-        return createToken(principal, permissions, IdentityProvider.LOCAL);
+        return createToken(principal, permissions, null);
     }
 
     /**
@@ -123,7 +125,7 @@ public class JsonWebToken {
      *
      * @param principal the Principal to create the token for
      * @param permissions the effective list of permissions for the principal
-     * @param identityProvider the identity provider the principal was authenticated with. If null, LOCAL is assumed
+     * @param identityProvider the identity provider the principal was authenticated with. If null, it will be derived from principal
      * @return a String representation of the generated token
      * @since 1.8.0
      */
@@ -143,7 +145,13 @@ public class JsonWebToken {
         if (identityProvider != null) {
             jwtBuilder.claim(IDENTITY_PROVIDER_CLAIM, identityProvider.name());
         } else {
-            jwtBuilder.claim(IDENTITY_PROVIDER_CLAIM, IdentityProvider.LOCAL.name());
+            if (principal instanceof LdapUser) {
+                jwtBuilder.claim(IDENTITY_PROVIDER_CLAIM, IdentityProvider.LDAP.name());
+            } else if (principal instanceof OidcUser) {
+                jwtBuilder.claim(IDENTITY_PROVIDER_CLAIM, IdentityProvider.OPENID_CONNECT.name());
+            } else {
+                jwtBuilder.claim(IDENTITY_PROVIDER_CLAIM, IdentityProvider.LOCAL.name());
+            }
         }
         return jwtBuilder.signWith(SignatureAlgorithm.HS256, key).compact();
     }
