@@ -71,17 +71,21 @@ public class JwtAuthenticationService implements AuthenticationService {
                     if (jwt.getSubject() == null || jwt.getExpiration() == null) {
                         throw new AuthenticationException("Token does not contain a valid subject or expiration");
                     }
-                    final ManagedUser managedUser = qm.getManagedUser(jwt.getSubject());
-                    if (managedUser != null) {
-                        return managedUser.isSuspended() ? null : managedUser;
-                    }
-                    final LdapUser ldapUser =  qm.getLdapUser(jwt.getSubject());
-                    if (ldapUser != null) {
-                        return ldapUser;
-                    }
-                    final OidcUser oidcUser = qm.getOidcUser(jwt.getSubject());
-                    if (oidcUser != null) {
-                        return oidcUser;
+                    if (jwt.getIdentityProvider() == null || IdentityProvider.LOCAL == jwt.getIdentityProvider()) {
+                        final ManagedUser managedUser = qm.getManagedUser(jwt.getSubject());
+                        if (managedUser != null) {
+                            return managedUser.isSuspended() ? null : managedUser;
+                        }
+                    } else if (IdentityProvider.LDAP == jwt.getIdentityProvider()) {
+                        final LdapUser ldapUser =  qm.getLdapUser(jwt.getSubject());
+                        if (ldapUser != null) {
+                            return ldapUser;
+                        }
+                    } else if (IdentityProvider.OPENID_CONNECT == jwt.getIdentityProvider()) {
+                        final OidcUser oidcUser = qm.getOidcUser(jwt.getSubject());
+                        if (oidcUser != null) {
+                            return oidcUser;
+                        }
                     }
                 }
             }

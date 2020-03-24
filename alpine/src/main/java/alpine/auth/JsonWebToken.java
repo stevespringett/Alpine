@@ -22,7 +22,9 @@ import alpine.Config;
 import alpine.crypto.KeyManager;
 import alpine.logging.Logger;
 import alpine.model.Permission;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
@@ -51,6 +53,7 @@ import java.util.stream.Collectors;
 public class JsonWebToken {
 
     private static final Logger LOGGER = Logger.getLogger(JsonWebToken.class);
+    private static final String IDENTITY_PROVIDER_CLAIM = "idp";
     private static String ISSUER = "Alpine";
     static {
         if (Config.getInstance().getApplicationName() != null) {
@@ -63,6 +66,7 @@ public class JsonWebToken {
     private final Key key;
     private String subject;
     private Date expiration;
+    private IdentityProvider identityProvider;
 
     /**
      * Constructs a new JsonWekToken object using the specified SecretKey which can
@@ -110,6 +114,20 @@ public class JsonWebToken {
      * @since 1.1.0
      */
     public String createToken(final Principal principal, final List<Permission> permissions) {
+        return createToken(principal, permissions, IdentityProvider.LOCAL);
+    }
+
+    /**
+     * Creates a new JWT for the specified principal. Token is signed using
+     * the SecretKey with an HMAC 256 algorithm.
+     *
+     * @param principal the Principal to create the token for
+     * @param permissions the effective list of permissions for the principal
+     * @param identityProvider the identity provider the principal was authenticated with. If null, LOCAL is assumed
+     * @return a String representation of the generated token
+     * @since 1.8.0
+     */
+    public String createToken(final Principal principal, final List<Permission> permissions, final IdentityProvider identityProvider) {
         final Date today = new Date();
         final JwtBuilder jwtBuilder = Jwts.builder();
         jwtBuilder.setSubject(principal.getName());
@@ -121,6 +139,11 @@ public class JsonWebToken {
                     .map(Permission::getName)
                     .collect(Collectors.joining(","))
             );
+        }
+        if (identityProvider != null) {
+            jwtBuilder.claim(IDENTITY_PROVIDER_CLAIM, identityProvider.name());
+        } else {
+            jwtBuilder.claim(IDENTITY_PROVIDER_CLAIM, IdentityProvider.LOCAL.name());
         }
         return jwtBuilder.signWith(SignatureAlgorithm.HS256, key).compact();
     }
@@ -150,9 +173,10 @@ public class JsonWebToken {
     public boolean validateToken(final String token) {
         try {
             final JwtParser jwtParser = Jwts.parser().setSigningKey(key);
-            jwtParser.parse(token);
-            this.subject = jwtParser.parseClaimsJws(token).getBody().getSubject();
-            this.expiration = jwtParser.parseClaimsJws(token).getBody().getExpiration();
+            final Jws<Claims> claims = jwtParser.parseClaimsJws(token);
+            this.subject = claims.getBody().getSubject();
+            this.expiration = claims.getBody().getExpiration();
+            this.identityProvider = IdentityProvider.forName(claims.getBody().get(IDENTITY_PROVIDER_CLAIM, String.class));
             return true;
         } catch (SignatureException e) {
             LOGGER.info(SecurityMarkers.SECURITY_FAILURE, "Received token that did not pass signature verification");
@@ -195,6 +219,14 @@ public class JsonWebToken {
      */
     public Date getExpiration() {
         return expiration;
+    }
+
+    /**
+     * Returns the identity provider of the token.
+     * @return an IdentityProvider
+     */
+    public IdentityProvider getIdentityProvider() {
+        return identityProvider;
     }
 
 }

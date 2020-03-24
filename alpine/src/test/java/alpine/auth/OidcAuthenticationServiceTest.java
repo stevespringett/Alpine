@@ -6,7 +6,7 @@ import alpine.model.OidcGroup;
 import alpine.model.OidcUser;
 import alpine.model.Team;
 import alpine.persistence.AlpineQueryManager;
-import alpine.persistence.PersistenceManagerFactory;
+import alpine.util.TestUtil;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.junit.After;
 import org.junit.Before;
@@ -17,9 +17,7 @@ import wiremock.org.apache.http.HttpHeaders;
 import wiremock.org.apache.http.HttpStatus;
 import wiremock.org.apache.http.entity.ContentType;
 
-import javax.jdo.PersistenceManager;
 import java.util.Collections;
-import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
@@ -40,7 +38,6 @@ public class OidcAuthenticationServiceTest {
 
     private Config configMock;
     private OidcConfiguration oidcConfigurationMock;
-    private PersistenceManager persistenceManager;
 
     @BeforeClass
     public static void setUpClass() {
@@ -57,30 +54,12 @@ public class OidcAuthenticationServiceTest {
 
         when(oidcConfigurationMock.getUserInfoEndpointUri())
                 .thenReturn(wireMockRule.url(OIDC_USERINFO_PATH));
-
-        persistenceManager = PersistenceManagerFactory.createPersistenceManager();
     }
 
     @After
     @SuppressWarnings("unchecked")
-    public void tearDown() {
-        // Delete all users that may have been persisted during the test
-        final List<OidcUser> users = (List<OidcUser>) persistenceManager.newQuery(OidcUser.class).execute();
-        if (users != null) {
-            persistenceManager.deletePersistentAll(users);
-        }
-        final List<MappedOidcGroup> mappedGroups = (List<MappedOidcGroup>) persistenceManager.newQuery(MappedOidcGroup.class).execute();
-        if (mappedGroups != null) {
-            persistenceManager.deletePersistentAll(mappedGroups);
-        }
-        final List<OidcGroup> groups = (List<OidcGroup>) persistenceManager.newQuery(OidcGroup.class).execute();
-        if (users != null) {
-            persistenceManager.deletePersistentAll(groups);
-        }
-        final List<Team> teams = (List<Team>) persistenceManager.newQuery(Team.class).execute();
-        if (teams != null) {
-            persistenceManager.deletePersistentAll(teams);
-        }
+    public void tearDown() throws Exception {
+        TestUtil.resetInMemoryDatabase();
     }
 
     @Test
