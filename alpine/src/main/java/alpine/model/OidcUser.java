@@ -36,7 +36,7 @@ public class OidcUser implements Serializable, Principal, UserPrincipal {
 
     @Persistent
     @Unique(name = "OIDCUSER_USERNAME_IDX")
-    @Column(name = "USERNAME")
+    @Column(name = "USERNAME", allowsNull = "false")
     @NotBlank
     @Size(min = 1, max = 255)
     @Pattern(regexp = "[\\P{Cc}]+", message = "The username must not contain control characters")
@@ -44,6 +44,7 @@ public class OidcUser implements Serializable, Principal, UserPrincipal {
 
     @Persistent
     @Column(name = "SUBJECT_IDENTIFIER", allowsNull = "false")
+    @Unique(name = "OIDCUSER_SUBJECTIDENTIFIER_IDX")
     @NotBlank
     @Size(min = 1, max = 255)
     @Pattern(regexp = "[\\P{Cc}]+", message = "The subject identifier must not contain control characters")
