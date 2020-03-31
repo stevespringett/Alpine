@@ -47,9 +47,6 @@ public class OidcAuthenticationService implements AuthenticationService {
     @Nullable
     @Override
     public Principal authenticate() throws AlpineAuthenticationException {
-        // Exchange the Access Token for User Info
-        // There's no guarantee that Access Tokens will always be JWTs (in case of GitLab, it indeed isn't),
-        // so this has the nice side effect that the Authorization Server can validate the Token itself
         final OidcUserInfo userInfo;
         try {
             userInfo = ClientBuilder.newClient().target(oidcConfiguration.getUserInfoEndpointUri())
@@ -70,14 +67,24 @@ public class OidcAuthenticationService implements AuthenticationService {
         final String usernameClaim = config.getProperty(Config.AlpineKey.OIDC_USERNAME_CLAIM);
         final String username = userInfo.getClaim(usernameClaim, String.class);
         if (username == null) {
-            LOGGER.error("The configured OIDC username claim (" + usernameClaim + ") could not be found in UserInfo");
+            LOGGER.error("The configured OIDC username claim (" + usernameClaim + ") could not be found in UserInfo response");
             throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.OTHER);
         }
 
         try (final AlpineQueryManager qm = new AlpineQueryManager()) {
-            final OidcUser user = qm.getOidcUser(username);
+            OidcUser user = qm.getOidcUser(username);
             if (user != null) {
                 LOGGER.debug("Attempting to authenticate user: " + username);
+                user.setEmail(userInfo.getEmail()); // email is not persisted and thus needs to be set ad-hoc
+                if (user.getSubjectIdentifier() == null) {
+                    LOGGER.debug("Assigning subject identifier " + userInfo.getSubject() + " to user " + username);
+                    user.setSubjectIdentifier(userInfo.getSubject());
+                    return qm.updateOidcUser(user);
+                } else if (!user.getSubjectIdentifier().equals(userInfo.getSubject())) {
+                    LOGGER.error("Refusing to authenticate user " + username + ": subject identifier has changed (" +
+                            user.getSubjectIdentifier() + " to " + userInfo.getSubject() + ")");
+                    throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.INVALID_CREDENTIALS);
+                }
                 if (config.getPropertyAsBoolean(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION)) {
                     return synchronizeTeams(qm, user, userInfo);
                 }
