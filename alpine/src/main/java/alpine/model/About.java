@@ -45,6 +45,8 @@ public class About implements Serializable {
     private static final String FRAMEWORK_TIMESTAMP = Config.getInstance().getFrameworkBuildTimestamp();
     private static final String FRAMEWORK_UUID = Config.getInstance().getFrameworkBuildUuid();
 
+    private static final String SYSTEM_UUID = Config.getInstance().getSystemUuid();
+
 
     public String getApplication() {
         return APPLICATION;
@@ -85,4 +87,7 @@ public class About implements Serializable {
         }
     }
 
+    public String getSystemUuid() {
+        return SYSTEM_UUID;
+    }
 }

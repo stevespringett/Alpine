@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -30,9 +31,8 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.util.Properties;
-
+import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
-
 import alpine.logging.Logger;
 import alpine.util.PathUtil;
 import alpine.util.SystemUtil;
@@ -54,6 +54,7 @@ public class Config {
     private static Properties properties;
     private static Properties alpineVersionProperties;
     private static Properties applicationVersionProperties;
+    private static String systemId;
 
     static {
         LOGGER.info(StringUtils.repeat("-", 80));
@@ -237,6 +238,38 @@ public class Config {
         if (applicationVersionProperties.size() == 0) {
             LOGGER.error("A fatal error occurred loading application version information. Please correct the issue and restart the application.");
         }
+
+        final File systemIdFile = getSystemIdFilePath();
+        if (!systemIdFile.exists()) {
+            try (OutputStream fos = Files.newOutputStream(systemIdFile.toPath())) {
+                fos.write(UUID.randomUUID().toString().getBytes());
+            } catch (IOException e) {
+                LOGGER.error("An error occurred writing to " + systemIdFile.getAbsolutePath(), e);
+            }
+        }
+        try {
+            systemId = new String(Files.readAllBytes(systemIdFile.toPath()));
+        } catch (IOException e) {
+            LOGGER.error("Unable to read the contents of " + systemIdFile.getAbsolutePath(), e);
+        }
+    }
+
+    /**
+     * Retrieves the path where the system.id is stored
+     * @return a File representing the path to the system.id
+     * @since 1.8.0
+     */
+    private File getSystemIdFilePath() {
+        return new File(Config.getInstance().getDataDirectorty() + File.separator + "id.system");
+    }
+
+    /**
+     * Returns the UUID unique to a system deployment.
+     * @return the UUID unique to a deployed system
+     * @since 1.8.0
+     */
+    public String getSystemUuid() {
+        return systemId;
     }
 
     /**
