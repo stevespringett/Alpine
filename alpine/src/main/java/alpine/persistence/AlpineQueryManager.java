@@ -127,6 +127,38 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     }
 
     /**
+     * Creates a new OidcUser object with the specified username.
+     * @param username The username of the new OidcUser. This must reference an
+     *                 existing username in the OpenID Connect identity provider.
+     * @return an LdapUser
+     * @since 1.8.0
+     */
+    public OidcUser createOidcUser(final String username) {
+        pm.currentTransaction().begin();
+        final OidcUser user = new OidcUser();
+        user.setUsername(username);
+        // Subject identifier and email will be synced when a
+        // user with the given username signs in for the first time
+        pm.makePersistent(user);
+        pm.currentTransaction().commit();
+        return getObjectById(OidcUser.class, user.getId());
+    }
+
+    /**
+     * Updates the specified OidcUser.
+     * @param transientUser the optionally detached OidcUser object to update.
+     * @return an OidcUser
+     * @since 1.8.0
+     */
+    public OidcUser updateOidcUser(final OidcUser transientUser) {
+        final OidcUser user = getObjectById(OidcUser.class, transientUser.getId());
+        pm.currentTransaction().begin();
+        user.setSubjectIdentifier(transientUser.getSubjectIdentifier());
+        pm.currentTransaction().commit();
+        return pm.getObjectById(OidcUser.class, user.getId());
+    }
+
+    /**
      * Retrieves an OidcUser containing the specified username. If the username
      * does not exist, returns null.
      * @param username The username to retrieve

@@ -300,6 +300,69 @@ public class OidcAuthenticationServiceTest {
     }
 
     @Test
+    public void authenticateShouldAssignSubjectIdAndEmailWhenUserAlreadyExistsAndAuthenticatesForFirstTime() throws AlpineAuthenticationException {
+        when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_USER_PROVISIONING)))
+                .thenReturn(true);
+
+        wireMockRule.stubFor(get(urlPathEqualTo(OIDC_USERINFO_PATH))
+                .willReturn(aResponse()
+                        .withStatus(HttpStatus.SC_OK)
+                        .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+                        .withBody("" +
+                                "{" +
+                                "    \"sub\": \"subject\", " +
+                                "    \"email\": \"subject@mail.local\", " +
+                                "    \"" + USERNAMCE_CLAIM + "\": \"username\"" +
+                                "}")));
+
+        try (final AlpineQueryManager qm = new AlpineQueryManager()) {
+            qm.createOidcUser("username");
+        }
+
+        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN);
+
+        final OidcUser provisionedUser = (OidcUser) authService.authenticate();
+        assertThat(provisionedUser).isNotNull();
+        assertThat(provisionedUser.getUsername()).isEqualTo("username");
+        assertThat(provisionedUser.getSubjectIdentifier()).isEqualTo("subject");
+        assertThat(provisionedUser.getEmail()).isEqualTo("subject@mail.local");
+        assertThat(provisionedUser.getTeams()).isNullOrEmpty();
+        assertThat(provisionedUser.getPermissions()).isNullOrEmpty();
+    }
+
+    @Test
+    public void authenticateShouldThrowExceptionWhenUserAlreadyExistsAndSubjectIdentifierHasChanged() {
+        when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_USER_PROVISIONING)))
+                .thenReturn(true);
+
+        wireMockRule.stubFor(get(urlPathEqualTo(OIDC_USERINFO_PATH))
+                .willReturn(aResponse()
+                        .withStatus(HttpStatus.SC_OK)
+                        .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+                        .withBody("" +
+                                "{" +
+                                "    \"sub\": \"changedSubject\", " +
+                                "    \"email\": \"subject@mail.local\", " +
+                                "    \"" + USERNAMCE_CLAIM + "\": \"username\"" +
+                                "}")));
+
+        try (final AlpineQueryManager qm = new AlpineQueryManager()) {
+            final OidcUser existingUser = new OidcUser();
+            existingUser.setUsername("username");
+            existingUser.setSubjectIdentifier("subject");
+            existingUser.setEmail("subject@mail.local");
+            qm.persist(existingUser);
+        }
+
+        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN);
+
+        assertThatExceptionOfType(AlpineAuthenticationException.class)
+                .isThrownBy(authService::authenticate)
+                .satisfies(exception -> assertThat(exception.getCauseType())
+                        .isEqualTo(AlpineAuthenticationException.CauseType.INVALID_CREDENTIALS));
+    }
+
+    @Test
     public void synchronizeTeamsShouldReturnUserWhenNoTeamsClaimWasConfigured() {
         when(configMock.getProperty(eq(Config.AlpineKey.OIDC_TEAMS_CLAIM)))
                 .thenReturn(null);

@@ -24,6 +24,7 @@ import org.eclipse.jetty.annotations.ServletContainerInitializersStarter;
 import org.eclipse.jetty.apache.jsp.JettyJasperInitializer;
 import org.eclipse.jetty.plus.annotation.ContainerInitializer;
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
@@ -62,7 +63,11 @@ public final class EmbeddedJettyServer {
         SLF4JBridgeHandler.install();
 
         final Server server = new Server();
-        final ServerConnector connector = new ServerConnector(server);
+        final HttpConfiguration httpConfig = new HttpConfiguration();
+        httpConfig.addCustomizer( new org.eclipse.jetty.server.ForwardedRequestCustomizer() ); // Add support for X-Forwarded headers
+
+        final HttpConnectionFactory connectionFactory = new HttpConnectionFactory( httpConfig );
+        final ServerConnector connector = new ServerConnector(server, connectionFactory);
         connector.setHost(host);
         connector.setPort(port);
         disableServerVersionHeader(connector);
