@@ -54,7 +54,9 @@ import java.util.UUID;
                 @Persistent(name = "apiKeys"),
                 @Persistent(name = "ldapUsers"),
                 @Persistent(name = "managedUsers"),
+                @Persistent(name = "oidcUsers"),
                 @Persistent(name = "mappedLdapGroups"),
+                @Persistent(name = "mappedOidcGroups"),
                 @Persistent(name = "permissions")
         })
 })
@@ -100,9 +102,17 @@ public class Team implements Serializable {
     @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "username ASC"))
     private List<ManagedUser> managedUsers;
 
+    @Persistent(mappedBy = "teams")
+    @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "username ASC"))
+    private List<OidcUser> oidcUsers;
+
     @Persistent(mappedBy = "team")
     @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "dn ASC"))
     private List<MappedLdapGroup> mappedLdapGroups;
+
+    @Persistent(mappedBy = "team")
+    @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "id ASC"))
+    private List<MappedOidcGroup> mappedOidcGroups;
 
     @Persistent(table = "TEAMS_PERMISSIONS", defaultFetchGroup = "true")
     @Join(column = "TEAM_ID")
@@ -158,12 +168,28 @@ public class Team implements Serializable {
         this.managedUsers = managedUsers;
     }
 
+    public List<OidcUser> getOidcUsers() {
+        return oidcUsers;
+    }
+
+    public void setOidcUsers(List<OidcUser> oidcUsers) {
+        this.oidcUsers = oidcUsers;
+    }
+
     public List<MappedLdapGroup> getMappedLdapGroups() {
         return mappedLdapGroups;
     }
 
     public void setMappedLdapGroups(List<MappedLdapGroup> mappedLdapGroups) {
         this.mappedLdapGroups = mappedLdapGroups;
+    }
+
+    public List<MappedOidcGroup> getMappedOidcGroups() {
+        return mappedOidcGroups;
+    }
+
+    public void setMappedOidcGroups(List<MappedOidcGroup> mappedOidcGroups) {
+        this.mappedOidcGroups = mappedOidcGroups;
     }
 
     public List<Permission> getPermissions() {

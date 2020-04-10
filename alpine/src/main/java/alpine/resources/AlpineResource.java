@@ -22,6 +22,7 @@ import alpine.logging.Logger;
 import alpine.model.ApiKey;
 import alpine.model.LdapUser;
 import alpine.model.ManagedUser;
+import alpine.model.OidcUser;
 import alpine.model.UserPrincipal;
 import alpine.persistence.AlpineQueryManager;
 import alpine.validation.RegexSequence;
@@ -335,6 +336,10 @@ public abstract class AlpineResource {
         } else {
             return null;
         }
+    }
+
+    protected boolean isOidcUser() {
+        return getPrincipal() instanceof OidcUser;
     }
 
     /**

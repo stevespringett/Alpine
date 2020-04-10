@@ -20,6 +20,8 @@ package alpine.model;
 
 import alpine.validation.RegexSequence;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.Extension;
 import javax.jdo.annotations.IdGeneratorStrategy;
@@ -42,6 +44,7 @@ import java.util.List;
  * @since 1.0.0
  */
 @PersistenceCapable
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Permission implements Serializable {
 
     private static final long serialVersionUID = 1420020753285692448L;
@@ -67,6 +70,11 @@ public class Permission implements Serializable {
     @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "name ASC"))
     @JsonIgnore
     private List<Team> teams;
+
+    @Persistent(mappedBy = "permissions")
+    @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "username ASC"))
+    @JsonIgnore
+    private List<OidcUser> oidcUsers;
 
     @Persistent(mappedBy = "permissions")
     @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "username ASC"))
@@ -108,6 +116,14 @@ public class Permission implements Serializable {
 
     public void setTeams(List<Team> teams) {
         this.teams = teams;
+    }
+
+    public List<OidcUser> getOidcUsers() {
+        return oidcUsers;
+    }
+
+    public void setOidcUsers(List<OidcUser> oidcUsers) {
+        this.oidcUsers = oidcUsers;
     }
 
     public List<LdapUser> getLdapUsers() {
