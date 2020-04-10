@@ -18,6 +18,9 @@
  */
 package alpine.auth;
 
+import alpine.model.LdapUser;
+import alpine.model.ManagedUser;
+import alpine.model.OidcUser;
 import alpine.model.Permission;
 import org.junit.Assert;
 import org.junit.Test;
@@ -25,6 +28,7 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -60,4 +64,55 @@ public class JsonWebTokenTest {
         Assert.assertEquals("admin", jwt.getSubject());
         Assert.assertNotNull(jwt.getExpiration());
     }
+
+    @Test
+    public void createTokenShouldDeriveIdentityProviderLocal() {
+        final JsonWebToken jwt = new JsonWebToken();
+
+        final String token = jwt.createToken(new ManagedUser());
+
+        assertThat(jwt.validateToken(token)).isTrue();
+        assertThat(jwt.getIdentityProvider()).isEqualTo(IdentityProvider.LOCAL);
+    }
+
+    @Test
+    public void createTokenShouldDeriveIdentityProviderLdap() {
+        final JsonWebToken jwt = new JsonWebToken();
+
+        final String token = jwt.createToken(new LdapUser());
+
+        assertThat(jwt.validateToken(token)).isTrue();
+        assertThat(jwt.getIdentityProvider()).isEqualTo(IdentityProvider.LDAP);
+    }
+
+    @Test
+    public void createTokenShouldDeriveIdentityProviderOidc() {
+        final JsonWebToken jwt = new JsonWebToken();
+
+        final String token = jwt.createToken(new OidcUser());
+
+        assertThat(jwt.validateToken(token)).isTrue();
+        assertThat(jwt.getIdentityProvider()).isEqualTo(IdentityProvider.OPENID_CONNECT);
+    }
+
+    @Test
+    public void createTokenShouldSetLocalIdentityProviderWhenProviderCouldNotBeDerived() {
+        final JsonWebToken jwt = new JsonWebToken();
+
+        final String token = jwt.createToken(mock(Principal.class));
+
+        assertThat(jwt.validateToken(token)).isTrue();
+        assertThat(jwt.getIdentityProvider()).isEqualTo(IdentityProvider.LOCAL);
+    }
+
+    @Test
+    public void createTokenShouldUseProvidedIdentityProvider() {
+        final JsonWebToken jwt = new JsonWebToken();
+
+        final String token = jwt.createToken(mock(Principal.class), null, IdentityProvider.OPENID_CONNECT);
+
+        assertThat(jwt.validateToken(token)).isTrue();
+        assertThat(jwt.getIdentityProvider()).isEqualTo(IdentityProvider.OPENID_CONNECT);
+    }
+
 }
