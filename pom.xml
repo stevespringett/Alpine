@@ -182,7 +182,7 @@
         <!-- Unit test libraries -->
         <lib.junit.version>4.13</lib.junit.version>
         <lib.mockito.version>3.3.3</lib.mockito.version>
-        <lib.assertj.version>3.15.0</lib.assertj.version>
+        <lib.assertj.version>3.16.0</lib.assertj.version>
         <lib.wiremock.version>2.26.0</lib.wiremock.version>
 
         <!-- Logback configuration - Used for Embedded Jetty profile -->
