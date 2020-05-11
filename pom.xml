@@ -159,7 +159,7 @@
         -->
         <lib.datanucleus.version>5.2.2</lib.datanucleus.version>
         <lib.h2.version>1.4.200</lib.h2.version>
-        <lib.hikaricp.version>3.3.1</lib.hikaricp.version>
+        <lib.hikaricp.version>3.4.5</lib.hikaricp.version>
         <lib.javassist.version>3.27.0-GA</lib.javassist.version>
         <lib.jackson.version>2.10.3</lib.jackson.version>
         <lib.javamail.version>1.6.2</lib.javamail.version>
