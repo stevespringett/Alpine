@@ -143,6 +143,7 @@ public class Config {
         HTTP_PROXY_USERNAME       ("alpine.http.proxy.username",        null),
         HTTP_PROXY_PASSWORD       ("alpine.http.proxy.password",        null),
         HTTP_PROXY_PASSWORD_FILE  ("alpine.http.proxy.password.file",   null),
+        NO_PROXY                  ("alpine.no.proxy",                   null),
         CORS_ENABLED              ("alpine.cors.enabled",               true),
         CORS_ALLOW_ORIGIN         ("alpine.cors.allow.origin",          "*"),
         CORS_ALLOW_METHODS        ("alpine.cors.allow.methods",         "GET POST PUT DELETE OPTIONS"),
