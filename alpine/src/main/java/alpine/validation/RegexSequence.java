@@ -19,7 +19,7 @@
 package alpine.validation;
 
 /**
- * RegexSequence contains a library of commonly used regular expressions 
+ * RegexSequence contains a library of commonly used regular expressions
  * used to validate untrusted input.
  *
  * @author Steve Springett
@@ -75,9 +75,10 @@ public class RegexSequence {
         public static final String HASH_MD5 = "^[0-9a-f]{32}$";
         public static final String HASH_SHA1 = "^[0-9a-f]{40}$";
         public static final String HASH_SHA256 = "^[0-9a-f]{64}$";
+        public static final String HASH_SHA384 = "^[0-9a-f]{96}$";
         public static final String HASH_SHA512 = "^[0-9a-f]{128}$";
         public static final String HASH_MD5_SHA1 = "^([0-9a-f]{32}|[0-9a-f]{40})$";
-        public static final String HASH_MD5_SHA1_SHA256_SHA512 = "^([0-9a-f]{32}|[0-9a-f]{40}|[0-9a-f]{64}|[0-9a-f]{128})$";
+        public static final String HASH_MD5_SHA1_SHA256_SHA384_SHA512 = "^([0-9a-f]{32}|[0-9a-f]{40}|[0-9a-f]{64}|[0-9a-f]{96}|[0-9a-f]{128})$";
 
         public static final String SAFESTRING = "^[\\p{L}\\p{N}.]{0,1024}$";
         public static final String HTML_HEX_CODE = "^#?([a-f]|[A-F]|[0-9]){3}(([a-f]|[A-F]|[0-9]){3})?$";
@@ -137,9 +138,10 @@ public class RegexSequence {
         public static final java.util.regex.Pattern HASH_MD5 = java.util.regex.Pattern.compile(RegexSequence.Definition.HASH_MD5);
         public static final java.util.regex.Pattern HASH_SHA1 = java.util.regex.Pattern.compile(RegexSequence.Definition.HASH_SHA1);
         public static final java.util.regex.Pattern HASH_SHA256 = java.util.regex.Pattern.compile(RegexSequence.Definition.HASH_SHA256);
+        public static final java.util.regex.Pattern HASH_SHA384 = java.util.regex.Pattern.compile(RegexSequence.Definition.HASH_SHA384);
         public static final java.util.regex.Pattern HASH_SHA512 = java.util.regex.Pattern.compile(RegexSequence.Definition.HASH_SHA512);
         public static final java.util.regex.Pattern HASH_MD5_SHA1 = java.util.regex.Pattern.compile(RegexSequence.Definition.HASH_MD5_SHA1);
-        public static final java.util.regex.Pattern HASH_MD5_SHA1_SHA256_SHA512 = java.util.regex.Pattern.compile(RegexSequence.Definition.HASH_MD5_SHA1_SHA256_SHA512);
+        public static final java.util.regex.Pattern HASH_MD5_SHA1_SHA256_SHA512 = java.util.regex.Pattern.compile(RegexSequence.Definition.HASH_MD5_SHA1_SHA256_SHA384_SHA512);
 
         public static final java.util.regex.Pattern SAFESTRING = java.util.regex.Pattern.compile(RegexSequence.Definition.SAFESTRING);
         public static final java.util.regex.Pattern HTML_HEX_CODE = java.util.regex.Pattern.compile(RegexSequence.Definition.HTML_HEX_CODE);
