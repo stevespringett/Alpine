@@ -15,14 +15,19 @@ import javax.ws.rs.core.MediaType;
  */
 public class OidcConfigurationResolver {
 
-    private static final OidcConfigurationResolver INSTANCE = new OidcConfigurationResolver(Config.getInstance().getProperty(Config.AlpineKey.OIDC_ISSUER));
+    private static final OidcConfigurationResolver INSTANCE = new OidcConfigurationResolver(
+            Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.OIDC_ENABLED),
+            Config.getInstance().getProperty(Config.AlpineKey.OIDC_ISSUER)
+    );
     private static final Logger LOGGER = Logger.getLogger(OidcConfigurationResolver.class);
     static final String OPENID_CONFIGURATION_PATH = "/.well-known/openid-configuration";
     static final String CONFIGURATION_CACHE_KEY = "OIDC_CONFIGURATION";
 
+    private final boolean oidcEnabled;
     private final String issuer;
 
-    OidcConfigurationResolver(final String issuer) {
+    OidcConfigurationResolver(final boolean oidcEnabled, final String issuer) {
+        this.oidcEnabled = oidcEnabled;
         this.issuer = issuer;
     }
 
@@ -37,6 +42,11 @@ public class OidcConfigurationResolver {
      */
     @Nullable
     public OidcConfiguration resolve() {
+        if (!oidcEnabled) {
+            LOGGER.debug("Will not resolve OIDC configuration: OIDC is disabled");
+            return null;
+        }
+
         if (issuer == null) {
             LOGGER.error("Cannot resolve OIDC configuration: No issuer provided");
             return null;
