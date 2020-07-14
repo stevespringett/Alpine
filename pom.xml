@@ -137,13 +137,16 @@
         <plugin.retirejs.indentSize>4</plugin.retirejs.indentSize>
 
         <!-- CycloneDX SBOM Creation -->
-        <maven.cyclonedx.plugin.version>1.6.4</maven.cyclonedx.plugin.version>
+        <maven.cyclonedx.plugin.version>2.0.0</maven.cyclonedx.plugin.version>
+        <plugin.cyclonedx.projectType>framework</plugin.cyclonedx.projectType>
+        <plugin.cyclonedx.schemaVersion>1.2</plugin.cyclonedx.schemaVersion>
+        <plugin.cyclonedx.outputFormat>all</plugin.cyclonedx.outputFormat>
         <plugin.cyclonedx.includeCompileScope>true</plugin.cyclonedx.includeCompileScope>
         <plugin.cyclonedx.includeProvidedScope>true</plugin.cyclonedx.includeProvidedScope>
         <plugin.cyclonedx.includeRuntimeScope>true</plugin.cyclonedx.includeRuntimeScope>
         <plugin.cyclonedx.includeSystemScope>true</plugin.cyclonedx.includeSystemScope>
         <plugin.cyclonedx.includeTestScope>false</plugin.cyclonedx.includeTestScope>
-        <plugin.cyclonedx.includeDependencyGraph>true</plugin.cyclonedx.includeDependencyGraph>
+        <plugin.cyclonedx.includeLicenseText>false</plugin.cyclonedx.includeLicenseText>
 
         <!-- Dependency Versions -->
         <lib.alpine.executable.war.version>1.2.3</lib.alpine.executable.war.version>
@@ -536,12 +539,15 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <projectType>${plugin.cyclonedx.projectType}</projectType>
+                    <schemaVersion>${plugin.cyclonedx.schemaVersion}</schemaVersion>
                     <includeCompileScope>${plugin.cyclonedx.includeCompileScope}</includeCompileScope>
                     <includeProvidedScope>${plugin.cyclonedx.includeProvidedScope}</includeProvidedScope>
                     <includeRuntimeScope>${plugin.cyclonedx.includeRuntimeScope}</includeRuntimeScope>
                     <includeSystemScope>${plugin.cyclonedx.includeSystemScope}</includeSystemScope>
                     <includeTestScope>${plugin.cyclonedx.includeTestScope}</includeTestScope>
-                    <includeDependencyGraph>${plugin.cyclonedx.includeDependencyGraph}</includeDependencyGraph>
+                    <includeLicenseText>${plugin.cyclonedx.includeLicenseText}</includeLicenseText>
+                    <outputFormat>${plugin.cyclonedx.outputFormat}</outputFormat>
                 </configuration>
             </plugin>
             <plugin>
