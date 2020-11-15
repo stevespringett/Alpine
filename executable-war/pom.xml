@@ -95,7 +95,7 @@
 
         <!-- Dependency Versions -->
         <lib.slf4j.version>1.7.30</lib.slf4j.version>
-        <lib.jetty.version>9.4.27.v20200227</lib.jetty.version>
+        <lib.jetty.version>9.4.34.v20201102</lib.jetty.version>
         <lib.logback.version>1.2.3</lib.logback.version>
 
         <!-- CycloneDX SBOM Creation -->
