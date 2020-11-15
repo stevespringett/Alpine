@@ -22,7 +22,9 @@ import alpine.Config;
 import alpine.logging.Logger;
 import alpine.util.DbUtil;
 import alpine.util.VersionComparator;
+import java.io.Closeable;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -35,7 +37,7 @@ import java.sql.Timestamp;
  * @author Steve Springett
  * @since 1.2.0
  */
-public class UpgradeMetaProcessor {
+public class UpgradeMetaProcessor implements Closeable {
 
     private final static Logger LOGGER = Logger.getLogger(UpgradeMetaProcessor.class);
 
@@ -48,6 +50,16 @@ public class UpgradeMetaProcessor {
      */
     public UpgradeMetaProcessor(final Connection connection) {
         this.connection = connection;
+    }
+
+    /**
+     * Constructs a new UpgradeMetaProcessor object
+     * along with a new SQL Connection object.
+     * @throws UpgradeException when an error occurs creating a Connection object
+     * @since 1.8.0
+     */
+    public UpgradeMetaProcessor() throws UpgradeException {
+        this.connection = createConnection();
     }
 
     /**
@@ -159,5 +171,34 @@ public class UpgradeMetaProcessor {
             DbUtil.close(statement);
             //DbUtil.close(connection); // do not close connection
         }
+    }
+
+    /**
+     * Creates a SQL Connection object.
+     */
+    private Connection createConnection() throws UpgradeException {
+        final String driver = Config.getInstance().getProperty(Config.AlpineKey.DATABASE_DRIVER);
+        final String dbUrl = Config.getInstance().getProperty(Config.AlpineKey.DATABASE_URL);
+        final String user = Config.getInstance().getProperty(Config.AlpineKey.DATABASE_USERNAME);
+        final String password = Config.getInstance().getProperty(Config.AlpineKey.DATABASE_PASSWORD);
+        try {
+            Class.forName(driver);
+            return DriverManager.getConnection(dbUrl, user, password);
+        } catch (ClassNotFoundException e) {
+            LOGGER.error("Unable to load JDBC driver.", e);
+            throw new UpgradeException("Unable to load JDBC driver.", e);
+        } catch (SQLException e) {
+            LOGGER.error("An error occurred connecting to the database.", e);
+            throw new UpgradeException("An error occurred connecting to the database.", e);
+        }
+    }
+
+    /**
+     * Closing a Connection object should only be done when this class creates the Connection
+     * and not when a Connection is passed to this objects constructor.
+     */
+    @Override
+    public void close() {
+        DbUtil.close(connection);
     }
 }
