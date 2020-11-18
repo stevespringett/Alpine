@@ -183,7 +183,7 @@
         <lib.slf4j.version>1.7.30</lib.slf4j.version>
         <lib.swagger.jersey.version>1.6.1</lib.swagger.jersey.version>
         <!-- Unit test libraries -->
-        <lib.junit.version>4.13</lib.junit.version>
+        <lib.junit.version>4.13.1</lib.junit.version>
         <lib.mockito.version>3.3.3</lib.mockito.version>
         <lib.assertj.version>3.18.1</lib.assertj.version>
         <lib.wiremock.version>2.26.0</lib.wiremock.version>
