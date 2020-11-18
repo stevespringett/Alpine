@@ -44,9 +44,15 @@ public class JavaVersion {
             update = NumberUtils.toInt(javaVersionElements[3]);
         } else {
             final String[] javaVersionElements = versionString.split("\\.|\\+");
-            major = NumberUtils.toInt(javaVersionElements[0]);
-            minor = NumberUtils.toInt(javaVersionElements[1]);
-            update = NumberUtils.toInt(javaVersionElements[2]);
+            if (javaVersionElements.length > 0) {
+                major = NumberUtils.toInt(javaVersionElements[0]);
+            }
+            if (javaVersionElements.length > 1) {
+                minor = NumberUtils.toInt(javaVersionElements[1]);
+            }
+            if (javaVersionElements.length > 2) {
+                update = NumberUtils.toInt(javaVersionElements[2]);
+            }
         }
     }
 
