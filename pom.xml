@@ -164,13 +164,13 @@
         <lib.h2.version>1.4.200</lib.h2.version>
         <lib.hikaricp.version>3.3.1</lib.hikaricp.version>
         <lib.javassist.version>3.27.0-GA</lib.javassist.version>
-        <lib.jackson.version>2.11.0</lib.jackson.version>
-        <lib.javamail.version>1.6.2</lib.javamail.version>
+        <lib.jackson.version>2.11.3</lib.jackson.version>
+        <lib.javamail.version>1.6.5</lib.javamail.version>
         <lib.jaxb.api.version>2.3.1</lib.jaxb.api.version>
         <lib.jaxb.core.version>2.3.0.1</lib.jaxb.core.version>
         <lib.jaxb.impl.version>2.3.3</lib.jaxb.impl.version>
         <lib.jdo.api.version>3.2.0-m13</lib.jdo.api.version>
-        <lib.jersey.version>2.29.1</lib.jersey.version>
+        <lib.jersey.version>2.32</lib.jersey.version>
         <lib.jsp.api.version>2.2</lib.jsp.api.version>
         <lib.jsonwebtoken.version>0.9.1</lib.jsonwebtoken.version>
         <lib.jsr305.version>3.0.2</lib.jsr305.version>
@@ -291,6 +291,12 @@
             <groupId>io.swagger</groupId>
             <artifactId>swagger-jersey2-jaxrs</artifactId>
             <version>${lib.swagger.jersey.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.validation</groupId>
+                    <artifactId>validation-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- Persistence -->
         <dependency>
@@ -408,7 +414,7 @@
         <!-- JavaMail API -->
         <dependency>
             <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
+            <artifactId>jakarta.mail</artifactId>
             <version>${lib.javamail.version}</version>
         </dependency>
         <!-- Quality -->
