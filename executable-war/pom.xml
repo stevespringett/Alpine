@@ -99,7 +99,7 @@
         <lib.logback.version>1.2.3</lib.logback.version>
 
         <!-- CycloneDX SBOM Creation -->
-        <maven.cyclonedx.plugin.version>2.1.0</maven.cyclonedx.plugin.version>
+        <maven.cyclonedx.plugin.version>2.1.1</maven.cyclonedx.plugin.version>
         <plugin.cyclonedx.includeCompileScope>true</plugin.cyclonedx.includeCompileScope>
         <plugin.cyclonedx.includeProvidedScope>true</plugin.cyclonedx.includeProvidedScope>
         <plugin.cyclonedx.includeRuntimeScope>true</plugin.cyclonedx.includeRuntimeScope>
