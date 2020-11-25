@@ -184,7 +184,7 @@
         <lib.swagger.jersey.version>1.6.2</lib.swagger.jersey.version>
         <!-- Unit test libraries -->
         <lib.junit.version>4.13.1</lib.junit.version>
-        <lib.mockito.version>3.6.0</lib.mockito.version>
+        <lib.mockito.version>3.6.28</lib.mockito.version>
         <lib.assertj.version>3.18.1</lib.assertj.version>
         <lib.wiremock.version>2.27.2</lib.wiremock.version>
 
