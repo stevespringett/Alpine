@@ -151,7 +151,7 @@
         <!-- Dependency Versions -->
         <lib.alpine.executable.war.version>1.2.6</lib.alpine.executable.war.version>
         <lib.bcrypt.version>0.4</lib.bcrypt.version>
-        <lib.caffeine.version>2.8.6</lib.caffeine.version>
+        <lib.caffeine.version>2.8.8</lib.caffeine.version>
         <lib.commons.collections4.version>4.4</lib.commons.collections4.version>
         <lib.commons.io.version>2.8.0</lib.commons.io.version>
         <lib.commons.lang3.version>3.11</lib.commons.lang3.version>
@@ -164,7 +164,7 @@
         <lib.h2.version>1.4.200</lib.h2.version>
         <lib.hikaricp.version>3.3.1</lib.hikaricp.version>
         <lib.javassist.version>3.27.0-GA</lib.javassist.version>
-        <lib.jackson.version>2.11.3</lib.jackson.version>
+        <lib.jackson.version>2.12.0</lib.jackson.version>
         <lib.javamail.version>1.6.5</lib.javamail.version>
         <lib.jaxb.api.version>2.3.1</lib.jaxb.api.version>
         <lib.jaxb.core.version>2.3.0.1</lib.jaxb.core.version>
@@ -184,7 +184,7 @@
         <lib.swagger.jersey.version>1.6.2</lib.swagger.jersey.version>
         <!-- Unit test libraries -->
         <lib.junit.version>4.13.1</lib.junit.version>
-        <lib.mockito.version>3.6.0</lib.mockito.version>
+        <lib.mockito.version>3.6.28</lib.mockito.version>
         <lib.assertj.version>3.18.1</lib.assertj.version>
         <lib.wiremock.version>2.27.2</lib.wiremock.version>
 
