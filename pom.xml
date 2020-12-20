@@ -188,6 +188,8 @@
         <lib.assertj.version>3.18.1</lib.assertj.version>
         <lib.wiremock.version>2.27.2</lib.wiremock.version>
 
+        <war-embedded-finalname>${project.build.finalName}-embedded</war-embedded-finalname>
+
         <!-- Logback configuration - Used for Embedded Jetty profile -->
         <logback.configuration.file>${project.build.directory}/classes/logback.xml</logback.configuration.file>
     </properties>
@@ -852,7 +854,7 @@
                         <artifactId>maven-war-plugin</artifactId>
                         <version>${maven.war.plugin.version}</version>
                         <configuration>
-                            <warName>${project.build.finalName}-embedded</warName>
+                            <warName>${war-embedded-finalname}</warName>
                             <archive>
                                 <manifest>
                                     <mainClass>alpine.embedded.EmbeddedJettyServer</mainClass>
