@@ -50,7 +50,7 @@ public class RegexSequence {
         public static final String HTTP_CONTEXT_PATH = "^\\/?[a-zA-Z0-9.\\-\\/_]*$";
         public static final String HTTP_PATH = "^[a-zA-Z0-9.\\-_]*$";
         public static final String HTTP_QUERY_STRING = "^[\\w()\\-=\\*\\.\\?;,+\\/:& %]*$";
-        public static final String HTTP_URI = "^[\\w()\\-=\\*\\.\\?;,+\\/:& ]*$";
+        public static final String HTTP_URI = "^[\\w()\\-=\\*\\.\\?;,+\\/:&@ ]*$";
         public static final String HTTP_URL = "^.*$";
         public static final String HTTP_JSESSION_ID = "^[A-Z0-9]{10,128}$";
 
