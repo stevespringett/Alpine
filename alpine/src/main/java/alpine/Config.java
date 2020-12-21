@@ -146,7 +146,7 @@ public class Config {
         NO_PROXY                  ("alpine.no.proxy",                   null),
         CORS_ENABLED              ("alpine.cors.enabled",               true),
         CORS_ALLOW_ORIGIN         ("alpine.cors.allow.origin",          "*"),
-        CORS_ALLOW_METHODS        ("alpine.cors.allow.methods",         "GET POST PUT DELETE OPTIONS"),
+        CORS_ALLOW_METHODS        ("alpine.cors.allow.methods",         "GET, POST, PUT, DELETE, OPTIONS"),
         CORS_ALLOW_HEADERS        ("alpine.cors.allow.headers",         "Origin, Content-Type, Authorization, X-Requested-With, Content-Length, Accept, Origin, X-Api-Key, X-Total-Count, *"),
         CORS_EXPOSE_HEADERS       ("alpine.cors.expose.headers",        "Origin, Content-Type, Authorization, X-Requested-With, Content-Length, Accept, Origin, X-Api-Key, X-Total-Count"),
         CORS_ALLOW_CREDENTIALS    ("alpine.cors.allow.credentials",     true),
