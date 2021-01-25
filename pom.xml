@@ -162,7 +162,7 @@
         -->
         <lib.datanucleus.version>5.2.5</lib.datanucleus.version>
         <lib.h2.version>1.4.200</lib.h2.version>
-        <lib.hikaricp.version>3.3.1</lib.hikaricp.version>
+        <lib.hikaricp.version>4.0.0</lib.hikaricp.version>
         <lib.javassist.version>3.27.0-GA</lib.javassist.version>
         <lib.jackson.version>2.12.0</lib.jackson.version>
         <lib.javamail.version>1.6.5</lib.javamail.version>
