@@ -23,15 +23,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.util.Properties;
 import java.util.UUID;
+import alpine.util.ByteFormat;
 import org.apache.commons.lang3.StringUtils;
 import alpine.logging.Logger;
 import alpine.util.PathUtil;
@@ -62,6 +57,7 @@ public class Config {
         LOGGER.info("OS Version:   " + SystemUtil.getOsVersion());
         LOGGER.info("OS Arch:      " + SystemUtil.getOsArchitecture());
         LOGGER.info("CPU Cores:    " + SystemUtil.getCpuCores());
+        LOGGER.info("Max Memory:   " + new ByteFormat().minimumFractionDigits(1).format2(SystemUtil.getMaxMemory()));
         LOGGER.info("Java Vendor:  " + SystemUtil.getJavaVendor());
         LOGGER.info("Java Version: " + SystemUtil.getJavaVersion());
         LOGGER.info("Java Home:    " + SystemUtil.getJavaHome());
@@ -105,7 +101,6 @@ public class Config {
         DATABASE_PORT             ("alpine.database.port",              9092),
         DATABASE_URL              ("alpine.database.url",               "jdbc:h2:mem:alpine"),
         DATABASE_DRIVER           ("alpine.database.driver",            "org.h2.Driver"),
-        DATABASE_DRIVER_PATH      ("alpine.database.driver.path",       null),
         DATABASE_USERNAME         ("alpine.database.username",          "sa"),
         DATABASE_PASSWORD         ("alpine.database.password",          ""),
         DATABASE_PASSWORD_FILE    ("alpine.database.password.file",     null),
@@ -477,41 +472,6 @@ public class Config {
     @Deprecated
     public String getProperty(String key, String defaultValue) {
         return properties.getProperty(key, defaultValue);
-    }
-
-    /**
-     * Extends the runtime classpath to include the files or directories specified.
-     * @param paths one or more strings representing a single JAR file or a directory containing JARs.
-     * @since 1.0.0
-     */
-    public void expandClasspath(String... paths) {
-        if (paths == null || paths.length == 0) {
-            return;
-        }
-        for (String path: paths) {
-            expandClasspath(new File(PathUtil.resolve(path)));
-        }
-    }
-
-    /**
-     * Extends the runtime classpath to include the files or directories specified.
-     * @param files one or more File objects representing a single JAR file or a directory containing JARs.
-     * @since 1.0.0
-     */
-    public void expandClasspath(File... files) {
-        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        Class<URLClassLoader> urlClass = URLClassLoader.class;
-        for (File file: files) {
-            LOGGER.info("Expanding classpath to include: " + file.getAbsolutePath());
-            URI fileUri = file.toURI();
-            try {
-                Method method = urlClass.getDeclaredMethod("addURL", URL.class);
-                method.setAccessible(true);
-                method.invoke(classLoader, fileUri.toURL());
-            } catch (MalformedURLException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                LOGGER.error("Error expanding classpath", e);
-            }
-        }
     }
 
     /**

@@ -45,7 +45,7 @@ public final class SystemUtil {
     private static boolean bit32;
     private static boolean bit64;
 
-    private static final JavaVersion JAVA_VERSION = new JavaVersion();
+    private static final Runtime.Version JAVA_VERSION = Runtime.version();
 
     private static final String BIT_BUCKET_UNIX = "/dev/null";
     private static final String BIT_BUCKET_WIN = "NUL"; // Yes, it's only one 'L'
@@ -218,7 +218,7 @@ public final class SystemUtil {
      * @return JavaVersion containing Java version information
      * @since 1.0
      */
-    public static JavaVersion getJavaVersion() {
+    public static Runtime.Version getJavaVersion() {
         return JAVA_VERSION;
     }
 
@@ -278,6 +278,15 @@ public final class SystemUtil {
      */
     public static int getCpuCores() {
         return Runtime.getRuntime().availableProcessors();
+    }
+
+    /**
+     * Returns the number of processor cores available to the JVM.
+     * @return an integer of the number of processor core
+     * @since 1.9.0
+     */
+    public static long getMaxMemory() {
+        return Runtime.getRuntime().maxMemory();
     }
 
     /**

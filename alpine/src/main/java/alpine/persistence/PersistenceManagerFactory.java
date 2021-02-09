@@ -22,7 +22,6 @@ import alpine.Config;
 import alpine.logging.Logger;
 import alpine.model.InstalledUpgrades;
 import alpine.model.SchemaVersion;
-import alpine.util.JavaVersion;
 import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.api.jdo.JDOPersistenceManagerFactory;
 import org.datanucleus.store.schema.SchemaAwareStoreManager;
@@ -49,19 +48,6 @@ public class PersistenceManagerFactory implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent event) {
         LOGGER.info("Initializing persistence framework");
-
-        final String driverPath = Config.getInstance().getProperty(Config.AlpineKey.DATABASE_DRIVER_PATH);
-        if (driverPath != null) {
-            final JavaVersion jv = new JavaVersion();
-            if (jv.getMajor() > 8) {
-                LOGGER.warn("Cannot dynamically expand classpath to include database driver. This capability "
-                        + "was removed in Java 11 and higher. Please add the database driver to the classpath "
-                        + "when starting the application.");
-            } else {
-                Config.getInstance().expandClasspath(driverPath);
-            }
-        }
-
         pmf = (JDOPersistenceManagerFactory)JDOHelper.getPersistenceManagerFactory(JdoProperties.get(), "Alpine");
 
         // Ensure that the UpgradeMetaProcessor and SchemaVersion tables are created NOW, not dynamically at runtime.

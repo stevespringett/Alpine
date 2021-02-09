@@ -177,12 +177,32 @@ public class ByteFormat {
     }
 
     /**
+     * Set the minimum number of fraction digits.  (See constructor for default.)
+     * @param d int
+     * @since 1.9.0
+     */
+    public ByteFormat minimumFractionDigits(int d) {
+        this.setMinimumFractionDigits(d);
+        return this;
+    }
+
+    /**
      * Set the maximum number of fraction digits.  (See constructor for default.)
      * @param d int
      * @since 1.0.0
      */
     public void setMaximumFractionDigits(int d) {
         numberFormat.setMaximumFractionDigits(d);
+    }
+
+    /**
+     * Set the maximum number of fraction digits.  (See constructor for default.)
+     * @param d int
+     * @since 1.9.0
+     */
+    public ByteFormat maximumFractionDigits(int d) {
+        this.setMaximumFractionDigits(d);
+        return this;
     }
 
     /**
@@ -198,6 +218,18 @@ public class ByteFormat {
         } else {
             this.names = names.clone();
         }
+    }
+
+    /**
+     * Set the names[] array to something other than the default one (see constructor).  You could do this,
+     * for example, if you wanted to spell out "gigabytes" instead of using "GB".
+     * Note:  The new array must be the same size as the original.  (There is no error checking to enforce this.)
+     * @param names String[]
+     * @since 1.9.0
+     */
+    public ByteFormat names(String[] names) {
+        this.setNames(names);
+        return this;
     }
 
 }
