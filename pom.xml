@@ -151,7 +151,7 @@
         <!-- Dependency Versions -->
         <lib.alpine.executable.war.version>1.2.7</lib.alpine.executable.war.version>
         <lib.bcrypt.version>0.4</lib.bcrypt.version>
-        <lib.caffeine.version>2.8.8</lib.caffeine.version>
+        <lib.caffeine.version>3.0.0</lib.caffeine.version>
         <lib.commons.collections4.version>4.4</lib.commons.collections4.version>
         <lib.commons.io.version>2.8.0</lib.commons.io.version>
         <lib.commons.lang3.version>3.11</lib.commons.lang3.version>
