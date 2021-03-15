@@ -19,8 +19,3 @@ jobs:
         wget -O ~/codacy-coverage-reporter-assembly.jar https://github.com/codacy/codacy-coverage-reporter/releases/download/4.0.5/codacy-coverage-reporter-4.0.5-assembly.jar
     - name: Build with Maven
       run: mvn clean install
-    - name: Publish test coverage
-      if: github.event_name == 'push'
-      #env:
-        #CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
-      #run: java -jar ~/codacy-coverage-reporter-assembly.jar report -l Java -r alpine/target/jacoco-ut/jacoco.xml
