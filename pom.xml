@@ -137,7 +137,7 @@
         <plugin.retirejs.indentSize>4</plugin.retirejs.indentSize>
 
         <!-- CycloneDX SBOM Creation -->
-        <maven.cyclonedx.plugin.version>2.2.0</maven.cyclonedx.plugin.version>
+        <maven.cyclonedx.plugin.version>2.3.0</maven.cyclonedx.plugin.version>
         <plugin.cyclonedx.projectType>framework</plugin.cyclonedx.projectType>
         <plugin.cyclonedx.schemaVersion>1.2</plugin.cyclonedx.schemaVersion>
         <plugin.cyclonedx.outputFormat>all</plugin.cyclonedx.outputFormat>
