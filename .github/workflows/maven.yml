@@ -21,6 +21,6 @@ jobs:
       run: mvn clean install
     - name: Publish test coverage
       if: github.event_name == 'push'
-      env:
-        CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
-      run: java -jar ~/codacy-coverage-reporter-assembly.jar report -l Java -r alpine/target/jacoco-ut/jacoco.xml
+      #env:
+        #CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+      #run: java -jar ~/codacy-coverage-reporter-assembly.jar report -l Java -r alpine/target/jacoco-ut/jacoco.xml
