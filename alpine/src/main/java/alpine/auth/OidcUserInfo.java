@@ -2,7 +2,6 @@ package alpine.auth;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,35 +12,25 @@ import java.util.Map;
  */
 public class OidcUserInfo {
 
-    @JsonProperty("sub")
-    private String subject;
+    private final Map<String, Object> claims;
 
-    @JsonProperty("email")
-    private String email;
-
-    private Map<String, Object> claims = new HashMap<>();
-
-    public String getSubject() {
-        return subject;
+    OidcUserInfo() {
+        claims = new HashMap<>();
     }
 
-    public void setSubject(final String subject) {
-        this.subject = subject;
+    public String getSubject() {
+        return getClaim("sub", String.class);
     }
 
     public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(final String email) {
-        this.email = email;
+        return getClaim("email", String.class);
     }
 
     @JsonAnyGetter
     public Map<String, Object> getClaims() {
         return claims;
     }
-
+    
     @SuppressWarnings("unchecked")
     public <T> T getClaim(final String key, final Class<T> clazz) {
         final Object claim = claims.get(key);
