@@ -68,6 +68,7 @@ public class OidcAuthenticationService implements AuthenticationService {
         final String username = userInfo.getClaim(usernameClaim, String.class);
         if (username == null) {
             LOGGER.error("The configured OIDC username claim (" + usernameClaim + ") could not be found in UserInfo response");
+            LOGGER.debug("Claims returned in UserInfo response: " + userInfo.getClaims());
             throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.OTHER);
         }
 
