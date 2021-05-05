@@ -129,6 +129,7 @@ public class Config {
         LDAP_TEAM_SYNCHRONIZATION ("alpine.ldap.team.synchronization",  false),
         OIDC_ENABLED              ("alpine.oidc.enabled",              false),
         OIDC_ISSUER               ("alpine.oidc.issuer",                null),
+        OIDC_CLIENT_ID            ("alpine.oidc.client.id",             null),
         OIDC_USERNAME_CLAIM       ("alpine.oidc.username.claim",       "sub"),
         OIDC_USER_PROVISIONING    ("alpine.oidc.user.provisioning",    false),
         OIDC_TEAM_SYNCHRONIZATION ("alpine.oidc.team.synchronization", false),
