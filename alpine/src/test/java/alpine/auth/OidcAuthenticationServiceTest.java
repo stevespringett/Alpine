@@ -17,7 +17,12 @@ import wiremock.org.apache.http.HttpHeaders;
 import wiremock.org.apache.http.HttpStatus;
 import wiremock.org.apache.http.entity.ContentType;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -44,15 +49,15 @@ public class OidcAuthenticationServiceTest {
     }
 
     @Before
-    public void setUp() {
+    public void setUp() throws URISyntaxException {
         configMock = mock(Config.class);
         oidcConfigurationMock = mock(OidcConfiguration.class);
 
         when(configMock.getProperty(eq(Config.AlpineKey.OIDC_USERNAME_CLAIM)))
                 .thenReturn(USERNAME_CLAIM);
 
-        when(oidcConfigurationMock.getUserInfoEndpointUri().toString())
-                .thenReturn(wireMockRule.url(OIDC_USERINFO_PATH));
+        when(oidcConfigurationMock.getUserInfoEndpointUri())
+                .thenReturn(new URI(wireMockRule.url(OIDC_USERINFO_PATH)));
     }
 
     @After
@@ -72,11 +77,11 @@ public class OidcAuthenticationServiceTest {
     }
 
     @Test
-    public void isSpecifiedShouldReturnFalseWhenAccessTokenIsNull() {
+    public void isSpecifiedShouldReturnFalseWhenAccessTokenAndIdTokenIsNull() {
         when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_ENABLED)))
                 .thenReturn(true);
 
-        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, null, ID_TOKEN);
+        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, null, null);
 
         assertThat(authService.isSpecified()).isFalse();
     }
@@ -107,7 +112,7 @@ public class OidcAuthenticationServiceTest {
                 .willReturn(aResponse()
                         .withStatus(HttpStatus.SC_UNAUTHORIZED)));
 
-        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN, ID_TOKEN);
+        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN, null);
 
         assertThatExceptionOfType(AlpineAuthenticationException.class)
                 .isThrownBy(authService::authenticate)
@@ -121,12 +126,12 @@ public class OidcAuthenticationServiceTest {
                 .willReturn(aResponse()
                         .withStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR)));
 
-        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN, ID_TOKEN);
+        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN, null);
 
         assertThatExceptionOfType(AlpineAuthenticationException.class)
                 .isThrownBy(authService::authenticate)
                 .satisfies(exception -> assertThat(exception.getCauseType())
-                        .isEqualTo(AlpineAuthenticationException.CauseType.OTHER));
+                        .isEqualTo(AlpineAuthenticationException.CauseType.INVALID_CREDENTIALS));
     }
 
     @Test
@@ -137,7 +142,7 @@ public class OidcAuthenticationServiceTest {
                         .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
                         .withBody("{}")));
 
-        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN, ID_TOKEN);
+        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN, null);
 
         assertThatExceptionOfType(AlpineAuthenticationException.class)
                 .isThrownBy(authService::authenticate)
@@ -178,7 +183,7 @@ public class OidcAuthenticationServiceTest {
                                 "    \"" + USERNAME_CLAIM + "\": \"username\"" +
                                 "}")));
 
-        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN, ID_TOKEN);
+        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN, null);
 
         OidcUser existingUser;
         try (final AlpineQueryManager qm = new AlpineQueryManager()) {
@@ -240,7 +245,7 @@ public class OidcAuthenticationServiceTest {
             qm.persist(mappedGroup);
         }
 
-        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN, ID_TOKEN);
+        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN, null);
 
         final OidcUser authenticatedUser = (OidcUser) authService.authenticate();
         assertThat(authenticatedUser.getTeams()).hasSize(1);
@@ -263,7 +268,7 @@ public class OidcAuthenticationServiceTest {
                                 "    \"" + USERNAME_CLAIM + "\": \"username\"" +
                                 "}")));
 
-        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN, ID_TOKEN);
+        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN, null);
 
         assertThatExceptionOfType(AlpineAuthenticationException.class)
                 .isThrownBy(authService::authenticate)
@@ -287,7 +292,7 @@ public class OidcAuthenticationServiceTest {
                                 "    \"" + USERNAME_CLAIM + "\": \"username\"" +
                                 "}")));
 
-        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN, ID_TOKEN);
+        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN, null);
 
         final OidcUser provisionedUser = (OidcUser) authService.authenticate();
         assertThat(provisionedUser).isNotNull();
@@ -318,7 +323,7 @@ public class OidcAuthenticationServiceTest {
             qm.createOidcUser("username");
         }
 
-        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN, ID_TOKEN);
+        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN, null);
 
         final OidcUser provisionedUser = (OidcUser) authService.authenticate();
         assertThat(provisionedUser).isNotNull();
@@ -353,7 +358,7 @@ public class OidcAuthenticationServiceTest {
             qm.persist(existingUser);
         }
 
-        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN, ID_TOKEN);
+        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN, null);
 
         assertThatExceptionOfType(AlpineAuthenticationException.class)
                 .isThrownBy(authService::authenticate)

@@ -16,6 +16,7 @@ import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
 import com.nimbusds.openid.connect.sdk.UserInfoRequest;
 import com.nimbusds.openid.connect.sdk.UserInfoResponse;
 import com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet;
+import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 import com.nimbusds.openid.connect.sdk.validators.IDTokenValidator;
 
 import javax.annotation.Nullable;
@@ -134,12 +135,12 @@ public class OidcAuthenticationService implements AuthenticationService {
             }
 
             if (isProfileComplete(mergedProfile, teamSyncEnabled)) {
-                LOGGER.debug("Profile complete, proceeding to authenticate");
+                LOGGER.debug("Merged profile is complete, proceeding to authenticate");
                 return authenticateInternal(mergedProfile);
             }
         }
 
-        LOGGER.error("Unable to gather complete profile (ID token: " + idTokenProfile +
+        LOGGER.error("Unable to assemble complete profile (ID token: " + idTokenProfile +
                 ", UserInfo: " + userInfoProfile + ", Merged: " + mergedProfile + ")");
         throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.OTHER);
     }
@@ -173,10 +174,10 @@ public class OidcAuthenticationService implements AuthenticationService {
         }
     }
 
-    private OidcProfile getProfileFromIdToken(final String rawIdToken, final String usernameClaim, final String teamsClaim) throws AlpineAuthenticationException {
-        final SignedJWT idToken;
+    private OidcProfile getProfileFromIdToken(final String idToken, final String usernameClaim, final String teamsClaim) throws AlpineAuthenticationException {
+        final SignedJWT parsedIdToken;
         try {
-            idToken = SignedJWT.parse(rawIdToken);
+            parsedIdToken = SignedJWT.parse(idToken);
         } catch (ParseException e) {
             LOGGER.error("Parsing ID token failed", e);
             throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.OTHER);
@@ -193,11 +194,11 @@ public class OidcAuthenticationService implements AuthenticationService {
         final var idTokenValidator = new IDTokenValidator(
                 new Issuer(oidcConfiguration.getIssuer()),
                 new ClientID(config.getProperty(Config.AlpineKey.OIDC_CLIENT_ID)),
-                idToken.getHeader().getAlgorithm(), jwkSet);
+                parsedIdToken.getHeader().getAlgorithm(), jwkSet);
 
         final IDTokenClaimsSet claimsSet;
         try {
-            claimsSet = idTokenValidator.validate(idToken, null);
+            claimsSet = idTokenValidator.validate(parsedIdToken, null);
             LOGGER.debug("ID token claims: " + claimsSet.toJSONString());
         } catch (BadJOSEException | JOSEException e) {
             LOGGER.error("ID token validation failed", e);
@@ -208,7 +209,7 @@ public class OidcAuthenticationService implements AuthenticationService {
         profile.setSubject(claimsSet.getSubject().getValue());
         profile.setUsername(claimsSet.getStringClaim(usernameClaim));
         profile.setTeams(claimsSet.getStringListClaim(teamsClaim));
-        profile.setEmail(claimsSet.getStringClaim("email"));
+        profile.setEmail(claimsSet.getStringClaim(UserInfo.EMAIL_CLAIM_NAME));
         return profile;
     }
 
@@ -248,7 +249,7 @@ public class OidcAuthenticationService implements AuthenticationService {
     private boolean isProfileComplete(final OidcProfile profile, final boolean teamSyncEnabled) {
         return profile.getSubject() != null
                 && profile.getUsername() != null
-                && (teamSyncEnabled && profile.getTeams() != null);
+                && (!teamSyncEnabled || (profile.getTeams() != null));
     }
 
     OidcProfile mergeProfiles(final OidcProfile left, final OidcProfile right) {
@@ -261,16 +262,7 @@ public class OidcAuthenticationService implements AuthenticationService {
     }
 
     private <T> T mergeProfileClaim(final T left, final T right) {
-        if (left != null) {
-            if (right == null) {
-                return left;
-            } else if (!left.equals(right)) {
-                throw new IllegalArgumentException("Conflicting profile claim: " + left + " vs " + right);
-            }
-            return left;
-        } else {
-            return right;
-        }
+        return (left != null) ? left : right;
     }
 
     JWKSet resolveJwkSet() throws IOException, ParseException {
