@@ -36,7 +36,7 @@ class OidcIdTokenAuthenticator {
             parsedIdToken = SignedJWT.parse(idToken);
         } catch (ParseException e) {
             LOGGER.error("Parsing ID token failed", e);
-            throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.OTHER);
+            throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.INVALID_CREDENTIALS);
         }
 
         final JWKSet jwkSet;
