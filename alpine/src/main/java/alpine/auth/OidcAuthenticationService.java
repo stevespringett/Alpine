@@ -1,28 +1,14 @@
 package alpine.auth;
 
 import alpine.Config;
-import alpine.cache.CacheManager;
 import alpine.logging.Logger;
 import alpine.model.OidcUser;
 import alpine.persistence.AlpineQueryManager;
 import alpine.util.OidcUtil;
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jose.proc.BadJOSEException;
-import com.nimbusds.jwt.SignedJWT;
-import com.nimbusds.oauth2.sdk.id.ClientID;
-import com.nimbusds.oauth2.sdk.id.Issuer;
-import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
-import com.nimbusds.openid.connect.sdk.UserInfoRequest;
-import com.nimbusds.openid.connect.sdk.UserInfoResponse;
-import com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet;
 import com.nimbusds.openid.connect.sdk.claims.UserInfo;
-import com.nimbusds.openid.connect.sdk.validators.IDTokenValidator;
 
 import javax.annotation.Nullable;
-import java.io.IOException;
 import java.security.Principal;
-import java.text.ParseException;
 
 /**
  * @since 1.8.0
@@ -30,10 +16,11 @@ import java.text.ParseException;
 public class OidcAuthenticationService implements AuthenticationService {
 
     private static final Logger LOGGER = Logger.getLogger(OidcAuthenticationService.class);
-    static final String JWK_SET_CACHE_KEY = "OIDC_JWK_SET";
 
     private final Config config;
     private final OidcConfiguration oidcConfiguration;
+    private final OidcIdTokenAuthenticator idTokenAuthenticator;
+    private final OidcUserInfoAuthenticator userInfoAuthenticator;
     private final String accessToken;
     private final String idToken;
 
@@ -59,8 +46,22 @@ public class OidcAuthenticationService implements AuthenticationService {
      * Constructor for unit tests
      */
     OidcAuthenticationService(final Config config, final OidcConfiguration oidcConfiguration, final String accessToken, final String idToken) {
+        this(config, oidcConfiguration, new OidcIdTokenAuthenticator(oidcConfiguration, config.getProperty(Config.AlpineKey.OIDC_CLIENT_ID)), new OidcUserInfoAuthenticator(oidcConfiguration), accessToken, idToken);
+    }
+
+    /**
+     * Constructor for unit tests
+     */
+    OidcAuthenticationService(final Config config,
+                              final OidcConfiguration oidcConfiguration,
+                              final OidcIdTokenAuthenticator idTokenAuthenticator,
+                              final OidcUserInfoAuthenticator userInfoAuthenticator,
+                              final String accessToken,
+                              final String idToken) {
         this.config = config;
         this.oidcConfiguration = oidcConfiguration;
+        this.idTokenAuthenticator = idTokenAuthenticator;
+        this.userInfoAuthenticator = userInfoAuthenticator;
         this.accessToken = accessToken;
         this.idToken = idToken;
     }
@@ -89,22 +90,31 @@ public class OidcAuthenticationService implements AuthenticationService {
     @Nullable
     @Override
     public Principal authenticate() throws AlpineAuthenticationException {
-        final String usernameClaim = config.getProperty(Config.AlpineKey.OIDC_USERNAME_CLAIM);
-        if (usernameClaim == null) {
+        final String usernameClaimName = config.getProperty(Config.AlpineKey.OIDC_USERNAME_CLAIM);
+        if (usernameClaimName == null) {
             LOGGER.error("No username claim has been configured");
             throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.OTHER);
         }
 
         final boolean teamSyncEnabled = config.getPropertyAsBoolean(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION);
-        final String teamsClaim = config.getProperty(Config.AlpineKey.OIDC_TEAMS_CLAIM);
-        if (teamSyncEnabled && teamsClaim == null) {
+        final String teamsClaimName = config.getProperty(Config.AlpineKey.OIDC_TEAMS_CLAIM);
+        if (teamSyncEnabled && teamsClaimName == null) {
             LOGGER.error("Team synchronization is enabled, but no teams claim has been configured");
             throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.OTHER);
         }
 
+        final OidcProfileCreator profileCreator = claims -> {
+            final var profile = new OidcProfile();
+            profile.setSubject(claims.getStringClaim(UserInfo.SUB_CLAIM_NAME));
+            profile.setUsername(claims.getStringClaim(usernameClaimName));
+            profile.setTeams(claims.getStringListClaim(teamsClaimName));
+            profile.setEmail(claims.getStringClaim(UserInfo.EMAIL_CLAIM_NAME));
+            return profile;
+        };
+
         OidcProfile idTokenProfile = null;
         if (idToken != null) {
-            idTokenProfile = getProfileFromIdToken(idToken, usernameClaim, teamsClaim);
+            idTokenProfile = idTokenAuthenticator.authenticate(idToken, profileCreator);
             LOGGER.debug("ID token profile: " + idTokenProfile);
 
             if (isProfileComplete(idTokenProfile, teamSyncEnabled)) {
@@ -115,7 +125,7 @@ public class OidcAuthenticationService implements AuthenticationService {
 
         OidcProfile userInfoProfile = null;
         if (accessToken != null) {
-            userInfoProfile = getProfileFromUserInfo(accessToken, usernameClaim, teamsClaim);
+            userInfoProfile = userInfoAuthenticator.authenticate(accessToken, profileCreator);
             LOGGER.debug("UserInfo profile: " + userInfoProfile);
 
             if (isProfileComplete(userInfoProfile, teamSyncEnabled)) {
@@ -174,78 +184,6 @@ public class OidcAuthenticationService implements AuthenticationService {
         }
     }
 
-    private OidcProfile getProfileFromIdToken(final String idToken, final String usernameClaim, final String teamsClaim) throws AlpineAuthenticationException {
-        final SignedJWT parsedIdToken;
-        try {
-            parsedIdToken = SignedJWT.parse(idToken);
-        } catch (ParseException e) {
-            LOGGER.error("Parsing ID token failed", e);
-            throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.OTHER);
-        }
-
-        final JWKSet jwkSet;
-        try {
-            jwkSet = resolveJwkSet();
-        } catch (IOException | ParseException e) {
-            LOGGER.error("Resolving JWK set failed", e);
-            throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.OTHER);
-        }
-
-        final var idTokenValidator = new IDTokenValidator(
-                new Issuer(oidcConfiguration.getIssuer()),
-                new ClientID(config.getProperty(Config.AlpineKey.OIDC_CLIENT_ID)),
-                parsedIdToken.getHeader().getAlgorithm(), jwkSet);
-
-        final IDTokenClaimsSet claimsSet;
-        try {
-            claimsSet = idTokenValidator.validate(parsedIdToken, null);
-            LOGGER.debug("ID token claims: " + claimsSet.toJSONString());
-        } catch (BadJOSEException | JOSEException e) {
-            LOGGER.error("ID token validation failed", e);
-            throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.INVALID_CREDENTIALS);
-        }
-
-        final var profile = new OidcProfile();
-        profile.setSubject(claimsSet.getSubject().getValue());
-        profile.setUsername(claimsSet.getStringClaim(usernameClaim));
-        profile.setTeams(claimsSet.getStringListClaim(teamsClaim));
-        profile.setEmail(claimsSet.getStringClaim(UserInfo.EMAIL_CLAIM_NAME));
-        return profile;
-    }
-
-    private OidcProfile getProfileFromUserInfo(final String accessToken, final String usernameClaim, final String teamsClaim) throws AlpineAuthenticationException {
-        final UserInfoResponse userInfoResponse;
-        try {
-            final var httpResponse =
-                    new UserInfoRequest(oidcConfiguration.getUserInfoEndpointUri(), new BearerAccessToken(accessToken))
-                            .toHTTPRequest()
-                            .send();
-            userInfoResponse = UserInfoResponse.parse(httpResponse);
-        } catch (IOException e) {
-            LOGGER.error("UserInfo request failed", e);
-            throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.OTHER);
-        } catch (com.nimbusds.oauth2.sdk.ParseException e) {
-            LOGGER.error("Parsing UserInfo response failed", e);
-            throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.OTHER);
-        }
-
-        if (!userInfoResponse.indicatesSuccess()) {
-            final var error = userInfoResponse.toErrorResponse().getErrorObject();
-            LOGGER.error("UserInfo request failed: " + error.getCode() + " - " + error.getDescription());
-            throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.INVALID_CREDENTIALS);
-        }
-
-        final var userInfo = userInfoResponse.toSuccessResponse().getUserInfo();
-        LOGGER.debug("UserInfo response: " + userInfo.toJSONString());
-
-        final var profile = new OidcProfile();
-        profile.setSubject(userInfo.getSubject().getValue());
-        profile.setUsername(userInfo.getStringClaim(usernameClaim));
-        profile.setTeams(userInfo.getStringListClaim(teamsClaim));
-        profile.setEmail(userInfo.getEmailAddress());
-        return profile;
-    }
-
     private boolean isProfileComplete(final OidcProfile profile, final boolean teamSyncEnabled) {
         return profile.getSubject() != null
                 && profile.getUsername() != null
@@ -263,21 +201,6 @@ public class OidcAuthenticationService implements AuthenticationService {
 
     private <T> T mergeProfileClaim(final T left, final T right) {
         return (left != null) ? left : right;
-    }
-
-    JWKSet resolveJwkSet() throws IOException, ParseException {
-        JWKSet jwkSet = CacheManager.getInstance().get(JWKSet.class, JWK_SET_CACHE_KEY);
-        if (jwkSet != null) {
-            LOGGER.debug("JWK set loaded from cache");
-            return jwkSet;
-        }
-
-        LOGGER.debug("Fetching JWK set from " + oidcConfiguration.getJwksUri());
-        jwkSet = JWKSet.load(oidcConfiguration.getJwksUri().toURL());
-
-        LOGGER.debug("Storing JWK set in cache");
-        CacheManager.getInstance().put(JWK_SET_CACHE_KEY, jwkSet);
-        return jwkSet;
     }
 
     private OidcUser autoProvision(final AlpineQueryManager qm, final OidcProfile profile) {
