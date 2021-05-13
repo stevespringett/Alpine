@@ -1,6 +1,7 @@
 package alpine.auth;
 
 import alpine.Config;
+import alpine.cache.CacheManager;
 import alpine.model.MappedOidcGroup;
 import alpine.model.OidcGroup;
 import alpine.model.OidcUser;
@@ -8,6 +9,8 @@ import alpine.model.Team;
 import alpine.persistence.AlpineQueryManager;
 import alpine.util.TestUtil;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.jose.jwk.KeyType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -17,12 +20,16 @@ import wiremock.org.apache.http.HttpHeaders;
 import wiremock.org.apache.http.HttpStatus;
 import wiremock.org.apache.http.entity.ContentType;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -502,5 +509,61 @@ public class OidcAuthenticationServiceTest {
 //            assertThat(oidcUser.getTeams()).isNullOrEmpty();
 //        }
 //    }
+
+    @Test
+    public void resolveJwkSetShouldReturnCachedValueWhenAvailable() throws IOException, ParseException {
+        final JWKSet cachedJwkSet = new JWKSet();
+        CacheManager.getInstance().put(OidcAuthenticationService.JWK_SET_CACHE_KEY, cachedJwkSet);
+
+        final var authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, null, null);
+
+        assertThat(authService.resolveJwkSet()).isEqualTo(cachedJwkSet);
+    }
+
+    @Test
+    public void resolveJwkSetShouldReturnJwkSetAndStoreItInCache() throws URISyntaxException, IOException, ParseException {
+        wireMockRule.stubFor(get(urlPathEqualTo("/jwks"))
+                .willReturn(aResponse()
+                        .withStatus(HttpStatus.SC_OK)
+                        .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
+                        // This JWK set is taken from https://datatracker.ietf.org/doc/html/rfc7517#appendix-A.1
+                        .withBody("" +
+                                "{\n" +
+                                "  \"keys\": [\n" +
+                                "    {\n" +
+                                "      \"kty\": \"EC\",\n" +
+                                "      \"crv\": \"P-256\",\n" +
+                                "      \"x\": \"MKBCTNIcKUSDii11ySs3526iDZ8AiTo7Tu6KPAqv7D4\",\n" +
+                                "      \"y\": \"4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM\",\n" +
+                                "      \"use\": \"enc\",\n" +
+                                "      \"kid\": \"1\"\n" +
+                                "    },\n" +
+                                "    {\n" +
+                                "      \"kty\": \"RSA\",\n" +
+                                "      \"n\": \"0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx4cbbfAAtVT86zwu1RK7aPFFxuhDR1L6tSoc_BJECPebWKRXjBZCiFV4n3oknjhMstn64tZ_2W-5JsGY4Hc5n9yBXArwl93lqt7_RN5w6Cf0h4QyQ5v-65YGjQR0_FDW2QvzqY368QQMicAtaSqzs8KJZgnYb9c7d0zgdAZHzu6qMQvRL5hajrn1n91CbOpbISD08qNLyrdkt-bFTWhAI4vMQFh6WeZu0fM4lFd2NcRwr3XPksINHaQ-G_xBniIqbw0Ls1jF44-csFCur-kEgU8awapJzKnqDKgw\",\n" +
+                                "      \"e\": \"AQAB\",\n" +
+                                "      \"alg\": \"RS256\",\n" +
+                                "      \"kid\": \"2011-04-29\"\n" +
+                                "    }\n" +
+                                "  ]\n" +
+                                "}")));
+
+        when(oidcConfigurationMock.getJwksUri())
+                .thenReturn(new URI(wireMockRule.url("/jwks")));
+
+        final var authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, null, null);
+
+        // Resolve and verify JWK set
+        final JWKSet jwkSet = authService.resolveJwkSet();
+        assertThat(jwkSet.getKeys()).hasSize(2);
+        assertThat(jwkSet.getKeyByKeyId("1").getKeyType()).isEqualTo(KeyType.EC);
+        assertThat(jwkSet.getKeyByKeyId("2011-04-29").getKeyType()).isEqualTo(KeyType.RSA);
+
+        // On the next invocation, the JWK set should be loaded from cache
+        assertThat(authService.resolveJwkSet()).isEqualTo(jwkSet);
+
+        // Only one request should've been made
+        verify(1, getRequestedFor(urlPathEqualTo("/jwks")));
+    }
 
 }

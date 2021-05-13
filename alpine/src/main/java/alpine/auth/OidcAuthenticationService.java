@@ -30,7 +30,7 @@ import java.text.ParseException;
 public class OidcAuthenticationService implements AuthenticationService {
 
     private static final Logger LOGGER = Logger.getLogger(OidcAuthenticationService.class);
-    private static final String JWK_SET_CACHE_KEY = "OIDC_JWK_SET";
+    static final String JWK_SET_CACHE_KEY = "OIDC_JWK_SET";
 
     private final Config config;
     private final OidcConfiguration oidcConfiguration;
