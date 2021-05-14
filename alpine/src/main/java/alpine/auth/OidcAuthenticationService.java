@@ -136,13 +136,8 @@ public class OidcAuthenticationService implements AuthenticationService {
 
         OidcProfile mergedProfile = null;
         if (idTokenProfile != null && userInfoProfile != null) {
-            try {
-                mergedProfile = mergeProfiles(idTokenProfile, userInfoProfile);
-                LOGGER.debug("Merged profile: " + mergedProfile);
-            } catch (IllegalArgumentException e) {
-                LOGGER.error("Failed to merge profiles", e);
-                throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.OTHER);
-            }
+            mergedProfile = mergeProfiles(idTokenProfile, userInfoProfile);
+            LOGGER.debug("Merged profile: " + mergedProfile);
 
             if (isProfileComplete(mergedProfile, teamSyncEnabled)) {
                 LOGGER.debug("Merged profile is complete, proceeding to authenticate");
@@ -190,16 +185,16 @@ public class OidcAuthenticationService implements AuthenticationService {
                 && (!teamSyncEnabled || (profile.getTeams() != null));
     }
 
-    OidcProfile mergeProfiles(final OidcProfile left, final OidcProfile right) {
+    private OidcProfile mergeProfiles(final OidcProfile left, final OidcProfile right) {
         final var profile = new OidcProfile();
-        profile.setSubject(mergeProfileClaim(left.getSubject(), right.getSubject()));
-        profile.setUsername(mergeProfileClaim(left.getUsername(), right.getUsername()));
-        profile.setTeams(mergeProfileClaim(left.getTeams(), right.getTeams()));
-        profile.setEmail(mergeProfileClaim(left.getEmail(), right.getEmail()));
+        profile.setSubject(selectProfileClaim(left.getSubject(), right.getSubject()));
+        profile.setUsername(selectProfileClaim(left.getUsername(), right.getUsername()));
+        profile.setTeams(selectProfileClaim(left.getTeams(), right.getTeams()));
+        profile.setEmail(selectProfileClaim(left.getEmail(), right.getEmail()));
         return profile;
     }
 
-    private <T> T mergeProfileClaim(final T left, final T right) {
+    private <T> T selectProfileClaim(final T left, final T right) {
         return (left != null) ? left : right;
     }
 
