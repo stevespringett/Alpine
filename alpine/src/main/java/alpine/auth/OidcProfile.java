@@ -47,7 +47,7 @@ class OidcProfile {
     @Override
     public String toString() {
         return "OidcProfile{" +
-                "subjectIdentifier='" + subject + '\'' +
+                "subject='" + subject + '\'' +
                 ", username='" + username + '\'' +
                 ", groups=" + groups +
                 ", email='" + email + '\'' +
