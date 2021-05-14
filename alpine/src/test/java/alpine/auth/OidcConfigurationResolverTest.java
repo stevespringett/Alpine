@@ -83,8 +83,8 @@ public class OidcConfigurationResolverTest {
         final OidcConfiguration oidcConfiguration = new OidcConfigurationResolver(true, wireMockRule.baseUrl()).resolve();
         assertThat(oidcConfiguration).isNotNull();
         assertThat(oidcConfiguration.getIssuer()).isEqualTo(wireMockRule.baseUrl());
-        assertThat(oidcConfiguration.getUserInfoEndpointUri()).isEqualTo(wireMockRule.baseUrl() + "/protocol/openid-connect/userinfo");
-        assertThat(oidcConfiguration.getJwksUri()).isEqualTo(wireMockRule.baseUrl() + "/protocol/openid-connect/certs");
+        assertThat(oidcConfiguration.getUserInfoEndpointUri().toString()).isEqualTo(wireMockRule.baseUrl() + "/protocol/openid-connect/userinfo");
+        assertThat(oidcConfiguration.getJwksUri().toString()).isEqualTo(wireMockRule.baseUrl() + "/protocol/openid-connect/certs");
 
         // On the next invocation, the configuration should be loaded from cache
         assertThat(new OidcConfigurationResolver(true, wireMockRule.baseUrl()).resolve()).isEqualTo(oidcConfiguration);
