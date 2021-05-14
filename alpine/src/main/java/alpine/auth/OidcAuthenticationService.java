@@ -7,7 +7,7 @@ import alpine.persistence.AlpineQueryManager;
 import alpine.util.OidcUtil;
 import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 import java.security.Principal;
 
 /**
@@ -21,8 +21,8 @@ public class OidcAuthenticationService implements AuthenticationService {
     private final OidcConfiguration oidcConfiguration;
     private final OidcIdTokenAuthenticator idTokenAuthenticator;
     private final OidcUserInfoAuthenticator userInfoAuthenticator;
-    private final String accessToken;
     private final String idToken;
+    private final String accessToken;
 
     /**
      * @param accessToken The access token acquired by authenticating with an IdP
@@ -30,23 +30,23 @@ public class OidcAuthenticationService implements AuthenticationService {
      */
     @Deprecated
     public OidcAuthenticationService(final String accessToken) {
-        this(Config.getInstance(), OidcConfigurationResolver.getInstance().resolve(), accessToken, null);
+        this(Config.getInstance(), OidcConfigurationResolver.getInstance().resolve(), null, accessToken);
     }
 
     /**
-     * @param accessToken The access token acquired by authenticating with an IdP
      * @param idToken     The ID token acquired by authenticating with an IdP
+     * @param accessToken The access token acquired by authenticating with an IdP
      * @since 1.10.0
      */
-    public OidcAuthenticationService(final String accessToken, final String idToken) {
+    public OidcAuthenticationService(final String idToken, final String accessToken) {
         this(Config.getInstance(), OidcConfigurationResolver.getInstance().resolve(), accessToken, idToken);
     }
 
     /**
      * Constructor for unit tests
      */
-    OidcAuthenticationService(final Config config, final OidcConfiguration oidcConfiguration, final String accessToken, final String idToken) {
-        this(config, oidcConfiguration, new OidcIdTokenAuthenticator(oidcConfiguration, config.getProperty(Config.AlpineKey.OIDC_CLIENT_ID)), new OidcUserInfoAuthenticator(oidcConfiguration), accessToken, idToken);
+    OidcAuthenticationService(final Config config, final OidcConfiguration oidcConfiguration, final String idToken, final String accessToken) {
+        this(config, oidcConfiguration, new OidcIdTokenAuthenticator(oidcConfiguration, config.getProperty(Config.AlpineKey.OIDC_CLIENT_ID)), new OidcUserInfoAuthenticator(oidcConfiguration), idToken, accessToken);
     }
 
     /**
@@ -56,14 +56,14 @@ public class OidcAuthenticationService implements AuthenticationService {
                               final OidcConfiguration oidcConfiguration,
                               final OidcIdTokenAuthenticator idTokenAuthenticator,
                               final OidcUserInfoAuthenticator userInfoAuthenticator,
-                              final String accessToken,
-                              final String idToken) {
+                              final String idToken,
+                              final String accessToken) {
         this.config = config;
         this.oidcConfiguration = oidcConfiguration;
         this.idTokenAuthenticator = idTokenAuthenticator;
         this.userInfoAuthenticator = userInfoAuthenticator;
-        this.accessToken = accessToken;
         this.idToken = idToken;
+        this.accessToken = accessToken;
     }
 
     @Override
@@ -87,7 +87,7 @@ public class OidcAuthenticationService implements AuthenticationService {
      * @return An authenticated {@link Principal}
      * @throws AlpineAuthenticationException When authentication failed
      */
-    @Nullable
+    @Nonnull
     @Override
     public Principal authenticate() throws AlpineAuthenticationException {
         final String usernameClaimName = config.getProperty(Config.AlpineKey.OIDC_USERNAME_CLAIM);
@@ -107,7 +107,7 @@ public class OidcAuthenticationService implements AuthenticationService {
             final var profile = new OidcProfile();
             profile.setSubject(claims.getStringClaim(UserInfo.SUB_CLAIM_NAME));
             profile.setUsername(claims.getStringClaim(usernameClaimName));
-            profile.setTeams(claims.getStringListClaim(teamsClaimName));
+            profile.setGroups(claims.getStringListClaim(teamsClaimName));
             profile.setEmail(claims.getStringClaim(UserInfo.EMAIL_CLAIM_NAME));
             return profile;
         };
@@ -166,7 +166,7 @@ public class OidcAuthenticationService implements AuthenticationService {
                     throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.INVALID_CREDENTIALS);
                 }
                 if (config.getPropertyAsBoolean(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION)) {
-                    return qm.synchronizeTeamMembership(user, profile.getTeams());
+                    return qm.synchronizeTeamMembership(user, profile.getGroups());
                 }
                 return user;
             } else if (config.getPropertyAsBoolean(Config.AlpineKey.OIDC_USER_PROVISIONING)) {
@@ -182,14 +182,14 @@ public class OidcAuthenticationService implements AuthenticationService {
     private boolean isProfileComplete(final OidcProfile profile, final boolean teamSyncEnabled) {
         return profile.getSubject() != null
                 && profile.getUsername() != null
-                && (!teamSyncEnabled || (profile.getTeams() != null));
+                && (!teamSyncEnabled || (profile.getGroups() != null));
     }
 
     private OidcProfile mergeProfiles(final OidcProfile left, final OidcProfile right) {
         final var profile = new OidcProfile();
         profile.setSubject(selectProfileClaim(left.getSubject(), right.getSubject()));
         profile.setUsername(selectProfileClaim(left.getUsername(), right.getUsername()));
-        profile.setTeams(selectProfileClaim(left.getTeams(), right.getTeams()));
+        profile.setGroups(selectProfileClaim(left.getGroups(), right.getGroups()));
         profile.setEmail(selectProfileClaim(left.getEmail(), right.getEmail()));
         return profile;
     }
@@ -207,7 +207,7 @@ public class OidcAuthenticationService implements AuthenticationService {
 
         if (config.getPropertyAsBoolean(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION)) {
             LOGGER.debug("Synchronizing teams for user " + user.getUsername());
-            return qm.synchronizeTeamMembership(user, profile.getTeams());
+            return qm.synchronizeTeamMembership(user, profile.getGroups());
         }
 
         return user;

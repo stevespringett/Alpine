@@ -9,7 +9,7 @@ class OidcProfile {
 
     private String subject;
     private String username;
-    private List<String> teams;
+    private List<String> groups;
     private String email;
 
     String getSubject() {
@@ -28,12 +28,12 @@ class OidcProfile {
         this.username = username;
     }
 
-    List<String> getTeams() {
-        return teams;
+    List<String> getGroups() {
+        return groups;
     }
 
-    void setTeams(final List<String> teams) {
-        this.teams = teams;
+    void setGroups(final List<String> groups) {
+        this.groups = groups;
     }
 
     String getEmail() {
@@ -49,7 +49,7 @@ class OidcProfile {
         return "OidcProfile{" +
                 "subjectIdentifier='" + subject + '\'' +
                 ", username='" + username + '\'' +
-                ", teams=" + teams +
+                ", groups=" + groups +
                 ", email='" + email + '\'' +
                 '}';
     }

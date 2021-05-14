@@ -22,12 +22,12 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 public class OidcUserInfoAuthenticatorTest {
 
     private static final String USERNAME_CLAIM_NAME = "username";
-    private static final String TEAMS_CLAIM_NAME = "teams";
+    private static final String TEAMS_CLAIM_NAME = "groups";
     private static final OidcProfileCreator PROFILE_CREATOR = claims -> {
         final var profile = new OidcProfile();
         profile.setSubject(claims.getStringClaim(UserInfo.SUB_CLAIM_NAME));
         profile.setUsername(claims.getStringClaim(USERNAME_CLAIM_NAME));
-        profile.setTeams(claims.getStringListClaim(TEAMS_CLAIM_NAME));
+        profile.setGroups(claims.getStringListClaim(TEAMS_CLAIM_NAME));
         profile.setEmail(claims.getStringClaim(UserInfo.EMAIL_CLAIM_NAME));
         return profile;
     };
@@ -53,7 +53,7 @@ public class OidcUserInfoAuthenticatorTest {
                                 "{" +
                                 "  \"" + UserInfo.SUB_CLAIM_NAME + "\": \"subject\", " +
                                 "  \"" + USERNAME_CLAIM_NAME + "\": \"username\", " +
-                                "  \"" + TEAMS_CLAIM_NAME + "\": [\"team1\",\"team2\"],\n" +
+                                "  \"" + TEAMS_CLAIM_NAME + "\": [\"group1\",\"group2\"],\n" +
                                 "  \"" + UserInfo.EMAIL_CLAIM_NAME + "\": \"username@example.com\"" +
                                 "}")));
 
@@ -64,7 +64,7 @@ public class OidcUserInfoAuthenticatorTest {
         final OidcProfile profile = authenticator.authenticate("accessToken", PROFILE_CREATOR);
         assertThat(profile.getSubject()).isEqualTo("subject");
         assertThat(profile.getUsername()).isEqualTo("username");
-        assertThat(profile.getTeams()).containsExactly("team1", "team2");
+        assertThat(profile.getGroups()).containsExactly("group1", "group2");
         assertThat(profile.getEmail()).isEqualTo("username@example.com");
     }
 

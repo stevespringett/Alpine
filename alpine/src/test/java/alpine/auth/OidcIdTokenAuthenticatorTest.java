@@ -41,13 +41,13 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 public class OidcIdTokenAuthenticatorTest {
 
     private static final String USERNAME_CLAIM_NAME = "username";
-    private static final String TEAMS_CLAIM_NAME = "teams";
+    private static final String TEAMS_CLAIM_NAME = "groups";
     private static final String EMAIL_CLAIM_NAME = "email";
     private static final OidcProfileCreator PROFILE_CREATOR = claims -> {
         final var profile = new OidcProfile();
         profile.setSubject(claims.getStringClaim(IDTokenClaimsSet.SUB_CLAIM_NAME));
         profile.setUsername(claims.getStringClaim(USERNAME_CLAIM_NAME));
-        profile.setTeams(claims.getStringListClaim(TEAMS_CLAIM_NAME));
+        profile.setGroups(claims.getStringListClaim(TEAMS_CLAIM_NAME));
         profile.setEmail(claims.getStringClaim(EMAIL_CLAIM_NAME));
         return profile;
     };
@@ -94,7 +94,7 @@ public class OidcIdTokenAuthenticatorTest {
                         IDTokenClaimsSet.EXP_CLAIM_NAME, LocalDateTime.now().plusMinutes(1).atZone(ZoneId.systemDefault()).toEpochSecond(),
                         IDTokenClaimsSet.IAT_CLAIM_NAME, LocalDateTime.now().minusMinutes(1).atZone(ZoneId.systemDefault()).toEpochSecond(),
                         USERNAME_CLAIM_NAME, "username",
-                        TEAMS_CLAIM_NAME, List.of("team1", "team2"),
+                        TEAMS_CLAIM_NAME, List.of("group1", "group2"),
                         EMAIL_CLAIM_NAME, "username@example.com"
                 ))
         );
@@ -108,7 +108,7 @@ public class OidcIdTokenAuthenticatorTest {
         final OidcProfile profile = authenticator.authenticate(token.serialize(), PROFILE_CREATOR);
         assertThat(profile.getSubject()).isEqualTo("subject");
         assertThat(profile.getUsername()).isEqualTo("username");
-        assertThat(profile.getTeams()).containsExactly("team1", "team2");
+        assertThat(profile.getGroups()).containsExactly("group1", "group2");
         assertThat(profile.getEmail()).isEqualTo("username@example.com");
     }
 
