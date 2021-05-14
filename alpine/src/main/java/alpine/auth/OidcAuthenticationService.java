@@ -39,7 +39,7 @@ public class OidcAuthenticationService implements AuthenticationService {
      * @since 1.10.0
      */
     public OidcAuthenticationService(final String idToken, final String accessToken) {
-        this(Config.getInstance(), OidcConfigurationResolver.getInstance().resolve(), accessToken, idToken);
+        this(Config.getInstance(), OidcConfigurationResolver.getInstance().resolve(), idToken, accessToken);
     }
 
     /**
@@ -51,6 +51,8 @@ public class OidcAuthenticationService implements AuthenticationService {
 
     /**
      * Constructor for unit tests
+     *
+     * @since 1.10.0
      */
     OidcAuthenticationService(final Config config,
                               final OidcConfiguration oidcConfiguration,
@@ -151,7 +153,7 @@ public class OidcAuthenticationService implements AuthenticationService {
     }
 
     private OidcUser authenticateInternal(final OidcProfile profile) throws AlpineAuthenticationException {
-        try (final AlpineQueryManager qm = new AlpineQueryManager()) {
+        try (final var qm = new AlpineQueryManager()) {
             OidcUser user = qm.getOidcUser(profile.getUsername());
             if (user != null) {
                 LOGGER.debug("Attempting to authenticate user: " + user.getUsername());
@@ -199,7 +201,7 @@ public class OidcAuthenticationService implements AuthenticationService {
     }
 
     private OidcUser autoProvision(final AlpineQueryManager qm, final OidcProfile profile) {
-        OidcUser user = new OidcUser();
+        var user = new OidcUser();
         user.setUsername(profile.getUsername());
         user.setSubjectIdentifier(profile.getSubject());
         user.setEmail(profile.getEmail());
