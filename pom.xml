@@ -137,7 +137,7 @@
         <plugin.retirejs.indentSize>4</plugin.retirejs.indentSize>
 
         <!-- CycloneDX SBOM Creation -->
-        <maven.cyclonedx.plugin.version>2.4.0</maven.cyclonedx.plugin.version>
+        <maven.cyclonedx.plugin.version>2.5.0</maven.cyclonedx.plugin.version>
         <plugin.cyclonedx.projectType>framework</plugin.cyclonedx.projectType>
         <plugin.cyclonedx.schemaVersion>1.2</plugin.cyclonedx.schemaVersion>
         <plugin.cyclonedx.outputFormat>all</plugin.cyclonedx.outputFormat>
@@ -170,7 +170,7 @@
         <lib.jaxb.core.version>2.3.0.1</lib.jaxb.core.version>
         <lib.jaxb.impl.version>2.3.3</lib.jaxb.impl.version>
         <lib.jdo.api.version>3.2.0-m13</lib.jdo.api.version>
-        <lib.jersey.version>2.33</lib.jersey.version>
+        <lib.jersey.version>3.0.2</lib.jersey.version>
         <lib.jsp.api.version>2.2</lib.jsp.api.version>
         <lib.jsonwebtoken.version>0.9.1</lib.jsonwebtoken.version>
         <lib.jsr305.version>3.0.2</lib.jsr305.version>
