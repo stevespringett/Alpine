@@ -1,29 +1,16 @@
 package alpine.auth;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.net.URI;
 
 /**
  * @see <a href="https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata">OpenID Connect specification: OpenID Provider Metadata</a>
  * @since 1.8.0
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class OidcConfiguration {
 
-    @JsonProperty("issuer")
     private String issuer;
-
-    @JsonProperty("authorization_endpoint")
-    private String authorizationEndpointUri;
-
-    @JsonProperty("token_endpoint")
-    private String tokenEndpointUri;
-
-    @JsonProperty("userinfo_endpoint")
-    private String userInfoEndpointUri;
-
-    @JsonProperty("jwks_uri")
-    private String jwksUri;
+    private URI userInfoEndpointUri;
+    private URI jwksUri;
 
     public String getIssuer() {
         return issuer;
@@ -33,36 +20,29 @@ public class OidcConfiguration {
         this.issuer = issuer;
     }
 
-    public String getAuthorizationEndpointUri() {
-        return authorizationEndpointUri;
-    }
-
-    public void setAuthorizationEndpointUri(final String authorizationEndpointUri) {
-        this.authorizationEndpointUri = authorizationEndpointUri;
-    }
-
-    public String getTokenEndpointUri() {
-        return tokenEndpointUri;
-    }
-
-    public void setTokenEndpointUri(final String tokenEndpointUri) {
-        this.tokenEndpointUri = tokenEndpointUri;
-    }
-
-    public String getUserInfoEndpointUri() {
+    public URI getUserInfoEndpointUri() {
         return userInfoEndpointUri;
     }
 
-    public void setUserInfoEndpointUri(final String userInfoEndpointUri) {
+    public void setUserInfoEndpointUri(final URI userInfoEndpointUri) {
         this.userInfoEndpointUri = userInfoEndpointUri;
     }
 
-    public String getJwksUri() {
+    public URI getJwksUri() {
         return jwksUri;
     }
 
-    public void setJwksUri(final String jwksUri) {
+    public void setJwksUri(final URI jwksUri) {
         this.jwksUri = jwksUri;
+    }
+
+    @Override
+    public String toString() {
+        return "OidcConfiguration{" +
+                "issuer='" + issuer + '\'' +
+                ", userInfoEndpointUri=" + userInfoEndpointUri +
+                ", jwksUri=" + jwksUri +
+                '}';
     }
 
 }

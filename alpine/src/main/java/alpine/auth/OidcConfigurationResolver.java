@@ -3,12 +3,12 @@ package alpine.auth;
 import alpine.Config;
 import alpine.cache.CacheManager;
 import alpine.logging.Logger;
+import com.nimbusds.oauth2.sdk.GeneralException;
+import com.nimbusds.oauth2.sdk.id.Issuer;
+import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
 
 import javax.annotation.Nullable;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.MediaType;
+import java.io.IOException;
 
 /**
  * @since 1.8.0
@@ -20,7 +20,6 @@ public class OidcConfigurationResolver {
             Config.getInstance().getProperty(Config.AlpineKey.OIDC_ISSUER)
     );
     private static final Logger LOGGER = Logger.getLogger(OidcConfigurationResolver.class);
-    static final String OPENID_CONFIGURATION_PATH = "/.well-known/openid-configuration";
     static final String CONFIGURATION_CACHE_KEY = "OIDC_CONFIGURATION";
 
     private final boolean oidcEnabled;
@@ -36,7 +35,7 @@ public class OidcConfigurationResolver {
     }
 
     /**
-     * Resolve the OpenID Connect configuration either from a remote authorization server or from cache.
+     * Resolve the {@link OidcConfiguration} either from a remote authorization server or from cache.
      *
      * @return The resolved {@link OidcConfiguration} or {@code null}, when resolving was not possible
      */
@@ -58,18 +57,21 @@ public class OidcConfigurationResolver {
             return configuration;
         }
 
-        LOGGER.debug("Loading OIDC configuration for issuer " + issuer);
+        LOGGER.debug("Fetching OIDC configuration from issuer " + issuer);
+        final OIDCProviderMetadata providerMetadata;
         try {
-            configuration = ClientBuilder.newClient().target(issuer)
-                    .path(OPENID_CONFIGURATION_PATH)
-                    .request(MediaType.APPLICATION_JSON)
-                    .get(OidcConfiguration.class);
-        } catch (WebApplicationException | ProcessingException e) {
-            LOGGER.error("Failed to load OIDC configuration from issuer " + issuer + ": " + e.getMessage());
+            providerMetadata = OIDCProviderMetadata.resolve(new Issuer(issuer));
+        } catch (IOException | GeneralException e) {
+            LOGGER.error("Failed to fetch OIDC configuration from issuer " + issuer, e);
             return null;
         }
 
-        LOGGER.debug("Storing OIDC configuration in cache");
+        configuration = new OidcConfiguration();
+        configuration.setIssuer(providerMetadata.getIssuer().getValue());
+        configuration.setJwksUri(providerMetadata.getJWKSetURI());
+        configuration.setUserInfoEndpointUri(providerMetadata.getUserInfoEndpointURI());
+
+        LOGGER.debug("Storing OIDC configuration in cache: " + configuration);
         CacheManager.getInstance().put(CONFIGURATION_CACHE_KEY, configuration);
 
         return configuration;

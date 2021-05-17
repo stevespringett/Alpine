@@ -5,15 +5,10 @@ import alpine.logging.Logger;
 import alpine.model.OidcUser;
 import alpine.persistence.AlpineQueryManager;
 import alpine.util.OidcUtil;
+import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 
-import javax.annotation.Nullable;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
+import javax.annotation.Nonnull;
 import java.security.Principal;
-import java.util.List;
 
 /**
  * @since 1.8.0
@@ -24,119 +19,200 @@ public class OidcAuthenticationService implements AuthenticationService {
 
     private final Config config;
     private final OidcConfiguration oidcConfiguration;
+    private final OidcIdTokenAuthenticator idTokenAuthenticator;
+    private final OidcUserInfoAuthenticator userInfoAuthenticator;
+    private final String idToken;
     private final String accessToken;
 
+    /**
+     * @param accessToken The access token acquired by authenticating with an IdP
+     * @deprecated Use {@link #OidcAuthenticationService(String, String)} instead
+     */
+    @Deprecated
     public OidcAuthenticationService(final String accessToken) {
-        this(Config.getInstance(), OidcConfigurationResolver.getInstance().resolve(), accessToken);
+        this(Config.getInstance(), OidcConfigurationResolver.getInstance().resolve(), null, accessToken);
+    }
+
+    /**
+     * @param idToken     The ID token acquired by authenticating with an IdP
+     * @param accessToken The access token acquired by authenticating with an IdP
+     * @since 1.10.0
+     */
+    public OidcAuthenticationService(final String idToken, final String accessToken) {
+        this(Config.getInstance(), OidcConfigurationResolver.getInstance().resolve(), idToken, accessToken);
     }
 
     /**
      * Constructor for unit tests
      */
-    OidcAuthenticationService(final Config config, final OidcConfiguration oidcConfiguration, final String accessToken) {
+    OidcAuthenticationService(final Config config, final OidcConfiguration oidcConfiguration, final String idToken, final String accessToken) {
+        this(config, oidcConfiguration, new OidcIdTokenAuthenticator(oidcConfiguration, config.getProperty(Config.AlpineKey.OIDC_CLIENT_ID)), new OidcUserInfoAuthenticator(oidcConfiguration), idToken, accessToken);
+    }
+
+    /**
+     * Constructor for unit tests
+     *
+     * @since 1.10.0
+     */
+    OidcAuthenticationService(final Config config,
+                              final OidcConfiguration oidcConfiguration,
+                              final OidcIdTokenAuthenticator idTokenAuthenticator,
+                              final OidcUserInfoAuthenticator userInfoAuthenticator,
+                              final String idToken,
+                              final String accessToken) {
         this.config = config;
         this.oidcConfiguration = oidcConfiguration;
+        this.idTokenAuthenticator = idTokenAuthenticator;
+        this.userInfoAuthenticator = userInfoAuthenticator;
+        this.idToken = idToken;
         this.accessToken = accessToken;
     }
 
     @Override
     public boolean isSpecified() {
-        return OidcUtil.isOidcAvailable(config, oidcConfiguration) && accessToken != null;
+        return OidcUtil.isOidcAvailable(config, oidcConfiguration)
+                && (accessToken != null || idToken != null);
     }
 
-    @Nullable
+    /**
+     * Authenticate a {@link Principal} using the provided credentials.
+     * <p>
+     * If an ID token is provided, Alpine will validate it and source configured claims from it.
+     * <p>
+     * If an access token is provided, Alpine will call the IdP's {@code /userinfo} endpoint with it
+     * to verify its validity, and source configured claims from the response.
+     * <p>
+     * If both access token and ID token are provided, the ID token takes precedence.
+     * When all configured claims are found in the ID token, {@code /userinfo} won't be requested.
+     * When not all claims were found in the ID token, {@code /userinfo} will be requested supplementary.
+     *
+     * @return An authenticated {@link Principal}
+     * @throws AlpineAuthenticationException When authentication failed
+     */
+    @Nonnull
     @Override
     public Principal authenticate() throws AlpineAuthenticationException {
-        final OidcUserInfo userInfo;
-        try {
-            userInfo = ClientBuilder.newClient().target(oidcConfiguration.getUserInfoEndpointUri())
-                    .request(MediaType.APPLICATION_JSON)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                    .get(OidcUserInfo.class);
-        } catch (WebApplicationException e) {
-            if (e.getResponse().getStatus() == 401) {
-                throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.INVALID_CREDENTIALS);
+        final String usernameClaimName = config.getProperty(Config.AlpineKey.OIDC_USERNAME_CLAIM);
+        if (usernameClaimName == null) {
+            LOGGER.error("No username claim has been configured");
+            throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.OTHER);
+        }
+
+        final boolean teamSyncEnabled = config.getPropertyAsBoolean(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION);
+        final String teamsClaimName = config.getProperty(Config.AlpineKey.OIDC_TEAMS_CLAIM);
+        if (teamSyncEnabled && teamsClaimName == null) {
+            LOGGER.error("Team synchronization is enabled, but no teams claim has been configured");
+            throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.OTHER);
+        }
+
+        final OidcProfileCreator profileCreator = claims -> {
+            final var profile = new OidcProfile();
+            profile.setSubject(claims.getStringClaim(UserInfo.SUB_CLAIM_NAME));
+            profile.setUsername(claims.getStringClaim(usernameClaimName));
+            profile.setGroups(claims.getStringListClaim(teamsClaimName));
+            profile.setEmail(claims.getStringClaim(UserInfo.EMAIL_CLAIM_NAME));
+            return profile;
+        };
+
+        OidcProfile idTokenProfile = null;
+        if (idToken != null) {
+            idTokenProfile = idTokenAuthenticator.authenticate(idToken, profileCreator);
+            LOGGER.debug("ID token profile: " + idTokenProfile);
+
+            if (isProfileComplete(idTokenProfile, teamSyncEnabled)) {
+                LOGGER.debug("ID token profile is complete, proceeding to authenticate");
+                return authenticateInternal(idTokenProfile);
             }
-            LOGGER.error("An error occurred requesting the OIDC UserInfo", e);
-            throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.OTHER);
-        } catch (ProcessingException e) {
-            LOGGER.error("An error occurred while processing the OIDC UserInfo response", e);
-            throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.OTHER);
         }
 
-        final String usernameClaim = config.getProperty(Config.AlpineKey.OIDC_USERNAME_CLAIM);
-        final String username = userInfo.getClaim(usernameClaim, String.class);
-        if (username == null) {
-            LOGGER.error("The configured OIDC username claim (" + usernameClaim + ") could not be found in UserInfo response");
-            LOGGER.debug("Claims returned in UserInfo response: " + userInfo.getClaims());
-            throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.OTHER);
+        OidcProfile userInfoProfile = null;
+        if (accessToken != null) {
+            userInfoProfile = userInfoAuthenticator.authenticate(accessToken, profileCreator);
+            LOGGER.debug("UserInfo profile: " + userInfoProfile);
+
+            if (isProfileComplete(userInfoProfile, teamSyncEnabled)) {
+                LOGGER.debug("UserInfo profile is complete, proceeding to authenticate");
+                return authenticateInternal(userInfoProfile);
+            }
         }
 
-        try (final AlpineQueryManager qm = new AlpineQueryManager()) {
-            OidcUser user = qm.getOidcUser(username);
+        OidcProfile mergedProfile = null;
+        if (idTokenProfile != null && userInfoProfile != null) {
+            mergedProfile = mergeProfiles(idTokenProfile, userInfoProfile);
+            LOGGER.debug("Merged profile: " + mergedProfile);
+
+            if (isProfileComplete(mergedProfile, teamSyncEnabled)) {
+                LOGGER.debug("Merged profile is complete, proceeding to authenticate");
+                return authenticateInternal(mergedProfile);
+            }
+        }
+
+        LOGGER.error("Unable to assemble complete profile (ID token: " + idTokenProfile +
+                ", UserInfo: " + userInfoProfile + ", Merged: " + mergedProfile + ")");
+        throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.OTHER);
+    }
+
+    private OidcUser authenticateInternal(final OidcProfile profile) throws AlpineAuthenticationException {
+        try (final var qm = new AlpineQueryManager()) {
+            OidcUser user = qm.getOidcUser(profile.getUsername());
             if (user != null) {
-                LOGGER.debug("Attempting to authenticate user: " + username);
-                user.setEmail(userInfo.getEmail()); // email is not persisted and thus needs to be set ad-hoc
+                LOGGER.debug("Attempting to authenticate user: " + user.getUsername());
+                user.setEmail(profile.getEmail()); // email is not persisted and thus needs to be set ad-hoc
                 if (user.getSubjectIdentifier() == null) {
-                    LOGGER.debug("Assigning subject identifier " + userInfo.getSubject() + " to user " + username);
-                    user.setSubjectIdentifier(userInfo.getSubject());
+                    LOGGER.debug("Assigning subject identifier " + profile.getSubject() + " to user " + user.getUsername());
+                    user.setSubjectIdentifier(profile.getSubject());
                     return qm.updateOidcUser(user);
-                } else if (!user.getSubjectIdentifier().equals(userInfo.getSubject())) {
-                    LOGGER.error("Refusing to authenticate user " + username + ": subject identifier has changed (" +
-                            user.getSubjectIdentifier() + " to " + userInfo.getSubject() + ")");
+                } else if (!user.getSubjectIdentifier().equals(profile.getSubject())) {
+                    LOGGER.error("Refusing to authenticate user " + user.getUsername() + ": subject identifier has changed (" +
+                            user.getSubjectIdentifier() + " to " + profile.getSubject() + ")");
                     throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.INVALID_CREDENTIALS);
                 }
                 if (config.getPropertyAsBoolean(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION)) {
-                    return synchronizeTeams(qm, user, userInfo);
+                    return qm.synchronizeTeamMembership(user, profile.getGroups());
                 }
                 return user;
             } else if (config.getPropertyAsBoolean(Config.AlpineKey.OIDC_USER_PROVISIONING)) {
-                LOGGER.debug("The user (" + username + ") authenticated successfully but the account has not been provisioned");
-                return autoProvision(qm, username, userInfo);
+                LOGGER.debug("The user (" + profile.getUsername() + ") authenticated successfully but the account has not been provisioned");
+                return autoProvision(qm, profile);
             } else {
-                LOGGER.debug("The user (" + username + ") is unmapped and user provisioning is not enabled");
+                LOGGER.debug("The user (" + profile.getUsername() + ") is unmapped and user provisioning is not enabled");
                 throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.UNMAPPED_ACCOUNT);
             }
         }
     }
 
-    private OidcUser autoProvision(final AlpineQueryManager qm, final String username, final OidcUserInfo userInfo) {
-        OidcUser user = new OidcUser();
-        user.setUsername(username);
-        user.setSubjectIdentifier(userInfo.getSubject());
-        user.setEmail(userInfo.getEmail());
+    private boolean isProfileComplete(final OidcProfile profile, final boolean teamSyncEnabled) {
+        return profile.getSubject() != null
+                && profile.getUsername() != null
+                && (!teamSyncEnabled || (profile.getGroups() != null));
+    }
+
+    private OidcProfile mergeProfiles(final OidcProfile left, final OidcProfile right) {
+        final var profile = new OidcProfile();
+        profile.setSubject(selectProfileClaim(left.getSubject(), right.getSubject()));
+        profile.setUsername(selectProfileClaim(left.getUsername(), right.getUsername()));
+        profile.setGroups(selectProfileClaim(left.getGroups(), right.getGroups()));
+        profile.setEmail(selectProfileClaim(left.getEmail(), right.getEmail()));
+        return profile;
+    }
+
+    private <T> T selectProfileClaim(final T left, final T right) {
+        return (left != null) ? left : right;
+    }
+
+    private OidcUser autoProvision(final AlpineQueryManager qm, final OidcProfile profile) {
+        var user = new OidcUser();
+        user.setUsername(profile.getUsername());
+        user.setSubjectIdentifier(profile.getSubject());
+        user.setEmail(profile.getEmail());
         user = qm.persist(user);
 
         if (config.getPropertyAsBoolean(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION)) {
-            LOGGER.debug("Synchronizing teams for user " + username);
-            return synchronizeTeams(qm, user, userInfo);
+            LOGGER.debug("Synchronizing teams for user " + user.getUsername());
+            return qm.synchronizeTeamMembership(user, profile.getGroups());
         }
 
         return user;
-    }
-
-    OidcUser synchronizeTeams(final AlpineQueryManager qm, final OidcUser user, final OidcUserInfo userInfo) {
-        final String teamsClaim = config.getProperty(Config.AlpineKey.OIDC_TEAMS_CLAIM);
-        if (teamsClaim == null) {
-            LOGGER.error("Synchronizing teams for user " + user.getUsername() + " failed: Synchronization is enabled, but no teams claim is configured");
-            return user;
-        }
-
-        final List<String> groups;
-        try {
-            //noinspection unchecked
-            groups = userInfo.getClaim(teamsClaim, List.class);
-        } catch (ClassCastException e) {
-            LOGGER.error("Synchronizing teams for user " + user.getUsername() + " failed: Teams claim is not a list", e);
-            return user;
-        }
-
-        if (groups == null) {
-            LOGGER.error("Synchronizing teams for user " + user.getUsername() + " failed: Teams claim " + teamsClaim + " does not exist");
-            return user;
-        }
-
-        return qm.synchronizeTeamMembership(user, groups);
     }
 
 }

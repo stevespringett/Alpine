@@ -284,7 +284,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
             }
 
             for (final MappedOidcGroup mappedOidcGroup : getMappedOidcGroups(group)) {
-                LOGGER.debug("Adding user: " + user.getUsername() + " to team: " + mappedOidcGroup.getTeam());
+                LOGGER.debug("Adding user: " + user.getUsername() + " to team: " + mappedOidcGroup.getTeam().getName());
                 addUserToTeam(user, mappedOidcGroup.getTeam());
             }
         }

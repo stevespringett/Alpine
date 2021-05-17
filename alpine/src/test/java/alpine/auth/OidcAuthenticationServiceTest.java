@@ -7,37 +7,31 @@ import alpine.model.OidcUser;
 import alpine.model.Team;
 import alpine.persistence.AlpineQueryManager;
 import alpine.util.TestUtil;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import wiremock.org.apache.http.HttpHeaders;
-import wiremock.org.apache.http.HttpStatus;
-import wiremock.org.apache.http.entity.ContentType;
 
 import java.util.Collections;
+import java.util.List;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class OidcAuthenticationServiceTest {
 
-    private static final String OIDC_USERINFO_PATH = "/userinfo";
-    private static final String USERNAMCE_CLAIM = "usernameClaim";
+    private static final String USERNAME_CLAIM_NAME = "username";
+    private static final String ID_TOKEN = "idToken";
     private static final String ACCESS_TOKEN = "accessToken";
-
-    @Rule
-    public WireMockRule wireMockRule = new WireMockRule(options().dynamicPort());
 
     private Config configMock;
     private OidcConfiguration oidcConfigurationMock;
+    private OidcIdTokenAuthenticator idTokenAuthenticatorMock;
+    private OidcUserInfoAuthenticator userInfoAuthenticatorMock;
 
     @BeforeClass
     public static void setUpClass() {
@@ -48,223 +42,239 @@ public class OidcAuthenticationServiceTest {
     public void setUp() {
         configMock = mock(Config.class);
         oidcConfigurationMock = mock(OidcConfiguration.class);
+        idTokenAuthenticatorMock = mock(OidcIdTokenAuthenticator.class);
+        userInfoAuthenticatorMock = mock(OidcUserInfoAuthenticator.class);
 
-        when(configMock.getProperty(eq(Config.AlpineKey.OIDC_USERNAME_CLAIM)))
-                .thenReturn(USERNAMCE_CLAIM);
-
-        when(oidcConfigurationMock.getUserInfoEndpointUri())
-                .thenReturn(wireMockRule.url(OIDC_USERINFO_PATH));
+        when(configMock.getProperty(eq(Config.AlpineKey.OIDC_USERNAME_CLAIM))).thenReturn(USERNAME_CLAIM_NAME);
     }
 
     @After
-    @SuppressWarnings("unchecked")
     public void tearDown() throws Exception {
         TestUtil.resetInMemoryDatabase();
     }
 
     @Test
     public void isSpecifiedShouldReturnFalseWhenOidcIsDisabled() {
-        when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_ENABLED)))
-                .thenReturn(false);
+        when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_ENABLED))).thenReturn(false);
 
-        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN);
+        final var authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ID_TOKEN, ACCESS_TOKEN);
 
         assertThat(authService.isSpecified()).isFalse();
     }
 
     @Test
-    public void isSpecifiedShouldReturnFalseWhenAccessTokenIsNull() {
-        when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_ENABLED)))
-                .thenReturn(true);
+    public void isSpecifiedShouldReturnFalseWhenAccessTokenAndIdTokenIsNull() {
+        when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_ENABLED))).thenReturn(true);
 
-        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, null);
+        final var authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, null, null);
 
         assertThat(authService.isSpecified()).isFalse();
     }
 
     @Test
     public void isSpecifiedShouldReturnFalseWhenOidcConfigurationIsNull() {
-        when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_ENABLED)))
-                .thenReturn(true);
+        when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_ENABLED))).thenReturn(true);
 
-        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, null, ACCESS_TOKEN);
+        final var authService = new OidcAuthenticationService(configMock, null, ID_TOKEN, ACCESS_TOKEN);
 
         assertThat(authService.isSpecified()).isFalse();
     }
 
     @Test
     public void isSpecifiedShouldReturnTrueWhenOidcIsEnabledAndOidcConfigurationIsNotNullAndAccessTokenIsNotNull() {
-        when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_ENABLED)))
-                .thenReturn(true);
+        when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_ENABLED))).thenReturn(true);
 
-        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN);
+        final var authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ID_TOKEN, ACCESS_TOKEN);
 
         assertThat(authService.isSpecified()).isTrue();
     }
 
     @Test
-    public void authenticateShouldThrowExceptionWhenRequestingUserInfoWithInvalidToken() {
-        wireMockRule.stubFor(get(urlPathEqualTo(OIDC_USERINFO_PATH))
-                .willReturn(aResponse()
-                        .withStatus(HttpStatus.SC_UNAUTHORIZED)));
-
-        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN);
-
-        assertThatExceptionOfType(AlpineAuthenticationException.class)
-                .isThrownBy(authService::authenticate)
-                .satisfies(exception -> assertThat(exception.getCauseType())
-                        .isEqualTo(AlpineAuthenticationException.CauseType.INVALID_CREDENTIALS));
-    }
-
-    @Test
-    public void authenticateShouldThrowExceptionWhenRequestingUserCausesAnUnexpectedHttpError() {
-        wireMockRule.stubFor(get(urlPathEqualTo(OIDC_USERINFO_PATH))
-                .willReturn(aResponse()
-                        .withStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR)));
-
-        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN);
-
-        assertThatExceptionOfType(AlpineAuthenticationException.class)
-                .isThrownBy(authService::authenticate)
-                .satisfies(exception -> assertThat(exception.getCauseType())
-                        .isEqualTo(AlpineAuthenticationException.CauseType.OTHER));
-    }
-
-    @Test
-    public void authenticateShouldThrowExceptionWhenUserInfoResponseProcessingFailed() {
-        wireMockRule.stubFor(get(urlPathEqualTo(OIDC_USERINFO_PATH))
-                .willReturn(aResponse()
-                        .withStatus(HttpStatus.SC_OK)
-                        .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-                        .withBody("{}")));
-
-        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN);
-
-        assertThatExceptionOfType(AlpineAuthenticationException.class)
-                .isThrownBy(authService::authenticate)
-                .satisfies(exception -> assertThat(exception.getCauseType())
-                        .isEqualTo(AlpineAuthenticationException.CauseType.OTHER));
-    }
-
-    @Test
-    public void authenticateShouldThrowExceptionWhenUserInfoDoesNotContainConfiguredUsernameClaim() {
-        wireMockRule.stubFor(get(urlPathEqualTo(OIDC_USERINFO_PATH))
-                .willReturn(aResponse()
-                        .withStatus(HttpStatus.SC_OK)
-                        .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-                        .withBody("" +
-                                "{" +
-                                "    \"sub\": \"subject\", " +
-                                "    \"email\": \"subject@mail.local\"" +
-                                "}")));
-
-        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN);
-
-        assertThatExceptionOfType(AlpineAuthenticationException.class)
-                .isThrownBy(authService::authenticate)
-                .satisfies(exception -> assertThat(exception.getCauseType())
-                        .isEqualTo(AlpineAuthenticationException.CauseType.OTHER));
-    }
-
-    @Test
-    public void authenticateShouldReturnUserWhenAlreadyExists() throws AlpineAuthenticationException {
-        wireMockRule.stubFor(get(urlPathEqualTo(OIDC_USERINFO_PATH))
-                .willReturn(aResponse()
-                        .withStatus(HttpStatus.SC_OK)
-                        .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-                        .withBody("" +
-                                "{" +
-                                "    \"sub\": \"subject\", " +
-                                "    \"email\": \"subject@mail.local\", " +
-                                "    \"" + USERNAMCE_CLAIM + "\": \"username\"" +
-                                "}")));
-
-        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN);
-
+    public void authenticateShouldAuthenticateExistingUserWithIdToken() throws Exception {
         OidcUser existingUser;
-        try (final AlpineQueryManager qm = new AlpineQueryManager()) {
+        try (final var qm = new AlpineQueryManager()) {
             existingUser = new OidcUser();
             existingUser.setUsername("username");
             existingUser.setSubjectIdentifier("subject");
-            existingUser.setEmail("subject@mail.local");
             existingUser = qm.persist(existingUser);
         }
 
-        final OidcUser authenticatedUser = (OidcUser) authService.authenticate();
-        assertThat(authenticatedUser).isNotNull();
+        final var profile = new OidcProfile();
+        profile.setSubject(existingUser.getSubjectIdentifier());
+        profile.setUsername(existingUser.getUsername());
+        when(idTokenAuthenticatorMock.authenticate(eq(ID_TOKEN), any(OidcProfileCreator.class))).thenReturn(profile);
+
+        final var authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, idTokenAuthenticatorMock, null, ID_TOKEN, null);
+
+        final var authenticatedUser = (OidcUser) authService.authenticate();
         assertThat(authenticatedUser.getId()).isEqualTo(existingUser.getId());
         assertThat(authenticatedUser.getUsername()).isEqualTo(existingUser.getUsername());
-        assertThat(authenticatedUser.getSubjectIdentifier()).isEqualTo(existingUser.getSubjectIdentifier());
-        assertThat(authenticatedUser.getEmail()).isEqualTo(existingUser.getEmail());
         assertThat(authenticatedUser.getTeams()).isNullOrEmpty();
-        assertThat(authenticatedUser.getPermissions()).isNullOrEmpty();
+        assertThat(authenticatedUser.getEmail()).isNull();
     }
 
     @Test
-    public void authenticateShouldSynchronizeTeamsWhenUserAlreadyExistsAndTeamSynchronizationIsEnabled() throws AlpineAuthenticationException {
-        when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION)))
-                .thenReturn(true);
-        when(configMock.getProperty(eq(Config.AlpineKey.OIDC_TEAMS_CLAIM)))
-                .thenReturn("groups");
-
-        wireMockRule.stubFor(get(urlPathEqualTo(OIDC_USERINFO_PATH))
-                .willReturn(aResponse()
-                        .withStatus(HttpStatus.SC_OK)
-                        .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-                        .withBody("" +
-                                "{" +
-                                "    \"sub\": \"subject\", " +
-                                "    \"email\": \"subject@mail.local\", " +
-                                "    \"" + USERNAMCE_CLAIM + "\": \"username\", " +
-                                "    \"groups\": [\"groupName\"]" +
-                                "}")));
-
-        Team teamToSync;
-        try (final AlpineQueryManager qm = new AlpineQueryManager()) {
-            final OidcUser existingUser = new OidcUser();
+    public void authenticateShouldAuthenticateExistingUserWithUserInfo() throws Exception {
+        OidcUser existingUser;
+        try (final var qm = new AlpineQueryManager()) {
+            existingUser = new OidcUser();
             existingUser.setUsername("username");
             existingUser.setSubjectIdentifier("subject");
-            existingUser.setEmail("subject@mail.local");
+            existingUser = qm.persist(existingUser);
+        }
+
+        final var profile = new OidcProfile();
+        profile.setSubject(existingUser.getSubjectIdentifier());
+        profile.setUsername(existingUser.getUsername());
+        when(userInfoAuthenticatorMock.authenticate(eq(ACCESS_TOKEN), any(OidcProfileCreator.class))).thenReturn(profile);
+
+        final var authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, null, userInfoAuthenticatorMock, null, ACCESS_TOKEN);
+
+        final var authenticatedUser = (OidcUser) authService.authenticate();
+        assertThat(authenticatedUser.getId()).isEqualTo(existingUser.getId());
+        assertThat(authenticatedUser.getUsername()).isEqualTo(existingUser.getUsername());
+        assertThat(authenticatedUser.getTeams()).isNullOrEmpty();
+        assertThat(authenticatedUser.getEmail()).isNull();
+    }
+
+    @Test
+    public void authenticateShouldThrowWhenUsernameClaimIsNotConfigured() {
+        when(configMock.getProperty(eq(Config.AlpineKey.OIDC_USERNAME_CLAIM))).thenReturn(null);
+
+        final var authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ID_TOKEN, ACCESS_TOKEN);
+
+        assertThatExceptionOfType(AlpineAuthenticationException.class)
+                .isThrownBy(authService::authenticate);
+    }
+
+    @Test
+    public void authenticateShouldThrowWhenTeamSyncIsEnabledAndTeamsClaimIsNotConfigured() {
+        when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION))).thenReturn(true);
+        when(configMock.getProperty(eq(Config.AlpineKey.OIDC_TEAMS_CLAIM))).thenReturn(null);
+
+        final var authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ID_TOKEN, ACCESS_TOKEN);
+
+        assertThatExceptionOfType(AlpineAuthenticationException.class)
+                .isThrownBy(authService::authenticate);
+    }
+
+    @Test
+    public void authenticateShouldSynchronizeTeamsWhenUserAlreadyExistsAndTeamSynchronizationIsEnabled() throws Exception {
+        when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION))).thenReturn(true);
+        when(configMock.getProperty(eq(Config.AlpineKey.OIDC_TEAMS_CLAIM))).thenReturn("groups");
+
+        OidcUser existingUser;
+        try (final var qm = new AlpineQueryManager()) {
+            existingUser = new OidcUser();
+            existingUser.setUsername("username");
+            existingUser.setSubjectIdentifier("subject");
             qm.persist(existingUser);
 
-            OidcGroup group = new OidcGroup();
+            var group = new OidcGroup();
             group.setName("groupName");
             group = qm.persist(group);
 
-            teamToSync = new Team();
+            var teamToSync = new Team();
             teamToSync.setName("teamName");
             teamToSync = qm.persist(teamToSync);
 
-            MappedOidcGroup mappedGroup = new MappedOidcGroup();
+            var mappedGroup = new MappedOidcGroup();
             mappedGroup.setGroup(group);
             mappedGroup.setTeam(teamToSync);
             qm.persist(mappedGroup);
         }
 
-        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN);
+        final var profile = new OidcProfile();
+        profile.setSubject("subject");
+        profile.setUsername("username");
+        profile.setGroups(List.of("groupName"));
+        when(idTokenAuthenticatorMock.authenticate(eq(ID_TOKEN), any(OidcProfileCreator.class))).thenReturn(profile);
 
-        final OidcUser authenticatedUser = (OidcUser) authService.authenticate();
+        final var authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, idTokenAuthenticatorMock, null, ID_TOKEN, null);
+
+        final var authenticatedUser = (OidcUser) authService.authenticate();
+        assertThat(authenticatedUser.getId()).isEqualTo(existingUser.getId());
         assertThat(authenticatedUser.getTeams()).hasSize(1);
         assertThat(authenticatedUser.getTeams().get(0).getName()).isEqualTo("teamName");
     }
 
     @Test
-    public void authenticateShouldThrowExceptionWhenUserDoesNotExistAndProvisioningIsDisabled() {
-        when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_USER_PROVISIONING)))
-                .thenReturn(false);
+    public void authenticateShouldSourceProfileFromIdTokenAndUserInfoIfAvailable() throws Exception {
+        when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_USER_PROVISIONING))).thenReturn(true);
+        when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION))).thenReturn(true);
+        when(configMock.getProperty(eq(Config.AlpineKey.OIDC_TEAMS_CLAIM))).thenReturn("groups");
 
-        wireMockRule.stubFor(get(urlPathEqualTo(OIDC_USERINFO_PATH))
-                .willReturn(aResponse()
-                        .withStatus(HttpStatus.SC_OK)
-                        .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-                        .withBody("" +
-                                "{" +
-                                "    \"sub\": \"subject\", " +
-                                "    \"email\": \"subject@mail.local\", " +
-                                "    \"" + USERNAMCE_CLAIM + "\": \"username\"" +
-                                "}")));
+        try (final var qm = new AlpineQueryManager()) {
+            var group = new OidcGroup();
+            group.setName("groupName");
+            group = qm.persist(group);
 
-        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN);
+            var teamToSync = new Team();
+            teamToSync.setName("teamName");
+            teamToSync = qm.persist(teamToSync);
+
+            final var mappedGroup = new MappedOidcGroup();
+            mappedGroup.setGroup(group);
+            mappedGroup.setTeam(teamToSync);
+            qm.persist(mappedGroup);
+        }
+
+        final var idTokenProfile = new OidcProfile();
+        idTokenProfile.setSubject("subject");
+        idTokenProfile.setUsername("username");
+        idTokenProfile.setEmail("username@example.com");
+        when(idTokenAuthenticatorMock.authenticate(eq(ID_TOKEN), any(OidcProfileCreator.class))).thenReturn(idTokenProfile);
+
+        final var userInfoProfile = new OidcProfile();
+        userInfoProfile.setSubject("subject");
+        userInfoProfile.setGroups(List.of("groupName"));
+        when(userInfoAuthenticatorMock.authenticate(eq(ACCESS_TOKEN), any(OidcProfileCreator.class))).thenReturn(userInfoProfile);
+
+        final var authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, idTokenAuthenticatorMock, userInfoAuthenticatorMock, ID_TOKEN, ACCESS_TOKEN);
+
+        final var provisionedUser = (OidcUser) authService.authenticate();
+        assertThat(provisionedUser.getUsername()).isEqualTo("username");
+        assertThat(provisionedUser.getSubjectIdentifier()).isEqualTo("subject");
+        assertThat(provisionedUser.getTeams()).hasSize(1);
+        assertThat(provisionedUser.getTeams().get(0).getName()).isEqualTo("teamName");
+        assertThat(provisionedUser.getEmail()).isEqualTo("username@example.com");
+    }
+
+    @Test
+    public void authenticateShouldThrowWhenUnableToAssembleCompleteProfile() throws Exception {
+        when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_USER_PROVISIONING))).thenReturn(true);
+        when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION))).thenReturn(true);
+        when(configMock.getProperty(eq(Config.AlpineKey.OIDC_TEAMS_CLAIM))).thenReturn("groups");
+
+        final var idTokenProfile = new OidcProfile();
+        idTokenProfile.setSubject("subject");
+        idTokenProfile.setUsername("username");
+        idTokenProfile.setEmail("username@example.com");
+        when(idTokenAuthenticatorMock.authenticate(eq(ID_TOKEN), any(OidcProfileCreator.class))).thenReturn(idTokenProfile);
+
+        final var userInfoProfile = new OidcProfile();
+        userInfoProfile.setSubject("subject");
+        userInfoProfile.setUsername("username");
+        when(userInfoAuthenticatorMock.authenticate(eq(ACCESS_TOKEN), any(OidcProfileCreator.class))).thenReturn(userInfoProfile);
+
+        final var authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, idTokenAuthenticatorMock, userInfoAuthenticatorMock, ID_TOKEN, ACCESS_TOKEN);
+
+        assertThatExceptionOfType(AlpineAuthenticationException.class)
+                .isThrownBy(authService::authenticate)
+                .satisfies(exception -> assertThat(exception.getCauseType())
+                        .isEqualTo(AlpineAuthenticationException.CauseType.OTHER));
+    }
+
+    @Test
+    public void authenticateShouldThrowWhenUserDoesNotExistAndProvisioningIsDisabled() throws Exception {
+        when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_USER_PROVISIONING))).thenReturn(false);
+
+        final var profile = new OidcProfile();
+        profile.setSubject("subject");
+        profile.setUsername("username");
+        when(idTokenAuthenticatorMock.authenticate(eq(ID_TOKEN), any(OidcProfileCreator.class))).thenReturn(profile);
+
+        final var authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, idTokenAuthenticatorMock, null, ID_TOKEN, null);
 
         assertThatExceptionOfType(AlpineAuthenticationException.class)
                 .isThrownBy(authService::authenticate)
@@ -273,88 +283,106 @@ public class OidcAuthenticationServiceTest {
     }
 
     @Test
-    public void authenticateShouldProvisionAndReturnNewUserWhenUserDoesNotExistAndProvisioningIsEnabled() throws AlpineAuthenticationException {
-        when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_USER_PROVISIONING)))
-                .thenReturn(true);
+    public void authenticateShouldProvisionAndReturnNewUserWhenUserDoesNotExistAndProvisioningIsEnabled() throws Exception {
+        when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_USER_PROVISIONING))).thenReturn(true);
 
-        wireMockRule.stubFor(get(urlPathEqualTo(OIDC_USERINFO_PATH))
-                .willReturn(aResponse()
-                        .withStatus(HttpStatus.SC_OK)
-                        .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-                        .withBody("" +
-                                "{" +
-                                "    \"sub\": \"subject\", " +
-                                "    \"email\": \"subject@mail.local\", " +
-                                "    \"" + USERNAMCE_CLAIM + "\": \"username\"" +
-                                "}")));
+        final var profile = new OidcProfile();
+        profile.setSubject("subject");
+        profile.setUsername("username");
+        profile.setEmail("username@example.com");
+        when(idTokenAuthenticatorMock.authenticate(eq(ID_TOKEN), any(OidcProfileCreator.class))).thenReturn(profile);
 
-        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN);
+        final var authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, idTokenAuthenticatorMock, null, ID_TOKEN, null);
 
-        final OidcUser provisionedUser = (OidcUser) authService.authenticate();
+        final var provisionedUser = (OidcUser) authService.authenticate();
         assertThat(provisionedUser).isNotNull();
         assertThat(provisionedUser.getUsername()).isEqualTo("username");
         assertThat(provisionedUser.getSubjectIdentifier()).isEqualTo("subject");
-        assertThat(provisionedUser.getEmail()).isEqualTo("subject@mail.local");
+        assertThat(provisionedUser.getEmail()).isEqualTo("username@example.com");
         assertThat(provisionedUser.getTeams()).isNullOrEmpty();
         assertThat(provisionedUser.getPermissions()).isNullOrEmpty();
     }
 
     @Test
-    public void authenticateShouldAssignSubjectIdAndEmailWhenUserAlreadyExistsAndAuthenticatesForFirstTime() throws AlpineAuthenticationException {
-        when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_USER_PROVISIONING)))
-                .thenReturn(true);
+    public void authenticateShouldProvisionAndSyncTeamsAndReturnNewUserWhenUserDoesNotExistAndProvisioningAndTeamSyncIsEnabled() throws Exception {
+        when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_USER_PROVISIONING))).thenReturn(true);
+        when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION))).thenReturn(true);
+        when(configMock.getProperty(eq(Config.AlpineKey.OIDC_TEAMS_CLAIM))).thenReturn("groups");
 
-        wireMockRule.stubFor(get(urlPathEqualTo(OIDC_USERINFO_PATH))
-                .willReturn(aResponse()
-                        .withStatus(HttpStatus.SC_OK)
-                        .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-                        .withBody("" +
-                                "{" +
-                                "    \"sub\": \"subject\", " +
-                                "    \"email\": \"subject@mail.local\", " +
-                                "    \"" + USERNAMCE_CLAIM + "\": \"username\"" +
-                                "}")));
+        try (final var qm = new AlpineQueryManager()) {
+            var group = new OidcGroup();
+            group.setName("groupName");
+            group = qm.persist(group);
 
+            var teamToSync = new Team();
+            teamToSync.setName("teamName");
+            teamToSync = qm.persist(teamToSync);
+
+            var mappedGroup = new MappedOidcGroup();
+            mappedGroup.setGroup(group);
+            mappedGroup.setTeam(teamToSync);
+            qm.persist(mappedGroup);
+        }
+
+        final var profile = new OidcProfile();
+        profile.setSubject("subject");
+        profile.setUsername("username");
+        profile.setGroups(List.of("groupName"));
+        profile.setEmail("username@example.com");
+        when(idTokenAuthenticatorMock.authenticate(eq(ID_TOKEN), any(OidcProfileCreator.class))).thenReturn(profile);
+
+        final var authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, idTokenAuthenticatorMock, null, ID_TOKEN, null);
+
+        final var provisionedUser = (OidcUser) authService.authenticate();
+        assertThat(provisionedUser).isNotNull();
+        assertThat(provisionedUser.getUsername()).isEqualTo("username");
+        assertThat(provisionedUser.getSubjectIdentifier()).isEqualTo("subject");
+        assertThat(provisionedUser.getEmail()).isEqualTo("username@example.com");
+        assertThat(provisionedUser.getTeams()).hasSize(1);
+        assertThat(provisionedUser.getTeams().get(0).getName()).isEqualTo("teamName");
+        assertThat(provisionedUser.getPermissions()).isNullOrEmpty();
+    }
+
+    @Test
+    public void authenticateShouldAssignSubjectIdAndEmailWhenUserAlreadyExistsAndAuthenticatesForFirstTime() throws Exception {
         try (final AlpineQueryManager qm = new AlpineQueryManager()) {
             qm.createOidcUser("username");
         }
 
-        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN);
+        final var profile = new OidcProfile();
+        profile.setSubject("subject");
+        profile.setUsername("username");
+        profile.setEmail("username@example.com");
+        when(idTokenAuthenticatorMock.authenticate(eq(ID_TOKEN), any(OidcProfileCreator.class))).thenReturn(profile);
 
-        final OidcUser provisionedUser = (OidcUser) authService.authenticate();
+        final var authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, idTokenAuthenticatorMock, null, ID_TOKEN, null);
+
+        final var provisionedUser = (OidcUser) authService.authenticate();
         assertThat(provisionedUser).isNotNull();
         assertThat(provisionedUser.getUsername()).isEqualTo("username");
         assertThat(provisionedUser.getSubjectIdentifier()).isEqualTo("subject");
-        assertThat(provisionedUser.getEmail()).isEqualTo("subject@mail.local");
+        assertThat(provisionedUser.getEmail()).isEqualTo("username@example.com");
         assertThat(provisionedUser.getTeams()).isNullOrEmpty();
         assertThat(provisionedUser.getPermissions()).isNullOrEmpty();
     }
 
     @Test
-    public void authenticateShouldThrowExceptionWhenUserAlreadyExistsAndSubjectIdentifierHasChanged() {
-        when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_USER_PROVISIONING)))
-                .thenReturn(true);
-
-        wireMockRule.stubFor(get(urlPathEqualTo(OIDC_USERINFO_PATH))
-                .willReturn(aResponse()
-                        .withStatus(HttpStatus.SC_OK)
-                        .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
-                        .withBody("" +
-                                "{" +
-                                "    \"sub\": \"changedSubject\", " +
-                                "    \"email\": \"subject@mail.local\", " +
-                                "    \"" + USERNAMCE_CLAIM + "\": \"username\"" +
-                                "}")));
-
-        try (final AlpineQueryManager qm = new AlpineQueryManager()) {
-            final OidcUser existingUser = new OidcUser();
+    public void authenticateShouldThrowWhenUserAlreadyExistsAndSubjectIdentifierHasChanged() throws Exception {
+        try (final var qm = new AlpineQueryManager()) {
+            final var existingUser = new OidcUser();
             existingUser.setUsername("username");
             existingUser.setSubjectIdentifier("subject");
-            existingUser.setEmail("subject@mail.local");
+            existingUser.setEmail("username@example.com");
             qm.persist(existingUser);
         }
 
-        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN);
+        final var profile = new OidcProfile();
+        profile.setSubject("changedSubject");
+        profile.setUsername("username");
+        profile.setEmail("username@example.com");
+        when(idTokenAuthenticatorMock.authenticate(eq(ID_TOKEN), any(OidcProfileCreator.class))).thenReturn(profile);
+
+        final var authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, idTokenAuthenticatorMock, null, ID_TOKEN, null);
 
         assertThatExceptionOfType(AlpineAuthenticationException.class)
                 .isThrownBy(authService::authenticate)
@@ -363,140 +391,70 @@ public class OidcAuthenticationServiceTest {
     }
 
     @Test
-    public void synchronizeTeamsShouldReturnUserWhenNoTeamsClaimWasConfigured() {
-        when(configMock.getProperty(eq(Config.AlpineKey.OIDC_TEAMS_CLAIM)))
-                .thenReturn(null);
+    public void synchronizeTeamsShouldRemoveOutdatedTeamMemberships() throws Exception {
+        when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION))).thenReturn(true);
+        when(configMock.getProperty(eq(Config.AlpineKey.OIDC_TEAMS_CLAIM))).thenReturn("groups");
 
-        final OidcUser oidcUser = new OidcUser();
-
-        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN);
-
-        assertThat(authService.synchronizeTeams(null, oidcUser, null)).isEqualTo(oidcUser);
-    }
-
-    @Test
-    public void synchronizeTeamsShouldReturnUserWhenTeamsClaimIsNotAList() {
-        when(configMock.getProperty(eq(Config.AlpineKey.OIDC_TEAMS_CLAIM)))
-                .thenReturn("teams");
-
-        final OidcUserInfo userInfo = new OidcUserInfo();
-        userInfo.setClaim("teams", "not-a-list");
-
-        final OidcUser oidcUser = new OidcUser();
-
-        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN);
-
-        assertThat(authService.synchronizeTeams(null, oidcUser, userInfo)).isEqualTo(oidcUser);
-    }
-
-    @Test
-    public void synchronizeTeamsShouldReturnUserWhenTeamsClaimDoesNotExist() {
-        when(configMock.getProperty(eq(Config.AlpineKey.OIDC_TEAMS_CLAIM)))
-                .thenReturn("teams");
-
-        final OidcUserInfo userInfo = new OidcUserInfo();
-
-        final OidcUser oidcUser = new OidcUser();
-
-        final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN);
-
-        assertThat(authService.synchronizeTeams(null, oidcUser, userInfo)).isEqualTo(oidcUser);
-    }
-
-    @Test
-    public void synchronizeTeamsShouldAddNewTeamMemberships() {
-        when(configMock.getProperty(eq(Config.AlpineKey.OIDC_TEAMS_CLAIM)))
-                .thenReturn("teams");
-
-        final OidcUserInfo userInfo = new OidcUserInfo();
-        userInfo.setClaim("teams", Collections.singletonList("groupName"));
-
-        try (final AlpineQueryManager qm = new AlpineQueryManager()) {
-            OidcUser oidcUser = new OidcUser();
+        try (final var qm = new AlpineQueryManager()) {
+            var oidcUser = new OidcUser();
             oidcUser.setUsername("username");
             oidcUser.setSubjectIdentifier("subject");
             oidcUser = qm.persist(oidcUser);
 
-            OidcGroup group = new OidcGroup();
+            var group = new OidcGroup();
             group.setName("groupName");
             group = qm.persist(group);
 
-            Team team = new Team();
+            var team = new Team();
             team.setName("teamName");
+            team.setOidcUsers(List.of(oidcUser));
             team = qm.persist(team);
 
-            final MappedOidcGroup mappedGroup = new MappedOidcGroup();
+            final var mappedGroup = new MappedOidcGroup();
             mappedGroup.setGroup(group);
             mappedGroup.setTeam(team);
             qm.persist(mappedGroup);
-
-            final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN);
-
-            oidcUser = authService.synchronizeTeams(qm, oidcUser, userInfo);
-            assertThat(oidcUser.getTeams()).hasSize(1);
-            assertThat(oidcUser.getTeams().get(0).getName()).isEqualTo("teamName");
         }
+
+        final var profile = new OidcProfile();
+        profile.setSubject("subject");
+        profile.setUsername("username");
+        profile.setGroups(Collections.emptyList());
+        when(idTokenAuthenticatorMock.authenticate(eq(ID_TOKEN), any(OidcProfileCreator.class))).thenReturn(profile);
+
+        final var authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, idTokenAuthenticatorMock, null, ID_TOKEN, null);
+
+        final var authenticatedUser = (OidcUser) authService.authenticate();
+        assertThat(authenticatedUser.getTeams()).isNullOrEmpty();
     }
 
     @Test
-    public void synchronizeTeamsShouldRemoveOutdatedTeamMemberships() {
-        when(configMock.getProperty(eq(Config.AlpineKey.OIDC_TEAMS_CLAIM)))
-                .thenReturn("teams");
+    public void authenticateShouldRemoveMembershipsOfUnmappedTeams() throws Exception {
+        when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION))).thenReturn(true);
+        when(configMock.getProperty(eq(Config.AlpineKey.OIDC_TEAMS_CLAIM))).thenReturn("groups");
 
-        final OidcUserInfo userInfo = new OidcUserInfo();
-        userInfo.setClaim("teams", Collections.emptyList());
-
-        try (final AlpineQueryManager qm = new AlpineQueryManager()) {
-            OidcUser oidcUser = new OidcUser();
+        try (final var qm = new AlpineQueryManager()) {
+            var oidcUser = new OidcUser();
             oidcUser.setUsername("username");
             oidcUser.setSubjectIdentifier("subject");
             oidcUser = qm.persist(oidcUser);
 
-            OidcGroup group = new OidcGroup();
-            group.setName("groupName");
-            group = qm.persist(group);
-
-            Team team = new Team();
-            team.setName("teamName");
-            team.setOidcUsers(Collections.singletonList(oidcUser));
-            team = qm.persist(team);
-
-            final MappedOidcGroup mappedGroup = new MappedOidcGroup();
-            mappedGroup.setGroup(group);
-            mappedGroup.setTeam(team);
-            qm.persist(mappedGroup);
-
-            final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN);
-
-            oidcUser = authService.synchronizeTeams(qm, oidcUser, userInfo);
-            assertThat(oidcUser.getTeams()).isNullOrEmpty();
-        }
-    }
-
-    @Test
-    public void synchronizeTeamsShouldRemoveMembershipsOfUnmappedTeams() {
-        when(configMock.getProperty(eq(Config.AlpineKey.OIDC_TEAMS_CLAIM)))
-                .thenReturn("teams");
-
-        final OidcUserInfo userInfo = new OidcUserInfo();
-        userInfo.setClaim("teams", Collections.singletonList("groupName"));
-
-        try (final AlpineQueryManager qm = new AlpineQueryManager()) {
-            OidcUser oidcUser = new OidcUser();
-            oidcUser.setUsername("username");
-            oidcUser.setSubjectIdentifier("subject");
-            oidcUser = qm.persist(oidcUser);
-
-            Team team = new Team();
+            var team = new Team();
             team.setName("teamName");
             team.setOidcUsers(Collections.singletonList(oidcUser));
             qm.persist(team);
-
-            final OidcAuthenticationService authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ACCESS_TOKEN);
-
-            oidcUser = authService.synchronizeTeams(qm, oidcUser, userInfo);
-            assertThat(oidcUser.getTeams()).isNullOrEmpty();
         }
+
+        final var profile = new OidcProfile();
+        profile.setSubject("subject");
+        profile.setUsername("username");
+        profile.setGroups(List.of("groupName"));
+        when(idTokenAuthenticatorMock.authenticate(eq(ID_TOKEN), any(OidcProfileCreator.class))).thenReturn(profile);
+
+        final var authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, idTokenAuthenticatorMock, null, ID_TOKEN, null);
+
+        final var authenticatedUser = (OidcUser) authService.authenticate();
+        assertThat(authenticatedUser.getTeams()).isNullOrEmpty();
     }
 
 }
