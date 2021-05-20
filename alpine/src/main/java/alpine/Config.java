@@ -106,7 +106,7 @@ public class Config {
         DATABASE_PASSWORD_FILE    ("alpine.database.password.file",     null),
         DATABASE_POOL_ENABLED     ("alpine.database.pool.enabled",      true),
         DATABASE_POOL_MAX_SIZE    ("alpine.database.pool.max.size",     20),
-        DATABASE_POOL_IDLE_TIMEOUT("alpine.database.pool.idle.timeout", 600000),
+        DATABASE_POOL_IDLE_TIMEOUT("alpine.database.pool.idle.timeout", 300000),
         DATABASE_POOL_MIN_IDLE    ("alpine.database.pool.min.idle",     10),
         DATABASE_POOL_MAX_LIFETIME("alpine.database.pool.max.lifetime", 600000),
         ENFORCE_AUTHENTICATION    ("alpine.enforce.authentication",     true),
