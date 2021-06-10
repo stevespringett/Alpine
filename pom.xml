@@ -160,7 +160,7 @@
              https://github.com/datanucleus/datanucleus-jdo-query/pull/10
         <lib.datanucleus-jdo-query.version>5.0.6</lib.datanucleus-jdo-query.version>
         -->
-        <lib.datanucleus.version>5.2.7</lib.datanucleus.version>
+        <lib.datanucleus.version>5.2.8</lib.datanucleus.version>
         <lib.h2.version>1.4.200</lib.h2.version>
         <lib.hikaricp.version>4.0.3</lib.hikaricp.version>
         <lib.javassist.version>3.28.0-GA</lib.javassist.version>
@@ -185,9 +185,9 @@
         <lib.swagger.jersey.version>1.6.2</lib.swagger.jersey.version>
         <!-- Unit test libraries -->
         <lib.junit.version>4.13.2</lib.junit.version>
-        <lib.mockito.version>3.10.0</lib.mockito.version>
+        <lib.mockito.version>3.11.0</lib.mockito.version>
         <lib.assertj.version>3.19.0</lib.assertj.version>
-        <lib.wiremock.version>2.28.0</lib.wiremock.version>
+        <lib.wiremock.version>2.28.1</lib.wiremock.version>
 
         <war-embedded-finalname>${project.build.finalName}-embedded</war-embedded-finalname>
 
