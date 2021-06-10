@@ -81,6 +81,15 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     }
 
     /**
+     * Constructs a new AlpineQueryManager.
+     * @param request an AlpineRequest
+     * @since 1.9.3
+     */
+    public AlpineQueryManager(final PersistenceManager pm, final AlpineRequest request) {
+        super(pm, request);
+    }
+
+    /**
      * Returns an API key.
      * @param key the key to return
      * @return an ApiKey

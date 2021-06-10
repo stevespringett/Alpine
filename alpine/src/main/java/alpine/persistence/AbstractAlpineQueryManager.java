@@ -60,7 +60,7 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      * @param pm the JDO PersistenceManager to use
      * @since 1.4.3
      */
-    public AbstractAlpineQueryManager(PersistenceManager pm) {
+    public AbstractAlpineQueryManager(final PersistenceManager pm) {
         this.pm = pm;
         principal = null;
         pagination = new Pagination(Pagination.Strategy.NONE, 0, 0);
@@ -108,6 +108,22 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      */
     public AbstractAlpineQueryManager(final AlpineRequest request) {
         pm = PersistenceManagerFactory.createPersistenceManager();
+        this.principal = request.getPrincipal();
+        this.pagination = request.getPagination();
+        this.filter = request.getFilter();
+        this.orderBy = request.getOrderBy();
+        this.orderDirection = request.getOrderDirection();
+    }
+
+    /**
+     * Constructs a new QueryManager. Deconstructs the specified AlpineRequest
+     * into its individual components including pagination and ordering.
+     * @param pm the JDO PersistenceManager to use
+     * @param request an AlpineRequest object
+     * @since 1.9.3
+     */
+    public AbstractAlpineQueryManager(final PersistenceManager pm, final AlpineRequest request) {
+        this.pm = pm;
         this.principal = request.getPrincipal();
         this.pagination = request.getPagination();
         this.filter = request.getFilter();
