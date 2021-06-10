@@ -80,8 +80,8 @@
     <properties>
         <!-- Maven Build Properties -->
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
@@ -95,7 +95,7 @@
 
         <!-- Dependency Versions -->
         <lib.slf4j.version>1.7.30</lib.slf4j.version>
-        <lib.jetty.version>9.4.40.v20210413</lib.jetty.version>
+        <lib.jetty.version>9.4.42.v20210604</lib.jetty.version>
         <lib.jetty.webapp.logging>9.4.27</lib.jetty.webapp.logging>
         <lib.logback.version>1.2.3</lib.logback.version>
 
@@ -261,6 +261,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>${maven.javadoc.plugin.version}</version>
+                <configuration>
+                    <javadocExecutable>${java.home}/bin</javadocExecutable>
+                </configuration>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
