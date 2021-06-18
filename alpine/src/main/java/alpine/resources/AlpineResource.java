@@ -25,7 +25,6 @@ import alpine.model.ManagedUser;
 import alpine.model.OidcUser;
 import alpine.model.UserPrincipal;
 import alpine.persistence.AlpineQueryManager;
-import alpine.validation.RegexSequence;
 import alpine.validation.ValidationException;
 import alpine.validation.ValidationTask;
 import io.jsonwebtoken.lang.Collections;
@@ -33,7 +32,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.server.validation.ValidationError;
 import org.owasp.security.logging.SecurityMarkers;
 import org.slf4j.Marker;
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -42,7 +40,6 @@ import javax.validation.ValidatorFactory;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.security.Principal;
@@ -104,7 +101,12 @@ public abstract class AlpineResource {
      * @since 1.0.0
      */
     protected AlpineRequest getAlpineRequest() {
-        return alpineRequest;
+        final Object alpineRequest = requestContext.getProperty("AlpineRequest");
+        if (alpineRequest != null) {
+            return (AlpineRequest) alpineRequest;
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -266,60 +268,6 @@ public abstract class AlpineResource {
         if (! Collections.isEmpty(errors)) {
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(errors).build());
         }
-    }
-
-    /**
-     * Initializes this resource instance by populating some of the features of this class
-     */
-    @PostConstruct
-    private void initialize() {
-        final MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
-        final String offset = multiParam(queryParams, "offset");
-        final String page = multiParam(queryParams, "page", "pageNumber");
-        final String size = multiParam(queryParams, "size", "pageSize", "limit");
-        final String filter = multiParam(queryParams, "filter", "searchText");
-        final String sort = multiParam(queryParams, "sort", "sortOrder");
-        final OrderDirection orderDirection;
-        String orderBy = multiParam(queryParams, "orderBy", "sortName");
-
-        if (StringUtils.isBlank(orderBy) || !RegexSequence.Pattern.STRING_IDENTIFIER.matcher(orderBy).matches()) {
-            orderBy = null;
-        }
-
-        if ("asc".equalsIgnoreCase(sort)) {
-            orderDirection = OrderDirection.ASCENDING;
-        } else if ("desc".equalsIgnoreCase(sort)) {
-            orderDirection = OrderDirection.DESCENDING;
-        } else {
-            orderDirection = OrderDirection.UNSPECIFIED;
-        }
-
-        final Pagination pagination;
-        if (StringUtils.isNotBlank(offset)) {
-            pagination = new Pagination(Pagination.Strategy.OFFSET, offset, size);
-        } else if (StringUtils.isNotBlank(page) && StringUtils.isNotBlank(size)) {
-            pagination = new Pagination(Pagination.Strategy.PAGES, page, size);
-        } else {
-            pagination = new Pagination(Pagination.Strategy.OFFSET, 0, 100); // Always paginate queries from resources
-        }
-        this.alpineRequest = new AlpineRequest(getPrincipal(), pagination, filter, orderBy, orderDirection);
-    }
-
-    /**
-     * Provides a facility to retrieve a param by more than one name. Different libraries
-     * and frameworks, expect (in some cases) different names for the same param.
-     * @param queryParams the parameters from the querystring
-     * @param params an array of one or more param names
-     * @return the value of the param, or null if not found
-     */
-    private String multiParam(final MultivaluedMap<String, String> queryParams, final String... params) {
-        for (final String param: params) {
-            final String value = queryParams.getFirst(param);
-            if (StringUtils.isNotBlank(value)) {
-                return value;
-            }
-        }
-        return null;
     }
 
     /**
