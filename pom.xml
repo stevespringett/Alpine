@@ -107,6 +107,7 @@
         <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
         <maven.uuidgenerator.plugin.version>1.0.1</maven.uuidgenerator.plugin.version>
         <maven.jacoco.plugin.version>0.8.7</maven.jacoco.plugin.version>
+        <maven.antrun.plugin.version>3.0.0</maven.antrun.plugin.version>
 
         <!-- Software Security: Fortify SCA -->
         <maven.fortify.plugin.version>18.20</maven.fortify.plugin.version>
@@ -189,7 +190,7 @@
         <lib.assertj.version>3.20.2</lib.assertj.version>
         <lib.wiremock.version>2.29.1</lib.wiremock.version>
 
-        <war-embedded-finalname>${project.build.finalName}-embedded</war-embedded-finalname>
+        <war-embedded-finalname>${project.build.finalName}</war-embedded-finalname>
 
         <!-- Logback configuration - Used for Embedded Jetty profile -->
         <logback.configuration.file>${project.build.directory}/classes/logback.xml</logback.configuration.file>
@@ -887,6 +888,30 @@
                             </overlays>
                         </configuration>
                     </plugin>
+                    <!-- Not ideal to include Ant, however, after trying copy-rename-maven-plugin, the resulting
+                    executable war always had DEBUG logging on when executed. Really odd behavior. Using the Move
+                    target within Ant seems to work fine without the weird logging issue in the resulting jar. -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>${maven.antrun.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>rename-war-file</id>
+                                <phase>package</phase>
+                                <configuration>
+                                    <target>
+                                        <move file="${project.build.directory}/${war-embedded-finalname}.war"
+                                              tofile="${project.build.directory}/${war-embedded-finalname}.jar"/>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
                 </plugins>
             </build>
         </profile>
