@@ -171,7 +171,7 @@
         <lib.jackson.version>2.12.4</lib.jackson.version>
         <lib.javamail.version>1.6.7</lib.javamail.version>
         <lib.jaxb.api.version>2.3.1</lib.jaxb.api.version>
-        <lib.jaxb.core.version>2.3.0.1</lib.jaxb.core.version>
+        <lib.jaxb.core.version>3.0.2</lib.jaxb.core.version>
         <lib.jaxb.impl.version>2.3.4</lib.jaxb.impl.version>
         <lib.jdo.api.version>3.2.0-m13</lib.jdo.api.version>
         <lib.jersey.version>2.34</lib.jersey.version>
