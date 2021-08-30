@@ -44,6 +44,7 @@ public class PersistenceManagerFactory implements ServletContextListener {
     private static final Logger LOGGER = Logger.getLogger(PersistenceManagerFactory.class);
 
     private static JDOPersistenceManagerFactory pmf;
+    private static final ThreadLocal<PersistenceManager> PER_THREAD_PM = new ThreadLocal<>();
 
     @Override
     public void contextInitialized(ServletContextEvent event) {
@@ -75,7 +76,16 @@ public class PersistenceManagerFactory implements ServletContextListener {
         if (pmf == null) {
             throw new IllegalStateException("Context is not initialized yet.");
         }
-        return pmf.getPersistenceManager();
+        return getPerThreadPersistenceManager();
+    }
+
+    private synchronized static PersistenceManager getPerThreadPersistenceManager() {
+        PersistenceManager pm = PER_THREAD_PM.get();
+        if(pm == null || pm.isClosed()) {
+            pm = pmf.getPersistenceManager();
+            PER_THREAD_PM.set(pm);
+        }
+        return pm;
     }
 
 }

@@ -21,13 +21,7 @@ package alpine.persistence;
 import alpine.Config;
 import java.util.Properties;
 
-import static org.datanucleus.PropertyNames.PROPERTY_CONNECTION_POOLINGTYPE;
-import static org.datanucleus.PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL;
-import static org.datanucleus.PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS;
-import static org.datanucleus.PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS;
-import static org.datanucleus.PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_DATABASE;
-import static org.datanucleus.PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES;
-import static org.datanucleus.PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_MODE;
+import static org.datanucleus.PropertyNames.*;
 import static org.datanucleus.store.rdbms.RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_IDLE_TIMEOUT;
 import static org.datanucleus.store.rdbms.RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MAX_LIFETIME;
 import static org.datanucleus.store.rdbms.RDBMSPropertyNames.PROPERTY_CONNECTION_POOL_MAX_POOL_SIZE;
@@ -61,6 +55,8 @@ public final class JdoProperties {
         properties.put(PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS, "true");
         properties.put(PROPERTY_SCHEMA_GENERATE_DATABASE_MODE, "create");
         properties.put(PROPERTY_QUERY_JDOQL_ALLOWALL, "true");
+        properties.put(PROPERTY_MULTITHREADED, "true");
+        properties.put("javax.jdo.option.Multithreaded", "true");
         return properties;
     }
 
@@ -78,6 +74,8 @@ public final class JdoProperties {
         properties.put(PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS, "true");
         properties.put(PROPERTY_SCHEMA_GENERATE_DATABASE_MODE, "create");
         properties.put(PROPERTY_QUERY_JDOQL_ALLOWALL, "true");
+        properties.put("javax.jdo.option.Multithreaded", "true");
+        properties.put(PROPERTY_MULTITHREADED, "true");
         return properties;
     }
 }
