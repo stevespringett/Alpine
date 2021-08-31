@@ -18,6 +18,7 @@
  */
 package alpine.persistence;
 
+import alpine.logging.Logger;
 import alpine.resources.AlpineRequest;
 import alpine.resources.OrderDirection;
 import alpine.resources.Pagination;
@@ -46,6 +47,8 @@ import java.util.UUID;
  * @since 1.0.0
  */
 public abstract class AbstractAlpineQueryManager implements AutoCloseable {
+
+    private static final Logger LOGGER = Logger.getLogger(AbstractAlpineQueryManager.class);
 
     protected final Principal principal;
     protected Pagination pagination;
@@ -604,7 +607,9 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      * @since 1.0.0
      */
     public void close() {
-        pm.close();
+        if (pm != null) {
+            pm.close();
+        }
     }
 
     public PersistenceManager getPersistenceManager() {
