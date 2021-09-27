@@ -5,7 +5,7 @@
     <parent>
         <groupId>us.springett</groupId>
         <artifactId>alpine-parent</artifactId>
-        <version>1.7.1</version>
+        <version>1.10.2</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -16,12 +16,16 @@
 
     <name>Example Alpine Application</name>
 
+    <properties>
+        <lib.alpine.version>${project.parent.version}</lib.alpine.version>
+    </properties>
+
     <dependencies>
         <!-- Alpine -->
         <dependency>
             <groupId>us.springett</groupId>
             <artifactId>alpine</artifactId>
-            <version>1.10.1</version>
+            <version>${project.parent.version}</version>
         </dependency>
         <!-- List other application dependencies here -->
     </dependencies>
