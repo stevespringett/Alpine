@@ -92,7 +92,9 @@ public class ApiKey implements Serializable, Principal {
     @Deprecated
     @JsonIgnore
     public String getName() {
-        return getKey();
+        String key = getKey();
+
+        return key.substring(0, 4) + "****" + key.substring(key.length() - 4);
     }
 
     public List<Team> getTeams() {
