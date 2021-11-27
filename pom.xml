@@ -152,7 +152,7 @@
         <!-- Dependency Versions -->
         <lib.alpine.executable.war.version>1.2.9</lib.alpine.executable.war.version>
         <lib.bcrypt.version>0.4</lib.bcrypt.version>
-        <lib.caffeine.version>3.0.3</lib.caffeine.version>
+        <lib.caffeine.version>3.0.4</lib.caffeine.version>
         <lib.commons.collections4.version>4.4</lib.commons.collections4.version>
         <lib.commons.io.version>2.11.0</lib.commons.io.version>
         <lib.commons.lang3.version>3.12.0</lib.commons.lang3.version>
@@ -168,12 +168,12 @@
         <lib.h2.version>1.4.200</lib.h2.version>
         <lib.hikaricp.version>4.0.3</lib.hikaricp.version>
         <lib.javassist.version>3.28.0-GA</lib.javassist.version>
-        <lib.jackson.version>2.12.4</lib.jackson.version>
+        <lib.jackson.version>2.13.0</lib.jackson.version>
         <lib.javamail.version>1.6.7</lib.javamail.version>
         <lib.jaxb.api.version>2.3.1</lib.jaxb.api.version>
         <lib.jaxb.core.version>2.3.0.1</lib.jaxb.core.version>
         <lib.jaxb.impl.version>2.3.4</lib.jaxb.impl.version>
-        <lib.jdo.api.version>3.2.0-m13</lib.jdo.api.version>
+        <lib.jdo.api.version>3.2.0-release</lib.jdo.api.version>
         <lib.jersey.version>2.34</lib.jersey.version>
         <lib.jsp.api.version>2.2</lib.jsp.api.version>
         <lib.jsonwebtoken.version>0.9.1</lib.jsonwebtoken.version>
@@ -181,7 +181,7 @@
         <lib.jsr353-impl.version>1.1.4</lib.jsr353-impl.version>
         <lib.jsr353-spec.version>1.1.4</lib.jsr353-spec.version>
         <lib.jstl.version>1.2.5</lib.jstl.version>
-        <lib.logback.version>1.2.5</lib.logback.version>
+        <lib.logback.version>1.2.7</lib.logback.version>
         <lib.nimbus-oauth2-oidc-sdk.version>9.15</lib.nimbus-oauth2-oidc-sdk.version>
         <lib.owasp.encoder.version>1.2.3</lib.owasp.encoder.version>
         <lib.owasp.security-logging.version>1.1.6</lib.owasp.security-logging.version>
