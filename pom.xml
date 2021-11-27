@@ -152,7 +152,7 @@
         <!-- Dependency Versions -->
         <lib.alpine.executable.war.version>1.2.9</lib.alpine.executable.war.version>
         <lib.bcrypt.version>0.4</lib.bcrypt.version>
-        <lib.caffeine.version>3.0.3</lib.caffeine.version>
+        <lib.caffeine.version>3.0.4</lib.caffeine.version>
         <lib.commons.collections4.version>4.4</lib.commons.collections4.version>
         <lib.commons.io.version>2.11.0</lib.commons.io.version>
         <lib.commons.lang3.version>3.12.0</lib.commons.lang3.version>
@@ -164,7 +164,7 @@
         <!-- DO NOT UPDATE Datanucleus RDBMS beyond 5.2.7 (for now) due to breaking changes introduced in
              https://github.com/datanucleus/datanucleus-rdbms/pull/375
         -->
-        <lib.datanucleus.version>5.2.7</lib.datanucleus.version>
+        <lib.datanucleus.version>5.2.8</lib.datanucleus.version>
         <lib.h2.version>1.4.200</lib.h2.version>
         <lib.hikaricp.version>4.0.3</lib.hikaricp.version>
         <lib.javassist.version>3.28.0-GA</lib.javassist.version>
