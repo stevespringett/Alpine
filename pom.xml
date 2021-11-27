@@ -150,7 +150,7 @@
         <plugin.cyclonedx.includeLicenseText>false</plugin.cyclonedx.includeLicenseText>
 
         <!-- Dependency Versions -->
-        <lib.alpine.executable.war.version>1.2.9</lib.alpine.executable.war.version>
+        <lib.alpine.executable.war.version>1.2.10</lib.alpine.executable.war.version>
         <lib.bcrypt.version>0.4</lib.bcrypt.version>
         <lib.caffeine.version>3.0.4</lib.caffeine.version>
         <lib.commons.collections4.version>4.4</lib.commons.collections4.version>
