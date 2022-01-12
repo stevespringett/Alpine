@@ -28,6 +28,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * BlacklistUrlFilter is a configurable Servlet Filter that can prevent access to
@@ -103,21 +105,35 @@ public final class BlacklistUrlFilter implements Filter {
 
         final HttpServletRequest req = (HttpServletRequest) request;
         final HttpServletResponse res = (HttpServletResponse) response;
-
-        final String requestUri = req.getRequestURI();
-        if (requestUri != null) {
-            for (final String url: denyUrls) {
-                if (requestUri.startsWith(url.trim())) {
-                    res.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        try {
+            // Canonicalize the URI
+            final String requestUri = new URI(req.getRequestURI()).normalize().getPath();
+            if (requestUri != null) {
+                // If the canonicalized URI still contains the '..' sequence, a potentially malicious request
+                // has been made. Respond with a 400. NOTE: Jetty/Embedded already has protections against this,
+                // therefore, the following code should never be true. But in the event Jetty changes in the future,
+                // this code is left here as an additional layer of defense.
+                // See: https://www.eclipse.org/jetty/javadoc/jetty-9/org/eclipse/jetty/http/HttpComplianceSection.html#NO_AMBIGUOUS_PATH_PARAMETERS
+                if (requestUri.contains("..")) {
+                    res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     return;
                 }
-            }
-            for (final String url: ignoreUrls) {
-                if (requestUri.startsWith(url.trim())) {
-                    res.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                    return;
+                for (final String url: denyUrls) {
+                    if (requestUri.startsWith(url.trim())) {
+                        res.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                        return;
+                    }
+                }
+                for (final String url: ignoreUrls) {
+                    if (requestUri.startsWith(url.trim())) {
+                        res.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                        return;
+                    }
                 }
             }
+        } catch (URISyntaxException e) {
+            res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
         }
         chain.doFilter(request, response);
     }

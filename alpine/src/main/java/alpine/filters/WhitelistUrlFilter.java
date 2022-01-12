@@ -28,6 +28,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 
 /**
@@ -111,40 +113,54 @@ public final class WhitelistUrlFilter implements Filter {
 
         final HttpServletRequest req = (HttpServletRequest) request;
         final HttpServletResponse res = (HttpServletResponse) response;
-
-        final String requestUri = req.getRequestURI();
-        if (requestUri != null) {
-            boolean allowed = false;
-            final String requestUrlExcludingContext = requestUri.substring(req.getContextPath().length());
-            for (final String url: allowUrls) {
-                if (requestUrlExcludingContext.equals("/")) {
-                    if (url.trim().equals("/") || (url.trim().equals("/index.jsp")) || (url.trim().equals("/index.html"))) {
+        try {
+            // Canonicalize the URI
+            final String requestUri = new URI(req.getRequestURI()).normalize().getPath();
+            if (requestUri != null) {
+                // If the canonicalized URI still contains the '..' sequence, a potentially malicious request
+                // has been made. Respond with a 400. NOTE: Jetty/Embedded already has protections against this,
+                // therefore, the following code should never be true. But in the event Jetty changes in the future,
+                // this code is left here as an additional layer of defense.
+                // See: https://www.eclipse.org/jetty/javadoc/jetty-9/org/eclipse/jetty/http/HttpComplianceSection.html#NO_AMBIGUOUS_PATH_PARAMETERS
+                if (requestUri.contains("..")) {
+                    res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    return;
+                }
+                boolean allowed = false;
+                final String requestUrlExcludingContext = requestUri.substring(req.getContextPath().length());
+                for (final String url: allowUrls) {
+                    if (requestUrlExcludingContext.equals("/")) {
+                        if (url.trim().equals("/") || (url.trim().equals("/index.jsp")) || (url.trim().equals("/index.html"))) {
+                            allowed = true;
+                        }
+                    } else if (requestUrlExcludingContext.startsWith(url.trim())) {
                         allowed = true;
                     }
-                } else if (requestUrlExcludingContext.startsWith(url.trim())) {
-                    allowed = true;
                 }
-            }
-            if (!allowed) {
-                if (forwardTo != null) {
-                    for (final String url: allowUrls) {
-                        if (forwardExcludes != null && Arrays.stream(forwardExcludes).anyMatch(url::equals)) {
-                            break;
+                if (!allowed) {
+                    if (forwardTo != null) {
+                        for (final String url: allowUrls) {
+                            if (forwardExcludes != null && Arrays.stream(forwardExcludes).anyMatch(url::equals)) {
+                                break;
+                            }
+                            final int occurrence = requestUrlExcludingContext.indexOf(url);
+                            if (occurrence > -1) {
+                                final String queryString = (req.getQueryString() == null) ? "" : "?" + req.getQueryString();
+                                final String resourceUrl = requestUrlExcludingContext.substring(occurrence) + queryString;
+                                req.getRequestDispatcher(resourceUrl).forward(request, response);
+                                return;
+                            }
                         }
-                        final int occurrence = requestUrlExcludingContext.indexOf(url);
-                        if (occurrence > -1) {
-                            final String queryString = (req.getQueryString() == null) ? "" : "?" + req.getQueryString();
-                            final String resourceUrl = requestUrlExcludingContext.substring(occurrence) + queryString;
-                            req.getRequestDispatcher(resourceUrl).forward(request, response);
-                            return;
-                        }
+                        req.getRequestDispatcher(forwardTo).forward(request, response);
+                    } else {
+                        res.setStatus(HttpServletResponse.SC_NOT_FOUND);
                     }
-                    req.getRequestDispatcher(forwardTo).forward(request, response);
-                } else {
-                    res.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    return;
                 }
-                return;
             }
+        } catch (URISyntaxException e) {
+            res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
         }
         chain.doFilter(request, response);
     }
