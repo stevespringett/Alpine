@@ -23,7 +23,7 @@
     <groupId>us.springett</groupId>
     <artifactId>alpine-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.10.3-SNAPSHOT</version>
+    <version>1.10.3</version>
 
     <modules>
         <module>alpine</module>
@@ -60,7 +60,7 @@
         <connection>scm:git:git@github.com:stevespringett/Alpine.git</connection>
         <url>https://github.com/stevespringett/Alpine.git</url>
         <developerConnection>scm:git:git@github.com:stevespringett/Alpine.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>alpine-parent-1.10.3</tag>
     </scm>
 
     <issueManagement>
@@ -122,8 +122,8 @@
         <maven.ossindex.plugin.version>3.1.0</maven.ossindex.plugin.version>
         <plugin.ossindex.authId>ossindex</plugin.ossindex.authId>
         <plugin.ossindex.cvssScoreThreshold>0.0</plugin.ossindex.cvssScoreThreshold>
-        <plugin.ossindex.excludeCoordinatesCsv/>
-        <plugin.ossindex.excludeVulnerabilityIdsCsv/>
+        <plugin.ossindex.excludeCoordinatesCsv />
+        <plugin.ossindex.excludeVulnerabilityIdsCsv />
         <plugin.ossindex.fail>true</plugin.ossindex.fail>
         <plugin.ossindex.reportFile>${project.build.directory}/ossindex.json</plugin.ossindex.reportFile>
         <plugin.ossindex.scope>compile</plugin.ossindex.scope>
@@ -904,7 +904,7 @@
                                 <phase>package</phase>
                                 <configuration>
                                     <target>
-                                        <move file="${project.build.directory}/${war-embedded-finalname}.war" tofile="${project.build.directory}/${war-embedded-finalname}.jar"/>
+                                        <move file="${project.build.directory}/${war-embedded-finalname}.war" tofile="${project.build.directory}/${war-embedded-finalname}.jar" />
                                     </target>
                                 </configuration>
                                 <goals>
