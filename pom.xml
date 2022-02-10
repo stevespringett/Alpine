@@ -174,7 +174,7 @@
         <lib.jaxb.core.version>2.3.0.1</lib.jaxb.core.version>
         <lib.jaxb.impl.version>2.3.5</lib.jaxb.impl.version>
         <lib.jdo.api.version>3.2.0-release</lib.jdo.api.version>
-        <lib.jersey.version>2.35</lib.jersey.version>
+        <lib.jersey.version>3.0.4</lib.jersey.version>
         <lib.jsp.api.version>2.2</lib.jsp.api.version>
         <lib.jsonwebtoken.version>0.9.1</lib.jsonwebtoken.version>
         <lib.jsr305.version>3.0.2</lib.jsr305.version>
