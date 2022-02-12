@@ -186,7 +186,7 @@
         <lib.owasp.encoder.version>1.2.3</lib.owasp.encoder.version>
         <lib.owasp.security-logging.version>1.1.7</lib.owasp.security-logging.version>
         <lib.slf4j.version>1.7.33</lib.slf4j.version>
-        <lib.swagger.jersey.version>1.6.4</lib.swagger.jersey.version>
+        <lib.swagger.jersey.version>1.6.5</lib.swagger.jersey.version>
         <!-- Unit test libraries -->
         <lib.junit.version>4.13.2</lib.junit.version>
         <lib.mockito.version>4.2.0</lib.mockito.version>
