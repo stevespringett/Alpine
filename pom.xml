@@ -550,9 +550,9 @@
                 <executions>
                     <execution>
                         <id>cyclonedx-aggregate</id>
-                        <phase>package</phase>
+                        <phase>prepare-package</phase>
                         <goals>
-                            <goal>makeAggregateBom</goal>
+                            <goal>makeBom</goal>
                         </goals>
                     </execution>
                 </executions>
