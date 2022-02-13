@@ -8,9 +8,9 @@ Alpine Executable WAR
 
 An executable WAR provides a way to create a standalone WAR, with all dependencies, capable of being deployed
 simply by calling `java -jar myapp.war`. Pre-configured servlet containers are not required. The project 
-incorporates a modern embedded Jetty container capable of supporting the Servlet 3.1 specification along with
-support for JSPs. The project requires Java 8 and is completely independent of the main Alpine project. In fact,
-the Alpine Executable WAR project can be used for virtually all Java web applications.
+incorporates a modern embedded Jetty container capable of supporting the Servlet 4.0 specification. The project 
+requires Java 8 and is completely independent of the main Alpine project. In fact, the Alpine Executable WAR 
+project can be used for virtually all Java web applications.
 
 
 Usage
@@ -24,7 +24,7 @@ Configure the Maven POM with the Alpine Embedded WAR dependency and configure th
     <dependency>
         <groupId>us.springett</groupId>
         <artifactId>alpine-executable-war</artifactId>
-        <version>1.2.8</version>
+        <version>1.3.0</version>
         <scope>provided</scope>
     </dependency>
 </dependencies>
