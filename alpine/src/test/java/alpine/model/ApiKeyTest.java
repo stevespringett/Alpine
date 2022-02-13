@@ -35,7 +35,7 @@ public class ApiKeyTest {
     @Test
     public void keyTest() {
         ApiKey key = new ApiKey();
-        key.setKey("12345");
+        key.setKey("12345678901234567890");
         Assert.assertEquals("12345678901234567890", key.getKey());
         Assert.assertEquals("1234****7890", key.getName());
     }
