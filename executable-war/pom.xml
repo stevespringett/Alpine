@@ -84,6 +84,7 @@
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <timestamp>${maven.build.timestamp}</timestamp>
 
         <!-- Maven Plugin Versions -->
         <maven.compiler.plugin.version>3.9.0</maven.compiler.plugin.version>
@@ -92,10 +93,12 @@
         <maven.source.plugin.version>3.2.1</maven.source.plugin.version>
         <maven.javadoc.plugin.version>3.3.2</maven.javadoc.plugin.version>
         <maven.shade.plugin.version>3.2.4</maven.shade.plugin.version>
+        <maven.uuidgenerator.plugin.version>1.0.1</maven.uuidgenerator.plugin.version>
 
         <!-- Dependency Versions -->
         <lib.slf4j.version>1.7.36</lib.slf4j.version>
-        <lib.jetty.version>9.4.45.v20220203</lib.jetty.version>
+        <lib.servlet-api.version>4.0.2</lib.servlet-api.version>
+        <lib.jetty.version>10.0.8</lib.jetty.version>
         <lib.jetty.webapp.logging>9.4.27</lib.jetty.webapp.logging>
         <lib.logback.version>1.2.10</lib.logback.version>
 
@@ -111,6 +114,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>${lib.servlet-api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
             <version>${lib.jetty.version}</version>
@@ -118,16 +127,6 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-webapp</artifactId>
-            <version>${lib.jetty.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>apache-jsp</artifactId>
-            <version>${lib.jetty.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>apache-jstl</artifactId>
             <version>${lib.jetty.version}</version>
         </dependency>
         <dependency>
@@ -207,6 +206,20 @@
 
         <plugins>
             <plugin>
+                <groupId>us.springett</groupId>
+                <artifactId>maven-uuid-generator</artifactId>
+                <version>${maven.uuidgenerator.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>generate-uuid</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.cyclonedx</groupId>
                 <artifactId>cyclonedx-maven-plugin</artifactId>
                 <version>${maven.cyclonedx.plugin.version}</version>
@@ -274,6 +287,19 @@
                 </executions>
             </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>alpine-executable-war.version</include>
+                </includes>
+            </resource>
+        </resources>
     </build>
 
     <profiles>

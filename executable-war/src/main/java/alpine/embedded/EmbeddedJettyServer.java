@@ -18,11 +18,6 @@
  */
 package alpine.embedded;
 
-import org.apache.tomcat.InstanceManager;
-import org.apache.tomcat.SimpleInstanceManager;
-import org.eclipse.jetty.annotations.ServletContainerInitializersStarter;
-import org.eclipse.jetty.apache.jsp.JettyJasperInitializer;
-import org.eclipse.jetty.plus.annotation.ContainerInitializer;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
@@ -31,14 +26,15 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ErrorPageErrorHandler;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.slf4j.Logger;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.security.ProtectionDomain;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Properties;
 
 /**
  * The primary class that starts an embedded Jetty server
@@ -47,6 +43,8 @@ import java.util.List;
  */
 public final class EmbeddedJettyServer {
 
+    private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(EmbeddedJettyServer.class);
+
     /**
      * Private constructor.
      */
@@ -54,6 +52,12 @@ public final class EmbeddedJettyServer {
     }
 
     public static void main(final String[] args) throws Exception {
+        try (final InputStream fis = Thread.currentThread().getContextClassLoader().getResourceAsStream("alpine-executable-war.version")) {
+            final Properties properties = new Properties();
+            properties.load(fis);
+            LOGGER.info(properties.getProperty("name") + " v" + properties.getProperty("version") + " (" + properties.getProperty("uuid") + ") built on: " + properties.getProperty("timestamp"));
+        }
+
         final CliArgs cliArgs = new CliArgs(args);
         final String contextPath = cliArgs.switchValue("-context", "/");
         final String host = cliArgs.switchValue("-host", "0.0.0.0");
@@ -79,14 +83,11 @@ public final class EmbeddedJettyServer {
         context.setErrorHandler(new ErrorHandler());
         context.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
         context.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern", ".*/[^/]*taglibs.*\\.jar$");
-        context.setAttribute("org.eclipse.jetty.containerInitializers", jspInitializers());
-        context.setAttribute(InstanceManager.class.getName(), new SimpleInstanceManager());
-        context.addBean(new ServletContainerInitializersStarter(context), true);
 
         // Prevent loading of logging classes
-        context.getSystemClasspathPattern().add("org.apache.log4j.");
-        context.getSystemClasspathPattern().add("org.slf4j.");
-        context.getSystemClasspathPattern().add("org.apache.commons.logging.");
+        context.getSystemClassMatcher().add("org.apache.log4j.");
+        context.getSystemClassMatcher().add("org.slf4j.");
+        context.getSystemClassMatcher().add("org.apache.commons.logging.");
 
         final ProtectionDomain protectionDomain = EmbeddedJettyServer.class.getProtectionDomain();
         final URL location = protectionDomain.getCodeSource().getLocation();
@@ -102,14 +103,6 @@ public final class EmbeddedJettyServer {
             e.printStackTrace();
             System.exit(-1);
         }
-    }
-
-    private static List<ContainerInitializer> jspInitializers() {
-        final JettyJasperInitializer sci = new JettyJasperInitializer();
-        final ContainerInitializer initializer = new ContainerInitializer(sci, null);
-        final List<ContainerInitializer> initializers = new ArrayList<>();
-        initializers.add(initializer);
-        return initializers;
     }
 
     private static void disableServerVersionHeader(Connector connector) {
