@@ -119,7 +119,7 @@
         <plugin.fortify.sca.findbugs>false</plugin.fortify.sca.findbugs>
 
         <!-- Sonatype OSS Index -->
-        <maven.ossindex.plugin.version>3.1.0</maven.ossindex.plugin.version>
+        <maven.ossindex.plugin.version>3.2.0</maven.ossindex.plugin.version>
         <plugin.ossindex.authId>ossindex</plugin.ossindex.authId>
         <plugin.ossindex.cvssScoreThreshold>0.0</plugin.ossindex.cvssScoreThreshold>
         <plugin.ossindex.excludeCoordinatesCsv />
@@ -189,7 +189,7 @@
         <lib.swagger.jersey.version>1.6.5</lib.swagger.jersey.version>
         <!-- Unit test libraries -->
         <lib.junit.version>4.13.2</lib.junit.version>
-        <lib.mockito.version>4.2.0</lib.mockito.version>
+        <lib.mockito.version>4.3.1</lib.mockito.version>
         <lib.assertj.version>3.22.0</lib.assertj.version>
         <lib.wiremock.version>2.30.1</lib.wiremock.version>
 
