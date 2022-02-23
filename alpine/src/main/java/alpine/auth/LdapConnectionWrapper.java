@@ -341,7 +341,7 @@ public class LdapConnectionWrapper {
         if (s == null) {
             return null;
         }
-        return s.replace("{USER_DN}", LdapStringSanitizer.sanitize(user.getDN()));
+        return s.replace("{USER_DN}", LdapStringSanitizer.sanitize(user.getDN())).replace("{USERNAME}", LdapStringSanitizer.sanitize(user.getUsername()));
     }
 
     private String searchTermSubstitution(final String ldapFilter, String searchTerm) {
