@@ -94,9 +94,9 @@
         <timestamp>${maven.build.timestamp}</timestamp>
 
         <!-- Maven Plugin Versions -->
-        <maven.compiler.plugin.version>3.9.0</maven.compiler.plugin.version>
+        <maven.compiler.plugin.version>3.10.0</maven.compiler.plugin.version>
         <maven.dependency.plugin.version>3.2.0</maven.dependency.plugin.version>
-        <maven.javadoc.plugin.version>3.3.1</maven.javadoc.plugin.version>
+        <maven.javadoc.plugin.version>3.3.2</maven.javadoc.plugin.version>
         <maven.site.plugin.version>3.7.1</maven.site.plugin.version>
         <maven.source.plugin.version>3.2.1</maven.source.plugin.version>
         <maven.surefire.plugin.version>2.22.2</maven.surefire.plugin.version>
@@ -119,7 +119,7 @@
         <plugin.fortify.sca.findbugs>false</plugin.fortify.sca.findbugs>
 
         <!-- Sonatype OSS Index -->
-        <maven.ossindex.plugin.version>3.1.0</maven.ossindex.plugin.version>
+        <maven.ossindex.plugin.version>3.2.0</maven.ossindex.plugin.version>
         <plugin.ossindex.authId>ossindex</plugin.ossindex.authId>
         <plugin.ossindex.cvssScoreThreshold>0.0</plugin.ossindex.cvssScoreThreshold>
         <plugin.ossindex.excludeCoordinatesCsv />
@@ -185,7 +185,7 @@
         <lib.nimbus-oauth2-oidc-sdk.version>9.25</lib.nimbus-oauth2-oidc-sdk.version>
         <lib.owasp.encoder.version>1.2.3</lib.owasp.encoder.version>
         <lib.owasp.security-logging.version>1.1.7</lib.owasp.security-logging.version>
-        <lib.slf4j.version>1.7.33</lib.slf4j.version>
+        <lib.slf4j.version>1.7.36</lib.slf4j.version>
         <lib.swagger.jersey.version>1.6.5</lib.swagger.jersey.version>
         <!-- Unit test libraries -->
         <lib.junit.version>4.13.2</lib.junit.version>
