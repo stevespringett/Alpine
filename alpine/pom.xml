@@ -22,13 +22,13 @@
     <parent>
         <groupId>us.springett</groupId>
         <artifactId>alpine-parent</artifactId>
-        <version>1.10.5-SNAPSHOT</version>
+        <version>1.10.5</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>us.springett</groupId>
     <artifactId>alpine</artifactId>
     <packaging>jar</packaging>
-    <version>1.10.5-SNAPSHOT</version>
+    <version>1.10.5</version>
 
     <name>Alpine</name>
     <description>
