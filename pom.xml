@@ -122,8 +122,8 @@
         <maven.ossindex.plugin.version>3.2.0</maven.ossindex.plugin.version>
         <plugin.ossindex.authId>ossindex</plugin.ossindex.authId>
         <plugin.ossindex.cvssScoreThreshold>0.0</plugin.ossindex.cvssScoreThreshold>
-        <plugin.ossindex.excludeCoordinatesCsv />
-        <plugin.ossindex.excludeVulnerabilityIdsCsv />
+        <plugin.ossindex.excludeCoordinatesCsv/>
+        <plugin.ossindex.excludeVulnerabilityIdsCsv/>
         <plugin.ossindex.fail>true</plugin.ossindex.fail>
         <plugin.ossindex.reportFile>${project.build.directory}/ossindex.json</plugin.ossindex.reportFile>
         <plugin.ossindex.scope>compile</plugin.ossindex.scope>
@@ -168,7 +168,7 @@
         <lib.h2.version>1.4.200</lib.h2.version>
         <lib.hikaricp.version>4.0.3</lib.hikaricp.version>
         <lib.javassist.version>3.28.0-GA</lib.javassist.version>
-        <lib.jackson.version>2.13.1</lib.jackson.version>
+        <lib.jackson.version>2.13.2.1</lib.jackson.version>
         <lib.javamail.version>1.6.7</lib.javamail.version>
         <lib.jaxb.api.version>2.3.1</lib.jaxb.api.version>
         <lib.jaxb.core.version>2.3.0.1</lib.jaxb.core.version>
@@ -904,7 +904,7 @@
                                 <phase>package</phase>
                                 <configuration>
                                     <target>
-                                        <move file="${project.build.directory}/${war-embedded-finalname}.war" tofile="${project.build.directory}/${war-embedded-finalname}.jar" />
+                                        <move file="${project.build.directory}/${war-embedded-finalname}.war" tofile="${project.build.directory}/${war-embedded-finalname}.jar"/>
                                     </target>
                                 </configuration>
                                 <goals>
