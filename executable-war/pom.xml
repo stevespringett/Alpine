@@ -100,7 +100,7 @@
         <lib.servlet-api.version>4.0.2</lib.servlet-api.version>
         <lib.jetty.version>10.0.8</lib.jetty.version>
         <lib.jetty.webapp.logging>9.4.27</lib.jetty.webapp.logging>
-        <lib.logback.version>1.2.10</lib.logback.version>
+        <lib.logback.version>1.2.11</lib.logback.version>
 
         <!-- CycloneDX SBOM Creation -->
         <maven.cyclonedx.plugin.version>2.5.3</maven.cyclonedx.plugin.version>
