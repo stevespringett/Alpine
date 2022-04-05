@@ -169,6 +169,7 @@
         <lib.hikaricp.version>4.0.3</lib.hikaricp.version>
         <lib.javassist.version>3.28.0-GA</lib.javassist.version>
         <lib.jackson.version>2.13.2</lib.jackson.version>
+        <lib.jackson-databind.version>2.13.2.2</lib.jackson-databind.version>
         <lib.javamail.version>1.6.7</lib.javamail.version>
         <lib.jaxb.api.version>2.3.1</lib.jaxb.api.version>
         <lib.jaxb.core.version>2.3.0.1</lib.jaxb.core.version>
@@ -368,7 +369,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>${lib.jackson.version}</version>
+            <version>${lib.jackson-databind.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
