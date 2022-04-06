@@ -1,35 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  This file is part of Alpine.
-
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
-
-  SPDX-License-Identifier: Apache-2.0
-  Copyright (c) Steve Springett. All Rights Reserved.
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
+  ~ This file is part of Alpine.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  ~
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~ Copyright (c) Steve Springett. All Rights Reserved.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>us.springett</groupId>
     <artifactId>alpine-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.10.6-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
 
     <modules>
-        <module>alpine</module>
+        <module>alpine-common</module>
+        <module>alpine-model</module>
+        <module>alpine-infra</module>
+        <module>alpine-server</module>
+        <module>alpine-executable-war</module>
     </modules>
 
-    <name>Alpine Parent POM</name>
+    <name>alpine-parent</name>
     <description>
         An opinionated scaffolding library that jumpstarts Java projects with an API-first design,
         secure defaults, and minimal dependencies.
@@ -94,19 +99,21 @@
         <timestamp>${maven.build.timestamp}</timestamp>
 
         <!-- Maven Plugin Versions -->
-        <maven.compiler.plugin.version>3.10.1</maven.compiler.plugin.version>
-        <maven.dependency.plugin.version>3.3.0</maven.dependency.plugin.version>
-        <maven.javadoc.plugin.version>3.3.2</maven.javadoc.plugin.version>
+        <maven.compiler.plugin.version>3.9.0</maven.compiler.plugin.version>
+        <maven.dependency.plugin.version>3.2.0</maven.dependency.plugin.version>
+        <maven.javadoc.plugin.version>3.3.1</maven.javadoc.plugin.version>
         <maven.site.plugin.version>3.7.1</maven.site.plugin.version>
         <maven.source.plugin.version>3.2.1</maven.source.plugin.version>
         <maven.surefire.plugin.version>2.22.2</maven.surefire.plugin.version>
+        <maven.jar.plugin.version>3.2.2</maven.jar.plugin.version>
         <maven.war.plugin.version>3.3.2</maven.war.plugin.version>
+        <maven.shade.plugin.version>3.2.4</maven.shade.plugin.version>
         <maven.datanucleus.plugin.version>5.2.1</maven.datanucleus.plugin.version>
-        <maven.versions.plugin.version>2.10.0</maven.versions.plugin.version>
+        <maven.versions.plugin.version>2.8.1</maven.versions.plugin.version>
         <maven.gpg.plugin.version>3.0.1</maven.gpg.plugin.version>
         <maven.enforcer.plugin.version>3.0.0</maven.enforcer.plugin.version>
         <maven.uuidgenerator.plugin.version>1.0.1</maven.uuidgenerator.plugin.version>
-        <maven.jacoco.plugin.version>0.8.8</maven.jacoco.plugin.version>
+        <maven.jacoco.plugin.version>0.8.7</maven.jacoco.plugin.version>
         <maven.antrun.plugin.version>3.0.0</maven.antrun.plugin.version>
 
         <!-- Software Security: Fortify SCA -->
@@ -119,11 +126,11 @@
         <plugin.fortify.sca.findbugs>false</plugin.fortify.sca.findbugs>
 
         <!-- Sonatype OSS Index -->
-        <maven.ossindex.plugin.version>3.2.0</maven.ossindex.plugin.version>
+        <maven.ossindex.plugin.version>3.1.0</maven.ossindex.plugin.version>
         <plugin.ossindex.authId>ossindex</plugin.ossindex.authId>
         <plugin.ossindex.cvssScoreThreshold>0.0</plugin.ossindex.cvssScoreThreshold>
-        <plugin.ossindex.excludeCoordinatesCsv/>
-        <plugin.ossindex.excludeVulnerabilityIdsCsv/>
+        <plugin.ossindex.excludeCoordinatesCsv />
+        <plugin.ossindex.excludeVulnerabilityIdsCsv />
         <plugin.ossindex.fail>true</plugin.ossindex.fail>
         <plugin.ossindex.reportFile>${project.build.directory}/ossindex.json</plugin.ossindex.reportFile>
         <plugin.ossindex.scope>compile</plugin.ossindex.scope>
@@ -150,9 +157,9 @@
         <plugin.cyclonedx.includeLicenseText>false</plugin.cyclonedx.includeLicenseText>
 
         <!-- Dependency Versions -->
-        <lib.alpine.executable.war.version>1.3.0</lib.alpine.executable.war.version>
+        <lib.alpine.executable.war.version>2.0.0-SNAPSHOT</lib.alpine.executable.war.version>
         <lib.bcrypt.version>0.4</lib.bcrypt.version>
-        <lib.caffeine.version>3.0.6</lib.caffeine.version>
+        <lib.caffeine.version>3.0.5</lib.caffeine.version>
         <lib.commons.collections4.version>4.4</lib.commons.collections4.version>
         <lib.commons.io.version>2.11.0</lib.commons.io.version>
         <lib.commons.lang3.version>3.12.0</lib.commons.lang3.version>
@@ -168,8 +175,7 @@
         <lib.h2.version>1.4.200</lib.h2.version>
         <lib.hikaricp.version>4.0.3</lib.hikaricp.version>
         <lib.javassist.version>3.28.0-GA</lib.javassist.version>
-        <lib.jackson.version>2.13.2</lib.jackson.version>
-        <lib.jackson-databind.version>2.13.2.2</lib.jackson-databind.version>
+        <lib.jackson.version>2.13.1</lib.jackson.version>
         <lib.javamail.version>1.6.7</lib.javamail.version>
         <lib.jaxb.api.version>2.3.1</lib.jaxb.api.version>
         <lib.jaxb.core.version>2.3.0.1</lib.jaxb.core.version>
@@ -182,15 +188,15 @@
         <lib.jsr353-impl.version>1.1.4</lib.jsr353-impl.version>
         <lib.jsr353-spec.version>1.1.4</lib.jsr353-spec.version>
         <lib.jstl.version>1.2.5</lib.jstl.version>
-        <lib.logback.version>1.2.11</lib.logback.version>
-        <lib.nimbus-oauth2-oidc-sdk.version>9.32</lib.nimbus-oauth2-oidc-sdk.version>
+        <lib.logback.version>1.2.10</lib.logback.version>
+        <lib.nimbus-oauth2-oidc-sdk.version>9.25</lib.nimbus-oauth2-oidc-sdk.version>
         <lib.owasp.encoder.version>1.2.3</lib.owasp.encoder.version>
         <lib.owasp.security-logging.version>1.1.7</lib.owasp.security-logging.version>
         <lib.slf4j.version>1.7.36</lib.slf4j.version>
-        <lib.swagger.jersey.version>1.6.6</lib.swagger.jersey.version>
+        <lib.swagger.jersey.version>1.6.5</lib.swagger.jersey.version>
         <!-- Unit test libraries -->
         <lib.junit.version>4.13.2</lib.junit.version>
-        <lib.mockito.version>4.4.0</lib.mockito.version>
+        <lib.mockito.version>4.2.0</lib.mockito.version>
         <lib.assertj.version>3.22.0</lib.assertj.version>
         <lib.wiremock.version>2.30.1</lib.wiremock.version>
 
@@ -200,292 +206,303 @@
         <logback.configuration.file>${project.build.directory}/classes/logback.xml</logback.configuration.file>
     </properties>
 
-    <dependencies>
-        <!-- Misc helper libraries -->
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>${lib.commons.io.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>${lib.commons.lang3.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-collections4</artifactId>
-            <version>${lib.commons.collections4.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.core</groupId>
-            <artifactId>jersey-client</artifactId>
-            <version>${lib.jersey.version}</version>
-        </dependency>
-        <!-- Server architecture -->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>4.0.1</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.containers</groupId>
-            <artifactId>jersey-container-servlet</artifactId>
-            <version>${lib.jersey.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.media</groupId>
-            <artifactId>jersey-media-json-jackson</artifactId>
-            <version>${lib.jersey.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.media</groupId>
-            <artifactId>jersey-media-multipart</artifactId>
-            <version>${lib.jersey.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.ext</groupId>
-            <artifactId>jersey-bean-validation</artifactId>
-            <version>${lib.jersey.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.inject</groupId>
-            <artifactId>jersey-hk2</artifactId>
-            <version>${lib.jersey.version}</version>
-        </dependency>
-        <!-- JAXB -->
-        <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <version>${lib.jaxb.api.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-core</artifactId>
-            <version>${lib.jaxb.core.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-            <version>${lib.jaxb.impl.version}</version>
-        </dependency>
-        <!-- JSON API specification and default implementation of JSR 353 -->
-        <dependency>
-            <groupId>javax.json</groupId>
-            <artifactId>javax.json-api</artifactId>
-            <version>${lib.jsr353-spec.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>javax.json</artifactId>
-            <version>${lib.jsr353-impl.version}</version>
-        </dependency>
-        <!-- JSP API's -->
-        <dependency>
-            <groupId>javax.servlet.jsp</groupId>
-            <artifactId>jsp-api</artifactId>
-            <version>${lib.jsp.api.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.taglibs</groupId>
-            <artifactId>taglibs-standard-impl</artifactId>
-            <version>${lib.jstl.version}</version>
-        </dependency>
-        <!-- todo: update swagger when available -->
-        <!-- https://github.com/swagger-api/swagger-core/issues/1594 -->
-        <dependency>
-            <groupId>io.swagger</groupId>
-            <artifactId>swagger-jersey2-jaxrs</artifactId>
-            <version>${lib.swagger.jersey.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.validation</groupId>
-                    <artifactId>validation-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <!-- Persistence -->
-        <dependency>
-            <groupId>org.datanucleus</groupId>
-            <artifactId>javax.jdo</artifactId>
-            <version>${lib.jdo.api.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.datanucleus</groupId>
-            <artifactId>datanucleus-api-jdo</artifactId>
-            <version>${lib.datanucleus-api-jdo.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.datanucleus</groupId>
-            <artifactId>datanucleus-core</artifactId>
-            <version>${lib.datanucleus.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.datanucleus</groupId>
-            <artifactId>datanucleus-rdbms</artifactId>
-            <version>${lib.datanucleus.version}</version>
-        </dependency>
-        <!--
-        <dependency>
-            <groupId>org.datanucleus</groupId>
-            <artifactId>datanucleus-jdo-query</artifactId>
-            <version>${lib.datanucleus-jdo-query.version}</version>
-        </dependency>
-        -->
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-            <version>${lib.hikaricp.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.javassist</groupId>
-            <artifactId>javassist</artifactId>
-            <version>${lib.javassist.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>${lib.h2.version}</version>
-        </dependency>
-        <!-- Authentication and Authorization -->
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt</artifactId>
-            <version>${lib.jsonwebtoken.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mindrot</groupId>
-            <artifactId>jbcrypt</artifactId>
-            <version>${lib.bcrypt.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.nimbusds</groupId>
-            <artifactId>oauth2-oidc-sdk</artifactId>
-            <version>${lib.nimbus-oauth2-oidc-sdk.version}</version>
-        </dependency>
-        <!-- JAX-RS JSON -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${lib.jackson-databind.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>${lib.jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.jaxrs</groupId>
-            <artifactId>jackson-jaxrs-base</artifactId>
-            <version>${lib.jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.jaxrs</groupId>
-            <artifactId>jackson-jaxrs-json-provider</artifactId>
-            <version>${lib.jackson.version}</version>
-        </dependency>
-        <!-- Logging -->
-        <!-- Overriding OWASP Security Logging dependencies with newer versions -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${lib.slf4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${lib.logback.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
-            <version>${lib.logback.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.owasp</groupId>
-            <artifactId>security-logging-common</artifactId>
-            <version>${lib.owasp.security-logging.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.owasp</groupId>
-            <artifactId>security-logging-logback</artifactId>
-            <version>${lib.owasp.security-logging.version}</version>
-        </dependency>
-        <!-- XSS prevention -->
-        <dependency>
-            <groupId>org.owasp.encoder</groupId>
-            <artifactId>encoder</artifactId>
-            <version>${lib.owasp.encoder.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.owasp.encoder</groupId>
-            <artifactId>encoder-jsp</artifactId>
-            <version>${lib.owasp.encoder.version}</version>
-        </dependency>
-        <!-- JavaMail API -->
-        <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>jakarta.mail</artifactId>
-            <version>${lib.javamail.version}</version>
-        </dependency>
-        <!-- Quality -->
-        <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>jsr305</artifactId>
-            <version>${lib.jsr305.version}</version>
-        </dependency>
-        <!-- Object cache -->
-        <dependency>
-            <groupId>com.github.ben-manes.caffeine</groupId>
-            <artifactId>caffeine</artifactId>
-            <version>${lib.caffeine.version}</version>
-        </dependency>
-        <!-- Unit Tests -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${lib.junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.test-framework.providers</groupId>
-            <artifactId>jersey-test-framework-provider-grizzly2</artifactId>
-            <version>${lib.jersey.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>${lib.mockito.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.stefanbirkner</groupId>
-            <artifactId>system-rules</artifactId>
-            <version>1.19.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <version>${lib.assertj.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.tomakehurst</groupId>
-            <artifactId>wiremock-jre8-standalone</artifactId>
-            <version>${lib.wiremock.version}</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+    <dependencyManagement>
+        <dependencies>
+            <!-- Misc helper libraries -->
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${lib.commons.io.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${lib.commons.lang3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>${lib.commons.collections4.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.core</groupId>
+                <artifactId>jersey-client</artifactId>
+                <version>${lib.jersey.version}</version>
+            </dependency>
+            <!-- Server architecture -->
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>javax.servlet-api</artifactId>
+                <version>4.0.1</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.containers</groupId>
+                <artifactId>jersey-container-servlet</artifactId>
+                <version>${lib.jersey.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.media</groupId>
+                <artifactId>jersey-media-json-jackson</artifactId>
+                <version>${lib.jersey.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.media</groupId>
+                <artifactId>jersey-media-multipart</artifactId>
+                <version>${lib.jersey.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.ext</groupId>
+                <artifactId>jersey-bean-validation</artifactId>
+                <version>${lib.jersey.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.inject</groupId>
+                <artifactId>jersey-hk2</artifactId>
+                <version>${lib.jersey.version}</version>
+            </dependency>
+            <!-- JAXB -->
+            <dependency>
+                <groupId>javax.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                <version>${lib.jaxb.api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-core</artifactId>
+                <version>${lib.jaxb.core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-impl</artifactId>
+                <version>${lib.jaxb.impl.version}</version>
+            </dependency>
+            <!-- JSON API specification and default implementation of JSR 353 -->
+            <dependency>
+                <groupId>javax.json</groupId>
+                <artifactId>javax.json-api</artifactId>
+                <version>${lib.jsr353-spec.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish</groupId>
+                <artifactId>javax.json</artifactId>
+                <version>${lib.jsr353-impl.version}</version>
+            </dependency>
+            <!-- JSP API's -->
+            <dependency>
+                <groupId>javax.servlet.jsp</groupId>
+                <artifactId>jsp-api</artifactId>
+                <version>${lib.jsp.api.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.taglibs</groupId>
+                <artifactId>taglibs-standard-impl</artifactId>
+                <version>${lib.jstl.version}</version>
+            </dependency>
+            <!-- todo: update swagger when available -->
+            <!-- https://github.com/swagger-api/swagger-core/issues/1594 -->
+            <dependency>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-jersey2-jaxrs</artifactId>
+                <version>${lib.swagger.jersey.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>javax.validation</groupId>
+                        <artifactId>validation-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <!-- Persistence -->
+            <dependency>
+                <groupId>org.datanucleus</groupId>
+                <artifactId>javax.jdo</artifactId>
+                <version>${lib.jdo.api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.datanucleus</groupId>
+                <artifactId>datanucleus-api-jdo</artifactId>
+                <version>${lib.datanucleus-api-jdo.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.datanucleus</groupId>
+                <artifactId>datanucleus-core</artifactId>
+                <version>${lib.datanucleus.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.datanucleus</groupId>
+                <artifactId>datanucleus-rdbms</artifactId>
+                <version>${lib.datanucleus.version}</version>
+            </dependency>
+            <!--
+            <dependency>
+                <groupId>org.datanucleus</groupId>
+                <artifactId>datanucleus-jdo-query</artifactId>
+                <version>${lib.datanucleus-jdo-query.version}</version>
+            </dependency>
+            -->
+            <dependency>
+                <groupId>com.zaxxer</groupId>
+                <artifactId>HikariCP</artifactId>
+                <version>${lib.hikaricp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.javassist</groupId>
+                <artifactId>javassist</artifactId>
+                <version>${lib.javassist.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>${lib.h2.version}</version>
+            </dependency>
+            <!-- Authentication and Authorization -->
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt</artifactId>
+                <version>${lib.jsonwebtoken.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mindrot</groupId>
+                <artifactId>jbcrypt</artifactId>
+                <version>${lib.bcrypt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.nimbusds</groupId>
+                <artifactId>oauth2-oidc-sdk</artifactId>
+                <version>${lib.nimbus-oauth2-oidc-sdk.version}</version>
+            </dependency>
+            <!-- JAX-RS JSON -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${lib.jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${lib.jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.jaxrs</groupId>
+                <artifactId>jackson-jaxrs-base</artifactId>
+                <version>${lib.jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.jaxrs</groupId>
+                <artifactId>jackson-jaxrs-json-provider</artifactId>
+                <version>${lib.jackson.version}</version>
+            </dependency>
+            <!-- Logging -->
+            <!-- Overriding OWASP Security Logging dependencies with newer versions -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${lib.slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${lib.logback.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
+                <version>${lib.logback.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.owasp</groupId>
+                <artifactId>security-logging-common</artifactId>
+                <version>${lib.owasp.security-logging.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.owasp</groupId>
+                <artifactId>security-logging-logback</artifactId>
+                <version>${lib.owasp.security-logging.version}</version>
+            </dependency>
+            <!-- XSS prevention -->
+            <dependency>
+                <groupId>org.owasp.encoder</groupId>
+                <artifactId>encoder</artifactId>
+                <version>${lib.owasp.encoder.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.owasp.encoder</groupId>
+                <artifactId>encoder-jsp</artifactId>
+                <version>${lib.owasp.encoder.version}</version>
+            </dependency>
+            <!-- JavaMail API -->
+            <dependency>
+                <groupId>com.sun.mail</groupId>
+                <artifactId>jakarta.mail</artifactId>
+                <version>${lib.javamail.version}</version>
+            </dependency>
+            <!-- Quality -->
+            <dependency>
+                <groupId>com.google.code.findbugs</groupId>
+                <artifactId>jsr305</artifactId>
+                <version>${lib.jsr305.version}</version>
+            </dependency>
+            <!-- Object cache -->
+            <dependency>
+                <groupId>com.github.ben-manes.caffeine</groupId>
+                <artifactId>caffeine</artifactId>
+                <version>${lib.caffeine.version}</version>
+            </dependency>
+            <!-- Unit Tests -->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${lib.junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.test-framework.providers</groupId>
+                <artifactId>jersey-test-framework-provider-grizzly2</artifactId>
+                <version>${lib.jersey.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${lib.mockito.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.github.stefanbirkner</groupId>
+                <artifactId>system-rules</artifactId>
+                <version>1.19.0</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>${lib.assertj.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.github.tomakehurst</groupId>
+                <artifactId>wiremock-jre8-standalone</artifactId>
+                <version>${lib.wiremock.version}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <prerequisites>
         <maven>3.6.0</maven>
     </prerequisites>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.datanucleus</groupId>
+                    <artifactId>datanucleus-maven-plugin</artifactId>
+                    <version>${maven.datanucleus.plugin.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -512,23 +529,9 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.datanucleus</groupId>
-                <artifactId>datanucleus-maven-plugin</artifactId>
-                <version>${maven.datanucleus.plugin.version}</version>
-                <configuration>
-                    <api>JDO</api>
-                    <persistenceUnitName>Alpine</persistenceUnitName>
-                    <verbose>true</verbose>
-                    <fork>false</fork>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>enhance</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven.jar.plugin.version}</version>
             </plugin>
             <plugin>
                 <groupId>us.springett</groupId>
@@ -616,6 +619,7 @@
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
                 <includes>
+                    <include>alpine.version</include>
                     <include>application.properties</include>
                 </includes>
             </resource>
@@ -623,6 +627,31 @@
     </build>
 
     <profiles>
+        <profile>
+            <id>enhance</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.datanucleus</groupId>
+                        <artifactId>datanucleus-maven-plugin</artifactId>
+                        <configuration>
+                            <api>JDO</api>
+                            <persistenceUnitName>Alpine</persistenceUnitName>
+                            <verbose>true</verbose>
+                            <fork>false</fork>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>process-classes</phase>
+                                <goals>
+                                    <goal>enhance</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>fortify</id>
             <!-- Only activate this profile if you're a Fortify customer, have the required
@@ -838,6 +867,16 @@
                     <version>${lib.alpine.executable.war.version}</version>
                     <scope>provided</scope>
                 </dependency>
+                <dependency>
+                    <groupId>org.owasp</groupId>
+                    <artifactId>security-logging-common</artifactId>
+                    <version>${lib.owasp.security-logging.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.owasp</groupId>
+                    <artifactId>security-logging-logback</artifactId>
+                    <version>${lib.owasp.security-logging.version}</version>
+                </dependency>
             </dependencies>
             <build>
                 <defaultGoal>package</defaultGoal>
@@ -905,7 +944,7 @@
                                 <phase>package</phase>
                                 <configuration>
                                     <target>
-                                        <move file="${project.build.directory}/${war-embedded-finalname}.war" tofile="${project.build.directory}/${war-embedded-finalname}.jar"/>
+                                        <move file="${project.build.directory}/${war-embedded-finalname}.war" tofile="${project.build.directory}/${war-embedded-finalname}.jar" />
                                     </target>
                                 </configuration>
                                 <goals>
