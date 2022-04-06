@@ -26,9 +26,9 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
-import wiremock.org.apache.http.HttpHeaders;
-import wiremock.org.apache.http.HttpStatus;
-import wiremock.org.apache.http.entity.ContentType;
+import wiremock.org.apache.hc.core5.http.HttpHeaders;
+import wiremock.org.apache.hc.core5.http.HttpStatus;
+import wiremock.org.apache.hc.core5.http.ContentType;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

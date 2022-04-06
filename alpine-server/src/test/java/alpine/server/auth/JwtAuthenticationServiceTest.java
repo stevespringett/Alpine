@@ -33,7 +33,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
-import wiremock.org.apache.http.HttpHeaders;
+import wiremock.org.apache.hc.core5.http.HttpHeaders;
 
 import javax.naming.AuthenticationException;
 import java.security.Principal;
