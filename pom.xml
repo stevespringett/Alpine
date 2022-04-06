@@ -159,7 +159,7 @@
         <!-- Dependency Versions -->
         <lib.alpine.executable.war.version>2.0.0-SNAPSHOT</lib.alpine.executable.war.version>
         <lib.bcrypt.version>0.4</lib.bcrypt.version>
-        <lib.caffeine.version>3.0.5</lib.caffeine.version>
+        <lib.caffeine.version>3.0.6</lib.caffeine.version>
         <lib.commons.collections4.version>4.4</lib.commons.collections4.version>
         <lib.commons.io.version>2.11.0</lib.commons.io.version>
         <lib.commons.lang3.version>3.12.0</lib.commons.lang3.version>
@@ -175,11 +175,12 @@
         <lib.h2.version>1.4.200</lib.h2.version>
         <lib.hikaricp.version>4.0.3</lib.hikaricp.version>
         <lib.javassist.version>3.28.0-GA</lib.javassist.version>
-        <lib.jackson.version>2.13.1</lib.jackson.version>
+        <lib.jackson.version>2.13.2</lib.jackson.version>
+        <lib.jackson-databind.version>2.13.2.2</lib.jackson-databind.version>
         <lib.javamail.version>1.6.7</lib.javamail.version>
         <lib.jaxb.api.version>2.3.1</lib.jaxb.api.version>
         <lib.jaxb.core.version>2.3.0.1</lib.jaxb.core.version>
-        <lib.jaxb.impl.version>2.3.5</lib.jaxb.impl.version>
+        <lib.jaxb.impl.version>2.3.6</lib.jaxb.impl.version>
         <lib.jdo.api.version>3.2.0-release</lib.jdo.api.version>
         <lib.jersey.version>2.35</lib.jersey.version>
         <lib.jsp.api.version>2.2</lib.jsp.api.version>
@@ -188,17 +189,17 @@
         <lib.jsr353-impl.version>1.1.4</lib.jsr353-impl.version>
         <lib.jsr353-spec.version>1.1.4</lib.jsr353-spec.version>
         <lib.jstl.version>1.2.5</lib.jstl.version>
-        <lib.logback.version>1.2.10</lib.logback.version>
-        <lib.nimbus-oauth2-oidc-sdk.version>9.25</lib.nimbus-oauth2-oidc-sdk.version>
+        <lib.logback.version>1.2.11</lib.logback.version>
+        <lib.nimbus-oauth2-oidc-sdk.version>9.32</lib.nimbus-oauth2-oidc-sdk.version>
         <lib.owasp.encoder.version>1.2.3</lib.owasp.encoder.version>
         <lib.owasp.security-logging.version>1.1.7</lib.owasp.security-logging.version>
         <lib.slf4j.version>1.7.36</lib.slf4j.version>
-        <lib.swagger.jersey.version>1.6.5</lib.swagger.jersey.version>
+        <lib.swagger.jersey.version>1.6.6</lib.swagger.jersey.version>
         <!-- Unit test libraries -->
         <lib.junit.version>4.13.2</lib.junit.version>
-        <lib.mockito.version>4.2.0</lib.mockito.version>
+        <lib.mockito.version>4.4.0</lib.mockito.version>
         <lib.assertj.version>3.22.0</lib.assertj.version>
-        <lib.wiremock.version>2.30.1</lib.wiremock.version>
+        <lib.wiremock.version>2.32.0</lib.wiremock.version>
 
         <war-embedded-finalname>${project.build.finalName}</war-embedded-finalname>
 
@@ -376,7 +377,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>${lib.jackson.version}</version>
+                <version>${lib.jackson-databind.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
