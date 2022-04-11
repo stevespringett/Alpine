@@ -172,7 +172,7 @@
              https://github.com/datanucleus/datanucleus-rdbms/pull/375
         -->
         <lib.datanucleus.version>5.2.7</lib.datanucleus.version>
-        <lib.h2.version>1.4.200</lib.h2.version>
+        <lib.h2.version>2.1.212</lib.h2.version>
         <lib.hikaricp.version>4.0.3</lib.hikaricp.version>
         <lib.javassist.version>3.28.0-GA</lib.javassist.version>
         <lib.jackson.version>2.13.2</lib.jackson.version>
