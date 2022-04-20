@@ -97,7 +97,7 @@ public class LdapConnectionWrapper {
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         env.put(Context.PROVIDER_URL, LDAP_URL);
         if (IS_LDAP_SSLTLS) {
-            env.put("java.naming.ldap.factory.socket", "alpine.crypto.RelaxedSSLSocketFactory");
+            env.put("java.naming.ldap.factory.socket", "alpine.security.crypto.RelaxedSSLSocketFactory");
         }
         try {
             return new InitialLdapContext(env, null);
@@ -123,7 +123,7 @@ public class LdapConnectionWrapper {
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         env.put(Context.PROVIDER_URL, LDAP_URL);
         if (IS_LDAP_SSLTLS) {
-            env.put("java.naming.ldap.factory.socket", "alpine.crypto.RelaxedSSLSocketFactory");
+            env.put("java.naming.ldap.factory.socket", "alpine.security.crypto.RelaxedSSLSocketFactory");
         }
         return new InitialDirContext(env);
     }
