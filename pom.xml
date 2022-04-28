@@ -97,6 +97,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <timestamp>${maven.build.timestamp}</timestamp>
+        <project.build.outputTimestamp>10</project.build.outputTimestamp>
 
         <!-- Maven Plugin Versions -->
         <maven.compiler.plugin.version>3.10.1</maven.compiler.plugin.version>
@@ -115,6 +116,7 @@
         <maven.uuidgenerator.plugin.version>1.0.1</maven.uuidgenerator.plugin.version>
         <maven.jacoco.plugin.version>0.8.8</maven.jacoco.plugin.version>
         <maven.antrun.plugin.version>3.1.0</maven.antrun.plugin.version>
+        <maven.release.plugin.version>3.0.0-M5</maven.release.plugin.version>
 
         <!-- Software Security: Fortify SCA -->
         <maven.fortify.plugin.version>18.20</maven.fortify.plugin.version>
@@ -501,6 +503,14 @@
                     <groupId>org.datanucleus</groupId>
                     <artifactId>datanucleus-maven-plugin</artifactId>
                     <version>${maven.datanucleus.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>${maven.release.plugin.version}</version>
+                    <configuration>
+                        <useReleaseProfile>true</useReleaseProfile>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
