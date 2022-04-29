@@ -163,7 +163,7 @@
         <lib.commons.collections4.version>4.4</lib.commons.collections4.version>
         <lib.commons.io.version>2.11.0</lib.commons.io.version>
         <lib.commons.lang3.version>3.12.0</lib.commons.lang3.version>
-        <lib.datanucleus-api-jdo.version>5.2.7</lib.datanucleus-api-jdo.version>
+        <lib.datanucleus-api-jdo.version>5.2.9</lib.datanucleus-api-jdo.version>
         <!-- Auto-generated classes have warnings which break build
              https://github.com/datanucleus/datanucleus-jdo-query/pull/10
         <lib.datanucleus-jdo-query.version>5.0.6</lib.datanucleus-jdo-query.version>
