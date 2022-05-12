@@ -82,6 +82,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
 
     /**
      * Constructs a new AlpineQueryManager.
+     * @param pm a PersistenceManager
      * @param request an AlpineRequest
      * @since 1.9.3
      */
