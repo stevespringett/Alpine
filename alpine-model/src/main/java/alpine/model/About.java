@@ -25,7 +25,7 @@ import java.io.Serializable;
 
 /**
  * A value object describing the name of the application, version, and the timestamp when it was built.
- * This class can be used as-is, or extended. The {@link alpine.resources.VersionResource} uses this
+ * This class can be used as-is, or extended. The alpine.server.resources.VersionResource uses this
  * class in it's JSON response.
  *
  * @author Steve Springett
