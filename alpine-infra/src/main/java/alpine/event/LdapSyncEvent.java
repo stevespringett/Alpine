@@ -23,7 +23,7 @@ import alpine.event.framework.Event;
 /**
  * An Event implementation specific for LDAP synchronization tasks.
  *
- * @see alpine.tasks.LdapSyncTask
+ * see alpine.server.tasks.LdapSyncTask
  *
  * @author Steve Springett
  * @since 1.0.0
