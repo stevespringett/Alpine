@@ -174,7 +174,7 @@
         <lib.datanucleus.version>5.2.7</lib.datanucleus.version>
         <lib.h2.version>1.4.200</lib.h2.version>
         <lib.hikaricp.version>4.0.3</lib.hikaricp.version>
-        <lib.javassist.version>3.28.0-GA</lib.javassist.version>
+        <lib.javassist.version>3.29.0-GA</lib.javassist.version>
         <lib.jackson.version>2.13.2</lib.jackson.version>
         <lib.jackson-databind.version>2.13.2.2</lib.jackson-databind.version>
         <lib.javamail.version>1.6.7</lib.javamail.version>
