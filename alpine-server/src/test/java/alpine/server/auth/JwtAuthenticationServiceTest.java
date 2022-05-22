@@ -25,7 +25,7 @@ import alpine.model.ManagedUser;
 import alpine.model.OidcUser;
 import alpine.model.UserPrincipal;
 import alpine.persistence.AlpineQueryManager;
-import alpine.server.util.TestUtil;
+import alpine.server.persistence.PersistenceManagerFactory;
 import org.assertj.core.api.Assertions;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.junit.After;
@@ -52,8 +52,8 @@ public class JwtAuthenticationServiceTest {
     }
 
     @After
-    public void tearDown() throws Exception {
-        TestUtil.resetInMemoryDatabase();
+    public void tearDown() {
+        PersistenceManagerFactory.tearDown();
     }
 
     @Test
