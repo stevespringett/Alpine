@@ -159,7 +159,7 @@
         <!-- Dependency Versions -->
         <lib.alpine.executable.war.version>2.0.1-SNAPSHOT</lib.alpine.executable.war.version>
         <lib.bcrypt.version>0.4</lib.bcrypt.version>
-        <lib.caffeine.version>3.1.0</lib.caffeine.version>
+        <lib.caffeine.version>3.1.1</lib.caffeine.version>
         <lib.commons.collections4.version>4.4</lib.commons.collections4.version>
         <lib.commons.io.version>2.11.0</lib.commons.io.version>
         <lib.commons.lang3.version>3.12.0</lib.commons.lang3.version>
@@ -172,9 +172,9 @@
         <lib.datanucleus-rdbms.version>5.2.11</lib.datanucleus-rdbms.version>
         <lib.h2.version>1.4.200</lib.h2.version>
         <lib.hikaricp.version>4.0.3</lib.hikaricp.version>
-        <lib.javassist.version>3.28.0-GA</lib.javassist.version>
+        <lib.javassist.version>3.29.0-GA</lib.javassist.version>
         <lib.jackson.version>2.13.2</lib.jackson.version>
-        <lib.jackson-databind.version>2.13.2.2</lib.jackson-databind.version>
+        <lib.jackson-databind.version>2.13.3</lib.jackson-databind.version>
         <lib.javamail.version>1.6.7</lib.javamail.version>
         <lib.jaxb.api.version>2.3.1</lib.jaxb.api.version>
         <lib.jaxb.core.version>2.3.0.1</lib.jaxb.core.version>
