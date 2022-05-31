@@ -144,7 +144,7 @@
         <plugin.retirejs.indentSize>4</plugin.retirejs.indentSize>
 
         <!-- CycloneDX SBOM Creation -->
-        <maven.cyclonedx.plugin.version>2.6.2</maven.cyclonedx.plugin.version>
+        <maven.cyclonedx.plugin.version>2.7.0</maven.cyclonedx.plugin.version>
         <plugin.cyclonedx.projectType>framework</plugin.cyclonedx.projectType>
         <plugin.cyclonedx.schemaVersion>1.4</plugin.cyclonedx.schemaVersion>
         <plugin.cyclonedx.outputFormat>all</plugin.cyclonedx.outputFormat>
@@ -159,7 +159,7 @@
         <!-- Dependency Versions -->
         <lib.alpine.executable.war.version>2.0.1-SNAPSHOT</lib.alpine.executable.war.version>
         <lib.bcrypt.version>0.4</lib.bcrypt.version>
-        <lib.caffeine.version>3.1.0</lib.caffeine.version>
+        <lib.caffeine.version>3.1.1</lib.caffeine.version>
         <lib.commons.collections4.version>4.4</lib.commons.collections4.version>
         <lib.commons.io.version>2.11.0</lib.commons.io.version>
         <lib.commons.lang3.version>3.12.0</lib.commons.lang3.version>
@@ -179,7 +179,7 @@
         <lib.jaxb.api.version>2.3.1</lib.jaxb.api.version>
         <lib.jaxb.core.version>2.3.0.1</lib.jaxb.core.version>
         <lib.jaxb.impl.version>2.3.6</lib.jaxb.impl.version>
-        <lib.jdo.api.version>3.2.0-release</lib.jdo.api.version>
+        <lib.jdo.api.version>3.2.1</lib.jdo.api.version>
         <lib.jersey.version>2.35</lib.jersey.version>
         <lib.jsp.api.version>2.2</lib.jsp.api.version>
         <lib.jsonwebtoken.version>0.9.1</lib.jsonwebtoken.version>
