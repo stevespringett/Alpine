@@ -25,7 +25,7 @@ import alpine.model.OidcGroup;
 import alpine.model.OidcUser;
 import alpine.model.Team;
 import alpine.persistence.AlpineQueryManager;
-import alpine.server.util.TestUtil;
+import alpine.server.persistence.PersistenceManagerFactory;
 import org.assertj.core.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
@@ -66,8 +66,8 @@ public class OidcAuthenticationServiceTest {
     }
 
     @After
-    public void tearDown() throws Exception {
-        TestUtil.resetInMemoryDatabase();
+    public void tearDown() {
+        PersistenceManagerFactory.tearDown();
     }
 
     @Test

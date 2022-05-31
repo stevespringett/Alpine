@@ -65,7 +65,7 @@ public class PersistenceManagerFactory implements IPersistenceManagerFactory, Se
     @Override
     public void contextDestroyed(ServletContextEvent event) {
         LOGGER.info("Shutting down persistence framework");
-        pmf.close();
+        tearDown();
     }
 
     /**
@@ -73,7 +73,7 @@ public class PersistenceManagerFactory implements IPersistenceManagerFactory, Se
      * @return a PersistenceManager
      */
     public static PersistenceManager createPersistenceManager() {
-        if (Config.isUnitTestsEnabled()) {
+        if (pmf == null && Config.isUnitTestsEnabled()) {
             pmf = (JDOPersistenceManagerFactory)JDOHelper.getPersistenceManagerFactory(JdoProperties.unit(), "Alpine");
         }
         if (pmf == null) {
@@ -84,6 +84,41 @@ public class PersistenceManagerFactory implements IPersistenceManagerFactory, Se
 
     public PersistenceManager getPersistenceManager() {
         return createPersistenceManager();
+    }
+
+
+    /**
+     * Set the {@link JDOPersistenceManagerFactory} to be used by {@link PersistenceManagerFactory}.
+     * <p>
+     * This is mainly useful for integration tests that run outside a servlet context,
+     * yet require a persistence context setup with an external database.
+     *
+     * @param pmf The {@link JDOPersistenceManagerFactory} to set
+     * @throws IllegalStateException When the {@link JDOPersistenceManagerFactory} was already initialized
+     * @since 2.1.0
+     */
+    @SuppressWarnings("unused")
+    public static void setJdoPersistenceManagerFactory(final JDOPersistenceManagerFactory pmf) {
+        if (PersistenceManagerFactory.pmf != null) {
+            throw new IllegalStateException("The PersistenceManagerFactory can only be set when it hasn't been initialized yet.");
+        }
+
+        PersistenceManagerFactory.pmf = pmf;
+    }
+
+    /**
+     * Closes the {@link JDOPersistenceManagerFactory} and removes any reference to it.
+     * <p>
+     * This method should be called in the {@code tearDown} method of unit- and integration
+     * tests that interact with the persistence layer.
+     *
+     * @since 2.1.0
+     */
+    public static void tearDown() {
+        if (pmf != null) {
+            pmf.close();
+            pmf = null;
+        }
     }
 
     /*
