@@ -20,6 +20,7 @@ package alpine.event.framework;
 
 import alpine.common.logging.Logger;
 import alpine.common.util.ThreadUtil;
+import alpine.common.metrics.Metrics;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -42,15 +43,17 @@ public final class EventService extends BaseEventService {
     private static final EventService INSTANCE = new EventService();
     private static final Logger LOGGER = Logger.getLogger(EventService.class);
     private static final ExecutorService EXECUTOR;
+    private static final String EXECUTOR_NAME = "Alpine-EventService";
 
     static {
         BasicThreadFactory factory = new BasicThreadFactory.Builder()
-                .namingPattern("Alpine-EventService-%d")
+                .namingPattern(EXECUTOR_NAME + "-%d")
                 .uncaughtExceptionHandler(new LoggableUncaughtExceptionHandler())
                 .build();
         EXECUTOR = Executors.newFixedThreadPool(ThreadUtil.determineNumberOfWorkerThreads(), factory);
         INSTANCE.setExecutorService(EXECUTOR);
         INSTANCE.setLogger(LOGGER);
+        Metrics.registerExecutorService(EXECUTOR, EXECUTOR_NAME);
     }
 
     /**

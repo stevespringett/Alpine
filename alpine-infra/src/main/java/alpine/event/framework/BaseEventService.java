@@ -19,8 +19,10 @@
 package alpine.event.framework;
 
 import alpine.common.logging.Logger;
+import alpine.common.metrics.Metrics;
 import alpine.model.EventServiceLog;
 import alpine.persistence.AlpineQueryManager;
+import io.micrometer.core.instrument.Counter;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -86,7 +88,7 @@ public abstract class BaseEventService implements IEventService {
             if (event instanceof ChainableEvent) {
                 if (! addTrackedEvent((ChainableEvent)event)) {
                     return;
-                };
+                }
             }
 
             // Check to see if the Event is Unblocked. If so, use a separate executor pool from normal events
@@ -138,6 +140,7 @@ public abstract class BaseEventService implements IEventService {
 
             });
         }
+        recordPublishedMetric(event);
     }
 
     /**
@@ -187,6 +190,14 @@ public abstract class BaseEventService implements IEventService {
         if (eventIdentifiers.isEmpty()) {
             chainTracker.remove(event.getChainIdentifier());
         }
+    }
+
+    private void recordPublishedMetric(final Event event) {
+        Counter.builder("alpine_events_published_total")
+                .description("Total number of published events")
+                .tags("event", event.getClass().getName(), "publisher", this.getClass().getName())
+                .register(Metrics.getRegistry())
+                .increment();
     }
 
     /**

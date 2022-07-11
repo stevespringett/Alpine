@@ -18,9 +18,12 @@
  */
 package alpine.notification;
 
-import alpine.event.framework.LoggableUncaughtExceptionHandler;
 import alpine.common.logging.Logger;
+import alpine.common.metrics.Metrics;
+import alpine.event.framework.LoggableUncaughtExceptionHandler;
+import io.micrometer.core.instrument.Counter;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Map;
@@ -42,12 +45,18 @@ public final class NotificationService implements INotificationService {
     private static final NotificationService INSTANCE = new NotificationService();
     private static final Logger LOGGER = Logger.getLogger(NotificationService.class);
     private static final Map<Class<? extends Notification>, ArrayList<Subscription>> SUBSCRIPTION_MAP = new ConcurrentHashMap<>();
-    private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(4,
-            new BasicThreadFactory.Builder()
-                    .namingPattern("Alpine-NotificationService-%d")
-                    .uncaughtExceptionHandler(new LoggableUncaughtExceptionHandler())
-                    .build()
-    );
+    private static final ExecutorService EXECUTOR_SERVICE;
+    private static final String EXECUTOR_SERVICE_NAME = "Alpine-NotificationService";
+
+    static {
+        EXECUTOR_SERVICE = Executors.newFixedThreadPool(4,
+                new BasicThreadFactory.Builder()
+                        .namingPattern(EXECUTOR_SERVICE_NAME + "-%d")
+                        .uncaughtExceptionHandler(new LoggableUncaughtExceptionHandler())
+                        .build()
+        );
+        Metrics.registerExecutorService(EXECUTOR_SERVICE, EXECUTOR_SERVICE_NAME);
+    }
 
     /**
      * Private constructor
@@ -70,7 +79,7 @@ public final class NotificationService implements INotificationService {
             LOGGER.debug("No subscribers to inform from notification: " + notification.getClass().getName());
             return;
         }
-        for (final Subscription subscription: subscriptions) {
+        for (final Subscription subscription : subscriptions) {
             if (subscription.getScope() != null && subscription.getGroup() != null && subscription.getLevel() != null) { // subscription was the most specific
                 if (subscription.getScope().equals(notification.getScope()) && subscription.getGroup().equals(notification.getGroup()) && subscription.getLevel() == notification.getLevel()) {
                     alertSubscriber(notification, subscription.getSubscriber());
@@ -91,6 +100,7 @@ public final class NotificationService implements INotificationService {
                 alertSubscriber(notification, subscription.getSubscriber());
             }
         }
+        recordPublishedMetric(notification);
     }
 
     private void alertSubscriber(final Notification notification, final Class<? extends Subscriber> subscriberClass) {
@@ -98,10 +108,23 @@ public final class NotificationService implements INotificationService {
         EXECUTOR_SERVICE.execute(() -> {
             try {
                 subscriberClass.getDeclaredConstructor().newInstance().inform(notification);
-            } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException | SecurityException e) {
+            } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
+                     IllegalAccessException | SecurityException e) {
                 LOGGER.error("An error occurred while informing subscriber: " + e);
             }
         });
+    }
+
+    private void recordPublishedMetric(final Notification notification) {
+        Counter.builder("alpine_notifications_published_total")
+                .description("Total number of published notifications")
+                .tags(
+                        "group", notification.getGroup(),
+                        "level", notification.getLevel().name(),
+                        "scope", notification.getScope()
+                )
+                .register(Metrics.getRegistry())
+                .increment();
     }
 
     /**
