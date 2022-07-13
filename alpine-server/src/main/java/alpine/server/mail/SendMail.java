@@ -49,6 +49,7 @@ public class SendMail {
     private Address[] bcc;
     private String subject;
     private String body;
+    private String bodyMimeType;
     private File[] attachments = {};
     private String host;
     private int port;
@@ -102,6 +103,11 @@ public class SendMail {
 
     public SendMail body(final String body) {
         this.body = body;
+        return this;
+    }
+
+    public SendMail bodyMimeType(final String bodyMimeType) {
+        this.bodyMimeType = bodyMimeType;
         return this;
     }
 
@@ -224,7 +230,13 @@ public class SendMail {
 
             message.setSubject(subject);
             BodyPart messageBodyPart = new MimeBodyPart();
-            messageBodyPart.setText(body);
+
+            if(bodyMimeType != null) {
+                messageBodyPart.setContent(body, bodyMimeType);
+            } else {
+                messageBodyPart.setText(body);
+            }
+
             Multipart multipart = new MimeMultipart();
             multipart.addBodyPart(messageBodyPart);
 
