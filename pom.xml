@@ -544,6 +544,11 @@
                 <version>${maven.jar.plugin.version}</version>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>${maven.war.plugin.version}</version>
+            </plugin>
+            <plugin>
                 <groupId>us.springett</groupId>
                 <artifactId>maven-uuid-generator</artifactId>
                 <version>${maven.uuidgenerator.plugin.version}</version>
