@@ -90,8 +90,8 @@
     <properties>
         <!-- Maven Build Properties -->
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <timestamp>${maven.build.timestamp}</timestamp>
@@ -106,7 +106,7 @@
         <maven.jar.plugin.version>3.2.2</maven.jar.plugin.version>
         <maven.war.plugin.version>3.3.2</maven.war.plugin.version>
         <maven.shade.plugin.version>3.3.0</maven.shade.plugin.version>
-        <maven.datanucleus.plugin.version>5.2.1</maven.datanucleus.plugin.version>
+        <maven.datanucleus.plugin.version>6.0.0-release</maven.datanucleus.plugin.version>
         <maven.versions.plugin.version>2.11.0</maven.versions.plugin.version>
         <maven.gpg.plugin.version>3.0.1</maven.gpg.plugin.version>
         <maven.enforcer.plugin.version>3.0.0</maven.enforcer.plugin.version>
@@ -163,13 +163,9 @@
         <lib.commons.collections4.version>4.4</lib.commons.collections4.version>
         <lib.commons.io.version>2.11.0</lib.commons.io.version>
         <lib.commons.lang3.version>3.12.0</lib.commons.lang3.version>
-        <lib.datanucleus-api-jdo.version>5.2.9</lib.datanucleus-api-jdo.version>
-        <!-- Auto-generated classes have warnings which break build
-             https://github.com/datanucleus/datanucleus-jdo-query/pull/10
-        <lib.datanucleus-jdo-query.version>5.0.6</lib.datanucleus-jdo-query.version>
-        -->
-        <lib.datanucleus.version>5.2.10</lib.datanucleus.version>
-        <lib.datanucleus-rdbms.version>5.2.11</lib.datanucleus-rdbms.version>
+        <lib.datanucleus-api-jdo.version>6.0.0-release</lib.datanucleus-api-jdo.version>
+        <lib.datanucleus.version>6.0.0-release</lib.datanucleus.version>
+        <lib.datanucleus-rdbms.version>6.0.0-release</lib.datanucleus-rdbms.version>
         <lib.h2.version>1.4.200</lib.h2.version>
         <lib.hikaricp.version>4.0.3</lib.hikaricp.version>
         <lib.javassist.version>3.29.0-GA</lib.javassist.version>
@@ -537,6 +533,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven.surefire.plugin.version}</version>
                 <configuration>
+                    <argLine>--add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED</argLine>
                     <reuseForks>false</reuseForks>
                     <forkCount>1</forkCount>
                 </configuration>
@@ -545,6 +542,11 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>${maven.jar.plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>${maven.war.plugin.version}</version>
             </plugin>
             <plugin>
                 <groupId>us.springett</groupId>

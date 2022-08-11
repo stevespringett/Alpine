@@ -19,6 +19,7 @@
 package alpine.common.util;
 
 import java.text.NumberFormat;
+import java.util.Locale;
 
 /**
  * Class to render a byte count as a human-readable string such as "1 KB" or "1 GB" instead of a raw number
@@ -50,7 +51,7 @@ public class ByteFormat {
      * @since 1.0.0
      */
     public ByteFormat() {
-        numberFormat = NumberFormat.getIntegerInstance();
+        numberFormat = NumberFormat.getIntegerInstance(Locale.ENGLISH);
         names = new String[]{" GB", " MB", " KB", " byte"};
         numberFormat.setMinimumFractionDigits(0);
         numberFormat.setMaximumFractionDigits(1);
