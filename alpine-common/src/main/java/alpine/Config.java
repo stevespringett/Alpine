@@ -130,6 +130,8 @@ public class Config {
         LDAP_USER_PROVISIONING    ("alpine.ldap.user.provisioning",     false),
         LDAP_TEAM_SYNCHRONIZATION ("alpine.ldap.team.synchronization",  false),
         METRICS_ENABLED           ("alpine.metrics.enabled",            false),
+        METRICS_AUTH_USERNAME     ("alpine.metrics.auth.username",      null),
+        METRICS_AUTH_PASSWORD     ("alpine.metrics.auth.password",      null),
         OIDC_ENABLED              ("alpine.oidc.enabled",               false),
         OIDC_ISSUER               ("alpine.oidc.issuer",                null),
         OIDC_CLIENT_ID            ("alpine.oidc.client.id",             null),

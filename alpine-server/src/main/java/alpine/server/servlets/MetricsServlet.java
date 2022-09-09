@@ -19,33 +19,102 @@
 package alpine.server.servlets;
 
 import alpine.Config;
+import alpine.common.logging.Logger;
 import alpine.common.metrics.Metrics;
+import io.prometheus.client.exporter.common.TextFormat;
+import org.apache.commons.lang3.StringUtils;
+import org.owasp.security.logging.SecurityMarkers;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.HttpHeaders;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 /**
  * @since 2.1.0
  */
 public class MetricsServlet extends HttpServlet {
 
+    private static final Logger LOGGER = Logger.getLogger(MetricsServlet.class);
+
+    private final Config config;
     private boolean metricsEnabled;
+    private String basicAuthUsername;
+    private String basicAuthPassword;
+
+    @SuppressWarnings("unused")
+    public MetricsServlet() {
+        this(Config.getInstance());
+    }
+
+    MetricsServlet(final Config config) {
+        this.config = config;
+    }
 
     @Override
     public void init() throws ServletException {
-        metricsEnabled = Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.METRICS_ENABLED);
+        metricsEnabled = config.getPropertyAsBoolean(Config.AlpineKey.METRICS_ENABLED);
+        basicAuthUsername = config.getProperty(Config.AlpineKey.METRICS_AUTH_USERNAME);
+        basicAuthPassword = config.getProperty(Config.AlpineKey.METRICS_AUTH_PASSWORD);
     }
 
     @Override
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+        if (isAuthenticationEnabled() && !isAuthenticated(req)) {
+            LOGGER.warn(SecurityMarkers.SECURITY_AUDIT, "Unauthorized access attempt (IP address: " +
+                    req.getRemoteAddr() + " / User-Agent: " + req.getHeader("User-Agent") + ")");
+            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            resp.setHeader(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"metrics\"");
+            return;
+        }
+
         if (metricsEnabled) {
+            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.setHeader(HttpHeaders.CONTENT_TYPE, TextFormat.CONTENT_TYPE_004);
             Metrics.getRegistry().scrape(resp.getWriter());
         } else {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
+    }
+
+    private boolean isAuthenticationEnabled() {
+        return StringUtils.isNotBlank(basicAuthUsername) && StringUtils.isNotBlank(basicAuthPassword);
+    }
+
+    private boolean isAuthenticated(final HttpServletRequest req) {
+        final String authHeader = req.getHeader(HttpHeaders.AUTHORIZATION);
+        if (StringUtils.isBlank(authHeader)) {
+            LOGGER.debug("No Authorization header provided");
+            return false;
+        }
+
+        final String[] headerParts = authHeader.split("\s");
+        if (headerParts.length != 2 || !"basic".equalsIgnoreCase(headerParts[0])) {
+            LOGGER.debug("Invalid Authorization header format");
+            return false;
+        }
+
+        final String credentials;
+        try {
+            final byte[] credentialsBytes = Base64.getUrlDecoder().decode(headerParts[1]);
+            credentials = new String(credentialsBytes, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            LOGGER.debug("Decoding basic auth credentials failed", e);
+            return false;
+        }
+
+        final String[] credentialsParts = credentials.split(":");
+        if (credentialsParts.length != 2) {
+            LOGGER.debug("Invalid basic auth credentials format");
+            return false;
+        }
+
+        return StringUtils.equals(basicAuthUsername, credentialsParts[0])
+                && StringUtils.equals(basicAuthPassword, credentialsParts[1]);
     }
 
 }
