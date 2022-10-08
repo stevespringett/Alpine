@@ -77,8 +77,9 @@ public class AuthorizationFilter implements ContainerRequestFilter {
                             return;
                         }
                     }
+                    final String maskedApiKey = apiKey.getKey().replaceAll("\\w(?=\\w{4})", "*");
                     LOGGER.info(SecurityMarkers.SECURITY_FAILURE, "Unauthorized access attempt made by API Key "
-                            + apiKey.getKey() + " to " + ((ContainerRequest) requestContext).getRequestUri().toString());
+                            + maskedApiKey + " to " + ((ContainerRequest) requestContext).getRequestUri().toString());
                 } else {
                     UserPrincipal user = null;
                     if (principal instanceof ManagedUser) {

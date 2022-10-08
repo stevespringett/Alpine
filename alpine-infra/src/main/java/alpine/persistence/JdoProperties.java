@@ -51,8 +51,6 @@ public final class JdoProperties {
         properties.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS, "true");
         properties.put(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_MODE, "create");
         properties.put(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL, "true");
-        properties.put(PropertyNames.PROPERTY_MULTITHREADED, "true");
-        properties.put("javax.jdo.option.Multithreaded", "true");
         if (Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.METRICS_ENABLED)) {
             properties.put(PropertyNames.PROPERTY_ENABLE_STATISTICS, "true");
         }
@@ -73,8 +71,6 @@ public final class JdoProperties {
         properties.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS, "true");
         properties.put(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_MODE, "create");
         properties.put(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL, "true");
-        properties.put("javax.jdo.option.Multithreaded", "true");
-        properties.put(PropertyNames.PROPERTY_MULTITHREADED, "true");
         return properties;
     }
 }
