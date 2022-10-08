@@ -167,7 +167,7 @@
         <lib.datanucleus.version>6.0.2</lib.datanucleus.version>
         <lib.datanucleus-rdbms.version>6.0.2</lib.datanucleus-rdbms.version>
         <lib.h2.version>2.1.214</lib.h2.version>
-        <lib.hikaricp.version>4.0.3</lib.hikaricp.version>
+        <lib.hikaricp.version>5.0.1</lib.hikaricp.version>
         <lib.javassist.version>3.29.0-GA</lib.javassist.version>
         <lib.jackson.version>2.13.3</lib.jackson.version>
         <lib.jackson-databind.version>2.13.3</lib.jackson-databind.version>
@@ -176,14 +176,14 @@
         <lib.jaxb.core.version>2.3.0.1</lib.jaxb.core.version>
         <lib.jaxb.impl.version>2.3.6</lib.jaxb.impl.version>
         <lib.jdo.api.version>3.2.1</lib.jdo.api.version>
-        <lib.jersey.version>2.35</lib.jersey.version>
+        <lib.jersey.version>2.37</lib.jersey.version>
         <lib.jsp.api.version>2.2</lib.jsp.api.version>
         <lib.jsonwebtoken.version>0.9.1</lib.jsonwebtoken.version>
         <lib.jsr305.version>3.0.2</lib.jsr305.version>
         <lib.jsr353-impl.version>1.1.4</lib.jsr353-impl.version>
         <lib.jsr353-spec.version>1.1.4</lib.jsr353-spec.version>
         <lib.jstl.version>1.2.5</lib.jstl.version>
-        <lib.logback.version>1.2.11</lib.logback.version>
+        <lib.logback.version>1.4.3</lib.logback.version>
         <lib.micrometer.version>1.9.1</lib.micrometer.version>
         <lib.nimbus-oauth2-oidc-sdk.version>9.38</lib.nimbus-oauth2-oidc-sdk.version>
         <lib.owasp.encoder.version>1.2.3</lib.owasp.encoder.version>
