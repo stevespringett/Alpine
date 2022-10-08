@@ -51,6 +51,9 @@ public final class JdoProperties {
         properties.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS, "true");
         properties.put(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_MODE, "create");
         properties.put(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL, "true");
+        if (Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.METRICS_ENABLED)) {
+            properties.put(PropertyNames.PROPERTY_ENABLE_STATISTICS, "true");
+        }
         return properties;
     }
 
