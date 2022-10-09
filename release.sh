@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-export JAVA_HOME=`/usr/libexec/java_home -v 11`
+export JAVA_HOME=`/usr/libexec/java_home -v 17`
 export PATH=JAVA_HOME/bin:$PATH
 
 read -p "Really deploy to Maven Central repository (Y/N)? "
