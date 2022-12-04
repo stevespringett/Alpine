@@ -32,6 +32,11 @@ public final class JdoProperties {
 
     private JdoProperties() { }
 
+    /**
+     * @return The pre-populated {@link Properties} for {@link javax.jdo.PersistenceManagerFactory} creation
+     * @deprecated Assemble DataNucleus properties in context of {@link javax.jdo.PersistenceManagerFactory} creation instead
+     */
+    @Deprecated(forRemoval = true)
     public static Properties get() {
         final Properties properties = new Properties();
         properties.put("javax.jdo.option.ConnectionURL", Config.getInstance().getProperty(Config.AlpineKey.DATABASE_URL));

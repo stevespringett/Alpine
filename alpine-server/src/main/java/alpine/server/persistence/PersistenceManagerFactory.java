@@ -25,24 +25,24 @@ import alpine.model.InstalledUpgrades;
 import alpine.model.SchemaVersion;
 import alpine.persistence.IPersistenceManagerFactory;
 import alpine.persistence.JdoProperties;
+import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.micrometer.core.instrument.FunctionCounter;
 import io.micrometer.core.instrument.Gauge;
-import org.apache.commons.lang3.reflect.FieldUtils;
 import org.datanucleus.PersistenceNucleusContext;
+import org.datanucleus.PropertyNames;
 import org.datanucleus.api.jdo.JDOPersistenceManagerFactory;
-import org.datanucleus.store.connection.ConnectionManagerImpl;
-import org.datanucleus.store.rdbms.ConnectionFactoryImpl;
-import org.datanucleus.store.rdbms.RDBMSStoreManager;
 import org.datanucleus.store.schema.SchemaAwareStoreManager;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.sql.DataSource;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * Initializes the JDO persistence manager on server startup.
@@ -56,28 +56,54 @@ public class PersistenceManagerFactory implements IPersistenceManagerFactory, Se
     private static final String DATANUCLEUS_METRICS_PREFIX = "datanucleus_";
 
     private static JDOPersistenceManagerFactory pmf;
-    //private static final ThreadLocal<PersistenceManager> PER_THREAD_PM = new ThreadLocal<>();
 
     @Override
     public void contextInitialized(ServletContextEvent event) {
         LOGGER.info("Initializing persistence framework");
-        pmf = (JDOPersistenceManagerFactory)JDOHelper.getPersistenceManagerFactory(JdoProperties.get(), "Alpine");
+
+        final var dnProps = new Properties();
+        dnProps.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_DATABASE, "true");
+        dnProps.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES, "true");
+        dnProps.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS, "true");
+        dnProps.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS, "true");
+        dnProps.put(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_MODE, "create");
+        dnProps.put(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL, "true");
+        if (Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.METRICS_ENABLED)) {
+            dnProps.put(PropertyNames.PROPERTY_ENABLE_STATISTICS, "true");
+        }
+
+        if (Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.DATABASE_POOL_ENABLED)) {
+            // DataNucleus per default creates two connection factories.
+            //  - Primary: Used for operations in transactional context
+            //  - Secondary: Used for operations in non-transactional context, schema generation and value generation
+            //
+            // When using pooling, DN will thus create two connection pools of equal size.
+            // However, the optimal sizing of these pools depends on how the application makes use of transactions.
+            // When only performing operations within transactions, connections in the secondary pool would remain
+            // mostly idle.
+            //
+            // See also:
+            //  - https://www.datanucleus.org/products/accessplatform_6_0/jdo/persistence.html#datastore_connection
+            //  - https://datanucleus.groups.io/g/main/topic/95191894#490
+
+            LOGGER.info("Creating transactional connection pool");
+            dnProps.put(PropertyNames.PROPERTY_CONNECTION_FACTORY, createTxPooledDataSource());
+
+            LOGGER.info("Creating non-transactional connection pool");
+            dnProps.put(PropertyNames.PROPERTY_CONNECTION_FACTORY2, createNonTxPooledDataSource());
+        } else {
+            // No connection pooling; Let DataNucleus handle the datasource setup
+            dnProps.put(PropertyNames.PROPERTY_CONNECTION_URL, Config.getInstance().getProperty(Config.AlpineKey.DATABASE_URL));
+            dnProps.put(PropertyNames.PROPERTY_CONNECTION_DRIVER_NAME, Config.getInstance().getProperty(Config.AlpineKey.DATABASE_DRIVER));
+            dnProps.put(PropertyNames.PROPERTY_CONNECTION_USER_NAME, Config.getInstance().getProperty(Config.AlpineKey.DATABASE_USERNAME));
+            dnProps.put(PropertyNames.PROPERTY_CONNECTION_PASSWORD, Config.getInstance().getPropertyOrFile(Config.AlpineKey.DATABASE_PASSWORD));
+        }
+
+        pmf = (JDOPersistenceManagerFactory) JDOHelper.getPersistenceManagerFactory(dnProps, "Alpine");
 
         if (Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.METRICS_ENABLED)) {
             LOGGER.info("Registering DataNucleus metrics");
             registerDataNucleusMetrics(pmf);
-
-            if (Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.DATABASE_POOL_ENABLED)) {
-                LOGGER.info("Registering HikariCP metrics");
-                try {
-                    registerHikariMetrics(pmf);
-                } catch (Exception ex) {
-                    // An exception may be thrown here when accessing hidden fields
-                    // via reflection failed. Potentially because fields were renamed.
-                    // Nothing mission-critical, but users should still be warned.
-                    LOGGER.warn("An unexpected error occurred while registering HikariCP metrics", ex);
-                }
-            }
         }
 
         // Ensure that the UpgradeMetaProcessor and SchemaVersion tables are created NOW, not dynamically at runtime.
@@ -232,37 +258,78 @@ public class PersistenceManagerFactory implements IPersistenceManagerFactory, Se
                 .register(Metrics.getRegistry());
     }
 
-    private void registerHikariMetrics(final JDOPersistenceManagerFactory pmf) throws IllegalAccessException {
-        // HikariCP has native support for Dropwizard and Micrometer metrics.
-        // However, DataNucleus doesn't provide access to the underlying DataSource
-        // after the PMF has been created. We use reflection to still get access
-        // to it and register it with the global metrics registry.
-        // In the future, we may construct the DataSources ourselves, so that this
-        // workaround won't be necessary anymore.
-        if (pmf.getNucleusContext().getStoreManager() instanceof final RDBMSStoreManager storeManager
-                && storeManager.getConnectionManager() instanceof final ConnectionManagerImpl connectionManager) {
-            registerConnectionPoolMetricsForConnectionFactory(FieldUtils.readField(connectionManager, "primaryConnectionFactory", true));
-            registerConnectionPoolMetricsForConnectionFactory(FieldUtils.readField(connectionManager, "secondaryConnectionFactory", true));
-        }
+    private DataSource createTxPooledDataSource() {
+        final var hikariConfig = createBaseHikariConfig("transactional");
+        hikariConfig.setMaximumPoolSize(getConfigPropertyWithFallback(
+                Config.AlpineKey.DATABASE_POOL_TX_MAX_SIZE,
+                Config.AlpineKey.DATABASE_POOL_MAX_SIZE,
+                Config.getInstance()::getPropertyAsInt
+        ));
+        hikariConfig.setMinimumIdle(getConfigPropertyWithFallback(
+                Config.AlpineKey.DATABASE_POOL_TX_MIN_IDLE,
+                Config.AlpineKey.DATABASE_POOL_MIN_IDLE,
+                Config.getInstance()::getPropertyAsInt
+        ));
+        hikariConfig.setMaxLifetime(getConfigPropertyWithFallback(
+                Config.AlpineKey.DATABASE_POOL_TX_MAX_LIFETIME,
+                Config.AlpineKey.DATABASE_POOL_MAX_LIFETIME,
+                Config.getInstance()::getPropertyAsInt
+        ));
+        hikariConfig.setIdleTimeout(getConfigPropertyWithFallback(
+                Config.AlpineKey.DATABASE_POOL_TX_IDLE_TIMEOUT,
+                Config.AlpineKey.DATABASE_POOL_IDLE_TIMEOUT,
+                Config.getInstance()::getPropertyAsInt
+        ));
+        return new HikariDataSource(hikariConfig);
     }
 
-    private void registerConnectionPoolMetricsForConnectionFactory(final Object connectionFactory) throws IllegalAccessException {
-        if (connectionFactory instanceof final ConnectionFactoryImpl connectionFactoryImpl) {
-            final Object dataSource = FieldUtils.readField(connectionFactoryImpl, "dataSource", true);
-            if (dataSource instanceof final HikariDataSource hikariDataSource) {
-                hikariDataSource.setMetricRegistry(Metrics.getRegistry());
-            }
-        }
+    private DataSource createNonTxPooledDataSource() {
+        final var hikariConfig = createBaseHikariConfig("non-transactional");
+        hikariConfig.setMaximumPoolSize(getConfigPropertyWithFallback(
+                Config.AlpineKey.DATABASE_POOL_NONTX_MAX_SIZE,
+                Config.AlpineKey.DATABASE_POOL_MAX_SIZE,
+                Config.getInstance()::getPropertyAsInt
+        ));
+        hikariConfig.setMinimumIdle(getConfigPropertyWithFallback(
+                Config.AlpineKey.DATABASE_POOL_NONTX_MIN_IDLE,
+                Config.AlpineKey.DATABASE_POOL_MIN_IDLE,
+                Config.getInstance()::getPropertyAsInt
+        ));
+        hikariConfig.setMaxLifetime(getConfigPropertyWithFallback(
+                Config.AlpineKey.DATABASE_POOL_NONTX_MAX_LIFETIME,
+                Config.AlpineKey.DATABASE_POOL_MAX_LIFETIME,
+                Config.getInstance()::getPropertyAsInt
+        ));
+        hikariConfig.setIdleTimeout(getConfigPropertyWithFallback(
+                Config.AlpineKey.DATABASE_POOL_NONTX_IDLE_TIMEOUT,
+                Config.AlpineKey.DATABASE_POOL_IDLE_TIMEOUT,
+                Config.getInstance()::getPropertyAsInt
+        ));
+        return new HikariDataSource(hikariConfig);
     }
 
-    /*
-    private synchronized static PersistenceManager getPerThreadPersistenceManager() {
-        PersistenceManager pm = PER_THREAD_PM.get();
-        if(pm == null || pm.isClosed()) {
-            pm = pmf.getPersistenceManager();
-            PER_THREAD_PM.set(pm);
+    private HikariConfig createBaseHikariConfig(final String poolName) {
+        final var hikariConfig = new HikariConfig();
+        hikariConfig.setPoolName(poolName);
+        hikariConfig.setJdbcUrl(Config.getInstance().getProperty(Config.AlpineKey.DATABASE_URL));
+        hikariConfig.setDriverClassName(Config.getInstance().getProperty(Config.AlpineKey.DATABASE_DRIVER));
+        hikariConfig.setUsername(Config.getInstance().getProperty(Config.AlpineKey.DATABASE_USERNAME));
+        hikariConfig.setPassword(Config.getInstance().getProperty(Config.AlpineKey.DATABASE_PASSWORD));
+
+        if (Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.METRICS_ENABLED)) {
+            hikariConfig.setMetricRegistry(Metrics.getRegistry());
         }
-        return pm;
+
+        return hikariConfig;
     }
-    */
+
+    private <T> T getConfigPropertyWithFallback(final Config.Key key, final Config.Key fallbackKey,
+                                                final Function<Config.Key, T> method) {
+        if (Config.getInstance().getProperty(key) != null) {
+            return method.apply(key);
+        }
+
+        return method.apply(fallbackKey);
+    }
+
 }
