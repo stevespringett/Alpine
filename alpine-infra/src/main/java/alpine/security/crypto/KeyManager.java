@@ -22,13 +22,17 @@ import alpine.Config;
 import alpine.common.logging.Logger;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.ObjectStreamConstants;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -95,7 +99,11 @@ public final class KeyManager {
         }
         if (secretKey == null) {
             try {
-                loadSecretKey();
+                if (secretKeyHasOldFormat()) {
+                    loadSecretKey();
+                } else {
+                    loadEncodedSecretKey();
+                }
             } catch (IOException | ClassNotFoundException e) {
                 LOGGER.error("An error occurred loading secret key");
                 LOGGER.error(e.getMessage());
@@ -122,7 +130,7 @@ public final class KeyManager {
         if (!secretKeyExists()) {
             try {
                 final SecretKey secretKey = generateSecretKey();
-                save(secretKey);
+                saveEncoded(secretKey);
             } catch (NoSuchAlgorithmException e) {
                 LOGGER.error("An error occurred generating new secret key");
                 LOGGER.error(e.getMessage());
@@ -168,6 +176,12 @@ public final class KeyManager {
      * @return a File representing the path to the key
      */
     private File getKeyPath(final KeyType keyType) {
+        if (keyType == KeyType.SECRET) {
+            final String secretKeyPath = Config.getInstance().getProperty(Config.AlpineKey.SECRET_KEY_PATH);
+            if (secretKeyPath != null) {
+                return Paths.get(secretKeyPath).toFile();
+            }
+        }
         return new File(Config.getInstance().getDataDirectorty()
                 + File.separator
                 + "keys" + File.separator
@@ -226,13 +240,30 @@ public final class KeyManager {
      * @param key the SecretKey to save
      * @throws IOException if the file cannot be written
      * @since 1.0.0
+     * @deprecated Use {@link #saveEncoded(SecretKey)} instead
      */
+    @Deprecated(forRemoval = true)
     public void save(final SecretKey key) throws IOException {
         final File keyFile = getKeyPath(key);
         keyFile.getParentFile().mkdirs(); // make directories if they do not exist
         try (OutputStream fos = Files.newOutputStream(keyFile.toPath());
              ObjectOutputStream oout = new ObjectOutputStream(fos)) {
             oout.writeObject(key);
+        }
+    }
+
+    /**
+     * Saves a secret key in encoded format.
+     *
+     * @param key the SecretKey to save
+     * @throws IOException if the file cannot be written
+     * @since 2.2.0
+     */
+    public void saveEncoded(final SecretKey key) throws IOException {
+        final File keyFile = getKeyPath(key);
+        keyFile.getParentFile().mkdirs(); // make directories if they do not exist
+        try (OutputStream fos = Files.newOutputStream(keyFile.toPath())) {
+            fos.write(key.getEncoded());
         }
     }
 
@@ -276,10 +307,12 @@ public final class KeyManager {
     /**
      * Loads the secret key.
      * @return a SecretKey
-     * @throws IOException if the file cannot be read
+     * @throws IOException            if the file cannot be read
      * @throws ClassNotFoundException if deserialization of the SecretKey fails
+     * @deprecated Use {@link #loadEncodedSecretKey()}
      */
-    private SecretKey loadSecretKey() throws IOException, ClassNotFoundException {
+    @Deprecated(forRemoval = true)
+    SecretKey loadSecretKey() throws IOException, ClassNotFoundException {
         final File file = getKeyPath(KeyType.SECRET);
         SecretKey key;
         try (InputStream fis = Files.newInputStream(file.toPath());
@@ -288,6 +321,21 @@ public final class KeyManager {
             key = (SecretKey) ois.readObject();
         }
         return this.secretKey = key;
+    }
+
+    /**
+     * Loads the encoded secret key.
+     *
+     * @return a SecretKey
+     * @throws IOException if the file cannot be read
+     * @since 2.2.0
+     */
+    SecretKey loadEncodedSecretKey() throws IOException {
+        final File file = getKeyPath(KeyType.SECRET);
+        try (InputStream fis = Files.newInputStream(file.toPath())) {
+            final byte[] encodedKey = fis.readAllBytes();
+            return this.secretKey = new SecretKeySpec(encodedKey, 0, encodedKey.length, "AES");
+        }
     }
 
     /**
@@ -308,6 +356,19 @@ public final class KeyManager {
      */
     public boolean secretKeyExists() {
         return getKeyPath(KeyType.SECRET).exists();
+    }
+
+    /**
+     * Checks if the secret key was stored in the old Java Object Serialization format.
+     *
+     * @return {@code true} when the old format is detected, otherwise {@code false}
+     * @throws IOException When reading the secret key file could not be read
+     * @since 2.2.0
+     */
+    boolean secretKeyHasOldFormat() throws IOException {
+        try (final InputStream fis = Files.newInputStream(getKeyPath(KeyType.SECRET).toPath())) {
+            return ByteBuffer.wrap(fis.readNBytes(2)).getShort() == ObjectStreamConstants.STREAM_MAGIC;
+        }
     }
 
     /**

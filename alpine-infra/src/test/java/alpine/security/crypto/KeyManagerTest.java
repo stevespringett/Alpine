@@ -18,9 +18,9 @@
  */
 package alpine.security.crypto;
 
-import alpine.security.crypto.KeyManager;
 import org.junit.Assert;
 import org.junit.Test;
+
 import javax.crypto.SecretKey;
 import java.security.KeyPair;
 
@@ -45,4 +45,30 @@ public class KeyManagerTest {
         Assert.assertTrue(KeyManager.getInstance().secretKeyExists());
         Assert.assertEquals(secretKey, KeyManager.getInstance().getSecretKey());
     }
+
+    @Test
+    public void saveAndLoadSecretKeyInLegacyFormatTest() throws Exception {
+        final SecretKey secretKey = KeyManager.getInstance().generateSecretKey();
+        KeyManager.getInstance().save(secretKey);
+        final SecretKey loadedKey = KeyManager.getInstance().loadSecretKey();
+        Assert.assertArrayEquals(secretKey.getEncoded(), loadedKey.getEncoded());
+    }
+
+    @Test
+    public void saveAndLoadSecretKeyInEncodedFormatTest() throws Exception {
+        final SecretKey secretKey = KeyManager.getInstance().generateSecretKey();
+        KeyManager.getInstance().saveEncoded(secretKey);
+        final SecretKey loadedKey = KeyManager.getInstance().loadEncodedSecretKey();
+        Assert.assertArrayEquals(secretKey.getEncoded(), loadedKey.getEncoded());
+    }
+
+    @Test
+    public void secretKeyHasOldFormatTest() throws Exception {
+        final SecretKey secretKey = KeyManager.getInstance().generateSecretKey();
+        KeyManager.getInstance().save(secretKey);
+        Assert.assertTrue(KeyManager.getInstance().secretKeyHasOldFormat());
+        KeyManager.getInstance().saveEncoded(secretKey);
+        Assert.assertFalse(KeyManager.getInstance().secretKeyHasOldFormat());
+    }
+
 }
