@@ -169,7 +169,7 @@
         <lib.h2.version>2.1.214</lib.h2.version>
         <lib.hikaricp.version>5.0.1</lib.hikaricp.version>
         <lib.javassist.version>3.29.2-GA</lib.javassist.version>
-        <lib.jackson.version>2.13.4</lib.jackson.version>
+        <lib.jackson.version>2.14.1</lib.jackson.version>
         <lib.jackson-databind.version>2.14.1</lib.jackson-databind.version>
         <lib.javamail.version>1.6.7</lib.javamail.version>
         <lib.jaxb.api.version>2.3.1</lib.jaxb.api.version>
