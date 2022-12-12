@@ -87,14 +87,7 @@ public class OidcConfigurationResolver {
             Issuer issuerObject = new Issuer(this.issuer);
             URL configURL = OIDCProviderMetadata.resolveURL(issuerObject);
             HTTPRequest httpRequest = new HTTPRequest(HTTPRequest.Method.GET, configURL);
-
-            String proxyHost = Config.getInstance().getProperty(Config.AlpineKey.HTTP_PROXY_ADDRESS);
-            String proxyPort = Config.getInstance().getProperty(Config.AlpineKey.HTTP_PROXY_PORT);
-
-            if (proxyHost != null && proxyPort != null) {
-                int proxyPortAsInt = Config.getInstance().getPropertyAsInt(Config.AlpineKey.HTTP_PROXY_PORT);
-                httpRequest.setProxy(new Proxy(Proxy.Type.HTTP,new InetSocketAddress(proxyHost,proxyPortAsInt)));
-            }
+            httpRequest.setProxy(OidcProxyHelper.getProxyForHost(configURL));
 
             HTTPResponse httpResponse = httpRequest.send();
 
