@@ -194,7 +194,7 @@
         <lib.junit.version>4.13.2</lib.junit.version>
         <lib.mockito.version>4.8.0</lib.mockito.version>
         <lib.assertj.version>3.23.1</lib.assertj.version>
-        <lib.wiremock.version>2.34.0</lib.wiremock.version>
+        <lib.wiremock.version>2.35.0</lib.wiremock.version>
 
         <war-embedded-finalname>${project.build.finalName}</war-embedded-finalname>
 
