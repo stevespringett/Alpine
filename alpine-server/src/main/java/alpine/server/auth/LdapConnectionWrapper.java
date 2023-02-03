@@ -212,9 +212,7 @@ public class LdapConnectionWrapper {
     public List<String> search(final DirContext dirContext, final String filter, final String searchTerm) throws NamingException {
         LOGGER.debug("Searching / filter: " + filter + " searchTerm: " + searchTerm);
         final List<String> entityDns = new ArrayList<>();
-        final String[] attributeFilter = {};
         final SearchControls sc = new SearchControls();
-        sc.setReturningAttributes(attributeFilter);
         sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
         final String searchFor = searchTermSubstitution(filter, searchTerm);
         LOGGER.debug("Searching for: " + searchFor);
@@ -239,9 +237,7 @@ public class LdapConnectionWrapper {
      */
     public List<SearchResult> searchForUsername(final DirContext ctx, final String username) throws NamingException {
         LOGGER.debug("Performing a directory search for: " + username);
-        final String[] attributeFilter = {};
         final SearchControls sc = new SearchControls();
-        sc.setReturningAttributes(attributeFilter);
         sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
         final String searchFor = LdapConnectionWrapper.ATTRIBUTE_NAME + "=" +
                 LdapStringSanitizer.sanitize(formatPrincipal(username));
