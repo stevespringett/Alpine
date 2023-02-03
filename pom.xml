@@ -137,7 +137,7 @@
         <plugin.ossindex.transitive>true</plugin.ossindex.transitive>
 
         <!-- Software Security: Retire.js -->
-        <maven.retirejs.plugin.version>3.0.3</maven.retirejs.plugin.version>
+        <maven.retirejs.plugin.version>3.0.4</maven.retirejs.plugin.version>
         <plugin.retirejs.breakOnFailure>true</plugin.retirejs.breakOnFailure>
         <plugin.retirejs.webAppDir>${project.build.sourceDirectory}/../webapp</plugin.retirejs.webAppDir>
         <plugin.retirejs.detail>true</plugin.retirejs.detail>
@@ -192,9 +192,9 @@
         <lib.swagger.jersey.version>1.6.9</lib.swagger.jersey.version>
         <!-- Unit test libraries -->
         <lib.junit.version>4.13.2</lib.junit.version>
-        <lib.mockito.version>4.8.0</lib.mockito.version>
+        <lib.mockito.version>5.1.1</lib.mockito.version>
         <lib.assertj.version>3.23.1</lib.assertj.version>
-        <lib.wiremock.version>2.34.0</lib.wiremock.version>
+        <lib.wiremock.version>2.35.0</lib.wiremock.version>
 
         <war-embedded-finalname>${project.build.finalName}</war-embedded-finalname>
 
