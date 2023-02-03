@@ -183,7 +183,7 @@
         <lib.jsr353-impl.version>1.1.4</lib.jsr353-impl.version>
         <lib.jsr353-spec.version>1.1.4</lib.jsr353-spec.version>
         <lib.jstl.version>1.2.5</lib.jstl.version>
-        <lib.logback.version>1.2.11</lib.logback.version>
+        <lib.logback.version>1.4.5</lib.logback.version>
         <lib.micrometer.version>1.9.4</lib.micrometer.version>
         <lib.nimbus-oauth2-oidc-sdk.version>9.43.1</lib.nimbus-oauth2-oidc-sdk.version>
         <lib.owasp.encoder.version>1.2.3</lib.owasp.encoder.version>
