@@ -20,6 +20,7 @@
 package alpine.server.auth;
 
 import alpine.common.logging.Logger;
+import com.nimbusds.oauth2.sdk.http.HTTPRequest;
 import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
 import com.nimbusds.openid.connect.sdk.UserInfoRequest;
 import com.nimbusds.openid.connect.sdk.UserInfoResponse;
@@ -42,10 +43,9 @@ class OidcUserInfoAuthenticator {
     OidcProfile authenticate(final String accessToken, final OidcProfileCreator profileCreator) throws AlpineAuthenticationException {
         final UserInfoResponse userInfoResponse;
         try {
-            final var httpResponse =
-                    new UserInfoRequest(configuration.getUserInfoEndpointUri(), new BearerAccessToken(accessToken))
-                            .toHTTPRequest()
-                            .send();
+            HTTPRequest httpRequest = new UserInfoRequest(configuration.getUserInfoEndpointUri(), new BearerAccessToken(accessToken)).toHTTPRequest();
+            httpRequest.setProxy(OidcProxyHelper.getProxyForHost(configuration.getUserInfoEndpointUri().toURL()));
+            final var httpResponse = httpRequest.send();
             userInfoResponse = UserInfoResponse.parse(httpResponse);
         } catch (IOException e) {
             LOGGER.error("UserInfo request failed", e);
