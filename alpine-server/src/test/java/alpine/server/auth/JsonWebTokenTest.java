@@ -22,8 +22,8 @@ import alpine.model.LdapUser;
 import alpine.model.ManagedUser;
 import alpine.model.OidcUser;
 import alpine.model.Permission;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.security.Principal;
@@ -35,19 +35,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class JsonWebTokenTest {
 
     @Test
-    public void createTokenTest() {
+    void createTokenTest() {
         Principal user = Mockito.mock(Principal.class);
         Mockito.when(user.getName()).thenReturn("admin");
         JsonWebToken jwt = new JsonWebToken();
         String token = jwt.createToken(user);
-        Assert.assertNotNull(token);
-        Assert.assertTrue(jwt.validateToken(token));
-        Assert.assertEquals("admin", jwt.getSubject());
-        Assert.assertNotNull(jwt.getExpiration());
+        Assertions.assertNotNull(token);
+        Assertions.assertTrue(jwt.validateToken(token));
+        Assertions.assertEquals("admin", jwt.getSubject());
+        Assertions.assertNotNull(jwt.getExpiration());
     }
 
     @Test
-    public void createTokenPermissionsTest() {
+    void createTokenPermissionsTest() {
         List<Permission> permissions = new ArrayList<>();
         Permission p1 = Mockito.mock(Permission.class);
         Mockito.when(p1.getName()).thenReturn("PERM-1");
@@ -59,14 +59,14 @@ public class JsonWebTokenTest {
         Mockito.when(user.getName()).thenReturn("admin");
         JsonWebToken jwt = new JsonWebToken();
         String token = jwt.createToken(user, permissions);
-        Assert.assertNotNull(token);
-        Assert.assertTrue(jwt.validateToken(token));
-        Assert.assertEquals("admin", jwt.getSubject());
-        Assert.assertNotNull(jwt.getExpiration());
+        Assertions.assertNotNull(token);
+        Assertions.assertTrue(jwt.validateToken(token));
+        Assertions.assertEquals("admin", jwt.getSubject());
+        Assertions.assertNotNull(jwt.getExpiration());
     }
 
     @Test
-    public void createTokenShouldDeriveIdentityProviderLocal() {
+    void createTokenShouldDeriveIdentityProviderLocal() {
         final JsonWebToken jwt = new JsonWebToken();
 
         final String token = jwt.createToken(new ManagedUser());
@@ -76,7 +76,7 @@ public class JsonWebTokenTest {
     }
 
     @Test
-    public void createTokenShouldDeriveIdentityProviderLdap() {
+    void createTokenShouldDeriveIdentityProviderLdap() {
         final JsonWebToken jwt = new JsonWebToken();
 
         final String token = jwt.createToken(new LdapUser());
@@ -86,7 +86,7 @@ public class JsonWebTokenTest {
     }
 
     @Test
-    public void createTokenShouldDeriveIdentityProviderOidc() {
+    void createTokenShouldDeriveIdentityProviderOidc() {
         final JsonWebToken jwt = new JsonWebToken();
 
         final String token = jwt.createToken(new OidcUser());
@@ -96,7 +96,7 @@ public class JsonWebTokenTest {
     }
 
     @Test
-    public void createTokenShouldSetLocalIdentityProviderWhenProviderCouldNotBeDerived() {
+    void createTokenShouldSetLocalIdentityProviderWhenProviderCouldNotBeDerived() {
         final JsonWebToken jwt = new JsonWebToken();
 
         final String token = jwt.createToken(Mockito.mock(Principal.class));
@@ -106,7 +106,7 @@ public class JsonWebTokenTest {
     }
 
     @Test
-    public void createTokenShouldUseProvidedIdentityProvider() {
+    void createTokenShouldUseProvidedIdentityProvider() {
         final JsonWebToken jwt = new JsonWebToken();
 
         final String token = jwt.createToken(Mockito.mock(Principal.class), null, IdentityProvider.OPENID_CONNECT);

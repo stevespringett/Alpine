@@ -19,22 +19,22 @@
 package alpine.model;
 
 import alpine.common.util.UuidUtil;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class AboutTest {
 
     @Test
-    public void getterTest() {
+    void getterTest() {
         About about = new About();
-        Assert.assertEquals("Unknown Alpine Application", about.getApplication());
-        Assert.assertEquals("0.0.0", about.getVersion());
-        Assert.assertEquals("1970-01-01 00:00:00", about.getTimestamp());
-        Assert.assertNull(about.getUuid());
+        Assertions.assertEquals("Unknown Alpine Application", about.getApplication());
+        Assertions.assertEquals("0.0.0", about.getVersion());
+        Assertions.assertEquals("1970-01-01 00:00:00", about.getTimestamp());
+        Assertions.assertNull(about.getUuid());
 
-        Assert.assertEquals("alpine-model", about.getFramework().getName());
-        Assert.assertTrue(about.getFramework().getVersion().startsWith("2."));
-        Assert.assertTrue(about.getFramework().getTimestamp().startsWith("20"));
-        Assert.assertTrue(UuidUtil.isValidUUID(about.getFramework().getUuid()));
+        Assertions.assertEquals("alpine-model", about.getFramework().getName());
+        Assertions.assertTrue(about.getFramework().getVersion().startsWith("2."));
+        Assertions.assertTrue(about.getFramework().getTimestamp().startsWith("20"));
+        Assertions.assertTrue(UuidUtil.isValidUUID(about.getFramework().getUuid()));
     }
 }

@@ -18,8 +18,8 @@
  */
 package alpine.model;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,27 +27,27 @@ import java.util.List;
 public class ApiKeyTest {
 
     @Test
-    public void idTest() {
+    void idTest() {
         ApiKey key = new ApiKey();
         key.setId(123L);
-        Assert.assertEquals(123L, key.getId());
+        Assertions.assertEquals(123L, key.getId());
     }
 
     @Test
-    public void keyTest() {
+    void keyTest() {
         ApiKey key = new ApiKey();
         key.setKey("12345678901234567890");
-        Assert.assertEquals("12345678901234567890", key.getKey());
-        Assert.assertEquals("1234****7890", key.getName());
+        Assertions.assertEquals("12345678901234567890", key.getKey());
+        Assertions.assertEquals("1234****7890", key.getName());
     }
 
     @Test
-    public void teamsTest() {
+    void teamsTest() {
         List<Team> teams = new ArrayList<>();
         teams.add(new Team());
         ApiKey key = new ApiKey();
         key.setTeams(teams);
-        Assert.assertEquals(teams, key.getTeams());
-        Assert.assertEquals(1, key.getTeams().size());
+        Assertions.assertEquals(teams, key.getTeams());
+        Assertions.assertEquals(1, key.getTeams().size());
     }
 }

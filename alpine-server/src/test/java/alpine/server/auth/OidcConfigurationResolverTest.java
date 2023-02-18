@@ -22,10 +22,10 @@ package alpine.server.auth;
 import alpine.server.cache.CacheManager;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
+import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import wiremock.org.apache.hc.core5.http.HttpHeaders;
 import wiremock.org.apache.hc.core5.http.HttpStatus;
 import wiremock.org.apache.hc.core5.http.ContentType;
@@ -36,27 +36,27 @@ public class OidcConfigurationResolverTest {
 
     private static final String OPENID_CONFIGURATION_PATH = "/.well-known/openid-configuration";
 
-    @Rule
-    public WireMockRule wireMockRule = new WireMockRule(WireMockConfiguration.options().dynamicPort());
+    @RegisterExtension
+    public WireMockExtension wireMockRule = WireMockExtension.newInstance().options(WireMockConfiguration.options().dynamicPort()).build();
 
-    @After
+    @AfterEach
     public void tearDown() {
         // Remove configs from cache to keep testing environment clean
         CacheManager.getInstance().remove(OidcConfiguration.class, OidcConfigurationResolver.CONFIGURATION_CACHE_KEY);
     }
 
     @Test
-    public void resolveShouldReturnNullWhenOidcIsNotEnabled() {
+    void resolveShouldReturnNullWhenOidcIsNotEnabled() {
         assertThat(new OidcConfigurationResolver(false, wireMockRule.baseUrl()).resolve()).isNull();
     }
 
     @Test
-    public void resolveShouldReturnNullWhenAuthorityIsNull() {
+    void resolveShouldReturnNullWhenAuthorityIsNull() {
         assertThat(new OidcConfigurationResolver(true, null).resolve()).isNull();
     }
 
     @Test
-    public void resolveShouldReturnCachedValueWhenAvailable() {
+    void resolveShouldReturnCachedValueWhenAvailable() {
         final OidcConfiguration cachedConfiguration = new OidcConfiguration();
         CacheManager.getInstance().put(OidcConfigurationResolver.CONFIGURATION_CACHE_KEY, cachedConfiguration);
 
@@ -64,7 +64,7 @@ public class OidcConfigurationResolverTest {
     }
 
     @Test
-    public void resolveShouldReturnNullWhenServerRespondsWithNon200StatusCode() {
+    void resolveShouldReturnNullWhenServerRespondsWithNon200StatusCode() {
         wireMockRule.stubFor(WireMock.get(WireMock.urlPathEqualTo(OPENID_CONFIGURATION_PATH))
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.SC_NOT_FOUND)));
@@ -74,7 +74,7 @@ public class OidcConfigurationResolverTest {
     }
 
     @Test
-    public void resolveShouldReturnNullWhenServerRespondsWithInvalidJson() {
+    void resolveShouldReturnNullWhenServerRespondsWithInvalidJson() {
         wireMockRule.stubFor(WireMock.get(WireMock.urlPathEqualTo(OPENID_CONFIGURATION_PATH))
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.SC_OK)
@@ -86,7 +86,7 @@ public class OidcConfigurationResolverTest {
     }
 
     @Test
-    public void resolveShouldReturnConfigurationAndStoreItInCache() {
+    void resolveShouldReturnConfigurationAndStoreItInCache() {
         wireMockRule.stubFor(WireMock.get(WireMock.urlPathEqualTo(OPENID_CONFIGURATION_PATH))
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.SC_OK)

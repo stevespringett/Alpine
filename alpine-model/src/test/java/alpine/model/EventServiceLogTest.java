@@ -18,8 +18,8 @@
  */
 package alpine.model;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -27,32 +27,32 @@ import java.util.Date;
 public class EventServiceLogTest {
 
     @Test
-    public void idTest() {
+    void idTest() {
         EventServiceLog esl = new EventServiceLog();
         esl.setId(123L);
-        Assert.assertEquals(123L, esl.getId());
+        Assertions.assertEquals(123L, esl.getId());
     }
 
     @Test
-    public void subscriberClassTest() {
+    void subscriberClassTest() {
         EventServiceLog esl = new EventServiceLog();
         esl.setSubscriberClass("com.example.SubscriberClass");
-        Assert.assertEquals("com.example.SubscriberClass", esl.getSubscriberClass());
+        Assertions.assertEquals("com.example.SubscriberClass", esl.getSubscriberClass());
     }
 
     @Test
-    public void startedTest() {
+    void startedTest() {
         Timestamp ts = Timestamp.from(new Date().toInstant());
         EventServiceLog esl = new EventServiceLog();
         esl.setStarted(ts);
-        Assert.assertEquals(ts, esl.getStarted());
+        Assertions.assertEquals(ts, esl.getStarted());
     }
 
     @Test
-    public void completedTest() {
+    void completedTest() {
         Timestamp ts = Timestamp.from(new Date().toInstant());
         EventServiceLog esl = new EventServiceLog();
         esl.setCompleted(ts);
-        Assert.assertEquals(ts, esl.getCompleted());
+        Assertions.assertEquals(ts, esl.getCompleted());
     }
 }

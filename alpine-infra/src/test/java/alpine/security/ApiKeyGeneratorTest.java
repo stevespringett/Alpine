@@ -18,8 +18,8 @@
  */
 package alpine.security;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import java.util.regex.Pattern;
 
 public class ApiKeyGeneratorTest {
@@ -27,16 +27,16 @@ public class ApiKeyGeneratorTest {
     private Pattern pattern = Pattern.compile("^[A-Za-z0-9]*$");
 
     @Test
-    public void defaultGenerateTest() {
+    void defaultGenerateTest() {
         String key = ApiKeyGenerator.generate();
-        Assert.assertEquals(32, key.length());
-        Assert.assertTrue(pattern.matcher(key).matches());
+        Assertions.assertEquals(32,key.length());
+        Assertions.assertTrue(pattern.matcher(key).matches());
     }
 
     @Test
-    public void generateTest() {
+    void generateTest() {
         String key = ApiKeyGenerator.generate(4096);
-        Assert.assertEquals(4096, key.length());
-        Assert.assertTrue(pattern.matcher(key).matches());
+        Assertions.assertEquals(4096,key.length());
+        Assertions.assertTrue(pattern.matcher(key).matches());
     }
 }

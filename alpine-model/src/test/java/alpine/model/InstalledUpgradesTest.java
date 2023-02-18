@@ -18,8 +18,8 @@
  */
 package alpine.model;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -27,32 +27,32 @@ import java.util.Date;
 public class InstalledUpgradesTest {
 
     @Test
-    public void idTest() {
+    void idTest() {
         InstalledUpgrades upgrades = new InstalledUpgrades();
         upgrades.setId(123L);
-        Assert.assertEquals(123L, upgrades.getId());
+        Assertions.assertEquals(123L, upgrades.getId());
     }
 
     @Test
-    public void upgradeClassTest() {
+    void upgradeClassTest() {
         InstalledUpgrades upgrades = new InstalledUpgrades();
         upgrades.setUpgradeClass("com.example.UpgradeClass");
-        Assert.assertEquals("com.example.UpgradeClass", upgrades.getUpgradeClass());
+        Assertions.assertEquals("com.example.UpgradeClass", upgrades.getUpgradeClass());
     }
 
     @Test
-    public void startedTest() {
+    void startedTest() {
         Timestamp ts = Timestamp.from(new Date().toInstant());
         InstalledUpgrades upgrades = new InstalledUpgrades();
         upgrades.setStartTime(ts);
-        Assert.assertEquals(ts, upgrades.getStartTime());
+        Assertions.assertEquals(ts, upgrades.getStartTime());
     }
 
     @Test
-    public void endTimeTest() {
+    void endTimeTest() {
         Timestamp ts = Timestamp.from(new Date().toInstant());
         InstalledUpgrades upgrades = new InstalledUpgrades();
         upgrades.setEndTime(ts);
-        Assert.assertEquals(ts, upgrades.getEndTime());
+        Assertions.assertEquals(ts, upgrades.getEndTime());
     }
 }

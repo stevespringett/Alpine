@@ -19,20 +19,16 @@
 package alpine.common.util;
 
 import org.junit.Rule;
-import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 public class ThreadUtilTest {
 
     @Rule
     public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     @Test
-    public void determineNumberOfWorkerThreadsTest() {
+    void determineNumberOfWorkerThreadsTest() {
         // TODO: FIX ME
         //environmentVariables.set("ALPINE_WORKER_THREADS", "10");
         //Assert.assertEquals(10, ThreadUtil.determineNumberOfWorkerThreads());

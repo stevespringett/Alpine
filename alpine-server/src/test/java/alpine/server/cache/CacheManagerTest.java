@@ -18,35 +18,35 @@
  */
 package alpine.server.cache;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class CacheManagerTest {
 
     @Test
-    public void putGetMaintTest() {
+    void putGetMaintTest() {
         CacheManager cacheManager = CacheManager.getInstance();
         for (int i = 1; i <= 1100; i++) {
-            cacheManager.put("key-" + i , "value-" + i);
+            cacheManager.put("key-" + i, "value-" + i);
         }
         cacheManager.maintenance(String.class);
         for (int i = 1; i <= 100; i++) {
-            Assert.assertNull(cacheManager.get(String.class, "key-" + i));
+            Assertions.assertNull(cacheManager.get(String.class, "key-" + i));
         }
         for (int i = 101; i <= 1100; i++) {
-            Assert.assertEquals("value-" + i, cacheManager.get(String.class, "key-" + i));
+            Assertions.assertEquals("value-" + i, cacheManager.get(String.class, "key-" + i));
         }
     }
 
     @Test
-    public void removeTest() {
+    void removeTest() {
         CacheManager cacheManager = CacheManager.getInstance();
 
         cacheManager.put("CacheManagerTest.removeTest", "testValue");
-        Assert.assertEquals("testValue", cacheManager.get(String.class, "CacheManagerTest.removeTest"));
+        Assertions.assertEquals("testValue", cacheManager.get(String.class, "CacheManagerTest.removeTest"));
 
         cacheManager.remove(String.class, "CacheManagerTest.removeTest");
-        Assert.assertNull(cacheManager.get(String.class, "CacheManagerTest.removeTest"));
+        Assertions.assertNull(cacheManager.get(String.class, "CacheManagerTest.removeTest"));
     }
 
 }

@@ -18,35 +18,35 @@
  */
 package alpine.common.util;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class BooleanUtilTest {
 
     @Test
-    public void valueOfTest() {
-        Assert.assertTrue(BooleanUtil.valueOf("TruE"));
-        Assert.assertTrue(BooleanUtil.valueOf("1"));
-        Assert.assertFalse(BooleanUtil.valueOf("3"));
-        Assert.assertFalse(BooleanUtil.valueOf("0"));
-        Assert.assertFalse(BooleanUtil.valueOf("TTRUE"));
-        Assert.assertFalse(BooleanUtil.valueOf(""));
-        Assert.assertFalse(BooleanUtil.valueOf(null));
+    void valueOfTest() {
+        Assertions.assertTrue(BooleanUtil.valueOf("TruE"));
+        Assertions.assertTrue(BooleanUtil.valueOf("1"));
+        Assertions.assertFalse(BooleanUtil.valueOf("3"));
+        Assertions.assertFalse(BooleanUtil.valueOf("0"));
+        Assertions.assertFalse(BooleanUtil.valueOf("TTRUE"));
+        Assertions.assertFalse(BooleanUtil.valueOf(""));
+        Assertions.assertFalse(BooleanUtil.valueOf(null));
     }
 
     @Test
-    public void isNullTest() {
+    void isNullTest() {
         Object o = new Object();
         Object n = null;
-        Assert.assertFalse(BooleanUtil.isNull(o));
-        Assert.assertTrue(BooleanUtil.isNull(n));
+        Assertions.assertFalse(BooleanUtil.isNull(o));
+        Assertions.assertTrue(BooleanUtil.isNull(n));
     }
 
     @Test
-    public void isNotNullTest() {
+    void isNotNullTest() {
         Object o = new Object();
         Object n = null;
-        Assert.assertTrue(BooleanUtil.isNotNull(o));
-        Assert.assertFalse(BooleanUtil.isNotNull(n));
+        Assertions.assertTrue(BooleanUtil.isNotNull(o));
+        Assertions.assertFalse(BooleanUtil.isNotNull(n));
     }
 }

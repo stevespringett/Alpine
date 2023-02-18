@@ -18,50 +18,50 @@
  */
 package alpine.model;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class ConfigPropertyTest {
 
     @Test
-    public void idTest() {
+    void idTest() {
         ConfigProperty prop = new ConfigProperty();
         prop.setId(123L);
-        Assert.assertEquals(123L, prop.getId());
+        Assertions.assertEquals(123L, prop.getId());
     }
 
     @Test
-    public void groupNameTest() {
+    void groupNameTest() {
         ConfigProperty prop = new ConfigProperty();
         prop.setGroupName("my-group");
-        Assert.assertEquals("my-group", prop.getGroupName());
+        Assertions.assertEquals("my-group", prop.getGroupName());
     }
 
     @Test
-    public void propertyNameTest() {
+    void propertyNameTest() {
         ConfigProperty prop = new ConfigProperty();
         prop.setPropertyName("my-property-name");
-        Assert.assertEquals("my-property-name", prop.getPropertyName());
+        Assertions.assertEquals("my-property-name", prop.getPropertyName());
     }
 
     @Test
-    public void propertyValueTest() {
+    void propertyValueTest() {
         ConfigProperty prop = new ConfigProperty();
         prop.setPropertyValue("my-property-value");
-        Assert.assertEquals("my-property-value", prop.getPropertyValue());
+        Assertions.assertEquals("my-property-value", prop.getPropertyValue());
     }
 
     @Test
-    public void propertyTypeTest() {
+    void propertyTypeTest() {
         ConfigProperty prop = new ConfigProperty();
         prop.setPropertyType(IConfigProperty.PropertyType.STRING);
-        Assert.assertEquals(IConfigProperty.PropertyType.STRING, prop.getPropertyType());
+        Assertions.assertEquals(IConfigProperty.PropertyType.STRING, prop.getPropertyType());
     }
 
     @Test
-    public void descriptionTest() {
+    void descriptionTest() {
         ConfigProperty prop = new ConfigProperty();
         prop.setDescription("My description");
-        Assert.assertEquals("My description", prop.getDescription());
+        Assertions.assertEquals("My description", prop.getDescription());
     }
 }

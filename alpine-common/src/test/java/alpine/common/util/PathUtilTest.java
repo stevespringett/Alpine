@@ -18,15 +18,15 @@
  */
 package alpine.common.util;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class PathUtilTest {
 
     @Test
-    public void resolveTest() {
-        Assert.assertEquals("/home/dtrack", PathUtil.resolve("/home/dtrack"));
-        Assert.assertNotNull(PathUtil.resolve("~/dtrack"));
-        Assert.assertNotEquals("~/dtrack", PathUtil.resolve("~/dtrack"));
+    void resolveTest() {
+        Assertions.assertEquals("/home/dtrack", PathUtil.resolve("/home/dtrack"));
+        Assertions.assertNotNull(PathUtil.resolve("~/dtrack"));
+        Assertions.assertNotEquals("~/dtrack", PathUtil.resolve("~/dtrack"));
     }
 }

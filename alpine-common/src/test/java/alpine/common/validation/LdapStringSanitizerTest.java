@@ -18,18 +18,18 @@
  */
 package alpine.common.validation;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class LdapStringSanitizerTest {
 
     @Test
-    public void sanitizeTest() {
-        Assert.assertEquals("abc\\2adef", LdapStringSanitizer.sanitize("abc*def"));
-        Assert.assertEquals("abc\\28def", LdapStringSanitizer.sanitize("abc(def"));
-        Assert.assertEquals("abc\\29def", LdapStringSanitizer.sanitize("abc)def"));
-        Assert.assertEquals("abc\\5cdef", LdapStringSanitizer.sanitize("abc\\def"));
-        Assert.assertEquals("abc\\00def", LdapStringSanitizer.sanitize("abc\u0000def"));
-        Assert.assertEquals("abc\\c9\\86def", LdapStringSanitizer.sanitize("abc\u0246def"));
+    void sanitizeTest() {
+        Assertions.assertEquals("abc\\2adef", LdapStringSanitizer.sanitize("abc*def"));
+        Assertions.assertEquals("abc\\28def", LdapStringSanitizer.sanitize("abc(def"));
+        Assertions.assertEquals("abc\\29def", LdapStringSanitizer.sanitize("abc)def"));
+        Assertions.assertEquals("abc\\5cdef", LdapStringSanitizer.sanitize("abc\\def"));
+        Assertions.assertEquals("abc\\00def", LdapStringSanitizer.sanitize("abc\u0000def"));
+        Assertions.assertEquals("abc\\c9\\86def", LdapStringSanitizer.sanitize("abc\u0246def"));
     }
 }

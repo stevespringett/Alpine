@@ -18,26 +18,26 @@
  */
 package alpine.common.util;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class UuidUtilTest {
 
     @Test
-    public void insertHyphensTest() {
-        Assert.assertEquals("9aa395cb-8e91-4e77-aeaf-1a41d85bffa8", UuidUtil.insertHyphens("9aa395cb8e914e77aeaf1a41d85bffa8"));
+    void insertHyphensTest() {
+        Assertions.assertEquals("9aa395cb-8e91-4e77-aeaf-1a41d85bffa8", UuidUtil.insertHyphens("9aa395cb8e914e77aeaf1a41d85bffa8"));
     }
 
     @Test
-    public void stripHyphensTest() {
-        Assert.assertEquals("9aa395cb8e914e77aeaf1a41d85bffa8", UuidUtil.stripHyphens("9aa395cb-8e91-4e77-aeaf-1a41d85bffa8"));
+    void stripHyphensTest() {
+        Assertions.assertEquals("9aa395cb8e914e77aeaf1a41d85bffa8", UuidUtil.stripHyphens("9aa395cb-8e91-4e77-aeaf-1a41d85bffa8"));
     }
 
     @Test
-    public void isValidUuidTest() {
-        Assert.assertFalse(UuidUtil.isValidUUID("9aa395cb8e914e77aeaf1a41d85bffa8"));
-        Assert.assertFalse(UuidUtil.isValidUUID("9AA395CB-8E91-4E77-AEAF-1A41D85BFFA8"));
-        Assert.assertTrue(UuidUtil.isValidUUID("00000000-0000-0000-0000-000000000000"));
-        Assert.assertTrue(UuidUtil.isValidUUID("9aa395cb-8e91-4e77-aeaf-1a41d85bffa8"));
+    void isValidUuidTest() {
+        Assertions.assertFalse(UuidUtil.isValidUUID("9aa395cb8e914e77aeaf1a41d85bffa8"));
+        Assertions.assertFalse(UuidUtil.isValidUUID("9AA395CB-8E91-4E77-AEAF-1A41D85BFFA8"));
+        Assertions.assertTrue(UuidUtil.isValidUUID("00000000-0000-0000-0000-000000000000"));
+        Assertions.assertTrue(UuidUtil.isValidUUID("9aa395cb-8e91-4e77-aeaf-1a41d85bffa8"));
     }
 }

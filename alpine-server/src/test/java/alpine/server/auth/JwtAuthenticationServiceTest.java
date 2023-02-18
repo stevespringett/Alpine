@@ -28,9 +28,9 @@ import alpine.persistence.AlpineQueryManager;
 import alpine.server.persistence.PersistenceManagerFactory;
 import org.assertj.core.api.Assertions;
 import org.glassfish.jersey.server.ContainerRequest;
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import wiremock.org.apache.hc.core5.http.HttpHeaders;
@@ -46,18 +46,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class JwtAuthenticationServiceTest {
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
         Config.enableUnitTests();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         PersistenceManagerFactory.tearDown();
     }
 
     @Test
-    public void isSpecifiedShouldReturnTrueWhenBearerIsNotNull() {
+    void isSpecifiedShouldReturnTrueWhenBearerIsNotNull() {
         final ContainerRequest containerRequestMock = Mockito.mock(ContainerRequest.class);
         Mockito.when(containerRequestMock.getRequestHeader(ArgumentMatchers.eq(HttpHeaders.AUTHORIZATION)))
                 .thenReturn(Collections.singletonList("Bearer 123456"));
@@ -68,7 +68,7 @@ public class JwtAuthenticationServiceTest {
     }
 
     @Test
-    public void isSpecifiedShouldReturnFalseWhenBearerIsNull() {
+    void isSpecifiedShouldReturnFalseWhenBearerIsNull() {
         final ContainerRequest containerRequestMock = Mockito.mock(ContainerRequest.class);
         Mockito.when(containerRequestMock.getRequestHeader(ArgumentMatchers.eq(HttpHeaders.AUTHORIZATION)))
                 .thenReturn(Collections.singletonList("Basic 123456"));
@@ -79,7 +79,7 @@ public class JwtAuthenticationServiceTest {
     }
 
     @Test
-    public void authenticateShouldReturnNullWhenBearerIsNull() throws AuthenticationException {
+    void authenticateShouldReturnNullWhenBearerIsNull() throws AuthenticationException {
         final ContainerRequest containerRequestMock = Mockito.mock(ContainerRequest.class);
         Mockito.when(containerRequestMock.getRequestHeader(ArgumentMatchers.eq(HttpHeaders.AUTHORIZATION)))
                 .thenReturn(Collections.singletonList("Basic 123456"));
@@ -90,7 +90,7 @@ public class JwtAuthenticationServiceTest {
     }
 
     @Test
-    public void authenticateShouldReturnNullWhenTokenIsInvalid() throws AuthenticationException {
+    void authenticateShouldReturnNullWhenTokenIsInvalid() throws AuthenticationException {
         final ContainerRequest containerRequestMock = Mockito.mock(ContainerRequest.class);
         Mockito.when(containerRequestMock.getRequestHeader(ArgumentMatchers.eq(HttpHeaders.AUTHORIZATION)))
                 .thenReturn(Collections.singletonList("Bearer invalidToken"));
@@ -101,7 +101,7 @@ public class JwtAuthenticationServiceTest {
     }
 
     @Test
-    public void authenticateShouldThrowExceptionWhenSubjectIsNull() {
+    void authenticateShouldThrowExceptionWhenSubjectIsNull() {
         final Map<String, Object> tokenClaims = new HashMap<>();
         tokenClaims.put("exp", Instant.now().plusSeconds(60).getEpochSecond());
         final String token = new JsonWebToken().createToken(tokenClaims);
@@ -117,7 +117,7 @@ public class JwtAuthenticationServiceTest {
     }
 
     @Test
-    public void authenticateShouldThrowExceptionWhenExpirationIsNull() {
+    void authenticateShouldThrowExceptionWhenExpirationIsNull() {
         final Map<String, Object> tokenClaims = new HashMap<>();
         tokenClaims.put("sub", "subject");
         final String token = new JsonWebToken().createToken(tokenClaims);
@@ -133,7 +133,7 @@ public class JwtAuthenticationServiceTest {
     }
 
     @Test
-    public void authenticateShouldReturnNullWhenManagedUserIsSuspended() throws AuthenticationException {
+    void authenticateShouldReturnNullWhenManagedUserIsSuspended() throws AuthenticationException {
         try (final AlpineQueryManager qm = new AlpineQueryManager()) {
             final ManagedUser managedUser = qm.createManagedUser("username", "passwordHash");
             managedUser.setSuspended(true);
@@ -156,7 +156,7 @@ public class JwtAuthenticationServiceTest {
     }
 
     @Test
-    public void authenticateShouldReturnNullWhenNoMatchingUserExists() throws AuthenticationException {
+    void authenticateShouldReturnNullWhenNoMatchingUserExists() throws AuthenticationException {
         final Principal principalMock = Mockito.mock(Principal.class);
         Mockito.when(principalMock.getName())
                 .thenReturn("username");
@@ -173,7 +173,7 @@ public class JwtAuthenticationServiceTest {
     }
 
     @Test
-    public void authenticateShouldReturnOidcUserWhenIdentityProviderIsLocal() throws AuthenticationException {
+    void authenticateShouldReturnOidcUserWhenIdentityProviderIsLocal() throws AuthenticationException {
         try (final AlpineQueryManager qm = new AlpineQueryManager()) {
             qm.createManagedUser("username", "passwordHash");
             qm.createLdapUser("username");
@@ -202,7 +202,7 @@ public class JwtAuthenticationServiceTest {
     }
 
     @Test
-    public void authenticateShouldReturnLdapUserWhenIdentityProviderIsLdap() throws AuthenticationException {
+    void authenticateShouldReturnLdapUserWhenIdentityProviderIsLdap() throws AuthenticationException {
         try (final AlpineQueryManager qm = new AlpineQueryManager()) {
             qm.createManagedUser("username", "passwordHash");
             qm.createLdapUser("username");
@@ -231,7 +231,7 @@ public class JwtAuthenticationServiceTest {
     }
 
     @Test
-    public void authenticateShouldReturnOidcUserWhenIdentityProviderIsOpenIdConnect() throws AuthenticationException {
+    void authenticateShouldReturnOidcUserWhenIdentityProviderIsOpenIdConnect() throws AuthenticationException {
         try (final AlpineQueryManager qm = new AlpineQueryManager()) {
             qm.createManagedUser("username", "passwordHash");
             qm.createLdapUser("username");

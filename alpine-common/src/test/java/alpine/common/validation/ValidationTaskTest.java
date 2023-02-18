@@ -18,30 +18,30 @@
  */
 package alpine.common.validation;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.regex.Pattern;
 
 public class ValidationTaskTest {
 
     @Test
-    public void constructorATest() {
+    void constructorATest() {
         Pattern p = Pattern.compile("[A-Za-z]");
         ValidationTask task = new ValidationTask(p, "Test Input", "Invalid", true);
-        Assert.assertEquals(p, task.getPattern());
-        Assert.assertEquals("Test Input", task.getInput());
-        Assert.assertEquals("Invalid", task.getErrorMessage());
-        Assert.assertTrue(task.isRequired());
+        Assertions.assertEquals(p, task.getPattern());
+        Assertions.assertEquals("Test Input", task.getInput());
+        Assertions.assertEquals("Invalid", task.getErrorMessage());
+        Assertions.assertTrue(task.isRequired());
     }
 
     @Test
-    public void constructorBTest() {
+    void constructorBTest() {
         Pattern p = Pattern.compile("[A-Za-z]");
         ValidationTask task = new ValidationTask(p, "Test Input", "Invalid");
-        Assert.assertEquals(p, task.getPattern());
-        Assert.assertEquals("Test Input", task.getInput());
-        Assert.assertEquals("Invalid", task.getErrorMessage());
-        Assert.assertTrue(task.isRequired());
+        Assertions.assertEquals(p, task.getPattern());
+        Assertions.assertEquals("Test Input", task.getInput());
+        Assertions.assertEquals("Invalid", task.getErrorMessage());
+        Assertions.assertTrue(task.isRequired());
     }
 }

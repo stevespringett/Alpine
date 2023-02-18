@@ -19,18 +19,18 @@
 package alpine.security.crypto;
 
 import alpine.security.crypto.RelaxedSSLSocketFactory;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import javax.net.SocketFactory;
 
 public class RelaxedSSLSocketFactoryTest {
 
     @Test
-    public void basicTest() {
+    void basicTest() {
         SocketFactory factory = RelaxedSSLSocketFactory.getDefault();
-        Assert.assertTrue(factory instanceof RelaxedSSLSocketFactory);
+        Assertions.assertTrue(factory instanceof RelaxedSSLSocketFactory);
         RelaxedSSLSocketFactory relatedFactory = (RelaxedSSLSocketFactory)factory;
-        Assert.assertTrue(relatedFactory.getDefaultCipherSuites().length > 0);
-        Assert.assertTrue(relatedFactory.getSupportedCipherSuites().length > 0);
+        Assertions.assertTrue(relatedFactory.getDefaultCipherSuites().length > 0);
+        Assertions.assertTrue(relatedFactory.getSupportedCipherSuites().length > 0);
     }
 }

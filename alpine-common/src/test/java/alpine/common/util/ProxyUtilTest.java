@@ -19,8 +19,8 @@
 package alpine.common.util;
 
 import alpine.Config;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.Map;
@@ -33,9 +33,9 @@ import static org.mockito.Mockito.when;
 public class ProxyUtilTest {
 
     @Test
-    public void fromConfigTest() {
-        Assert.assertNull(ProxyUtil.fromConfig(null));
-        Assert.assertNull(ProxyUtil.fromConfig(mock(Config.class)));
+    void fromConfigTest() {
+        Assertions.assertNull(ProxyUtil.fromConfig(null));
+        Assertions.assertNull(ProxyUtil.fromConfig(mock(Config.class)));
 
         var configMock = mock(Config.class);
         when(configMock.getProperty(eq(Config.AlpineKey.HTTP_PROXY_ADDRESS))).thenReturn("proxy.http.example.com");
@@ -45,46 +45,46 @@ public class ProxyUtilTest {
         when(configMock.getProperty(eq(Config.AlpineKey.NO_PROXY))).thenReturn("acme.com,foo.bar:1234");
 
         final var proxyCfg = ProxyUtil.fromConfig(configMock);
-        Assert.assertNotNull(proxyCfg);
-        Assert.assertEquals("proxy.http.example.com", proxyCfg.getHost());
-        Assert.assertEquals(6666, proxyCfg.getPort());
-        Assert.assertEquals("domain", proxyCfg.getDomain());
-        Assert.assertEquals("username", proxyCfg.getUsername());
-        Assert.assertEquals("pa$%word", proxyCfg.getPassword());
-        Assert.assertEquals(Set.of("acme.com", "foo.bar:1234"), proxyCfg.getNoProxy());
+        Assertions.assertNotNull(proxyCfg);
+        Assertions.assertEquals("proxy.http.example.com", proxyCfg.getHost());
+        Assertions.assertEquals(6666, proxyCfg.getPort());
+        Assertions.assertEquals("domain", proxyCfg.getDomain());
+        Assertions.assertEquals("username", proxyCfg.getUsername());
+        Assertions.assertEquals("pa$%word", proxyCfg.getPassword());
+        Assertions.assertEquals(Set.of("acme.com", "foo.bar:1234"), proxyCfg.getNoProxy());
     }
 
     @Test
-    public void fromEnvironmentTest() {
-        Assert.assertNull(ProxyUtil.fromEnvironment(null));
-        Assert.assertNull(ProxyUtil.fromEnvironment(Collections.emptyMap()));
+    void fromEnvironmentTest() {
+        Assertions.assertNull(ProxyUtil.fromEnvironment(null));
+        Assertions.assertNull(ProxyUtil.fromEnvironment(Collections.emptyMap()));
 
         final var proxyCfg = ProxyUtil.fromEnvironment(Map.of(
                 "https_proxy", "http://proxy.https.example.com:6443",
                 "http_proxy", "http://proxy.http.example.com:6666",
                 "no_proxy", "acme.com,foo.bar:1234"
         ));
-        Assert.assertNotNull(proxyCfg);
-        Assert.assertEquals("proxy.https.example.com", proxyCfg.getHost());
-        Assert.assertEquals(6443, proxyCfg.getPort());
-        Assert.assertNull(proxyCfg.getDomain());
-        Assert.assertNull(proxyCfg.getUsername());
-        Assert.assertNull(proxyCfg.getPassword());
-        Assert.assertEquals(Set.of("acme.com", "foo.bar:1234"), proxyCfg.getNoProxy());
+        Assertions.assertNotNull(proxyCfg);
+        Assertions.assertEquals("proxy.https.example.com", proxyCfg.getHost());
+        Assertions.assertEquals(6443, proxyCfg.getPort());
+        Assertions.assertNull(proxyCfg.getDomain());
+        Assertions.assertNull(proxyCfg.getUsername());
+        Assertions.assertNull(proxyCfg.getPassword());
+        Assertions.assertEquals(Set.of("acme.com", "foo.bar:1234"), proxyCfg.getNoProxy());
     }
 
     @Test
-    public void fromEnvironmentWithAuthenticationTest() {
+    void fromEnvironmentWithAuthenticationTest() {
         final var proxyCfg = ProxyUtil.fromEnvironment(Map.of(
                 "http_proxy", "http://domain%5Cusername:pa$%25word@proxy.http.example.com:6666"
         ));
-        Assert.assertNotNull(proxyCfg);
-        Assert.assertEquals("proxy.http.example.com", proxyCfg.getHost());
-        Assert.assertEquals(6666, proxyCfg.getPort());
-        Assert.assertEquals("domain", proxyCfg.getDomain());
-        Assert.assertEquals("username", proxyCfg.getUsername());
-        Assert.assertEquals("pa$%word", proxyCfg.getPassword());
-        Assert.assertNull(proxyCfg.getNoProxy());
+        Assertions.assertNotNull(proxyCfg);
+        Assertions.assertEquals("proxy.http.example.com", proxyCfg.getHost());
+        Assertions.assertEquals(6666, proxyCfg.getPort());
+        Assertions.assertEquals("domain", proxyCfg.getDomain());
+        Assertions.assertEquals("username", proxyCfg.getUsername());
+        Assertions.assertEquals("pa$%word", proxyCfg.getPassword());
+        Assertions.assertNull(proxyCfg.getNoProxy());
     }
 
 }

@@ -22,7 +22,7 @@ package alpine.server.auth;
 import alpine.server.cache.CacheManager;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSObject;
@@ -36,10 +36,10 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet;
 import org.assertj.core.api.Assertions;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import wiremock.org.apache.hc.core5.http.HttpHeaders;
 import wiremock.org.apache.hc.core5.http.HttpStatus;
 import wiremock.org.apache.hc.core5.http.ContentType;
@@ -67,24 +67,24 @@ public class OidcIdTokenAuthenticatorTest {
         return profile;
     };
 
-    @Rule
-    public WireMockRule wireMockRule = new WireMockRule(WireMockConfiguration.options().dynamicPort());
+    @RegisterExtension
+    public WireMockExtension wireMockRule = WireMockExtension.newInstance().options(WireMockConfiguration.options().dynamicPort()).build();
 
     private OidcConfiguration oidcConfiguration;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         oidcConfiguration = new OidcConfiguration();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         // Remove JWK sets from cache to keep testing environment clean
         CacheManager.getInstance().remove(JWKSet.class, OidcIdTokenAuthenticator.JWK_SET_CACHE_KEY);
     }
 
     @Test
-    public void authenticateShouldReturnOidcProfile() throws Exception {
+    void authenticateShouldReturnOidcProfile() throws Exception {
         // Generate a JWK to sign the token with
         final RSAKey jwk = new RSAKeyGenerator(2048).keyUse(KeyUse.SIGNATURE).keyID(UUID.randomUUID().toString()).generate();
         final var jwkSet = new JWKSet(jwk.toPublicJWK());
@@ -128,7 +128,7 @@ public class OidcIdTokenAuthenticatorTest {
     }
 
     @Test
-    public void authenticateShouldThrowWhenTokenIsNotSigned() throws Exception {
+    void authenticateShouldThrowWhenTokenIsNotSigned() throws Exception {
         // Generate a JWK to sign the token with
         final RSAKey jwk = new RSAKeyGenerator(2048).keyUse(KeyUse.SIGNATURE).keyID(UUID.randomUUID().toString()).generate();
         final var jwkSet = new JWKSet(jwk.toPublicJWK());
@@ -164,7 +164,7 @@ public class OidcIdTokenAuthenticatorTest {
     }
 
     @Test
-    public void authenticateShouldThrowWhenResolvingJwkSetFailed() throws Exception {
+    void authenticateShouldThrowWhenResolvingJwkSetFailed() throws Exception {
         // Register endpoint for JWK set retrieval
         wireMockRule.stubFor(WireMock.get(WireMock.urlPathEqualTo("/jwks"))
                 .willReturn(WireMock.aResponse()
@@ -202,7 +202,7 @@ public class OidcIdTokenAuthenticatorTest {
     }
 
     @Test
-    public void authenticateShouldThrowWhenValidatingIdTokenFailed() throws Exception {
+    void authenticateShouldThrowWhenValidatingIdTokenFailed() throws Exception {
         // Generate a JWK to sign the token with
         final RSAKey jwk = new RSAKeyGenerator(2048).keyUse(KeyUse.SIGNATURE).keyID(UUID.randomUUID().toString()).generate();
         final var jwkSet = new JWKSet(jwk.toPublicJWK());
@@ -244,7 +244,7 @@ public class OidcIdTokenAuthenticatorTest {
     }
 
     @Test
-    public void resolveJwkSetShouldReturnCachedValueWhenAvailable() throws Exception {
+    void resolveJwkSetShouldReturnCachedValueWhenAvailable() throws Exception {
         final var cachedJwkSet = new JWKSet();
         CacheManager.getInstance().put(OidcIdTokenAuthenticator.JWK_SET_CACHE_KEY, cachedJwkSet);
 
@@ -253,7 +253,7 @@ public class OidcIdTokenAuthenticatorTest {
     }
 
     @Test
-    public void resolveJwkSetShouldReturnJwkSetAndStoreItInCache() throws Exception {
+    void resolveJwkSetShouldReturnJwkSetAndStoreItInCache() throws Exception {
         wireMockRule.stubFor(WireMock.get(WireMock.urlPathEqualTo("/jwks"))
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.SC_OK)

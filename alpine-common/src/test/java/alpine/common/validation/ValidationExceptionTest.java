@@ -18,18 +18,18 @@
  */
 package alpine.common.validation;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class ValidationExceptionTest {
 
     @Test
-    public void exceptionTest() {
+    void exceptionTest() {
         Object o = new Object();
         ValidationException e = new ValidationException(o, "Sample Exception");
-        Assert.assertEquals(o, e.getInput());
-        Assert.assertEquals("Sample Exception", e.getMessage());
-        Assert.assertEquals("Sample Exception", e.getLocalizedMessage());
-        Assert.assertNull(e.getCause());
+        Assertions.assertEquals(o, e.getInput());
+        Assertions.assertEquals("Sample Exception", e.getMessage());
+        Assertions.assertEquals("Sample Exception", e.getLocalizedMessage());
+        Assertions.assertNull(e.getCause());
     }
 }

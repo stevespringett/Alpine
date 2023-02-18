@@ -18,8 +18,8 @@
  */
 package alpine.model;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,53 +27,53 @@ import java.util.List;
 public class PermissionTest {
 
     @Test
-    public void idTest() {
+    void idTest() {
         Permission permission = new Permission();
         permission.setId(123L);
-        Assert.assertEquals(123L, permission.getId());
+        Assertions.assertEquals(123L, permission.getId());
     }
 
     @Test
-    public void nameTest() {
+    void nameTest() {
         Permission permission = new Permission();
         permission.setName("Permission-A");
-        Assert.assertEquals("Permission-A", permission.getName());
+        Assertions.assertEquals("Permission-A", permission.getName());
     }
 
     @Test
-    public void descriptionTest() {
+    void descriptionTest() {
         Permission permission = new Permission();
         permission.setDescription("Permission A");
-        Assert.assertEquals("Permission A", permission.getDescription());
+        Assertions.assertEquals("Permission A", permission.getDescription());
     }
 
     @Test
-    public void teamsTest() {
+    void teamsTest() {
         List<Team> teams = new ArrayList<>();
         teams.add(new Team());
         Permission permission = new Permission();
         permission.setTeams(teams);
-        Assert.assertEquals(teams, permission.getTeams());
-        Assert.assertEquals(1, permission.getTeams().size());
+        Assertions.assertEquals(teams, permission.getTeams());
+        Assertions.assertEquals(1, permission.getTeams().size());
     }
 
     @Test
-    public void ldapUsersTest() {
+    void ldapUsersTest() {
         List<LdapUser> users = new ArrayList<>();
         users.add(new LdapUser());
         Permission permission = new Permission();
         permission.setLdapUsers(users);
-        Assert.assertEquals(users, permission.getLdapUsers());
-        Assert.assertEquals(1, permission.getLdapUsers().size());
+        Assertions.assertEquals(users, permission.getLdapUsers());
+        Assertions.assertEquals(1, permission.getLdapUsers().size());
     }
 
     @Test
-    public void managedUserTest() {
+    void managedUserTest() {
         List<ManagedUser> users = new ArrayList<>();
         users.add(new ManagedUser());
         Permission permission = new Permission();
         permission.setManagedUsers(users);
-        Assert.assertEquals(users, permission.getManagedUsers());
-        Assert.assertEquals(1, permission.getManagedUsers().size());
+        Assertions.assertEquals(users, permission.getManagedUsers());
+        Assertions.assertEquals(1, permission.getManagedUsers().size());
     }
 }

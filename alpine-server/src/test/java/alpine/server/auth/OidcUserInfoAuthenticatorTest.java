@@ -21,12 +21,12 @@ package alpine.server.auth;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.http.Fault;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import wiremock.org.apache.hc.core5.http.HttpHeaders;
 import wiremock.org.apache.hc.core5.http.HttpStatus;
 import wiremock.org.apache.hc.core5.http.ContentType;
@@ -48,18 +48,18 @@ public class OidcUserInfoAuthenticatorTest {
         return profile;
     };
 
-    @Rule
-    public WireMockRule wireMockRule = new WireMockRule(WireMockConfiguration.options().dynamicPort());
+    @RegisterExtension
+    public WireMockExtension wireMockRule = WireMockExtension.newInstance().options(WireMockConfiguration.options().dynamicPort()).build();
 
     private OidcConfiguration oidcConfiguration;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         oidcConfiguration = new OidcConfiguration();
     }
 
     @Test
-    public void authenticateShouldReturnOidcProfile() throws Exception {
+    void authenticateShouldReturnOidcProfile() throws Exception {
         // Provide a UserInfo response with all required claims
         wireMockRule.stubFor(WireMock.get(WireMock.urlPathEqualTo("/userinfo"))
                 .willReturn(WireMock.aResponse()
@@ -85,7 +85,7 @@ public class OidcUserInfoAuthenticatorTest {
     }
 
     @Test
-    public void authenticateShouldThrowWhenUserInfoRequestFailed() throws Exception {
+    void authenticateShouldThrowWhenUserInfoRequestFailed() throws Exception {
         // Simulate an error during the request
         wireMockRule.stubFor(WireMock.get(WireMock.urlPathEqualTo("/userinfo"))
                 .willReturn(WireMock.aResponse().withFault(Fault.CONNECTION_RESET_BY_PEER)));
@@ -101,7 +101,7 @@ public class OidcUserInfoAuthenticatorTest {
     }
 
     @Test
-    public void authenticateShouldThrowWhenParsingUserInfoResponseFailed() throws Exception {
+    void authenticateShouldThrowWhenParsingUserInfoResponseFailed() throws Exception {
         // Simulate a response with unparseable body
         wireMockRule.stubFor(WireMock.get(WireMock.urlPathEqualTo("/userinfo"))
                 .willReturn(WireMock.aResponse()
@@ -120,7 +120,7 @@ public class OidcUserInfoAuthenticatorTest {
     }
 
     @Test
-    public void authenticateShouldThrowWhenUserInfoResponseIndicatesError() throws Exception {
+    void authenticateShouldThrowWhenUserInfoResponseIndicatesError() throws Exception {
         // Simulate a response indicating an invalid access token
         wireMockRule.stubFor(WireMock.get(WireMock.urlPathEqualTo("/userinfo"))
                 .willReturn(WireMock.aResponse()

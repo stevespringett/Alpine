@@ -20,8 +20,8 @@ package alpine.server.servlets;
 
 import alpine.Config;
 import io.prometheus.client.exporter.common.TextFormat;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -43,7 +43,7 @@ public class MetricsServletTest {
     private ByteArrayOutputStream responseOutputStream;
     private PrintWriter responseWriter;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         configMock = mock(Config.class);
         requestMock = mock(HttpServletRequest.class);
@@ -53,7 +53,7 @@ public class MetricsServletTest {
     }
 
     @Test
-    public void shouldRespondWithMetricsWhenEnabled() throws Exception {
+    void shouldRespondWithMetricsWhenEnabled() throws Exception {
         when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.METRICS_ENABLED))).thenReturn(true);
 
         when(responseMock.getWriter()).thenReturn(responseWriter);
@@ -68,7 +68,7 @@ public class MetricsServletTest {
     }
 
     @Test
-    public void shouldRespondWithNotFoundWhenNotEnabled() throws Exception {
+    void shouldRespondWithNotFoundWhenNotEnabled() throws Exception {
         when(responseMock.getWriter()).thenReturn(responseWriter);
 
         final var servlet = new MetricsServlet(configMock);
@@ -80,7 +80,7 @@ public class MetricsServletTest {
     }
 
     @Test
-    public void shouldRespondWithMetricsWhenEnabledAndAuthenticated() throws Exception {
+    void shouldRespondWithMetricsWhenEnabledAndAuthenticated() throws Exception {
         when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.METRICS_ENABLED))).thenReturn(true);
         when(configMock.getProperty(eq(Config.AlpineKey.METRICS_AUTH_USERNAME))).thenReturn("metrics-user");
         when(configMock.getProperty(eq(Config.AlpineKey.METRICS_AUTH_PASSWORD))).thenReturn("metrics-password");
@@ -99,7 +99,7 @@ public class MetricsServletTest {
     }
 
     @Test
-    public void shouldRespondWithUnauthorizedWhenEnabledAndAuthenticationFailed() throws Exception {
+    void shouldRespondWithUnauthorizedWhenEnabledAndAuthenticationFailed() throws Exception {
         when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.METRICS_ENABLED))).thenReturn(true);
         when(configMock.getProperty(eq(Config.AlpineKey.METRICS_AUTH_USERNAME))).thenReturn("metrics-user");
         when(configMock.getProperty(eq(Config.AlpineKey.METRICS_AUTH_PASSWORD))).thenReturn("metrics-password");

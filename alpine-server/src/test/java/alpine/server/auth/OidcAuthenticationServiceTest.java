@@ -27,10 +27,10 @@ import alpine.model.Team;
 import alpine.persistence.AlpineQueryManager;
 import alpine.server.persistence.PersistenceManagerFactory;
 import org.assertj.core.api.Assertions;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
@@ -50,12 +50,12 @@ public class OidcAuthenticationServiceTest {
     private OidcIdTokenAuthenticator idTokenAuthenticatorMock;
     private OidcUserInfoAuthenticator userInfoAuthenticatorMock;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
         Config.enableUnitTests();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         configMock = Mockito.mock(Config.class);
         oidcConfigurationMock = Mockito.mock(OidcConfiguration.class);
@@ -65,13 +65,13 @@ public class OidcAuthenticationServiceTest {
         Mockito.when(configMock.getProperty(ArgumentMatchers.eq(Config.AlpineKey.OIDC_USERNAME_CLAIM))).thenReturn(USERNAME_CLAIM_NAME);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         PersistenceManagerFactory.tearDown();
     }
 
     @Test
-    public void isSpecifiedShouldReturnFalseWhenOidcIsDisabled() {
+    void isSpecifiedShouldReturnFalseWhenOidcIsDisabled() {
         Mockito.when(configMock.getPropertyAsBoolean(ArgumentMatchers.eq(Config.AlpineKey.OIDC_ENABLED))).thenReturn(false);
 
         final var authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ID_TOKEN, ACCESS_TOKEN);
@@ -80,7 +80,7 @@ public class OidcAuthenticationServiceTest {
     }
 
     @Test
-    public void isSpecifiedShouldReturnFalseWhenAccessTokenAndIdTokenIsNull() {
+    void isSpecifiedShouldReturnFalseWhenAccessTokenAndIdTokenIsNull() {
         Mockito.when(configMock.getPropertyAsBoolean(ArgumentMatchers.eq(Config.AlpineKey.OIDC_ENABLED))).thenReturn(true);
 
         final var authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, null, null);
@@ -89,7 +89,7 @@ public class OidcAuthenticationServiceTest {
     }
 
     @Test
-    public void isSpecifiedShouldReturnFalseWhenOidcConfigurationIsNull() {
+    void isSpecifiedShouldReturnFalseWhenOidcConfigurationIsNull() {
         Mockito.when(configMock.getPropertyAsBoolean(ArgumentMatchers.eq(Config.AlpineKey.OIDC_ENABLED))).thenReturn(true);
 
         final var authService = new OidcAuthenticationService(configMock, null, ID_TOKEN, ACCESS_TOKEN);
@@ -98,7 +98,7 @@ public class OidcAuthenticationServiceTest {
     }
 
     @Test
-    public void isSpecifiedShouldReturnTrueWhenOidcIsEnabledAndOidcConfigurationIsNotNullAndAccessTokenIsNotNull() {
+    void isSpecifiedShouldReturnTrueWhenOidcIsEnabledAndOidcConfigurationIsNotNullAndAccessTokenIsNotNull() {
         Mockito.when(configMock.getPropertyAsBoolean(ArgumentMatchers.eq(Config.AlpineKey.OIDC_ENABLED))).thenReturn(true);
 
         final var authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ID_TOKEN, ACCESS_TOKEN);
@@ -107,7 +107,7 @@ public class OidcAuthenticationServiceTest {
     }
 
     @Test
-    public void authenticateShouldAuthenticateExistingUserWithIdToken() throws Exception {
+    void authenticateShouldAuthenticateExistingUserWithIdToken() throws Exception {
         OidcUser existingUser;
         try (final var qm = new AlpineQueryManager()) {
             existingUser = new OidcUser();
@@ -131,7 +131,7 @@ public class OidcAuthenticationServiceTest {
     }
 
     @Test
-    public void authenticateShouldAuthenticateExistingUserWithUserInfo() throws Exception {
+    void authenticateShouldAuthenticateExistingUserWithUserInfo() throws Exception {
         OidcUser existingUser;
         try (final var qm = new AlpineQueryManager()) {
             existingUser = new OidcUser();
@@ -155,7 +155,7 @@ public class OidcAuthenticationServiceTest {
     }
 
     @Test
-    public void authenticateShouldThrowWhenUsernameClaimIsNotConfigured() {
+    void authenticateShouldThrowWhenUsernameClaimIsNotConfigured() {
         Mockito.when(configMock.getProperty(ArgumentMatchers.eq(Config.AlpineKey.OIDC_USERNAME_CLAIM))).thenReturn(null);
 
         final var authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, ID_TOKEN, ACCESS_TOKEN);
@@ -165,7 +165,7 @@ public class OidcAuthenticationServiceTest {
     }
 
     @Test
-    public void authenticateShouldThrowWhenTeamSyncIsEnabledAndTeamsClaimIsNotConfigured() {
+    void authenticateShouldThrowWhenTeamSyncIsEnabledAndTeamsClaimIsNotConfigured() {
         Mockito.when(configMock.getPropertyAsBoolean(ArgumentMatchers.eq(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION))).thenReturn(true);
         Mockito.when(configMock.getProperty(ArgumentMatchers.eq(Config.AlpineKey.OIDC_TEAMS_CLAIM))).thenReturn(null);
 
@@ -176,7 +176,7 @@ public class OidcAuthenticationServiceTest {
     }
 
     @Test
-    public void authenticateShouldSynchronizeTeamsWhenUserAlreadyExistsAndTeamSynchronizationIsEnabled() throws Exception {
+    void authenticateShouldSynchronizeTeamsWhenUserAlreadyExistsAndTeamSynchronizationIsEnabled() throws Exception {
         Mockito.when(configMock.getPropertyAsBoolean(ArgumentMatchers.eq(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION))).thenReturn(true);
         Mockito.when(configMock.getProperty(ArgumentMatchers.eq(Config.AlpineKey.OIDC_TEAMS_CLAIM))).thenReturn("groups");
 
@@ -216,7 +216,7 @@ public class OidcAuthenticationServiceTest {
     }
 
     @Test
-    public void authenticateShouldSourceProfileFromIdTokenAndUserInfoIfAvailable() throws Exception {
+    void authenticateShouldSourceProfileFromIdTokenAndUserInfoIfAvailable() throws Exception {
         Mockito.when(configMock.getPropertyAsBoolean(ArgumentMatchers.eq(Config.AlpineKey.OIDC_USER_PROVISIONING))).thenReturn(true);
         Mockito.when(configMock.getPropertyAsBoolean(ArgumentMatchers.eq(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION))).thenReturn(true);
         Mockito.when(configMock.getProperty(ArgumentMatchers.eq(Config.AlpineKey.OIDC_TEAMS_CLAIM))).thenReturn("groups");
@@ -258,7 +258,7 @@ public class OidcAuthenticationServiceTest {
     }
 
     @Test
-    public void authenticateShouldThrowWhenUnableToAssembleCompleteProfile() throws Exception {
+    void authenticateShouldThrowWhenUnableToAssembleCompleteProfile() throws Exception {
         Mockito.when(configMock.getPropertyAsBoolean(ArgumentMatchers.eq(Config.AlpineKey.OIDC_USER_PROVISIONING))).thenReturn(true);
         Mockito.when(configMock.getPropertyAsBoolean(ArgumentMatchers.eq(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION))).thenReturn(true);
         Mockito.when(configMock.getProperty(ArgumentMatchers.eq(Config.AlpineKey.OIDC_TEAMS_CLAIM))).thenReturn("groups");
@@ -283,7 +283,7 @@ public class OidcAuthenticationServiceTest {
     }
 
     @Test
-    public void authenticateShouldThrowWhenUserDoesNotExistAndProvisioningIsDisabled() throws Exception {
+    void authenticateShouldThrowWhenUserDoesNotExistAndProvisioningIsDisabled() throws Exception {
         Mockito.when(configMock.getPropertyAsBoolean(ArgumentMatchers.eq(Config.AlpineKey.OIDC_USER_PROVISIONING))).thenReturn(false);
 
         final var profile = new OidcProfile();
@@ -300,7 +300,7 @@ public class OidcAuthenticationServiceTest {
     }
 
     @Test
-    public void authenticateShouldProvisionAndReturnNewUserWhenUserDoesNotExistAndProvisioningIsEnabled() throws Exception {
+    void authenticateShouldProvisionAndReturnNewUserWhenUserDoesNotExistAndProvisioningIsEnabled() throws Exception {
         Mockito.when(configMock.getPropertyAsBoolean(ArgumentMatchers.eq(Config.AlpineKey.OIDC_USER_PROVISIONING))).thenReturn(true);
 
         final var profile = new OidcProfile();
@@ -321,7 +321,7 @@ public class OidcAuthenticationServiceTest {
     }
 
     @Test
-    public void authenticateShouldProvisionAndSyncTeamsAndReturnNewUserWhenUserDoesNotExistAndProvisioningAndTeamSyncIsEnabled() throws Exception {
+    void authenticateShouldProvisionAndSyncTeamsAndReturnNewUserWhenUserDoesNotExistAndProvisioningAndTeamSyncIsEnabled() throws Exception {
         Mockito.when(configMock.getPropertyAsBoolean(ArgumentMatchers.eq(Config.AlpineKey.OIDC_USER_PROVISIONING))).thenReturn(true);
         Mockito.when(configMock.getPropertyAsBoolean(ArgumentMatchers.eq(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION))).thenReturn(true);
         Mockito.when(configMock.getProperty(ArgumentMatchers.eq(Config.AlpineKey.OIDC_TEAMS_CLAIM))).thenReturn("groups");
@@ -361,7 +361,7 @@ public class OidcAuthenticationServiceTest {
     }
 
     @Test
-    public void authenticateShouldAssignSubjectIdAndEmailWhenUserAlreadyExistsAndAuthenticatesForFirstTime() throws Exception {
+    void authenticateShouldAssignSubjectIdAndEmailWhenUserAlreadyExistsAndAuthenticatesForFirstTime() throws Exception {
         try (final AlpineQueryManager qm = new AlpineQueryManager()) {
             qm.createOidcUser("username");
         }
@@ -384,7 +384,7 @@ public class OidcAuthenticationServiceTest {
     }
 
     @Test
-    public void authenticateShouldThrowWhenUserAlreadyExistsAndSubjectIdentifierHasChanged() throws Exception {
+    void authenticateShouldThrowWhenUserAlreadyExistsAndSubjectIdentifierHasChanged() throws Exception {
         try (final var qm = new AlpineQueryManager()) {
             final var existingUser = new OidcUser();
             existingUser.setUsername("username");
@@ -408,7 +408,7 @@ public class OidcAuthenticationServiceTest {
     }
 
     @Test
-    public void synchronizeTeamsShouldRemoveOutdatedTeamMemberships() throws Exception {
+    void synchronizeTeamsShouldRemoveOutdatedTeamMemberships() throws Exception {
         Mockito.when(configMock.getPropertyAsBoolean(ArgumentMatchers.eq(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION))).thenReturn(true);
         Mockito.when(configMock.getProperty(ArgumentMatchers.eq(Config.AlpineKey.OIDC_TEAMS_CLAIM))).thenReturn("groups");
 
@@ -446,7 +446,7 @@ public class OidcAuthenticationServiceTest {
     }
 
     @Test
-    public void authenticateShouldRemoveMembershipsOfUnmappedTeams() throws Exception {
+    void authenticateShouldRemoveMembershipsOfUnmappedTeams() throws Exception {
         Mockito.when(configMock.getPropertyAsBoolean(ArgumentMatchers.eq(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION))).thenReturn(true);
         Mockito.when(configMock.getProperty(ArgumentMatchers.eq(Config.AlpineKey.OIDC_TEAMS_CLAIM))).thenReturn("groups");
 

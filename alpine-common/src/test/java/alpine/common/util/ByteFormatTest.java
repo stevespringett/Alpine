@@ -18,24 +18,24 @@
  */
 package alpine.common.util;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class ByteFormatTest {
 
     @Test
-    public void formatTest() {
+    void formatTest() {
         ByteFormat bf = new ByteFormat();
-        Assert.assertEquals("100 bytes", bf.format(100));
-        Assert.assertEquals("999 bytes", bf.format(999L));
+        Assertions.assertEquals("100 bytes", bf.format(100));
+        Assertions.assertEquals("999 bytes", bf.format(999L));
     }
 
     @Test
-    public void format2Test() {
+    void format2Test() {
         ByteFormat bf = new ByteFormat();
-        Assert.assertEquals("100 bytes", bf.format2(100));
-        Assert.assertEquals("999 bytes", bf.format2(999L));
-        Assert.assertEquals("9.8 KB (10,000 bytes)", bf.format2(10000));
-        Assert.assertEquals("97.7 KB (99,999 bytes)", bf.format2(99999L));
+        Assertions.assertEquals("100 bytes", bf.format2(100));
+        Assertions.assertEquals("999 bytes", bf.format2(999L));
+        Assertions.assertEquals("9.8 KB (10,000 bytes)", bf.format2(10000));
+        Assertions.assertEquals("97.7 KB (99,999 bytes)", bf.format2(99999L));
     }
 }

@@ -22,14 +22,14 @@ package alpine.model;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
 public class OidcUserTest {
 
     @Test
-    public void testJsonSerialization() throws JsonProcessingException {
+    void testJsonSerialization() throws JsonProcessingException {
         final Team team = new Team();
         team.setName("teamName");
 
@@ -55,7 +55,7 @@ public class OidcUserTest {
     }
 
     @Test
-    public void testJsonDeserialization() throws JsonProcessingException {
+    void testJsonDeserialization() throws JsonProcessingException {
         final OidcUser oidcUser = new ObjectMapper().readValue("" +
                 "{" +
                 "\"id\":666," +
