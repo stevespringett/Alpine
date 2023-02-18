@@ -18,6 +18,8 @@
  */
 package alpine.common.util;
 
+import java.io.File;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +28,7 @@ public class PathUtilTest {
     @Test
     void resolveTest() {
         Assertions.assertEquals("/home/dtrack", PathUtil.resolve("/home/dtrack"));
-        Assertions.assertNotNull(PathUtil.resolve("~/dtrack"));
-        Assertions.assertNotEquals("~/dtrack", PathUtil.resolve("~/dtrack"));
+        Assertions.assertNotNull(PathUtil.resolve("~" + File.separator + "dtrack"));
+        Assertions.assertNotEquals("~" + File.separator + "dtrack", PathUtil.resolve("~" + File.separator + "dtrack"));
     }
 }
