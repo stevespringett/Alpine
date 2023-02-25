@@ -280,6 +280,11 @@ public class PersistenceManagerFactory implements IPersistenceManagerFactory, Se
                 Config.AlpineKey.DATABASE_POOL_IDLE_TIMEOUT,
                 Config.getInstance()::getPropertyAsInt
         ));
+        hikariConfig.setKeepaliveTime(getConfigPropertyWithFallback(
+                Config.AlpineKey.DATABASE_POOL_TX_KEEPALIVE_INTERVAL,
+                Config.AlpineKey.DATABASE_POOL_KEEPALIVE_INTERVAL,
+                Config.getInstance()::getPropertyAsInt
+        ));
         return new HikariDataSource(hikariConfig);
     }
 
@@ -303,6 +308,11 @@ public class PersistenceManagerFactory implements IPersistenceManagerFactory, Se
         hikariConfig.setIdleTimeout(getConfigPropertyWithFallback(
                 Config.AlpineKey.DATABASE_POOL_NONTX_IDLE_TIMEOUT,
                 Config.AlpineKey.DATABASE_POOL_IDLE_TIMEOUT,
+                Config.getInstance()::getPropertyAsInt
+        ));
+        hikariConfig.setKeepaliveTime(getConfigPropertyWithFallback(
+                Config.AlpineKey.DATABASE_POOL_NONTX_KEEPALIVE_INTERVAL,
+                Config.AlpineKey.DATABASE_POOL_KEEPALIVE_INTERVAL,
                 Config.getInstance()::getPropertyAsInt
         ));
         return new HikariDataSource(hikariConfig);
