@@ -256,6 +256,27 @@ public class PersistenceManagerFactory implements IPersistenceManagerFactory, Se
                         p -> p.getNucleusContext().getStatistics().getConnectionActiveCurrent())
                 .description("Number of currently active managed datastore connections")
                 .register(Metrics.getRegistry());
+
+        Gauge.builder(DATANUCLEUS_METRICS_PREFIX + "cache_second_level_entries", pmf,
+                        p -> p.getNucleusContext().getLevel2Cache().getSize())
+                .description("Number of entries in the second level cache")
+                .register(Metrics.getRegistry());
+
+        Gauge.builder(DATANUCLEUS_METRICS_PREFIX + "cache_query_generic_compilation_entries", pmf,
+                        p -> p.getQueryGenericCompilationCache().size())
+                .description("Number of entries in the generic query compilation cache")
+                .register(Metrics.getRegistry());
+
+        Gauge.builder(DATANUCLEUS_METRICS_PREFIX + "cache_query_datastore_compilation_entries", pmf,
+                        p -> p.getQueryDatastoreCompilationCache().size())
+                .description("Number of entries in the datastore query compilation cache")
+                .register(Metrics.getRegistry());
+
+        // Note: The query results cache is disabled per default.
+        Gauge.builder(DATANUCLEUS_METRICS_PREFIX + "cache_query_result_entries", pmf,
+                        p -> p.getQueryCache().getQueryCache().size())
+                .description("Number of entries in the query result cache")
+                .register(Metrics.getRegistry());
     }
 
     private DataSource createTxPooledDataSource() {
