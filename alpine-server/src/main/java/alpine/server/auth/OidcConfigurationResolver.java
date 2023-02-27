@@ -21,13 +21,21 @@ package alpine.server.auth;
 
 import alpine.Config;
 import alpine.common.logging.Logger;
+import alpine.common.util.ProxyConfig;
+import alpine.common.util.ProxyUtil;
 import alpine.server.cache.CacheManager;
 import com.nimbusds.oauth2.sdk.GeneralException;
+import com.nimbusds.oauth2.sdk.http.HTTPRequest;
+import com.nimbusds.oauth2.sdk.http.HTTPResponse;
 import com.nimbusds.oauth2.sdk.id.Issuer;
 import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
+import net.minidev.json.JSONObject;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.URL;
 
 /**
  * @since 1.8.0
@@ -77,23 +85,47 @@ public class OidcConfigurationResolver {
         }
 
         LOGGER.debug("Fetching OIDC configuration from issuer " + issuer);
-        final OIDCProviderMetadata providerMetadata;
         try {
-            providerMetadata = OIDCProviderMetadata.resolve(new Issuer(issuer));
+            Issuer issuerObject = new Issuer(this.issuer);
+            URL configURL = OIDCProviderMetadata.resolveURL(issuerObject);
+            HTTPRequest httpRequest = new HTTPRequest(HTTPRequest.Method.GET, configURL);
+            final ProxyConfig proxyCfg = ProxyUtil.getProxyConfig();
+
+            if (proxyCfg!=null && proxyCfg.shouldProxy(configURL)) {
+                httpRequest.setProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyCfg.getHost(), proxyCfg.getPort())));
+            }
+
+            HTTPResponse httpResponse = httpRequest.send();
+
+            if (httpResponse.getStatusCode() != 200) {
+                throw new IOException("Couldn't download OpenID Provider metadata from " + configURL +
+                        ": Status code " + httpResponse.getStatusCode());
+            }
+
+            JSONObject jsonObject = httpResponse.getContentAsJSONObject();
+
+            OIDCProviderMetadata op = OIDCProviderMetadata.parse(jsonObject);
+
+            if (!issuerObject.equals(op.getIssuer())) {
+                throw new GeneralException("The returned issuer doesn't match the expected: " + op.getIssuer());
+            }
+
+            configuration = new OidcConfiguration();
+            configuration.setIssuer(op.getIssuer().getValue());
+            configuration.setJwksUri(op.getJWKSetURI());
+            configuration.setUserInfoEndpointUri(op.getUserInfoEndpointURI());
+
+            LOGGER.debug("Storing OIDC configuration in cache: " + configuration);
+            CacheManager.getInstance().put(CONFIGURATION_CACHE_KEY, configuration);
+
+            return configuration;
+
         } catch (IOException | GeneralException e) {
             LOGGER.error("Failed to fetch OIDC configuration from issuer " + issuer, e);
             return null;
         }
 
-        configuration = new OidcConfiguration();
-        configuration.setIssuer(providerMetadata.getIssuer().getValue());
-        configuration.setJwksUri(providerMetadata.getJWKSetURI());
-        configuration.setUserInfoEndpointUri(providerMetadata.getUserInfoEndpointURI());
 
-        LOGGER.debug("Storing OIDC configuration in cache: " + configuration);
-        CacheManager.getInstance().put(CONFIGURATION_CACHE_KEY, configuration);
-
-        return configuration;
     }
 
 }

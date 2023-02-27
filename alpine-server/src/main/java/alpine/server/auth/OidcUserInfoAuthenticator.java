@@ -20,11 +20,16 @@
 package alpine.server.auth;
 
 import alpine.common.logging.Logger;
+import alpine.common.util.ProxyConfig;
+import alpine.common.util.ProxyUtil;
+import com.nimbusds.oauth2.sdk.http.HTTPRequest;
 import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
 import com.nimbusds.openid.connect.sdk.UserInfoRequest;
 import com.nimbusds.openid.connect.sdk.UserInfoResponse;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 
 /**
  * @since 1.10.0
@@ -42,10 +47,13 @@ class OidcUserInfoAuthenticator {
     OidcProfile authenticate(final String accessToken, final OidcProfileCreator profileCreator) throws AlpineAuthenticationException {
         final UserInfoResponse userInfoResponse;
         try {
-            final var httpResponse =
-                    new UserInfoRequest(configuration.getUserInfoEndpointUri(), new BearerAccessToken(accessToken))
-                            .toHTTPRequest()
-                            .send();
+            HTTPRequest httpRequest = new UserInfoRequest(configuration.getUserInfoEndpointUri(), new BearerAccessToken(accessToken)).toHTTPRequest();
+            final ProxyConfig proxyCfg = ProxyUtil.getProxyConfig();
+
+            if (proxyCfg != null && proxyCfg.shouldProxy(configuration.getUserInfoEndpointUri().toURL())) {
+                httpRequest.setProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyCfg.getHost(), proxyCfg.getPort())));
+            }
+            final var httpResponse = httpRequest.send();
             userInfoResponse = UserInfoResponse.parse(httpResponse);
         } catch (IOException e) {
             LOGGER.error("UserInfo request failed", e);
