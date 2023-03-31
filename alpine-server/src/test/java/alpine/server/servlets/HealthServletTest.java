@@ -146,7 +146,7 @@ public class HealthServletTest {
         servlet.init();
         servlet.doGet(requestMock, responseMock);
 
-        verify(responseMock).setStatus(eq(500));
+        verify(responseMock).sendError(eq(500));
         verify(responseMock, never()).setHeader(eq("Content-Type"), anyString());
         assertThat(responseOutputStream.size()).isZero();
     }

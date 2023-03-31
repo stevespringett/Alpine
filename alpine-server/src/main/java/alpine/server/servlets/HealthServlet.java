@@ -78,7 +78,7 @@ public class HealthServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) {
+    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
         final HealthCheckType requestedCheckType = determineHealthCheckType(req);
 
         final var checkResponses = new ArrayList<HealthCheckResponse>();
@@ -91,7 +91,7 @@ public class HealthServlet extends HttpServlet {
             }
         } catch (Exception e) {
             LOGGER.error("Failed to execute health checks", e);
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return;
         }
 
@@ -106,19 +106,18 @@ public class HealthServlet extends HttpServlet {
                 .put("status", overallStatus.name())
                 .putPOJO("checks", checkResponses);
 
+        if (overallStatus == HealthCheckResponse.Status.UP) {
+            resp.setStatus(HttpServletResponse.SC_OK);
+        } else {
+            resp.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+        }
+
         try {
             resp.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
             objectMapper.writeValue(resp.getWriter(), responseJson);
         } catch (IOException e) {
             LOGGER.error("Failed to write health response", e);
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            return;
-        }
-
-        if (overallStatus == HealthCheckResponse.Status.UP) {
-            resp.setStatus(HttpServletResponse.SC_OK);
-        } else {
-            resp.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 
