@@ -189,6 +189,10 @@
             <groupId>com.fasterxml.jackson.jaxrs</groupId>
             <artifactId>jackson-jaxrs-json-provider</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jdk8</artifactId>
+        </dependency>
         <!-- Logging -->
         <!-- Overriding OWASP Security Logging dependencies with newer versions -->
         <dependency>
@@ -210,6 +214,11 @@
         <dependency>
             <groupId>org.owasp</groupId>
             <artifactId>security-logging-logback</artifactId>
+        </dependency>
+        <!-- Health -->
+        <dependency>
+            <groupId>org.eclipse.microprofile.health</groupId>
+            <artifactId>microprofile-health-api</artifactId>
         </dependency>
         <!-- XSS prevention -->
         <dependency>
@@ -259,6 +268,11 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.javacrumbs.json-unit</groupId>
+            <artifactId>json-unit-assertj</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
