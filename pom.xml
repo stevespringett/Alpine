@@ -177,6 +177,7 @@
         <lib.jaxb.impl.version>2.3.6</lib.jaxb.impl.version>
         <lib.jdo.api.version>3.2.1</lib.jdo.api.version>
         <lib.jersey.version>2.38</lib.jersey.version>
+        <lib.json-unit.version>2.37.0</lib.json-unit.version>
         <lib.jsp.api.version>2.2</lib.jsp.api.version>
         <lib.jsonwebtoken.version>0.9.1</lib.jsonwebtoken.version>
         <lib.jsr305.version>3.0.2</lib.jsr305.version>
@@ -480,6 +481,12 @@
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
                 <version>${lib.assertj.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>net.javacrumbs.json-unit</groupId>
+                <artifactId>json-unit-assertj</artifactId>
+                <version>${lib.json-unit.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>

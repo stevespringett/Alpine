@@ -19,6 +19,7 @@
 package alpine.server.servlets;
 
 import alpine.common.logging.Logger;
+import alpine.server.health.HealthCheckRegistry;
 import alpine.server.health.HealthCheckType;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -39,30 +40,36 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.ServiceLoader;
 
 /**
  * A {@link HttpServlet} exposing health information, following the MicroProfile Health specification.
  * <p>
  * Health checks can be added by implementing the {@link HealthCheck} interface, and registering
- * implementations as providers of {@code org.eclipse.microprofile.health.HealthCheck} in {@code META-INF/services}.
+ * implementations with the global {@link HealthCheckRegistry} instance.
  * <p>
- * {@link HealthCheck} implementations must be annotated with either {@link Liveness}, {@link Readiness}, or {@link Startup}.
- * Checks without any of those annotations will be ignored.
+ * {@link HealthCheck} implementations must be annotated with either {@link Liveness}, {@link Readiness}, {@link Startup},
+ * or any combination of the same. Checks without any of those annotations will be ignored.
  *
  * @see <a href="https://download.eclipse.org/microprofile/microprofile-health-3.1/microprofile-health-spec-3.1.html">MicroProfile Health Specification</a>
  * @since 2.3.0
  */
-public class HealthCheckServlet extends HttpServlet {
+public class HealthServlet extends HttpServlet {
 
-    private static final Logger LOGGER = Logger.getLogger(HealthCheckServlet.class);
+    private static final Logger LOGGER = Logger.getLogger(HealthServlet.class);
 
-    private ServiceLoader<HealthCheck> healthCheckServiceLoader;
+    private final HealthCheckRegistry checkRegistry;
     private ObjectMapper objectMapper;
+
+    public HealthServlet() {
+        this(HealthCheckRegistry.getInstance());
+    }
+
+    HealthServlet(final HealthCheckRegistry checkRegistry) {
+        this.checkRegistry = checkRegistry;
+    }
 
     @Override
     public void init() throws ServletException {
-        healthCheckServiceLoader = ServiceLoader.load(HealthCheck.class);
         objectMapper = new ObjectMapper()
                 // HealthCheckResponse#data is of type Optional.
                 // We need this module to correctly serialize Optional values.
@@ -72,14 +79,12 @@ public class HealthCheckServlet extends HttpServlet {
 
     @Override
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) {
-        final HealthCheckType requestCheckType = determineHealthCheckType(req);
+        final HealthCheckType requestedCheckType = determineHealthCheckType(req);
 
         final var checkResponses = new ArrayList<HealthCheckResponse>();
         try {
-            for (final HealthCheck healthCheck : healthCheckServiceLoader) {
-                final HealthCheckType checkType = determineHealthCheckType(healthCheck);
-                if (checkType != null
-                        && (requestCheckType == HealthCheckType.ALL || requestCheckType == checkType)) {
+            for (final HealthCheck healthCheck : checkRegistry.getChecks().values()) {
+                if (matchesCheckType(healthCheck, requestedCheckType)) {
                     LOGGER.debug("Calling health check: " + healthCheck.getClass().getName());
                     checkResponses.add(healthCheck.call());
                 }
@@ -131,19 +136,22 @@ public class HealthCheckServlet extends HttpServlet {
         };
     }
 
-    private HealthCheckType determineHealthCheckType(final HealthCheck healthCheck) {
-        final Class<? extends HealthCheck> checkClass = healthCheck.getClass();
-        if (checkClass.isAnnotationPresent(Liveness.class)) {
-            return HealthCheckType.LIVENESS;
-        } else if (checkClass.isAnnotationPresent(Readiness.class)) {
-            return HealthCheckType.READINESS;
-        } else if (checkClass.isAnnotationPresent(Startup.class)) {
-            return HealthCheckType.STARTUP;
+    private boolean matchesCheckType(final HealthCheck check, final HealthCheckType requestedType) {
+        final Class<? extends HealthCheck> checkClass = check.getClass();
+        if (checkClass.isAnnotationPresent(Liveness.class)
+                && (requestedType == HealthCheckType.ALL || requestedType == HealthCheckType.LIVENESS)) {
+            return true;
+        } else if (checkClass.isAnnotationPresent(Readiness.class)
+                && (requestedType == HealthCheckType.ALL || requestedType == HealthCheckType.READINESS)) {
+            return true;
+        } else if (checkClass.isAnnotationPresent(Startup.class)
+                && (requestedType == HealthCheckType.ALL || requestedType == HealthCheckType.STARTUP)) {
+            return true;
         }
 
         // Checks without classification are supposed to be
         // ignored according to the spec.
-        return null;
+        return false;
     }
 
 }
