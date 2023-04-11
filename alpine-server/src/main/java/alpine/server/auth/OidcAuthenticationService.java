@@ -28,6 +28,7 @@ import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 
 import javax.annotation.Nonnull;
 import java.security.Principal;
+import java.util.Objects;
 
 /**
  * @since 1.8.0
@@ -176,15 +177,20 @@ public class OidcAuthenticationService implements AuthenticationService {
             OidcUser user = qm.getOidcUser(profile.getUsername());
             if (user != null) {
                 LOGGER.debug("Attempting to authenticate user: " + user.getUsername());
-                user.setEmail(profile.getEmail()); // email is not persisted and thus needs to be set ad-hoc
                 if (user.getSubjectIdentifier() == null) {
                     LOGGER.debug("Assigning subject identifier " + profile.getSubject() + " to user " + user.getUsername());
                     user.setSubjectIdentifier(profile.getSubject());
+                    user.setEmail(profile.getEmail());
                     return qm.updateOidcUser(user);
                 } else if (!user.getSubjectIdentifier().equals(profile.getSubject())) {
                     LOGGER.error("Refusing to authenticate user " + user.getUsername() + ": subject identifier has changed (" +
                             user.getSubjectIdentifier() + " to " + profile.getSubject() + ")");
                     throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.INVALID_CREDENTIALS);
+                }
+                if (!Objects.equals(user.getEmail(), profile.getEmail())) {
+                    LOGGER.debug("Updating email of user " + user.getUsername() + ": " + user.getEmail() + " -> " + profile.getEmail());
+                    user.setEmail(profile.getEmail());
+                    user = qm.updateOidcUser(user);
                 }
                 if (config.getPropertyAsBoolean(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION)) {
                     return qm.synchronizeTeamMembership(user, profile.getGroups());
