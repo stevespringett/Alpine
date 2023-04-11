@@ -164,6 +164,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
         final OidcUser user = getObjectById(OidcUser.class, transientUser.getId());
         pm.currentTransaction().begin();
         user.setSubjectIdentifier(transientUser.getSubjectIdentifier());
+        user.setEmail(transientUser.getEmail());
         pm.currentTransaction().commit();
         return pm.getObjectById(OidcUser.class, user.getId());
     }

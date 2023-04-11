@@ -384,6 +384,37 @@ public class OidcAuthenticationServiceTest {
     }
 
     @Test
+    public void authenticateShouldUpdateEmailWhenChangedSinceLastAuthentication() throws Exception {
+        try (final var qm = new AlpineQueryManager()) {
+            final OidcUser user = qm.createOidcUser("username");
+            user.setSubjectIdentifier("subject");
+            user.setEmail("username@example.com");
+            qm.updateOidcUser(user);
+        }
+
+        final var profile = new OidcProfile();
+        profile.setSubject("subject");
+        profile.setUsername("username");
+        profile.setEmail("username666@example.com");
+        Mockito.when(idTokenAuthenticatorMock.authenticate(ArgumentMatchers.eq(ID_TOKEN), ArgumentMatchers.any(OidcProfileCreator.class))).thenReturn(profile);
+
+        final var authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, idTokenAuthenticatorMock, null, ID_TOKEN, null);
+
+        final var provisionedUser = (OidcUser) authService.authenticate();
+        Assertions.assertThat(provisionedUser).isNotNull();
+        Assertions.assertThat(provisionedUser.getUsername()).isEqualTo("username");
+        Assertions.assertThat(provisionedUser.getSubjectIdentifier()).isEqualTo("subject");
+        Assertions.assertThat(provisionedUser.getEmail()).isEqualTo("username666@example.com");
+        Assertions.assertThat(provisionedUser.getTeams()).isNullOrEmpty();
+        Assertions.assertThat(provisionedUser.getPermissions()).isNullOrEmpty();
+
+        try (final var qm = new AlpineQueryManager()) {
+            final OidcUser user = qm.getOidcUser("username");
+            assertThat(user.getEmail()).isEqualTo("username666@example.com");
+        }
+    }
+
+    @Test
     public void authenticateShouldThrowWhenUserAlreadyExistsAndSubjectIdentifierHasChanged() throws Exception {
         try (final var qm = new AlpineQueryManager()) {
             final var existingUser = new OidcUser();

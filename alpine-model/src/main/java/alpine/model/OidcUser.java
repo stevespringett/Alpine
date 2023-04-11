@@ -67,9 +67,11 @@ public class OidcUser implements Serializable, Principal, UserPrincipal {
     @Pattern(regexp = "[\\P{Cc}]+", message = "The subject identifier must not contain control characters")
     private String subjectIdentifier;
 
+    @Persistent
+    @Column(name = "EMAIL", allowsNull = "true")
     @Size(max = 255)
     @Pattern(regexp = "[\\P{Cc}]+", message = "The email address must not contain control characters")
-    private transient String email; // not persisted - will be retrieved from the identity provider
+    private String email;
 
     @Persistent(table = "OIDCUSERS_TEAMS", defaultFetchGroup = "true")
     @Join(column = "OIDCUSERS_ID")
