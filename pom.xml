@@ -164,7 +164,7 @@
         <lib.commons.io.version>2.11.0</lib.commons.io.version>
         <lib.commons.lang3.version>3.12.0</lib.commons.lang3.version>
         <lib.datanucleus-api-jdo.version>6.0.1</lib.datanucleus-api-jdo.version>
-        <lib.datanucleus.version>6.0.3</lib.datanucleus.version>
+        <lib.datanucleus.version>6.0.4</lib.datanucleus.version>
         <lib.datanucleus-rdbms.version>6.0.3</lib.datanucleus-rdbms.version>
         <lib.h2.version>2.1.214</lib.h2.version>
         <lib.hikaricp.version>5.0.1</lib.hikaricp.version>
