@@ -27,9 +27,10 @@ import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
+import wiremock.org.apache.hc.core5.http.ContentType;
 import wiremock.org.apache.hc.core5.http.HttpHeaders;
 import wiremock.org.apache.hc.core5.http.HttpStatus;
-import wiremock.org.apache.hc.core5.http.ContentType;
 
 import java.net.URI;
 
@@ -50,6 +51,9 @@ public class OidcUserInfoAuthenticatorTest {
 
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(WireMockConfiguration.options().dynamicPort());
+
+    @Rule
+    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
 
     private OidcConfiguration oidcConfiguration;
 
@@ -135,6 +139,27 @@ public class OidcUserInfoAuthenticatorTest {
                 .isThrownBy(() -> authenticator.authenticate("accessToken", PROFILE_CREATOR))
                 .satisfies(exception -> assertThat(exception.getCauseType())
                         .isEqualTo(AlpineAuthenticationException.CauseType.INVALID_CREDENTIALS));
+    }
+
+    @Test
+    public void authenticateShouldUseHttpProxyIfConfigured() throws Exception {
+        environmentVariables.set("http_proxy", "http://localhost:6666");
+
+        wireMockRule.stubFor(WireMock.get(WireMock.urlPathEqualTo("/userinfo"))
+                .willReturn(WireMock.aResponse()
+                        .withStatus(418)));
+
+        oidcConfiguration.setUserInfoEndpointUri(new URI(wireMockRule.url("/userinfo")));
+
+        final var authenticator = new OidcUserInfoAuthenticator(oidcConfiguration);
+
+        // Attempt to authenticate.
+        // Should try to use the configured HTTP proxy, which will fail.
+        Assertions.assertThatExceptionOfType(AlpineAuthenticationException.class)
+                .isThrownBy(() -> authenticator.authenticate("accessToken", PROFILE_CREATOR));
+
+        // No request should've reached its target.
+        WireMock.verify(0, WireMock.getRequestedFor(WireMock.urlPathEqualTo("/userinfo")));
     }
 
 }

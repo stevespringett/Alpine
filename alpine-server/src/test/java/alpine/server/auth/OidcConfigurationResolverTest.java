@@ -26,9 +26,10 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
+import wiremock.org.apache.hc.core5.http.ContentType;
 import wiremock.org.apache.hc.core5.http.HttpHeaders;
 import wiremock.org.apache.hc.core5.http.HttpStatus;
-import wiremock.org.apache.hc.core5.http.ContentType;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -38,6 +39,9 @@ public class OidcConfigurationResolverTest {
 
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(WireMockConfiguration.options().dynamicPort());
+
+    @Rule
+    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
 
     @After
     public void tearDown() {
@@ -110,6 +114,22 @@ public class OidcConfigurationResolverTest {
 
         // Only one request should've been made
         WireMock.verify(1, WireMock.getRequestedFor(WireMock.urlPathEqualTo(OPENID_CONFIGURATION_PATH)));
+    }
+
+    @Test
+    public void resolveShouldUseHttpProxyIfConfigured() {
+        environmentVariables.set("http_proxy", "http://localhost:6666");
+
+        wireMockRule.stubFor(WireMock.get(WireMock.urlPathEqualTo(OPENID_CONFIGURATION_PATH))
+                .willReturn(WireMock.aResponse()
+                        .withStatus(418)));
+
+        // Attempt to resolve.
+        // Should try to use the configured HTTP proxy, which will fail.
+        assertThat(new OidcConfigurationResolver(true, wireMockRule.baseUrl()).resolve()).isNull();
+
+        // No request should've reached its target.
+        WireMock.verify(0, WireMock.getRequestedFor(WireMock.urlPathEqualTo(OPENID_CONFIGURATION_PATH)));
     }
 
 }

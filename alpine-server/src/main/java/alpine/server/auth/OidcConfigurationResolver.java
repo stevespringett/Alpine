@@ -33,8 +33,6 @@ import net.minidev.json.JSONObject;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
 import java.net.URL;
 
 /**
@@ -91,8 +89,8 @@ public class OidcConfigurationResolver {
             HTTPRequest httpRequest = new HTTPRequest(HTTPRequest.Method.GET, configURL);
             final ProxyConfig proxyCfg = ProxyUtil.getProxyConfig();
 
-            if (proxyCfg!=null && proxyCfg.shouldProxy(configURL)) {
-                httpRequest.setProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyCfg.getHost(), proxyCfg.getPort())));
+            if (proxyCfg != null && proxyCfg.shouldProxy(configURL)) {
+                httpRequest.setProxy(proxyCfg.getProxy());
             }
 
             HTTPResponse httpResponse = httpRequest.send();
