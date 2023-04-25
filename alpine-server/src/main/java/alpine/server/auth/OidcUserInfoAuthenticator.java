@@ -28,8 +28,6 @@ import com.nimbusds.openid.connect.sdk.UserInfoRequest;
 import com.nimbusds.openid.connect.sdk.UserInfoResponse;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
 
 /**
  * @since 1.10.0
@@ -51,7 +49,7 @@ class OidcUserInfoAuthenticator {
             final ProxyConfig proxyCfg = ProxyUtil.getProxyConfig();
 
             if (proxyCfg != null && proxyCfg.shouldProxy(configuration.getUserInfoEndpointUri().toURL())) {
-                httpRequest.setProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyCfg.getHost(), proxyCfg.getPort())));
+                httpRequest.setProxy(proxyCfg.getProxy());
             }
             final var httpResponse = httpRequest.send();
             userInfoResponse = UserInfoResponse.parse(httpResponse);

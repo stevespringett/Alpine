@@ -40,10 +40,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
+import wiremock.org.apache.hc.core5.http.ContentType;
 import wiremock.org.apache.hc.core5.http.HttpHeaders;
 import wiremock.org.apache.hc.core5.http.HttpStatus;
-import wiremock.org.apache.hc.core5.http.ContentType;
 
+import java.net.ConnectException;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -52,6 +54,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class OidcIdTokenAuthenticatorTest {
 
@@ -69,6 +72,9 @@ public class OidcIdTokenAuthenticatorTest {
 
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(WireMockConfiguration.options().dynamicPort());
+
+    @Rule
+    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
 
     private OidcConfiguration oidcConfiguration;
 
@@ -295,6 +301,27 @@ public class OidcIdTokenAuthenticatorTest {
 
         // Only one request should've been made
         WireMock.verify(1, WireMock.getRequestedFor(WireMock.urlPathEqualTo("/jwks")));
+    }
+
+    @Test
+    public void resolveJwkSetShouldUseHttpProxyIfConfigured() throws Exception {
+        environmentVariables.set("http_proxy", "http://localhost:6666");
+
+        wireMockRule.stubFor(WireMock.get(WireMock.urlPathEqualTo("/jwks"))
+                .willReturn(WireMock.aResponse()
+                        .withStatus(418)));
+
+        oidcConfiguration.setJwksUri(new URI(wireMockRule.url("/jwks")));
+
+        final var authenticator = new OidcIdTokenAuthenticator(oidcConfiguration, "clientId");
+
+        // Attempt to resolve the JWK set.
+        // Should try to use the configured HTTP proxy, which will fail.
+        assertThatExceptionOfType(ConnectException.class)
+                .isThrownBy(authenticator::resolveJwkSet);
+
+        // No request should've reached its target.
+        WireMock.verify(0, WireMock.getRequestedFor(WireMock.urlPathEqualTo("/jwks")));
     }
 
 }

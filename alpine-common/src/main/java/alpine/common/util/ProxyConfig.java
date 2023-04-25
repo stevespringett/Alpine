@@ -18,9 +18,10 @@
  */
 package alpine.common.util;
 
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.net.URI;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Set;
 
 /**
@@ -82,6 +83,10 @@ public final class ProxyConfig {
             }
         }
         return true;
+    }
+
+    public Proxy getProxy() {
+        return new Proxy(Proxy.Type.HTTP, new InetSocketAddress(host, port));
     }
 
     public String getHost() {

@@ -20,6 +20,7 @@
 package alpine.server.auth;
 
 import alpine.common.logging.Logger;
+import alpine.common.util.ProxyUtil;
 import alpine.server.cache.CacheManager;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -31,6 +32,7 @@ import com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet;
 import com.nimbusds.openid.connect.sdk.validators.IDTokenValidator;
 
 import java.io.IOException;
+import java.net.URL;
 import java.text.ParseException;
 
 /**
@@ -90,7 +92,15 @@ class OidcIdTokenAuthenticator {
         }
 
         LOGGER.debug("Fetching JWK set from " + configuration.getJwksUri());
-        jwkSet = JWKSet.load(configuration.getJwksUri().toURL());
+        final URL jwksUrl = configuration.getJwksUri().toURL();
+
+        final var proxyCfg = ProxyUtil.getProxyConfig();
+        if (proxyCfg != null && proxyCfg.shouldProxy(jwksUrl)) {
+            LOGGER.debug("Using proxy to fetch JWK set");
+            jwkSet = JWKSet.load(configuration.getJwksUri().toURL(), 0, 0, 0, proxyCfg.getProxy());
+        } else {
+            jwkSet = JWKSet.load(jwksUrl);
+        }
 
         LOGGER.debug("Storing JWK set in cache");
         CacheManager.getInstance().put(JWK_SET_CACHE_KEY, jwkSet);
