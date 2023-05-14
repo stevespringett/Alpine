@@ -22,7 +22,7 @@
     <groupId>us.springett</groupId>
     <artifactId>alpine-parent</artifactId>
     <packaging>pom</packaging>
-    <version>2.2.2-SNAPSHOT</version>
+    <version>2.2.2</version>
 
     <modules>
         <module>alpine-common</module>
@@ -63,7 +63,7 @@
         <connection>scm:git:git@github.com:stevespringett/Alpine.git</connection>
         <url>https://github.com/stevespringett/Alpine.git</url>
         <developerConnection>scm:git:git@github.com:stevespringett/Alpine.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>alpine-parent-2.2.2</tag>
     </scm>
 
     <issueManagement>
@@ -157,7 +157,7 @@
         <plugin.cyclonedx.outputReactorProjects>true</plugin.cyclonedx.outputReactorProjects>
 
         <!-- Dependency Versions -->
-        <lib.alpine.executable.war.version>2.2.2-SNAPSHOT</lib.alpine.executable.war.version>
+        <lib.alpine.executable.war.version>2.2.2</lib.alpine.executable.war.version>
         <lib.bcrypt.version>0.4</lib.bcrypt.version>
         <lib.caffeine.version>3.1.1</lib.caffeine.version>
         <lib.commons.collections4.version>4.4</lib.commons.collections4.version>
