@@ -30,6 +30,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -203,7 +205,7 @@ public class Config {
     /**
      * Initialize the Config object. This method should only be called once.
      */
-    private void init() {
+    void init() {
         if (properties != null) {
             return;
         }
@@ -474,6 +476,55 @@ public class Config {
      */
     public boolean getPropertyAsBoolean(Key key) {
         return "true".equalsIgnoreCase(getProperty(key));
+    }
+
+    /**
+     * Get "pass-through" properties with a given {@code prefix}.
+     * <p>
+     * Pass-through properties do not have corresponding {@link Config.Key}s.
+     * Their main use-case is to allow users to configure certain aspects of libraries and frameworks used by Alpine,
+     * without Alpine having to introduce {@link AlpineKey}s for every single option.
+     * <p>
+     * Properties are read from both environment variables, and {@link #PROP_FILE}.
+     * When a property is defined in both environment and {@code application.properties}, environment takes precedence.
+     * <p>
+     * Properties <strong>must</strong> be prefixed with {@code ALPINE_} (for environment variables) or {@code alpine.}
+     * (for {@code application.properties}) respectively. The Alpine prefix will be removed in keys of the returned
+     * {@link Map}, but the given {@code prefix} will be retained.
+     *
+     * @param prefix Prefix of the properties to fetch
+     * @return A {@link Map} containing the matched properties
+     * @since 2.3.0
+     */
+    public Map<String, String> getPassThroughProperties(final String prefix) {
+        final var passThroughProperties = new HashMap<String, String>();
+        try {
+            for (final Map.Entry<String, String> envVar : System.getenv().entrySet()) {
+                if (envVar.getKey().startsWith("ALPINE_%s_".formatted(prefix.toUpperCase().replace(".", "_")))) {
+                    final String key = envVar.getKey().replaceFirst("^ALPINE_", "").toLowerCase().replace("_", ".");
+                    passThroughProperties.put(key, envVar.getValue());
+                }
+            }
+        } catch (SecurityException e) {
+            LOGGER.warn("""
+                    Unable to retrieve pass-through properties for prefix "%s" \
+                    from environment variables. Using defaults.""".formatted(prefix), e);
+        }
+        for (final Map.Entry<Object, Object> property : properties.entrySet()) {
+            if (property.getKey() instanceof String key
+                    && key.startsWith("alpine.%s.".formatted(prefix))
+                    && property.getValue() instanceof final String value) {
+                key = key.replaceFirst("^alpine\\.", "");
+                if (!passThroughProperties.containsKey(key)) { // Environment variables take precedence
+                    passThroughProperties.put(key, value);
+                }
+            }
+        }
+        return passThroughProperties;
+    }
+
+    static void reset() {
+        properties = null;
     }
 
     /**

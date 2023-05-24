@@ -62,6 +62,11 @@ public class PersistenceManagerFactory implements IPersistenceManagerFactory, Se
         LOGGER.info("Initializing persistence framework");
 
         final var dnProps = new Properties();
+
+        // Apply pass-through properties first. Settings that are hardcoded, or have dedicated
+        // AlpineKeys, must still take precedence over pass-through properties.
+        dnProps.putAll(Config.getInstance().getPassThroughProperties("datanucleus"));
+
         dnProps.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_DATABASE, "true");
         dnProps.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES, "true");
         dnProps.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS, "true");
