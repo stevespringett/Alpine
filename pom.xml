@@ -185,6 +185,7 @@
         <lib.jsr353-spec.version>1.1.4</lib.jsr353-spec.version>
         <lib.jstl.version>1.2.5</lib.jstl.version>
         <lib.logback.version>1.2.11</lib.logback.version>
+        <lib.logstash-logback-encoder.version>7.3</lib.logstash-logback-encoder.version> <!-- logstash-logback-encoder >= v7.4 requires logback v2 -->
         <lib.micrometer.version>1.9.4</lib.micrometer.version>
         <lib.microprofile-health-api.version>3.1</lib.microprofile-health-api.version>
         <lib.nimbus-oauth2-oidc-sdk.version>10.7.1</lib.nimbus-oauth2-oidc-sdk.version>
@@ -361,6 +362,11 @@
             <!-- JAX-RS JSON -->
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${lib.jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
                 <version>${lib.jackson-databind.version}</version>
             </dependency>
@@ -422,6 +428,11 @@
                 <groupId>org.owasp</groupId>
                 <artifactId>security-logging-logback</artifactId>
                 <version>${lib.owasp.security-logging.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.logstash.logback</groupId>
+                <artifactId>logstash-logback-encoder</artifactId>
+                <version>${lib.logstash-logback-encoder.version}</version>
             </dependency>
             <!-- XSS prevention -->
             <dependency>
@@ -905,12 +916,26 @@
                 <dependency>
                     <groupId>org.owasp</groupId>
                     <artifactId>security-logging-common</artifactId>
-                    <version>${lib.owasp.security-logging.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>org.owasp</groupId>
                     <artifactId>security-logging-logback</artifactId>
-                    <version>${lib.owasp.security-logging.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>net.logstash.logback</groupId>
+                    <artifactId>logstash-logback-encoder</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-core</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-annotations</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
                 </dependency>
             </dependencies>
             <build>
@@ -961,6 +986,26 @@
                                 <overlay>
                                     <groupId>org.owasp</groupId>
                                     <artifactId>security-logging-logback</artifactId>
+                                    <type>jar</type>
+                                </overlay>
+                                <overlay>
+                                    <groupId>net.logstash.logback</groupId>
+                                    <artifactId>logstash-logback-encoder</artifactId>
+                                    <type>jar</type>
+                                </overlay>
+                                <overlay>
+                                    <groupId>com.fasterxml.jackson.core</groupId>
+                                    <artifactId>jackson-annotations</artifactId>
+                                    <type>jar</type>
+                                </overlay>
+                                <overlay>
+                                    <groupId>com.fasterxml.jackson.core</groupId>
+                                    <artifactId>jackson-core</artifactId>
+                                    <type>jar</type>
+                                </overlay>
+                                <overlay>
+                                    <groupId>com.fasterxml.jackson.core</groupId>
+                                    <artifactId>jackson-databind</artifactId>
                                     <type>jar</type>
                                 </overlay>
                             </overlays>
