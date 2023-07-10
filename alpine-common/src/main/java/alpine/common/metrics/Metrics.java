@@ -19,10 +19,12 @@
 package alpine.common.metrics;
 
 import alpine.Config;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics;
 import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 
+import java.util.ServiceLoader;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -30,16 +32,24 @@ import java.util.concurrent.ExecutorService;
  */
 public final class Metrics {
 
-    private static final PrometheusMeterRegistry registry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
+    private static final PrometheusMeterRegistry REGISTRY = customized(new PrometheusMeterRegistry(PrometheusConfig.DEFAULT));
 
     public static PrometheusMeterRegistry getRegistry() {
-        return registry;
+        return REGISTRY;
     }
 
     public static void registerExecutorService(final ExecutorService executorService, final String name) {
         if (Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.METRICS_ENABLED)) {
-            new ExecutorServiceMetrics(executorService, name, null).bindTo(registry);
+            new ExecutorServiceMetrics(executorService, name, null).bindTo(REGISTRY);
         }
+    }
+
+    static <T extends MeterRegistry> T customized(final T meterRegistry) {
+        for (final MeterRegistryCustomizer customizer : ServiceLoader.load(MeterRegistryCustomizer.class)) {
+            customizer.accept(meterRegistry);
+        }
+
+        return meterRegistry;
     }
 
 }
