@@ -181,6 +181,16 @@ public final class KeyManager {
             if (secretKeyPath != null) {
                 return Paths.get(secretKeyPath).toFile();
             }
+        } else if (keyType == KeyType.PRIVATE) {
+            final String privateKeyPath = Config.getInstance().getProperty(Config.AlpineKey.PRIVATE_KEY_PATH);
+            if (privateKeyPath != null) {
+                return Paths.get(privateKeyPath).toFile();
+            }
+        } else if (keyType == KeyType.PUBLIC) {
+            final String publicKeyPath = Config.getInstance().getProperty(Config.AlpineKey.PUBLIC_KEY_PATH);
+            if (publicKeyPath != null) {
+                return Paths.get(publicKeyPath).toFile();
+            }
         }
         return new File(Config.getInstance().getDataDirectorty()
                 + File.separator
