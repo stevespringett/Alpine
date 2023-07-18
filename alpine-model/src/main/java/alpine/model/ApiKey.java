@@ -59,7 +59,8 @@ public class ApiKey implements Serializable, Principal {
     @Column(name = "APIKEY", allowsNull = "false")
     @NotNull
     @Size(min = 32, max = 255)
-    @Pattern(regexp = RegexSequence.Definition.ALPHA_NUMERIC, message = "The API key must contain only alpha and/or numeric characters")
+    @Pattern(regexp = RegexSequence.Definition.WORD_CHARS,
+            message = "The API key must contain only alpha, numeric and/or underscore characters")
     private String key;
 
     @Persistent(table = "APIKEYS_TEAMS", defaultFetchGroup = "true")
