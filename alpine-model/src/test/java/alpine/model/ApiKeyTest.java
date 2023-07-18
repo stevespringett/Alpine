@@ -18,6 +18,7 @@
  */
 package alpine.model;
 
+import alpine.Config;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ApiKeyTest {
+    final String prefix = Config.getInstance().getProperty(Config.AlpineKey.API_KEY_PREFIX);
 
     @Test
     public void idTest() {
@@ -35,10 +37,43 @@ public class ApiKeyTest {
 
     @Test
     public void keyTest() {
-        ApiKey key = new ApiKey();
-        key.setKey("12345678901234567890");
-        Assert.assertEquals("12345678901234567890", key.getKey());
-        Assert.assertEquals("1234****7890", key.getName());
+        {
+            ApiKey key = new ApiKey();
+            key.setKey("12345678901234567890");
+            Assert.assertEquals("12345678901234567890", key.getKey());
+            Assert.assertEquals("****************7890", key.getName());
+        }
+        {
+            ApiKey key = new ApiKey();
+            key.setKey(prefix + "12345678901234567890");
+            Assert.assertEquals(prefix + "12345678901234567890", key.getKey());
+            Assert.assertEquals(prefix + "****************7890", key.getName());
+        }
+    }
+
+    @Test
+    public void maskTest() {
+        {
+            ApiKey key = new ApiKey();
+            key.setKey("12345678901234567890");
+            Assert.assertEquals("****************7890", key.getMaskedKey());
+        }
+        {
+            ApiKey key = new ApiKey();
+            key.setKey("1234ABCabc+_=!?-*");
+            Assert.assertEquals("*************!?-*", key.getMaskedKey());
+        }
+        {
+            ApiKey key = new ApiKey();
+            key.setKey("1234");
+            Assert.assertEquals("1234", key.getMaskedKey());
+        }
+        {
+            // test with prefix
+            ApiKey key = new ApiKey();
+            key.setKey(prefix + "1234567890");
+            Assert.assertEquals(prefix + "******7890", key.getMaskedKey());
+        }
     }
 
     @Test
