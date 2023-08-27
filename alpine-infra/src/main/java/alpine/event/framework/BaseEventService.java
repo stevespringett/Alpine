@@ -24,14 +24,20 @@ import alpine.model.EventServiceLog;
 import alpine.persistence.AlpineQueryManager;
 import io.micrometer.core.instrument.Counter;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import static alpine.common.util.ExecutorUtil.getExecutorStats;
 
 /**
  * A publish/subscribe (pub/sub) event service that provides the ability to publish events and
@@ -241,6 +247,34 @@ public abstract class BaseEventService implements IEventService {
         logger.info("Shutting down EventService");
         executor.shutdown();
         dynamicExecutor.shutdown();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean shutdown(final Duration timeout) {
+        shutdown();
+
+        final Instant waitTimeout = Instant.now().plus(timeout);
+        Instant statsLastLoggedAt = null;
+        while (!executor.isTerminated() || !dynamicExecutor.isTerminated()) {
+            if (waitTimeout.isBefore(Instant.now())) {
+                logger.warn("Timeout exceeded while waiting for executors to finish: executor=%s, dynamicExecutor=%s"
+                        .formatted(getExecutorStats(executor), getExecutorStats(dynamicExecutor)));
+                return false;
+            }
+
+            final Instant now = Instant.now();
+            if (statsLastLoggedAt == null || now.minus(5, ChronoUnit.SECONDS).isAfter(statsLastLoggedAt)) {
+                logger.info("Waiting for executors to terminate: executor=%s, dynamicExecutor=%s"
+                        .formatted(getExecutorStats(executor), getExecutorStats(dynamicExecutor)));
+                statsLastLoggedAt = now;
+            }
+        }
+
+        logger.info("Executors terminated successfully");
+        return true;
     }
 
 }

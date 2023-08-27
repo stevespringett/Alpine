@@ -25,11 +25,18 @@ import io.micrometer.core.instrument.Counter;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
 import java.lang.reflect.InvocationTargetException;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+import static alpine.common.util.ExecutorUtil.getExecutorStats;
 
 /**
  * The NotificationService provides a way to dispatch (publish) notifications to zero or more subscribers.
@@ -49,12 +56,12 @@ public final class NotificationService implements INotificationService {
     private static final String EXECUTOR_SERVICE_NAME = "Alpine-NotificationService";
 
     static {
-        EXECUTOR_SERVICE = Executors.newFixedThreadPool(4,
-                new BasicThreadFactory.Builder()
-                        .namingPattern(EXECUTOR_SERVICE_NAME + "-%d")
-                        .uncaughtExceptionHandler(new LoggableUncaughtExceptionHandler())
-                        .build()
-        );
+        BasicThreadFactory factory = new BasicThreadFactory.Builder()
+                .namingPattern(EXECUTOR_SERVICE_NAME + "-%d")
+                .uncaughtExceptionHandler(new LoggableUncaughtExceptionHandler())
+                .build();
+        EXECUTOR_SERVICE = new ThreadPoolExecutor(4, 4, 0L, TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<>(), factory);
         Metrics.registerExecutorService(EXECUTOR_SERVICE, EXECUTOR_SERVICE_NAME);
     }
 
@@ -175,6 +182,32 @@ public final class NotificationService implements INotificationService {
     public void shutdown() {
         LOGGER.info("Shutting down NotificationService");
         EXECUTOR_SERVICE.shutdown();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean shutdown(final Duration timeout) {
+        shutdown();
+
+        final Instant waitTimeout = Instant.now().plus(timeout);
+        Instant lastStatsLog = null;
+        while (!EXECUTOR_SERVICE.isTerminated()) {
+            if (waitTimeout.isBefore(Instant.now())) {
+                LOGGER.warn("Timeout exceeded while waiting for executor to finish: %s"
+                        .formatted(getExecutorStats(EXECUTOR_SERVICE)));
+                return false;
+            }
+
+            final Instant now = Instant.now();
+            if (lastStatsLog == null || now.minus(3, ChronoUnit.SECONDS).isAfter(lastStatsLog)) {
+                LOGGER.info("Waiting for executor to terminate: %s".formatted(getExecutorStats(EXECUTOR_SERVICE)));
+                lastStatsLog = now;
+            }
+        }
+
+        LOGGER.info("Executor terminated gracefully");
+        return true;
     }
 
 }
