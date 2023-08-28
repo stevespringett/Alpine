@@ -18,6 +18,7 @@
  */
 package alpine.event.framework;
 
+import java.time.Duration;
 import java.util.UUID;
 
 /**
@@ -74,6 +75,18 @@ public interface IEventService {
      * @since 1.2.0
      */
     void shutdown();
+
+    /**
+     * Shuts down this {@link IEventService}, and waits for already queued events to be processed
+     * until a given {@code timeout} elapses.
+     * <p>
+     * Events enqueued during shutdown will not be processed.
+     *
+     * @param timeout The {@link Duration} to wait for event processing to complete
+     * @return {@code true} when all queued events were processed prior to {@code timeout} elapsing, otherwise {@code false}
+     * @since 2.3.0
+     */
+    boolean shutdown(final Duration timeout);
 
     /**
      * Determines if the specified event is currently being processed. Processing may indicate the

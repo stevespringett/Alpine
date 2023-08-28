@@ -39,7 +39,7 @@ import java.util.concurrent.Executors;
 public final class SingleThreadedEventService extends BaseEventService {
 
     private static final SingleThreadedEventService INSTANCE = new SingleThreadedEventService();
-    private static final Logger LOGGER = Logger.getLogger(EventService.class);
+    private static final Logger LOGGER = Logger.getLogger(SingleThreadedEventService.class);
     private static final ExecutorService EXECUTOR;
     private static final String EXECUTOR_NAME = "Alpine-SingleThreadedEventService";
 

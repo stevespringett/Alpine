@@ -19,11 +19,14 @@
 package alpine.event.framework;
 
 import alpine.common.logging.Logger;
-import alpine.common.util.ThreadUtil;
 import alpine.common.metrics.Metrics;
+import alpine.common.util.ThreadUtil;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A publish/subscribe (pub/sub) event service that provides the ability to publish events and
@@ -50,7 +53,9 @@ public final class EventService extends BaseEventService {
                 .namingPattern(EXECUTOR_NAME + "-%d")
                 .uncaughtExceptionHandler(new LoggableUncaughtExceptionHandler())
                 .build();
-        EXECUTOR = Executors.newFixedThreadPool(ThreadUtil.determineNumberOfWorkerThreads(), factory);
+        final int threadPoolSize = ThreadUtil.determineNumberOfWorkerThreads();
+        EXECUTOR = new ThreadPoolExecutor(threadPoolSize, threadPoolSize, 0L, TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<>(), factory);
         INSTANCE.setExecutorService(EXECUTOR);
         INSTANCE.setLogger(LOGGER);
         Metrics.registerExecutorService(EXECUTOR, EXECUTOR_NAME);

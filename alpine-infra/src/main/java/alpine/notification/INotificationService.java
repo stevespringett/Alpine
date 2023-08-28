@@ -18,6 +18,8 @@
  */
 package alpine.notification;
 
+import java.time.Duration;
+
 /**
  * Defines a NotificationService. All notification services must be singletons and implement a static
  * getInstance() method.
@@ -78,4 +80,17 @@ public interface INotificationService {
      * @since 1.3.0
      */
     void shutdown();
+
+    /**
+     * Shuts down this {@link INotificationService}, and waits for already queued notifications
+     * to be processed until a given {@code timeout} elapses.
+     * <p>
+     * Notifications enqueued during shutdown will not be processed.
+     *
+     * @param timeout The {@link Duration} to wait for notification processing to complete
+     * @return {@code true} when all queued notifications were processed prior to {@code timeout} elapsing, otherwise {@code false}
+     * @since 2.3.0
+     */
+    boolean shutdown(final Duration timeout);
+
 }
