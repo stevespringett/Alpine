@@ -101,6 +101,8 @@ public class Config {
         WORKER_THREAD_MULTIPLIER               ("alpine.worker.thread.multiplier",   4),
         DATA_DIRECTORY                         ("alpine.data.directory",             "~/.alpine"),
         SECRET_KEY_PATH                        ("alpine.secret.key.path",            null),
+        PRIVATE_KEY_PATH                       ("alpine.private.key.path",           null),
+        PUBLIC_KEY_PATH                        ("alpine.public.key.path",            null),
         DATABASE_MODE                          ("alpine.database.mode",              "embedded"),
         DATABASE_PORT                          ("alpine.database.port",              9092),
         DATABASE_URL                           ("alpine.database.url",               "jdbc:h2:mem:alpine"),
