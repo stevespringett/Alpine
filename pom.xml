@@ -144,7 +144,7 @@
         <plugin.retirejs.indentSize>4</plugin.retirejs.indentSize>
 
         <!-- CycloneDX SBOM Creation -->
-        <maven.cyclonedx.plugin.version>2.7.1</maven.cyclonedx.plugin.version>
+        <maven.cyclonedx.plugin.version>2.7.9</maven.cyclonedx.plugin.version>
         <plugin.cyclonedx.projectType>framework</plugin.cyclonedx.projectType>
         <plugin.cyclonedx.schemaVersion>1.4</plugin.cyclonedx.schemaVersion>
         <plugin.cyclonedx.outputFormat>all</plugin.cyclonedx.outputFormat>
@@ -159,18 +159,18 @@
         <!-- Dependency Versions -->
         <lib.alpine.executable.war.version>2.2.3-SNAPSHOT</lib.alpine.executable.war.version>
         <lib.bcrypt.version>0.4</lib.bcrypt.version>
-        <lib.caffeine.version>3.1.1</lib.caffeine.version>
+        <lib.caffeine.version>3.1.8</lib.caffeine.version>
         <lib.commons.collections4.version>4.4</lib.commons.collections4.version>
-        <lib.commons.io.version>2.11.0</lib.commons.io.version>
-        <lib.commons.lang3.version>3.12.0</lib.commons.lang3.version>
+        <lib.commons.io.version>2.13.0</lib.commons.io.version>
+        <lib.commons.lang3.version>3.13.0</lib.commons.lang3.version>
         <lib.datanucleus-api-jdo.version>6.0.1</lib.datanucleus-api-jdo.version>
         <lib.datanucleus.version>6.0.3</lib.datanucleus.version>
         <lib.datanucleus-rdbms.version>6.0.3</lib.datanucleus-rdbms.version>
         <lib.h2.version>2.2.224</lib.h2.version>
         <lib.hikaricp.version>5.0.1</lib.hikaricp.version>
         <lib.javassist.version>3.29.2-GA</lib.javassist.version>
-        <lib.jackson.version>2.15.0</lib.jackson.version>
-        <lib.jackson-databind.version>2.14.1</lib.jackson-databind.version>
+        <lib.jackson.version>2.15.2</lib.jackson.version>
+        <lib.jackson-databind.version>2.15.2</lib.jackson-databind.version>
         <lib.javamail.version>1.6.7</lib.javamail.version>
         <lib.jaxb.api.version>2.3.1</lib.jaxb.api.version>
         <lib.jaxb.core.version>2.3.0.1</lib.jaxb.core.version>
@@ -185,18 +185,18 @@
         <lib.jsr353-spec.version>1.1.4</lib.jsr353-spec.version>
         <lib.jstl.version>1.2.5</lib.jstl.version>
         <lib.logback.version>1.2.11</lib.logback.version>
-        <lib.logstash-logback-encoder.version>7.3</lib.logstash-logback-encoder.version> <!-- logstash-logback-encoder >= v7.4 requires logback v2 -->
-        <lib.micrometer.version>1.9.4</lib.micrometer.version>
+        <lib.logstash-logback-encoder.version>7.4</lib.logstash-logback-encoder.version> <!-- logstash-logback-encoder >= v7.4 requires logback v2 -->
+        <lib.micrometer.version>1.11.4</lib.micrometer.version>
         <lib.microprofile-health-api.version>3.1</lib.microprofile-health-api.version>
-        <lib.nimbus-oauth2-oidc-sdk.version>10.7.1</lib.nimbus-oauth2-oidc-sdk.version>
+        <lib.nimbus-oauth2-oidc-sdk.version>10.15</lib.nimbus-oauth2-oidc-sdk.version>
         <lib.owasp.encoder.version>1.2.3</lib.owasp.encoder.version>
         <lib.owasp.security-logging.version>1.1.7</lib.owasp.security-logging.version>
         <lib.slf4j.version>1.7.36</lib.slf4j.version>
-        <lib.swagger.jersey.version>1.6.9</lib.swagger.jersey.version>
+        <lib.swagger.jersey.version>1.6.11</lib.swagger.jersey.version>
         <!-- Unit test libraries -->
         <lib.junit.version>4.13.2</lib.junit.version>
-        <lib.mockito.version>5.1.1</lib.mockito.version>
-        <lib.assertj.version>3.23.1</lib.assertj.version>
+        <lib.mockito.version>5.5.0</lib.mockito.version>
+        <lib.assertj.version>3.24.2</lib.assertj.version>
         <lib.wiremock.version>2.35.1</lib.wiremock.version>
 
         <war-embedded-finalname>${project.build.finalName}</war-embedded-finalname>
