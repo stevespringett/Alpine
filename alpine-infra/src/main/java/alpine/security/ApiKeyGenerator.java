@@ -18,6 +18,8 @@
  */
 package alpine.security;
 
+import alpine.Config;
+
 import java.security.SecureRandom;
 
 /**
@@ -35,7 +37,7 @@ public final class ApiKeyGenerator {
     private ApiKeyGenerator() { }
 
     /**
-     * Generates a 32 character cryptographically secure API key.
+     * Generates a prefixed cryptographically secure API key of 32 characters not including the prefix length.
      *  @return a String representation of the API key
      * @since 1.0.0
      */
@@ -44,8 +46,8 @@ public final class ApiKeyGenerator {
     }
 
     /**
-     * Generates a cryptographically secure API key of the specified length.
-     * @param chars the length of the API key to generate
+     * Generates a cryptographically secure API key of the specified length having the configured API key prefix.
+     * @param chars the length of the API key to generate not including the prefix length
      * @return a String representation of the API key
      */
     public static String generate(final int chars) {
@@ -57,6 +59,11 @@ public final class ApiKeyGenerator {
             }
             buff[i] = VALID_CHARACTERS[secureRandom.nextInt(VALID_CHARACTERS.length)];
         }
-        return new String(buff);
+
+        return getApiKeyPrefix() + String.valueOf(buff);
+    }
+
+    private static String getApiKeyPrefix() {
+        return Config.getInstance().getProperty(Config.AlpineKey.API_KEY_PREFIX);
     }
 }

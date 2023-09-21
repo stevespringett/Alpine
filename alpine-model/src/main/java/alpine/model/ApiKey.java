@@ -18,6 +18,7 @@
  */
 package alpine.model;
 
+import alpine.Config;
 import alpine.common.validation.RegexSequence;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -48,6 +49,7 @@ import java.util.List;
 public class ApiKey implements Serializable, Principal {
 
     private static final long serialVersionUID = 1582714693932260365L;
+    private static final String prefix = Config.getInstance().getProperty(Config.AlpineKey.API_KEY_PREFIX);
 
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.NATIVE)
@@ -59,7 +61,8 @@ public class ApiKey implements Serializable, Principal {
     @Column(name = "APIKEY", allowsNull = "false")
     @NotNull
     @Size(min = 32, max = 255)
-    @Pattern(regexp = RegexSequence.Definition.ALPHA_NUMERIC, message = "The API key must contain only alpha and/or numeric characters")
+    @Pattern(regexp = RegexSequence.Definition.WORD_CHARS,
+            message = "The API key must contain only alpha, numeric and/or underscore characters")
     private String key;
 
     @Persistent(table = "APIKEYS_TEAMS", defaultFetchGroup = "true")
@@ -86,6 +89,25 @@ public class ApiKey implements Serializable, Principal {
     }
 
     /**
+     * Masks all key characters except the prefix and last four characters with *. If the key does not have the
+     * currently configured prefix, do not return it.
+     * @return Masked key.
+     */
+    public String getMaskedKey() {
+        final StringBuilder maskedKey = new StringBuilder();
+
+        // if key does not have the current prefix, do not return a prefix
+        if (key.startsWith(prefix))
+            maskedKey.append(prefix);
+
+        // mask all characters except the last four
+        maskedKey.append("*".repeat(key.length() - maskedKey.length() - 4));
+        maskedKey.append(key.substring(key.length() - 4));
+
+        return maskedKey.toString();
+    }
+
+    /**
      * Do not use - only here to satisfy Principal implementation requirement.
      * @deprecated use {@link UserPrincipal#getUsername()}
      * @return a String presentation of the username
@@ -93,9 +115,7 @@ public class ApiKey implements Serializable, Principal {
     @Deprecated
     @JsonIgnore
     public String getName() {
-        String key = getKey();
-
-        return key.substring(0, 4) + "****" + key.substring(key.length() - 4);
+        return getMaskedKey();
     }
 
     public List<Team> getTeams() {
