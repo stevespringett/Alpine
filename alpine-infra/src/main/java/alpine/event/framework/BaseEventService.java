@@ -23,6 +23,7 @@ import alpine.common.metrics.Metrics;
 import alpine.model.EventServiceLog;
 import alpine.persistence.AlpineQueryManager;
 import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Timer;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
 import java.lang.reflect.InvocationTargetException;
@@ -104,7 +105,15 @@ public abstract class BaseEventService implements IEventService {
                 try (AlpineQueryManager qm = new AlpineQueryManager()) {
                     final EventServiceLog eventServiceLog = qm.createEventServiceLog(clazz);
                     final Subscriber subscriber = clazz.getDeclaredConstructor().newInstance();
-                    subscriber.inform(event);
+                    final Timer.Sample timerSample = Timer.start();
+                    try {
+                        subscriber.inform(event);
+                    } finally {
+                        timerSample.stop(Timer.builder("alpine_event_processing")
+                                .tag("event", event.getClass().getSimpleName())
+                                .tag("subscriber", clazz.getSimpleName())
+                                .register(Metrics.getRegistry()));
+                    }
                     qm.updateEventServiceLog(eventServiceLog);
                     if (event instanceof ChainableEvent) {
                         ChainableEvent chainableEvent = (ChainableEvent)event;
