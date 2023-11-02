@@ -33,8 +33,7 @@
 
         <!-- Dependency Versions -->
         <lib.servlet-api.version>4.0.2</lib.servlet-api.version>
-        <lib.jetty.version>10.0.14</lib.jetty.version>
-        <lib.jetty.webapp.logging>9.4.27</lib.jetty.webapp.logging>
+        <lib.jetty.version>10.0.18</lib.jetty.version>
     </properties>
 
     <dependencies>
@@ -53,11 +52,6 @@
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-webapp</artifactId>
             <version>${lib.jetty.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-webapp-logging</artifactId>
-            <version>${lib.jetty.webapp.logging}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
