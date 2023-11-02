@@ -138,12 +138,11 @@ public abstract class BaseEventService implements IEventService {
                             }
                         }
                     }
+                } finally {
+                    if (event instanceof ChainableEvent) {
+                        removeTrackedEvent((ChainableEvent)event);
+                    }
                 }
-
-                if (event instanceof ChainableEvent) {
-                    removeTrackedEvent((ChainableEvent)event);
-                }
-
             });
         }
         recordPublishedMetric(event);
