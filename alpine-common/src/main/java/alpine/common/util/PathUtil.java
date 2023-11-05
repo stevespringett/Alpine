@@ -43,7 +43,7 @@ public class PathUtil {
         if (path == null) {
             return null;
         }
-        if (path.startsWith("~" + File.separator)) {
+        if (path.startsWith("~/") || path.startsWith("~\\")) {
             return SystemUtil.getUserHome() + path.substring(1);
         }
         return path;
