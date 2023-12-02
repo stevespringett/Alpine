@@ -63,16 +63,20 @@ public class PersistenceManagerFactory implements IPersistenceManagerFactory, Se
 
         final var dnProps = new Properties();
 
-        // Apply pass-through properties first. Settings that are hardcoded, or have dedicated
-        // AlpineKeys, must still take precedence over pass-through properties.
+        if (Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.DATABASE_MIGRATION_ENABLED)) {
+            dnProps.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_DATABASE, "true");
+            dnProps.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES, "true");
+            dnProps.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS, "true");
+            dnProps.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS, "true");
+            dnProps.put(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_MODE, "create");
+        }
+
+        // Apply pass-through properties.
         dnProps.putAll(Config.getInstance().getPassThroughProperties("datanucleus"));
 
-        dnProps.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_DATABASE, "true");
-        dnProps.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES, "true");
-        dnProps.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS, "true");
-        dnProps.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS, "true");
-        dnProps.put(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_MODE, "create");
+        // Apply settings that are required by Alpine and shouldn't be customized.
         dnProps.put(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL, "true");
+
         if (Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.METRICS_ENABLED)) {
             dnProps.put(PropertyNames.PROPERTY_ENABLE_STATISTICS, "true");
         }
@@ -111,12 +115,14 @@ public class PersistenceManagerFactory implements IPersistenceManagerFactory, Se
             registerDataNucleusMetrics(pmf);
         }
 
-        // Ensure that the UpgradeMetaProcessor and SchemaVersion tables are created NOW, not dynamically at runtime.
-        final PersistenceNucleusContext ctx = pmf.getNucleusContext();
-        final Set<String> classNames = new HashSet<>();
-        classNames.add(InstalledUpgrades.class.getCanonicalName());
-        classNames.add(SchemaVersion.class.getCanonicalName());
-        ((SchemaAwareStoreManager)ctx.getStoreManager()).createSchemaForClasses(classNames, new Properties());
+        if (Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.DATABASE_MIGRATION_ENABLED)) {
+            // Ensure that the UpgradeMetaProcessor and SchemaVersion tables are created NOW, not dynamically at runtime.
+            final PersistenceNucleusContext ctx = pmf.getNucleusContext();
+            final Set<String> classNames = new HashSet<>();
+            classNames.add(InstalledUpgrades.class.getCanonicalName());
+            classNames.add(SchemaVersion.class.getCanonicalName());
+            ((SchemaAwareStoreManager) ctx.getStoreManager()).createSchemaForClasses(classNames, new Properties());
+        }
     }
 
     @Override
