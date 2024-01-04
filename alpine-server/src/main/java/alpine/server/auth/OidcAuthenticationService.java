@@ -235,9 +235,10 @@ public class OidcAuthenticationService implements AuthenticationService {
         if (config.getPropertyAsBoolean(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION)) {
             LOGGER.debug("Synchronizing teams for user " + user.getUsername());
             return qm.synchronizeTeamMembership(user, profile.getGroups());
+        } else {
+            // Only apply default teams during auto-provisioning, not on later updates:
+            return qm.addUserToTeams(user, config.getPropertyAsList(Config.AlpineKey.OIDC_TEAMS_DEFAULT));
         }
-
-        return user;
     }
 
 }

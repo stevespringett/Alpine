@@ -30,7 +30,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
@@ -161,6 +163,7 @@ public class Config {
         OIDC_USER_PROVISIONING                 ("alpine.oidc.user.provisioning",    false),
         OIDC_TEAM_SYNCHRONIZATION              ("alpine.oidc.team.synchronization", false),
         OIDC_TEAMS_CLAIM                       ("alpine.oidc.teams.claim",       "groups"),
+        OIDC_TEAMS_DEFAULT                     ("alpine.oidc.teams.default",         null),
         HTTP_PROXY_ADDRESS                     ("alpine.http.proxy.address",         null),
         HTTP_PROXY_PORT                        ("alpine.http.proxy.port",            null),
         HTTP_PROXY_USERNAME                    ("alpine.http.proxy.username",        null),
@@ -480,6 +483,22 @@ public class Config {
      */
     public boolean getPropertyAsBoolean(Key key) {
         return "true".equalsIgnoreCase(getProperty(key));
+    }
+
+    /**
+     * Return the configured value for the specified Key.
+     * @param key The Key to return the configuration for
+     * @return a list of the comma-separated values of the configuration,
+     *         or an empty list otherwise
+     * @since 2.2.5
+     */
+    public List<String> getPropertyAsList(Key key) {
+        String property = getProperty(key);
+        if (property == null) {
+            return Collections.emptyList();
+        } else {
+            return List.of(property.split(","));
+        }
     }
 
     /**

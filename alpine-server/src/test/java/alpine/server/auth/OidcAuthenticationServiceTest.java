@@ -321,6 +321,35 @@ public class OidcAuthenticationServiceTest {
     }
 
     @Test
+    public void authenticateShouldProvisionAndApplyDefaultTeamsAndReturnNewUserWhenUserDoesNotExistAndProvisioningIsEnabled() throws Exception {
+        Mockito.when(configMock.getPropertyAsBoolean(ArgumentMatchers.eq(Config.AlpineKey.OIDC_USER_PROVISIONING))).thenReturn(true);
+        Mockito.when(configMock.getPropertyAsList(ArgumentMatchers.eq(Config.AlpineKey.OIDC_TEAMS_DEFAULT))).thenReturn(List.of("teamName"));
+
+        try (final var qm = new AlpineQueryManager()) {
+            var teamToAssign = new Team();
+            teamToAssign.setName("teamName");
+            qm.persist(teamToAssign);
+        }
+
+        final var profile = new OidcProfile();
+        profile.setSubject("subject");
+        profile.setUsername("username");
+        profile.setEmail("username@example.com");
+        Mockito.when(idTokenAuthenticatorMock.authenticate(ArgumentMatchers.eq(ID_TOKEN), ArgumentMatchers.any(OidcProfileCreator.class))).thenReturn(profile);
+
+        final var authService = new OidcAuthenticationService(configMock, oidcConfigurationMock, idTokenAuthenticatorMock, null, ID_TOKEN, null);
+
+        final var provisionedUser = (OidcUser) authService.authenticate();
+        Assertions.assertThat(provisionedUser).isNotNull();
+        Assertions.assertThat(provisionedUser.getUsername()).isEqualTo("username");
+        Assertions.assertThat(provisionedUser.getSubjectIdentifier()).isEqualTo("subject");
+        Assertions.assertThat(provisionedUser.getEmail()).isEqualTo("username@example.com");
+        Assertions.assertThat(provisionedUser.getTeams()).hasSize(1);
+        Assertions.assertThat(provisionedUser.getTeams().get(0).getName()).isEqualTo("teamName");
+        Assertions.assertThat(provisionedUser.getPermissions()).isNullOrEmpty();
+    }
+
+    @Test
     public void authenticateShouldProvisionAndSyncTeamsAndReturnNewUserWhenUserDoesNotExistAndProvisioningAndTeamSyncIsEnabled() throws Exception {
         Mockito.when(configMock.getPropertyAsBoolean(ArgumentMatchers.eq(Config.AlpineKey.OIDC_USER_PROVISIONING))).thenReturn(true);
         Mockito.when(configMock.getPropertyAsBoolean(ArgumentMatchers.eq(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION))).thenReturn(true);

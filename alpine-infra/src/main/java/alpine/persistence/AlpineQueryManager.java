@@ -304,6 +304,30 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     }
 
     /**
+     * This method adds the specified user to teams with the specified names. It does not
+     * remove the user from any teams, and silently ignores references to teams that do not exist.
+     * @param user the OpenID Connect user to sync team membership for
+     * @param teamNames a list of teams the user is a member of
+     * @return a refreshed OidcUser object
+     * @since 2.2.5
+     */
+    public OidcUser addUserToTeams(final OidcUser user, final List<String> teamNames) {
+        LOGGER.debug("Synchronizing team membership for OpenID Connect user " + user.getUsername());
+
+        for (final String teamName : teamNames) {
+            Team team = getTeam(teamName);
+            if (team == null) {
+                LOGGER.warn("Cannot add user " + user.getUsername() + " to team " + teamName + ", because no team with that name exists");
+            } else {
+                LOGGER.debug("Adding user: " + user.getUsername() + " to team: " + teamName);
+                addUserToTeam(user, team);
+            }
+        }
+
+        return getObjectById(OidcUser.class, user.getId());
+    }
+
+    /**
      * Retrieves an LdapUser containing the specified username. If the username
      * does not exist, returns null.
      * @param username The username to retrieve
@@ -547,6 +571,20 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
         final Query query = pm.newQuery(Team.class);
         query.setOrdering("name asc");
         return (List<Team>) query.execute();
+    }
+
+    /**
+     * Returns a Team containing the specified name. If the name
+     * does not exist, returns null.
+     * @param name Name of the team to retrieve
+     * @return a Team
+     * @since 2.2.5
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public Team getTeam(final String name) {
+        final Query query = pm.newQuery(Team.class, "name == :name");
+        final List<Team> result = (List<Team>) query.execute(name);
+        return Collections.isEmpty(result) ? null : result.get(0);
     }
 
     /**
