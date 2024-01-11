@@ -19,6 +19,7 @@
 package alpine.server.filters;
 
 import alpine.common.logging.Logger;
+import alpine.model.ApiKey;
 import alpine.server.auth.ApiKeyAuthenticationService;
 import alpine.server.auth.JwtAuthenticationService;
 import org.glassfish.jersey.server.ContainerRequest;
@@ -66,6 +67,9 @@ public class AuthenticationFilter implements ContainerRequestFilter {
             if (apiKeyAuthService.isSpecified()) {
                 try {
                     principal = apiKeyAuthService.authenticate();
+                    if (principal instanceof final ApiKey apiKey) {
+                        ApiKeyUsageTracker.onApiKeyUsed(apiKey);
+                    }
                 } catch (AuthenticationException e) {
                     LOGGER.info(SecurityMarkers.SECURITY_FAILURE, "Invalid API key asserted");
                     requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
