@@ -37,6 +37,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.security.Principal;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -65,6 +66,19 @@ public class ApiKey implements Serializable, Principal {
             message = "The API key must contain only alpha, numeric and/or underscore characters")
     private String key;
 
+    @Persistent
+    @Column(name = "COMMENT")
+    @Size(max = 255)
+    private String comment;
+
+    @Persistent
+    @Column(name = "CREATED")
+    private Date created;
+
+    @Persistent
+    @Column(name = "LAST_USED")
+    private Date lastUsed;
+
     @Persistent(table = "APIKEYS_TEAMS", defaultFetchGroup = "true")
     @Join(column = "APIKEY_ID")
     @Element(column = "TEAM_ID")
@@ -91,6 +105,7 @@ public class ApiKey implements Serializable, Principal {
     /**
      * Masks all key characters except the prefix and last four characters with *. If the key does not have the
      * currently configured prefix, do not return it.
+     *
      * @return Masked key.
      */
     public String getMaskedKey() {
@@ -109,13 +124,38 @@ public class ApiKey implements Serializable, Principal {
 
     /**
      * Do not use - only here to satisfy Principal implementation requirement.
-     * @deprecated use {@link UserPrincipal#getUsername()}
+     *
      * @return a String presentation of the username
+     * @deprecated use {@link UserPrincipal#getUsername()}
      */
     @Deprecated
     @JsonIgnore
     public String getName() {
         return getMaskedKey();
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(final String comment) {
+        this.comment = comment;
+    }
+
+    public Date getCreated() {
+        return created;
+    }
+
+    public void setCreated(final Date created) {
+        this.created = created;
+    }
+
+    public Date getLastUsed() {
+        return lastUsed;
+    }
+
+    public void setLastUsed(final Date lastUsed) {
+        this.lastUsed = lastUsed;
     }
 
     public List<Team> getTeams() {

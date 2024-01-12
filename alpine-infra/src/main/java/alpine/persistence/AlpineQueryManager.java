@@ -130,10 +130,19 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
         pm.currentTransaction().begin();
         final ApiKey apiKey = new ApiKey();
         apiKey.setKey(ApiKeyGenerator.generate());
+        apiKey.setCreated(new Date());
         apiKey.setTeams(teams);
         pm.makePersistent(apiKey);
         pm.currentTransaction().commit();
         return pm.getObjectById(ApiKey.class, apiKey.getId());
+    }
+
+    public ApiKey updateApiKey(final ApiKey transientApiKey) {
+        pm.currentTransaction().begin();
+        final ApiKey apiKey = getObjectById(ApiKey.class, transientApiKey.getId());
+        apiKey.setComment(transientApiKey.getComment());
+        pm.currentTransaction().commit();
+        return pm.getObjectById(ApiKey.class, transientApiKey.getId());
     }
 
     /**
