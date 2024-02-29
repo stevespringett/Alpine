@@ -756,16 +756,25 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @since 1.0.0
      */
     public boolean hasPermission(final UserPrincipal user, String permissionName, boolean includeTeams) {
-        Query query;
-        if (user instanceof ManagedUser) {
-            query = pm.newQuery(Permission.class, "name == :permissionName && managedUsers.contains(:user)");
-        } else if (user instanceof LdapUser) {
-            query = pm.newQuery(Permission.class, "name == :permissionName && ldapUsers.contains(:user)");
+        Query<?> query;
+        if (user instanceof final ManagedUser managedUser) {
+            query = pm.newQuery(Permission.class, "name == :permissionName && managedUsers.contains(user) && user.id == :userId");
+            query.declareVariables("alpine.model.ManagedUser user");
+            query.setParameters(permissionName, managedUser.getId());
+        } else if (user instanceof final LdapUser ldapUser) {
+            query = pm.newQuery(Permission.class, "name == :permissionName && ldapUsers.contains(user) && user.id == :userId");
+            query.declareVariables("alpine.model.LdapUser user");
+            query.setParameters(permissionName, ldapUser.getId());
+        } else if (user instanceof final OidcUser oidcUser) {
+            query = pm.newQuery(Permission.class, "name == :permissionName && oidcUsers.contains(user) && user.id == :userId");
+            query.declareVariables("alpine.model.OidcUser user");
+            query.setParameters(permissionName, oidcUser.getId());
         } else {
-            query = pm.newQuery(Permission.class, "name == :permissionName && oidcUsers.contains(:user)");
+            LOGGER.warn("Unrecognized principal class %s; Unable to verify permissions".formatted(user.getClass()));
+            return false;
         }
         query.setResult("count(id)");
-        final long count = (Long) query.execute(permissionName, user);
+        final long count = query.executeResultUnique(Long.class);
         if (count > 0) {
             return true;
         }
@@ -787,9 +796,11 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @since 1.0.0
      */
     public boolean hasPermission(final Team team, String permissionName) {
-        final Query query = pm.newQuery(Permission.class, "name == :permissionName && teams.contains(:team)");
+        final Query<?> query = pm.newQuery(Permission.class, "name == :permissionName && teams.contains(team) && team.id == :teamId");
+        query.declareVariables("alpine.model.Team team");
+        query.setParameters(permissionName, team.getId());
         query.setResult("count(id)");
-        return (Long) query.execute(permissionName, team) > 0;
+        return query.executeResultUnique(Long.class) > 0;
     }
 
     /**
