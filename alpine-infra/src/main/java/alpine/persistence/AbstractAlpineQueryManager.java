@@ -20,15 +20,18 @@ package alpine.persistence;
 
 import alpine.common.validation.RegexSequence;
 import alpine.resources.AlpineRequest;
+import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.collections4.CollectionUtils;
 import org.datanucleus.api.jdo.JDOQuery;
 
 import javax.jdo.FetchPlan;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
-import java.lang.reflect.Field;
+import javax.jdo.metadata.MemberMetadata;
+import javax.jdo.metadata.TypeMetadata;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -206,16 +209,38 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
         if (orderBy != null && RegexSequence.Pattern.STRING_IDENTIFIER.matcher(orderBy).matches() && orderDirection != OrderDirection.UNSPECIFIED) {
             // Check to see if the specified orderBy field is defined in the class being queried.
             boolean found = false;
+            // NB: Only persistent fields can be used as sorting subject.
             final org.datanucleus.store.query.Query<T> iq = ((JDOQuery<T>) query).getInternalQuery();
             final String candidateField = orderBy.contains(".") ? orderBy.substring(0, orderBy.indexOf('.')) : orderBy;
-            for (final Field field: iq.getCandidateClass().getDeclaredFields()) {
-                if (candidateField.equals(field.getName())) {
-                    found = true;
+            final TypeMetadata candidateTypeMetadata = pm.getPersistenceManagerFactory().getMetadata(iq.getCandidateClassName());
+            if (candidateTypeMetadata == null) {
+                // NB: If this happens then the entire query is broken and needs programmatic fixing.
+                // Throwing an exception here to make this painfully obvious.
+                throw new IllegalStateException("""
+                        Persistence type metadata for candidate class %s could not be found. \
+                        Querying for non-persistent types is not supported, correct your query.\
+                        """.formatted(iq.getCandidateClassName()));
+            }
+            boolean foundPersistentMember = false;
+            for (final MemberMetadata memberMetadata : candidateTypeMetadata.getMembers()) {
+                if (candidateField.equals(memberMetadata.getName())) {
+                    foundPersistentMember = true;
                     break;
                 }
             }
-            if (found) {
+            if (foundPersistentMember) {
                 query.setOrdering(orderBy + " " + orderDirection.name().toLowerCase());
+            } else {
+                // Is it a non-persistent (transient) field?
+                final boolean foundNonPersistentMember = Arrays.stream(iq.getCandidateClass().getDeclaredFields())
+                        .anyMatch(field -> field.getName().equals(candidateField));
+                if (foundNonPersistentMember) {
+                    throw new NotSortableException(iq.getCandidateClass().getSimpleName(), candidateField,
+                            "The field is computed and can not be queried or sorted by");
+                }
+
+                throw new NotSortableException(iq.getCandidateClass().getSimpleName(), candidateField,
+                        "The field does not exist");
             }
         }
         return query;

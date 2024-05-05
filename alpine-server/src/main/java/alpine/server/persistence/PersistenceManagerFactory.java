@@ -357,7 +357,7 @@ public class PersistenceManagerFactory implements IPersistenceManagerFactory, Se
         hikariConfig.setJdbcUrl(Config.getInstance().getProperty(Config.AlpineKey.DATABASE_URL));
         hikariConfig.setDriverClassName(Config.getInstance().getProperty(Config.AlpineKey.DATABASE_DRIVER));
         hikariConfig.setUsername(Config.getInstance().getProperty(Config.AlpineKey.DATABASE_USERNAME));
-        hikariConfig.setPassword(Config.getInstance().getProperty(Config.AlpineKey.DATABASE_PASSWORD));
+        hikariConfig.setPassword(Config.getInstance().getPropertyOrFile(Config.AlpineKey.DATABASE_PASSWORD));
 
         if (Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.METRICS_ENABLED)) {
             hikariConfig.setMetricRegistry(Metrics.getRegistry());
