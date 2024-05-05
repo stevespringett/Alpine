@@ -18,12 +18,11 @@
  */
 package alpine.persistence;
 
-import alpine.security.ApiKeyGenerator;
+import alpine.common.logging.Logger;
 import alpine.event.LdapSyncEvent;
 import alpine.event.framework.EventService;
 import alpine.event.framework.LoggableSubscriber;
 import alpine.event.framework.Subscriber;
-import alpine.common.logging.Logger;
 import alpine.model.ApiKey;
 import alpine.model.ConfigProperty;
 import alpine.model.EventServiceLog;
@@ -37,7 +36,8 @@ import alpine.model.Permission;
 import alpine.model.Team;
 import alpine.model.UserPrincipal;
 import alpine.resources.AlpineRequest;
-import io.jsonwebtoken.lang.Collections;
+import alpine.security.ApiKeyGenerator;
+
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import java.sql.Timestamp;
@@ -96,11 +96,12 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @return an ApiKey
      * @since 1.0.0
      */
-    @SuppressWarnings("unchecked")
     public ApiKey getApiKey(final String key) {
-        final Query query = pm.newQuery(ApiKey.class, "key == :key");
-        final List<ApiKey> result = (List<ApiKey>) query.execute(key);
-        return Collections.isEmpty(result) ? null : result.get(0);
+        return callInTransaction(() -> {
+            final Query<ApiKey> query = pm.newQuery(ApiKey.class, "key == :key");
+            query.setParameters(key);
+            return executeAndCloseUnique(query);
+        });
     }
 
     /**
@@ -112,10 +113,10 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @since 1.0.0
      */
     public ApiKey regenerateApiKey(final ApiKey apiKey) {
-        pm.currentTransaction().begin();
-        apiKey.setKey(ApiKeyGenerator.generate());
-        pm.currentTransaction().commit();
-        return pm.getObjectById(ApiKey.class, apiKey.getId());
+        return callInTransaction(() -> {
+            apiKey.setKey(ApiKeyGenerator.generate());
+            return apiKey;
+        });
     }
 
     /**
@@ -125,24 +126,21 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @return an ApiKey
      */
     public ApiKey createApiKey(final Team team) {
-        final List<Team> teams = new ArrayList<>();
-        teams.add(team);
-        pm.currentTransaction().begin();
-        final ApiKey apiKey = new ApiKey();
-        apiKey.setKey(ApiKeyGenerator.generate());
-        apiKey.setCreated(new Date());
-        apiKey.setTeams(teams);
-        pm.makePersistent(apiKey);
-        pm.currentTransaction().commit();
-        return pm.getObjectById(ApiKey.class, apiKey.getId());
+        return callInTransaction(() -> {
+            final var apiKey = new ApiKey();
+            apiKey.setKey(ApiKeyGenerator.generate());
+            apiKey.setCreated(new Date());
+            apiKey.setTeams(List.of(team));
+            return pm.makePersistent(apiKey);
+        });
     }
 
     public ApiKey updateApiKey(final ApiKey transientApiKey) {
-        pm.currentTransaction().begin();
-        final ApiKey apiKey = getObjectById(ApiKey.class, transientApiKey.getId());
-        apiKey.setComment(transientApiKey.getComment());
-        pm.currentTransaction().commit();
-        return pm.getObjectById(ApiKey.class, transientApiKey.getId());
+        return callInTransaction(() -> {
+            final ApiKey apiKey = getObjectById(ApiKey.class, transientApiKey.getId());
+            apiKey.setComment(transientApiKey.getComment());
+            return apiKey;
+        });
     }
 
     /**
@@ -153,14 +151,13 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @since 1.8.0
      */
     public OidcUser createOidcUser(final String username) {
-        pm.currentTransaction().begin();
-        final OidcUser user = new OidcUser();
-        user.setUsername(username);
-        // Subject identifier and email will be synced when a
-        // user with the given username signs in for the first time
-        pm.makePersistent(user);
-        pm.currentTransaction().commit();
-        return getObjectById(OidcUser.class, user.getId());
+        return callInTransaction(() -> {
+            final var user = new OidcUser();
+            user.setUsername(username);
+            // Subject identifier and email will be synced when a
+            // user with the given username signs in for the first time
+            return pm.makePersistent(user);
+        });
     }
 
     /**
@@ -170,12 +167,12 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @since 1.8.0
      */
     public OidcUser updateOidcUser(final OidcUser transientUser) {
-        final OidcUser user = getObjectById(OidcUser.class, transientUser.getId());
-        pm.currentTransaction().begin();
-        user.setSubjectIdentifier(transientUser.getSubjectIdentifier());
-        user.setEmail(transientUser.getEmail());
-        pm.currentTransaction().commit();
-        return pm.getObjectById(OidcUser.class, user.getId());
+        return callInTransaction(() -> {
+            final OidcUser user = getObjectById(OidcUser.class, transientUser.getId());
+            user.setSubjectIdentifier(transientUser.getSubjectIdentifier());
+            user.setEmail(transientUser.getEmail());
+            return user;
+        });
     }
 
     /**
@@ -185,11 +182,10 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @return an OidcUser
      * @since 1.8.0
      */
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public OidcUser getOidcUser(final String username) {
-        final Query query = pm.newQuery(OidcUser.class, "username == :username");
-        final List<OidcUser> result = (List<OidcUser>) query.execute(username);
-        return Collections.isEmpty(result) ? null : result.get(0);
+        final Query<OidcUser> query = pm.newQuery(OidcUser.class, "username == :username");
+        query.setParameters(username);
+        return executeAndCloseUnique(query);
     }
 
     /**
@@ -197,11 +193,10 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @return a list of OidcUser
      * @since 1.8.0
      */
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public List<OidcUser> getOidcUsers() {
-        final Query query = pm.newQuery(OidcUser.class);
+        final Query<OidcUser> query = pm.newQuery(OidcUser.class);
         query.setOrdering("username asc");
-        return (List<OidcUser>) query.execute();
+        return executeAndCloseList(query);
     }
 
     /**
@@ -211,12 +206,11 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @since 1.8.0
      */
     public OidcGroup createOidcGroup(final String name) {
-        pm.currentTransaction().begin();
-        final OidcGroup group = new OidcGroup();
-        group.setName(name);
-        pm.makePersistent(group);
-        pm.currentTransaction().commit();
-        return getObjectByUuid(OidcGroup.class, group.getUuid());
+        return callInTransaction(() -> {
+            final var group = new OidcGroup();
+            group.setName(name);
+            return pm.makePersistent(group);
+        });
     }
 
     /**
@@ -226,11 +220,11 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @since 1.8.0
      */
     public OidcGroup updateOidcGroup(final OidcGroup oidcGroup) {
-        final OidcGroup oidcGroupToUpdate = getObjectByUuid(OidcGroup.class, oidcGroup.getUuid());
-        pm.currentTransaction().begin();
-        oidcGroupToUpdate.setName(oidcGroup.getName());
-        pm.currentTransaction().commit();
-        return pm.getObjectById(OidcGroup.class, oidcGroupToUpdate.getId());
+        return callInTransaction(() -> {
+            final OidcGroup oidcGroupToUpdate = getObjectByUuid(OidcGroup.class, oidcGroup.getUuid());
+            oidcGroupToUpdate.setName(oidcGroup.getName());
+            return oidcGroupToUpdate;
+        });
     }
 
     /**
@@ -238,11 +232,10 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @return a list of OidcGroup
      * @since 1.8.0
      */
-    @SuppressWarnings({"rawtypes", "unchecked"})
     public List<OidcGroup> getOidcGroups() {
-        final Query query = pm.newQuery(OidcGroup.class);
+        final Query<OidcGroup> query = pm.newQuery(OidcGroup.class);
         query.setOrdering("name asc");
-        return (List<OidcGroup>) query.execute();
+        return executeAndCloseList(query);
     }
 
     /**
@@ -252,11 +245,10 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @return an OidcGroup
      * @since 1.8.0
      */
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public OidcGroup getOidcGroup(final String name) {
-        final Query query = pm.newQuery(OidcGroup.class, "name == :name");
-        final List<OidcGroup> result = (List<OidcGroup>) query.execute(name);
-        return Collections.isEmpty(result) ? null : result.get(0);
+        final Query<OidcGroup> query = pm.newQuery(OidcGroup.class, "name == :name");
+        query.setParameters(name);
+        return executeAndCloseUnique(query);
     }
 
     /**
@@ -271,45 +263,46 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      */
     public OidcUser synchronizeTeamMembership(final OidcUser user, final List<String> groupNames) {
         LOGGER.debug("Synchronizing team membership for OpenID Connect user " + user.getUsername());
-        final List<Team> removeThese = new ArrayList<>();
-
-        if (user.getTeams() != null) {
-            for (final Team team : user.getTeams()) {
-                LOGGER.debug(user.getUsername() + " is a member of team: " + team.getName());
-                if (team.getMappedOidcGroups() != null && !team.getMappedOidcGroups().isEmpty()) {
-                    for (final MappedOidcGroup mappedOidcGroup : team.getMappedOidcGroups()) {
-                        LOGGER.debug(mappedOidcGroup.getGroup().getName() + " is mapped to team: " + team.getName());
-                        if (!groupNames.contains(mappedOidcGroup.getGroup().getName())) {
-                            LOGGER.debug(mappedOidcGroup.getGroup().getName() + " is not identified in the List of groups specified. Queuing removal of membership for user " + user.getUsername());
-                            removeThese.add(team);
+        return callInTransaction(() -> {
+            final List<Team> removeThese = new ArrayList<>();
+            if (user.getTeams() != null) {
+                for (final Team team : user.getTeams()) {
+                    LOGGER.debug(user.getUsername() + " is a member of team: " + team.getName());
+                    if (team.getMappedOidcGroups() != null && !team.getMappedOidcGroups().isEmpty()) {
+                        for (final MappedOidcGroup mappedOidcGroup : team.getMappedOidcGroups()) {
+                            LOGGER.debug(mappedOidcGroup.getGroup().getName() + " is mapped to team: " + team.getName());
+                            if (!groupNames.contains(mappedOidcGroup.getGroup().getName())) {
+                                LOGGER.debug(mappedOidcGroup.getGroup().getName() + " is not identified in the List of groups specified. Queuing removal of membership for user " + user.getUsername());
+                                removeThese.add(team);
+                            }
                         }
+                    } else {
+                        LOGGER.debug(team.getName() + " does not have any mapped OpenID Connect groups. Queuing removal of " + user.getUsername() + " from team: " + team.getName());
+                        removeThese.add(team);
                     }
-                } else {
-                    LOGGER.debug(team.getName() + " does not have any mapped OpenID Connect groups. Queuing removal of " + user.getUsername() + " from team: " + team.getName());
-                    removeThese.add(team);
                 }
             }
-        }
 
-        for (final Team team : removeThese) {
-            LOGGER.debug("Removing user: " + user.getUsername() + " from team: " + team.getName());
-            removeUserFromTeam(user, team);
-        }
-
-        for (final String groupName : groupNames) {
-            final OidcGroup group = getOidcGroup(groupName);
-            if (group == null) {
-                LOGGER.debug("Unknown OpenID Connect group " + groupName);
-                continue;
+            for (final Team team : removeThese) {
+                LOGGER.debug("Removing user: " + user.getUsername() + " from team: " + team.getName());
+                removeUserFromTeam(user, team);
             }
 
-            for (final MappedOidcGroup mappedOidcGroup : getMappedOidcGroups(group)) {
-                LOGGER.debug("Adding user: " + user.getUsername() + " to team: " + mappedOidcGroup.getTeam().getName());
-                addUserToTeam(user, mappedOidcGroup.getTeam());
-            }
-        }
+            for (final String groupName : groupNames) {
+                final OidcGroup group = getOidcGroup(groupName);
+                if (group == null) {
+                    LOGGER.debug("Unknown OpenID Connect group " + groupName);
+                    continue;
+                }
 
-        return getObjectById(OidcUser.class, user.getId());
+                for (final MappedOidcGroup mappedOidcGroup : getMappedOidcGroups(group)) {
+                    LOGGER.debug("Adding user: " + user.getUsername() + " to team: " + mappedOidcGroup.getTeam().getName());
+                    addUserToTeam(user, mappedOidcGroup.getTeam());
+                }
+            }
+
+            return user;
+        });
     }
 
     /**
@@ -323,17 +316,19 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     public OidcUser addUserToTeams(final OidcUser user, final List<String> teamNames) {
         LOGGER.debug("Synchronizing team membership for OpenID Connect user " + user.getUsername());
 
-        for (final String teamName : teamNames) {
-            Team team = getTeam(teamName);
-            if (team == null) {
-                LOGGER.warn("Cannot add user " + user.getUsername() + " to team " + teamName + ", because no team with that name exists");
-            } else {
-                LOGGER.debug("Adding user: " + user.getUsername() + " to team: " + teamName);
-                addUserToTeam(user, team);
+        return callInTransaction(() -> {
+            for (final String teamName : teamNames) {
+                Team team = getTeam(teamName);
+                if (team == null) {
+                    LOGGER.warn("Cannot add user " + user.getUsername() + " to team " + teamName + ", because no team with that name exists");
+                } else {
+                    LOGGER.debug("Adding user: " + user.getUsername() + " to team: " + teamName);
+                    addUserToTeam(user, team);
+                }
             }
-        }
 
-        return getObjectById(OidcUser.class, user.getId());
+            return user;
+        });
     }
 
     /**
@@ -343,11 +338,10 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @return an LdapUser
      * @since 1.0.0
      */
-    @SuppressWarnings("unchecked")
     public LdapUser getLdapUser(final String username) {
-        final Query query = pm.newQuery(LdapUser.class, "username == :username");
-        final List<LdapUser> result = (List<LdapUser>) query.execute(username);
-        return Collections.isEmpty(result) ? null : result.get(0);
+        final Query<LdapUser> query = pm.newQuery(LdapUser.class, "username == :username");
+        query.setParameters(username);
+        return executeAndCloseUnique(query);
     }
 
     /**
@@ -355,11 +349,10 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @return a list of LdapUsers
      * @since 1.0.0
      */
-    @SuppressWarnings("unchecked")
     public List<LdapUser> getLdapUsers() {
-        final Query query = pm.newQuery(LdapUser.class);
+        final Query<LdapUser> query = pm.newQuery(LdapUser.class);
         query.setOrdering("username asc");
-        return (List<LdapUser>) query.execute();
+        return executeAndCloseList(query);
     }
 
     /**
@@ -369,14 +362,14 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @since 1.0.0
      */
     public LdapUser createLdapUser(final String username) {
-        pm.currentTransaction().begin();
-        final LdapUser user = new LdapUser();
-        user.setUsername(username);
-        user.setDN("Syncing...");
-        pm.makePersistent(user);
-        pm.currentTransaction().commit();
-        EventService.getInstance().publish(new LdapSyncEvent(user.getUsername()));
-        return getObjectById(LdapUser.class, user.getId());
+        final LdapUser createdUser = callInTransaction(() -> {
+            final var user = new LdapUser();
+            user.setUsername(username);
+            user.setDN("Syncing...");
+            return pm.makePersistent(user);
+        });
+        EventService.getInstance().publish(new LdapSyncEvent(createdUser.getUsername()));
+        return createdUser;
     }
 
     /**
@@ -386,11 +379,11 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @since 1.0.0
      */
     public LdapUser updateLdapUser(final LdapUser transientUser) {
-        final LdapUser user = getObjectById(LdapUser.class, transientUser.getId());
-        pm.currentTransaction().begin();
-        user.setDN(transientUser.getDN());
-        pm.currentTransaction().commit();
-        return pm.getObjectById(LdapUser.class, user.getId());
+        return callInTransaction(() -> {
+            final LdapUser user = getObjectById(LdapUser.class, transientUser.getId());
+            user.setDN(transientUser.getDN());
+            return user;
+        });
     }
 
     /**
@@ -405,35 +398,37 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      */
     public LdapUser synchronizeTeamMembership(final LdapUser user, final List<String> groupDNs) {
         LOGGER.debug("Synchronizing team membership for " + user.getUsername());
-        final List<Team> removeThese = new ArrayList<>();
-        if (user.getTeams() != null) {
-            for (final Team team : user.getTeams()) {
-                LOGGER.debug(user.getUsername() + " is a member of team: " + team.getName());
-                if (team.getMappedLdapGroups() != null) {
-                    for (final MappedLdapGroup mappedLdapGroup : team.getMappedLdapGroups()) {
-                        LOGGER.debug(mappedLdapGroup.getDn() + " is mapped to team: " + team.getName());
-                        if (!groupDNs.contains(mappedLdapGroup.getDn())) {
-                            LOGGER.debug(mappedLdapGroup.getDn() + " is not identified in the List of group DNs specified. Queuing removal of membership for user " + user.getUsername());
-                            removeThese.add(team);
+        return callInTransaction(() -> {
+            final List<Team> removeThese = new ArrayList<>();
+            if (user.getTeams() != null) {
+                for (final Team team : user.getTeams()) {
+                    LOGGER.debug(user.getUsername() + " is a member of team: " + team.getName());
+                    if (team.getMappedLdapGroups() != null) {
+                        for (final MappedLdapGroup mappedLdapGroup : team.getMappedLdapGroups()) {
+                            LOGGER.debug(mappedLdapGroup.getDn() + " is mapped to team: " + team.getName());
+                            if (!groupDNs.contains(mappedLdapGroup.getDn())) {
+                                LOGGER.debug(mappedLdapGroup.getDn() + " is not identified in the List of group DNs specified. Queuing removal of membership for user " + user.getUsername());
+                                removeThese.add(team);
+                            }
                         }
+                    } else {
+                        LOGGER.debug(team.getName() + " does not have any mapped LDAP groups. Queuing removal of " + user.getUsername() + " from team: " + team.getName());
+                        removeThese.add(team);
                     }
-                } else {
-                    LOGGER.debug(team.getName() + " does not have any mapped LDAP groups. Queuing removal of " + user.getUsername() + " from team: " + team.getName());
-                    removeThese.add(team);
                 }
             }
-        }
-        for (final Team team: removeThese) {
-            LOGGER.debug("Removing user: " + user.getUsername() + " from team: " + team.getName());
-            removeUserFromTeam(user, team);
-        }
-        for (final String groupDN: groupDNs) {
-            for (final MappedLdapGroup mappedLdapGroup: getMappedLdapGroups(groupDN)) {
-                LOGGER.debug("Adding user: " + user.getUsername() + " to team: " + mappedLdapGroup.getTeam());
-                addUserToTeam(user, mappedLdapGroup.getTeam());
+            for (final Team team: removeThese) {
+                LOGGER.debug("Removing user: " + user.getUsername() + " from team: " + team.getName());
+                removeUserFromTeam(user, team);
             }
-        }
-        return getObjectById(LdapUser.class, user.getId());
+            for (final String groupDN: groupDNs) {
+                for (final MappedLdapGroup mappedLdapGroup: getMappedLdapGroups(groupDN)) {
+                    LOGGER.debug("Adding user: " + user.getUsername() + " to team: " + mappedLdapGroup.getTeam());
+                    addUserToTeam(user, mappedLdapGroup.getTeam());
+                }
+            }
+            return user;
+        });
     }
 
     /**
@@ -462,19 +457,18 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     public ManagedUser createManagedUser(final String username, final String fullname, final String email,
                                          final String passwordHash, final boolean forcePasswordChange,
                                          final boolean nonExpiryPassword, final boolean suspended) {
-        pm.currentTransaction().begin();
-        final ManagedUser user = new ManagedUser();
-        user.setUsername(username);
-        user.setFullname(fullname);
-        user.setEmail(email);
-        user.setPassword(passwordHash);
-        user.setForcePasswordChange(forcePasswordChange);
-        user.setNonExpiryPassword(nonExpiryPassword);
-        user.setSuspended(suspended);
-        user.setLastPasswordChange(new Date());
-        pm.makePersistent(user);
-        pm.currentTransaction().commit();
-        return getObjectById(ManagedUser.class, user.getId());
+        return callInTransaction(() -> {
+            final var user = new ManagedUser();
+            user.setUsername(username);
+            user.setFullname(fullname);
+            user.setEmail(email);
+            user.setPassword(passwordHash);
+            user.setForcePasswordChange(forcePasswordChange);
+            user.setNonExpiryPassword(nonExpiryPassword);
+            user.setSuspended(suspended);
+            user.setLastPasswordChange(new Date());
+            return pm.makePersistent(user);
+        });
     }
 
     /**
@@ -484,21 +478,21 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @since 1.0.0
      */
     public ManagedUser updateManagedUser(final ManagedUser transientUser) {
-        final ManagedUser user = getObjectById(ManagedUser.class, transientUser.getId());
-        pm.currentTransaction().begin();
-        user.setFullname(transientUser.getFullname());
-        user.setEmail(transientUser.getEmail());
-        user.setForcePasswordChange(transientUser.isForcePasswordChange());
-        user.setNonExpiryPassword(transientUser.isNonExpiryPassword());
-        user.setSuspended(transientUser.isSuspended());
-        if (transientUser.getPassword() != null) {
-            if (!user.getPassword().equals(transientUser.getPassword())) {
-                user.setLastPasswordChange(new Date());
+        return callInTransaction(() -> {
+            final ManagedUser user = getObjectById(ManagedUser.class, transientUser.getId());
+            user.setFullname(transientUser.getFullname());
+            user.setEmail(transientUser.getEmail());
+            user.setForcePasswordChange(transientUser.isForcePasswordChange());
+            user.setNonExpiryPassword(transientUser.isNonExpiryPassword());
+            user.setSuspended(transientUser.isSuspended());
+            if (transientUser.getPassword() != null) {
+                if (!user.getPassword().equals(transientUser.getPassword())) {
+                    user.setLastPasswordChange(new Date());
+                }
+                user.setPassword(transientUser.getPassword());
             }
-            user.setPassword(transientUser.getPassword());
-        }
-        pm.currentTransaction().commit();
-        return pm.getObjectById(ManagedUser.class, user.getId());
+            return user;
+        });
     }
 
     /**
@@ -508,11 +502,10 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @return a ManagedUser
      * @since 1.0.0
      */
-    @SuppressWarnings("unchecked")
     public ManagedUser getManagedUser(final String username) {
-        final Query query = pm.newQuery(ManagedUser.class, "username == :username");
-        final List<ManagedUser> result = (List<ManagedUser>) query.execute(username);
-        return Collections.isEmpty(result) ? null : result.get(0);
+        final Query<ManagedUser> query = pm.newQuery(ManagedUser.class, "username == :username");
+        query.setParameters(username);
+        return executeAndCloseUnique(query);
     }
 
     /**
@@ -520,11 +513,10 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @return a List of ManagedUsers
      * @since 1.0.0
      */
-    @SuppressWarnings("unchecked")
     public List<ManagedUser> getManagedUsers() {
-        final Query query = pm.newQuery(ManagedUser.class);
+        final Query<ManagedUser> query = pm.newQuery(ManagedUser.class);
         query.setOrdering("username asc");
-        return (List<ManagedUser>) query.execute();
+        return executeAndCloseList(query);
     }
 
     /**
@@ -552,21 +544,21 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * then {@link #createApiKey} is invoked and a cryptographically secure
      * API key is generated.
      * @param name The name of th team
-     * @param createApiKey whether or not to create an API key for the team
+     * @param createApiKey whether to create an API key for the team
      * @return a Team
      * @since 1.0.0
      */
     public Team createTeam(final String name, final boolean createApiKey) {
-        pm.currentTransaction().begin();
-        final Team team = new Team();
-        team.setName(name);
-        //todo assign permissions
-        pm.makePersistent(team);
-        pm.currentTransaction().commit();
-        if (createApiKey) {
-            createApiKey(team);
-        }
-        return getObjectByUuid(Team.class, team.getUuid(), Team.FetchGroup.ALL.name());
+        return callInTransaction(() -> {
+            final var team = new Team();
+            team.setName(name);
+            //todo assign permissions
+            pm.makePersistent(team);
+            if (createApiKey) {
+                createApiKey(team);
+            }
+            return team;
+        });
     }
 
     /**
@@ -574,12 +566,11 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @return a List of Teams
      * @since 1.0.0
      */
-    @SuppressWarnings("unchecked")
     public List<Team> getTeams() {
-        pm.getFetchPlan().addGroup(Team.FetchGroup.ALL.name());
-        final Query query = pm.newQuery(Team.class);
+        final Query<Team> query = pm.newQuery(Team.class);
+        query.getFetchPlan().addGroup(Team.FetchGroup.ALL.name());
         query.setOrdering("name asc");
-        return (List<Team>) query.execute();
+        return executeAndCloseList(query);
     }
 
     /**
@@ -589,11 +580,10 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @return a Team
      * @since 2.2.5
      */
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public Team getTeam(final String name) {
-        final Query query = pm.newQuery(Team.class, "name == :name");
-        final List<Team> result = (List<Team>) query.execute(name);
-        return Collections.isEmpty(result) ? null : result.get(0);
+        final Query<Team> query = pm.newQuery(Team.class, "name == :name");
+        query.setParameters(name);
+        return executeAndCloseUnique(query);
     }
 
     /**
@@ -603,12 +593,12 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @since 1.0.0
      */
     public Team updateTeam(final Team transientTeam) {
-        final Team team = getObjectByUuid(Team.class, transientTeam.getUuid());
-        pm.currentTransaction().begin();
-        team.setName(transientTeam.getName());
-        //todo assign permissions
-        pm.currentTransaction().commit();
-        return pm.getObjectById(Team.class, team.getId());
+        return callInTransaction(() -> {
+            final Team team = getObjectByUuid(Team.class, transientTeam.getUuid());
+            team.setName(transientTeam.getName());
+            //todo assign permissions
+            return team;
+        });
     }
 
     /**
@@ -621,24 +611,24 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @since 1.0.0
      */
     public boolean addUserToTeam(final UserPrincipal user, final Team team) {
-        List<Team> teams = user.getTeams();
-        boolean found = false;
-        if (teams == null) {
-            teams = new ArrayList<>();
-        }
-        for (final Team t: teams) {
-            if (team.getUuid().equals(t.getUuid())) {
-                found = true;
+        return callInTransaction(() -> {
+            List<Team> teams = user.getTeams();
+            boolean found = false;
+            if (teams == null) {
+                teams = new ArrayList<>();
             }
-        }
-        if (!found) {
-            pm.currentTransaction().begin();
-            teams.add(team);
-            user.setTeams(teams);
-            pm.currentTransaction().commit();
-            return true;
-        }
-        return false;
+            for (final Team t: teams) {
+                if (team.getUuid().equals(t.getUuid())) {
+                    found = true;
+                }
+            }
+            if (!found) {
+                teams.add(team);
+                user.setTeams(teams);
+                return true;
+            }
+            return false;
+        });
     }
 
     /**
@@ -650,24 +640,24 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @since 1.0.0
      */
     public boolean removeUserFromTeam(final UserPrincipal user, final Team team) {
-        final List<Team> teams = user.getTeams();
-        if (teams == null) {
-            return false;
-        }
-        boolean found = false;
-        for (final Team t: teams) {
-            if (team.getUuid().equals(t.getUuid())) {
-                found = true;
+        return callInTransaction(() -> {
+            final List<Team> teams = user.getTeams();
+            if (teams == null) {
+                return false;
             }
-        }
-        if (found) {
-            pm.currentTransaction().begin();
-            teams.remove(team);
-            user.setTeams(teams);
-            pm.currentTransaction().commit();
-            return true;
-        }
-        return false;
+            boolean found = false;
+            for (final Team t: teams) {
+                if (team.getUuid().equals(t.getUuid())) {
+                    found = true;
+                }
+            }
+            if (found) {
+                teams.remove(team);
+                user.setTeams(teams);
+                return true;
+            }
+            return false;
+        });
     }
 
     /**
@@ -678,13 +668,12 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @since 1.1.0
      */
     public Permission createPermission(final String name, final String description) {
-        pm.currentTransaction().begin();
-        final Permission permission = new Permission();
-        permission.setName(name);
-        permission.setDescription(description);
-        pm.makePersistent(permission);
-        pm.currentTransaction().commit();
-        return getObjectById(Permission.class, permission.getId());
+        return callInTransaction(() -> {
+            final var permission = new Permission();
+            permission.setName(name);
+            permission.setDescription(description);
+            return pm.makePersistent(permission);
+        });
     }
 
     /**
@@ -693,11 +682,10 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @return a Permission
      * @since 1.1.0
      */
-    @SuppressWarnings("unchecked")
     public Permission getPermission(final String name) {
-        final Query query = pm.newQuery(Permission.class, "name == :name");
-        final List<Permission> result = (List<Permission>) query.execute(name);
-        return Collections.isEmpty(result) ? null : result.get(0);
+        final Query<Permission> query = pm.newQuery(Permission.class, "name == :name");
+        query.setParameters(name);
+        return executeAndCloseUnique(query);
     }
 
     /**
@@ -705,11 +693,10 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @return a List of Permission objects
      * @since 1.1.0
      */
-    @SuppressWarnings("unchecked")
     public List<Permission> getPermissions() {
-        final Query query = pm.newQuery(Permission.class);
+        final Query<Permission> query = pm.newQuery(Permission.class);
         query.setOrdering("name asc");
-        return (List<Permission>) query.execute();
+        return executeAndCloseList(query);
     }
 
     /**
@@ -796,11 +783,11 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @since 1.0.0
      */
     public boolean hasPermission(final Team team, String permissionName) {
-        final Query<?> query = pm.newQuery(Permission.class, "name == :permissionName && teams.contains(team) && team.id == :teamId");
+        final Query<Permission> query = pm.newQuery(Permission.class, "name == :permissionName && teams.contains(team) && team.id == :teamId");
         query.declareVariables("alpine.model.Team team");
         query.setParameters(permissionName, team.getId());
         query.setResult("count(id)");
-        return query.executeResultUnique(Long.class) > 0;
+        return executeAndCloseResultUnique(query, Long.class) > 0;
     }
 
     /**
@@ -832,11 +819,10 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @return a MappedLdapGroup if found, or null if no mapping exists
      * @since 1.4.0
      */
-    @SuppressWarnings("unchecked")
     public MappedLdapGroup getMappedLdapGroup(final Team team, final String dn) {
-        final Query query = pm.newQuery(MappedLdapGroup.class, "team == :team && dn == :dn");
-        final List<MappedLdapGroup> result = (List<MappedLdapGroup>) query.execute(team, dn);
-        return Collections.isEmpty(result) ? null : result.get(0);
+        final Query<MappedLdapGroup> query = pm.newQuery(MappedLdapGroup.class, "team == :team && dn == :dn");
+        query.setParameters(team, dn);
+        return executeAndCloseUnique(query);
     }
 
     /**
@@ -845,10 +831,10 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @return a List of MappedLdapGroup objects
      * @since 1.4.0
      */
-    @SuppressWarnings("unchecked")
     public List<MappedLdapGroup> getMappedLdapGroups(final Team team) {
-        final Query query = pm.newQuery(MappedLdapGroup.class, "team == :team");
-        return (List<MappedLdapGroup>) query.execute(team);
+        final Query<MappedLdapGroup> query = pm.newQuery(MappedLdapGroup.class, "team == :team");
+        query.setParameters(team);
+        return executeAndCloseList(query);
     }
 
     /**
@@ -857,10 +843,10 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @return a List of MappedLdapGroup objects
      * @since 1.4.0
      */
-    @SuppressWarnings("unchecked")
     public List<MappedLdapGroup> getMappedLdapGroups(final String dn) {
-        final Query query = pm.newQuery(MappedLdapGroup.class, "dn == :dn");
-        return (List<MappedLdapGroup>) query.execute(dn);
+        final Query<MappedLdapGroup> query = pm.newQuery(MappedLdapGroup.class, "dn == :dn");
+        query.setParameters(dn);
+        return executeAndCloseList(query);
     }
 
     /**
@@ -882,13 +868,12 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @since 1.4.0
      */
     public MappedLdapGroup createMappedLdapGroup(final Team team, final String dn) {
-        pm.currentTransaction().begin();
-        final MappedLdapGroup mapping = new MappedLdapGroup();
-        mapping.setTeam(team);
-        mapping.setDn(dn);
-        pm.makePersistent(mapping);
-        pm.currentTransaction().commit();
-        return getObjectById(MappedLdapGroup.class, mapping.getId());
+        return callInTransaction(() -> {
+            final var mapping = new MappedLdapGroup();
+            mapping.setTeam(team);
+            mapping.setDn(dn);
+            return pm.makePersistent(mapping);
+        });
     }
 
     /**
@@ -899,13 +884,12 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @since 1.8.0
      */
     public MappedOidcGroup createMappedOidcGroup(final Team team, final OidcGroup group) {
-        pm.currentTransaction().begin();
-        final MappedOidcGroup mapping = new MappedOidcGroup();
-        mapping.setTeam(team);
-        mapping.setGroup(group);
-        pm.makePersistent(mapping);
-        pm.currentTransaction().commit();
-        return getObjectById(MappedOidcGroup.class, mapping.getId());
+        return callInTransaction(() -> {
+            final var mapping = new MappedOidcGroup();
+            mapping.setTeam(team);
+            mapping.setGroup(group);
+            return pm.makePersistent(mapping);
+        });
     }
 
     /**
@@ -915,11 +899,10 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @return a MappedOidcGroup if found, or null if no mapping exists
      * @since 1.8.0
      */
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public MappedOidcGroup getMappedOidcGroup(final Team team, final OidcGroup group) {
-        final Query query = pm.newQuery(MappedOidcGroup.class, "team == :team && group == :group");
-        final List<MappedOidcGroup> result = (List<MappedOidcGroup>) query.execute(team, group);
-        return Collections.isEmpty(result) ? null : result.get(0);
+        final Query<MappedOidcGroup> query = pm.newQuery(MappedOidcGroup.class, "team == :team && group == :group");
+        query.setParameters(team, group);
+        return executeAndCloseUnique(query);
     }
 
     /**
@@ -928,10 +911,10 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @return a List of MappedOidcGroup objects
      * @since 1.8.0
      */
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public List<MappedOidcGroup> getMappedOidcGroups(final Team team) {
-        final Query query = pm.newQuery(MappedOidcGroup.class, "team == :team");
-        return (List<MappedOidcGroup>) query.execute(team);
+        final Query<MappedOidcGroup> query = pm.newQuery(MappedOidcGroup.class, "team == :team");
+        query.setParameters(team);
+        return executeAndCloseList(query);
     }
 
     /**
@@ -940,10 +923,10 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @return a List of MappedOidcGroup objects
      * @since 1.8.0
      */
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public List<MappedOidcGroup> getMappedOidcGroups(final OidcGroup group) {
-        final Query query = pm.newQuery(MappedOidcGroup.class, "group == :group");
-        return (List<MappedOidcGroup>) query.execute(group);
+        final Query<MappedOidcGroup> query = pm.newQuery(MappedOidcGroup.class, "group == :group");
+        query.setParameters(group);
+        return executeAndCloseList(query);
     }
 
     /**
@@ -967,13 +950,12 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      */
     public EventServiceLog createEventServiceLog(Class<? extends Subscriber> clazz) {
         if (LoggableSubscriber.class.isAssignableFrom(clazz)) {
-            pm.currentTransaction().begin();
-            final EventServiceLog log = new EventServiceLog();
-            log.setSubscriberClass(clazz.getCanonicalName());
-            log.setStarted(new Timestamp(new Date().getTime()));
-            pm.makePersistent(log);
-            pm.currentTransaction().commit();
-            return getObjectById(EventServiceLog.class, log.getId());
+            callInTransaction(() -> {
+                final var log = new EventServiceLog();
+                log.setSubscriberClass(clazz.getCanonicalName());
+                log.setStarted(new Timestamp(new Date().getTime()));
+                return pm.makePersistent(log);
+            });
         }
         return null;
     }
@@ -984,16 +966,19 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @return an updated EventServiceLog
      */
     public EventServiceLog updateEventServiceLog(EventServiceLog eventServiceLog) {
-        if (eventServiceLog != null) {
+        if (eventServiceLog == null) {
+            return null;
+        }
+
+        return callInTransaction(() -> {
             final EventServiceLog log = getObjectById(EventServiceLog.class, eventServiceLog.getId());
             if (log != null) {
-                pm.currentTransaction().begin();
                 log.setCompleted(new Timestamp(new Date().getTime()));
-                pm.currentTransaction().commit();
-                return pm.getObjectById(EventServiceLog.class, log.getId());
+                return log;
+            } else {
+                return null;
             }
-        }
-        return null;
+        });
     }
 
     /**
@@ -1003,12 +988,12 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @return a EventServiceLog
      * @since 1.0.0
      */
-    @SuppressWarnings("unchecked")
     public EventServiceLog getLatestEventServiceLog(final Class<LoggableSubscriber> clazz) {
-        final Query query = pm.newQuery(EventServiceLog.class, "eventClass == :clazz");
+        final Query<EventServiceLog> query = pm.newQuery(EventServiceLog.class, "eventClass == :clazz");
+        query.setParameters(clazz);
         query.setOrdering("completed desc");
-        final List<EventServiceLog> result = (List<EventServiceLog>) query.execute(clazz);
-        return Collections.isEmpty(result) ? null : result.get(0);
+        query.setRange(0, 1);
+        return executeAndCloseUnique(query);
     }
 
     /**
@@ -1018,11 +1003,10 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @return a ConfigProperty object
      * @since 1.3.0
      */
-    @SuppressWarnings("unchecked")
     public ConfigProperty getConfigProperty(final String groupName, final String propertyName) {
-        final Query query = pm.newQuery(ConfigProperty.class, "groupName == :groupName && propertyName == :propertyName");
-        final List<ConfigProperty> result = (List<ConfigProperty>) query.execute(groupName, propertyName);
-        return Collections.isEmpty(result) ? null : result.get(0);
+        final Query<ConfigProperty> query = pm.newQuery(ConfigProperty.class, "groupName == :groupName && propertyName == :propertyName");
+        query.setParameters(groupName, propertyName);
+        return executeAndCloseUnique(query);
     }
 
     /**
@@ -1031,11 +1015,11 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @return a List of ConfigProperty objects
      * @since 1.3.0
      */
-    @SuppressWarnings("unchecked")
     public List<ConfigProperty> getConfigProperties(final String groupName) {
-        final Query query = pm.newQuery(ConfigProperty.class, "groupName == :groupName");
+        final Query<ConfigProperty> query = pm.newQuery(ConfigProperty.class, "groupName == :groupName");
+        query.setParameters(groupName);
         query.setOrdering("propertyName asc");
-        return (List<ConfigProperty>) query.execute(groupName);
+        return executeAndCloseList(query);
     }
 
     /**
@@ -1043,11 +1027,10 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @return a List of ConfigProperty objects
      * @since 1.3.0
      */
-    @SuppressWarnings("unchecked")
     public List<ConfigProperty> getConfigProperties() {
-        final Query query = pm.newQuery(ConfigProperty.class);
+        final Query<ConfigProperty> query = pm.newQuery(ConfigProperty.class);
         query.setOrdering("groupName asc, propertyName asc");
-        return (List<ConfigProperty>) query.execute();
+        return executeAndCloseList(query);
     }
 
     /**
@@ -1063,16 +1046,15 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     public ConfigProperty createConfigProperty(final String groupName, final String propertyName,
                                                final String propertyValue, final ConfigProperty.PropertyType propertyType,
                                                final String description) {
-        pm.currentTransaction().begin();
-        final ConfigProperty configProperty = new ConfigProperty();
-        configProperty.setGroupName(groupName);
-        configProperty.setPropertyName(propertyName);
-        configProperty.setPropertyValue(propertyValue);
-        configProperty.setPropertyType(propertyType);
-        configProperty.setDescription(description);
-        pm.makePersistent(configProperty);
-        pm.currentTransaction().commit();
-        return getObjectById(ConfigProperty.class, configProperty.getId());
+        return callInTransaction(() -> {
+            final ConfigProperty configProperty = new ConfigProperty();
+            configProperty.setGroupName(groupName);
+            configProperty.setPropertyName(propertyName);
+            configProperty.setPropertyValue(propertyValue);
+            configProperty.setPropertyType(propertyType);
+            configProperty.setDescription(description);
+            return pm.makePersistent(configProperty);
+        });
     }
 
 }

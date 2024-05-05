@@ -76,6 +76,7 @@ public class PersistenceManagerFactory implements IPersistenceManagerFactory, Se
 
         // Apply settings that are required by Alpine and shouldn't be customized.
         dnProps.put(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL, "true");
+        dnProps.put(PropertyNames.PROPERTY_RETAIN_VALUES, "true");
 
         if (Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.METRICS_ENABLED)) {
             dnProps.put(PropertyNames.PROPERTY_ENABLE_STATISTICS, "true");
