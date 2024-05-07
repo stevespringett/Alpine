@@ -20,7 +20,6 @@ package alpine.persistence;
 
 import alpine.common.validation.RegexSequence;
 import alpine.resources.AlpineRequest;
-import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.collections4.CollectionUtils;
 import org.datanucleus.api.jdo.JDOQuery;
 
@@ -257,11 +256,16 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      */
     public long getCount(final Query<?> query, final Object... parameters) {
         final org.datanucleus.store.query.Query<?> internalQuery = ((JDOQuery<?>) query).getInternalQuery();
-        final Query<?> countQuery = pm.newQuery(internalQuery.getCandidateClass());
-        countQuery.setFilter(internalQuery.getFilter());
-        countQuery.setParameters(parameters);
-        countQuery.setResult("count(this)");
-        return executeAndCloseResultUnique(countQuery, Long.class);
+        final String originalOrdering = internalQuery.getOrdering();
+        query.setOrdering(null);
+        query.setResult("count(this)");
+        try {
+            // NB: Don't close the query as it is to be reused.
+            return (Long) query.executeWithArray(parameters);
+        } finally {
+            query.setOrdering(originalOrdering);
+            query.setResult(null);
+        }
     }
 
     /**
@@ -275,11 +279,16 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      */
     public long getCount(final Query<?> query, final Map<String, Object> parameters) {
         final org.datanucleus.store.query.Query<?> internalQuery = ((JDOQuery<?>) query).getInternalQuery();
-        final Query<?> countQuery = pm.newQuery(internalQuery.getCandidateClass());
-        countQuery.setFilter(internalQuery.getFilter());
-        countQuery.setNamedParameters(parameters);
-        countQuery.setResult("count(this)");
-        return executeAndCloseResultUnique(countQuery, Long.class);
+        final String originalOrdering = internalQuery.getOrdering();
+        query.setOrdering(null);
+        query.setResult("count(this)");
+        try {
+            // NB: Don't close the query as it is to be reused.
+            return (Long) query.executeWithMap(parameters);
+        } finally {
+            query.setOrdering(originalOrdering);
+            query.setResult(null);
+        }
     }
 
     /**
