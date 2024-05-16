@@ -20,8 +20,11 @@ package alpine.server.resources;
 
 import alpine.model.About;
 import alpine.server.auth.AuthenticationNotRequired;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -38,16 +41,16 @@ import javax.ws.rs.core.Response;
  * @since 1.0.0
  */
 @Path("/version")
-@Produces(MediaType.APPLICATION_JSON)
-@Api(value = "version")
+@Tag(name = "version")
 public final class VersionResource {
 
     @GET
-    @ApiOperation(
-            value = "Returns application version information",
-            notes = "Returns a simple json object containing the name of the application and the version",
-            response = About.class
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(
+            summary = "Returns application version information",
+            description = "Returns a simple json object containing the name of the application and the version"
     )
+    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = About.class)))
     @AuthenticationNotRequired
     public Response getVersion() {
         return Response.ok(new GenericEntity<>(new About()) { }).build();

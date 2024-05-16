@@ -36,7 +36,7 @@ import java.security.Principal;
 
 /**
  * A filter that ensures that all calls going through this filter are
- * authenticated. Exceptions are made for swagger URLs.
+ * authenticated.
  *
  * @see AuthenticationFeature
  * @author Steve Springett
@@ -54,10 +54,6 @@ public class AuthenticationFilter implements ContainerRequestFilter {
             final ContainerRequest request = (ContainerRequest) requestContext;
             // Bypass authentication for CORS preflight
             if (HttpMethod.OPTIONS.equals(request.getMethod())) {
-                return;
-            }
-            // Bypass authentication for swagger
-            if (request.getRequestUri().getPath().contains("/api/swagger")) {
                 return;
             }
 

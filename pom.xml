@@ -193,7 +193,7 @@
         <lib.owasp.encoder.version>1.2.3</lib.owasp.encoder.version>
         <lib.owasp.security-logging.version>1.1.7</lib.owasp.security-logging.version>
         <lib.slf4j.version>2.0.12</lib.slf4j.version>
-        <lib.swagger.jersey.version>1.6.11</lib.swagger.jersey.version>
+        <lib.swagger.version>2.2.22</lib.swagger.version>
         <!-- Unit test libraries -->
         <lib.junit.version>4.13.2</lib.junit.version>
         <lib.mockito.version>5.5.0</lib.mockito.version>
@@ -288,18 +288,10 @@
                 <artifactId>javax.json</artifactId>
                 <version>${lib.jsr353-impl.version}</version>
             </dependency>
-            <!-- todo: update swagger when available -->
-            <!-- https://github.com/swagger-api/swagger-core/issues/1594 -->
             <dependency>
-                <groupId>io.swagger</groupId>
-                <artifactId>swagger-jersey2-jaxrs</artifactId>
-                <version>${lib.swagger.jersey.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>javax.validation</groupId>
-                        <artifactId>validation-api</artifactId>
-                    </exclusion>
-                </exclusions>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations</artifactId>
+                <version>${lib.swagger.version}</version>
             </dependency>
             <!-- Persistence -->
             <dependency>

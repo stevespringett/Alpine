@@ -33,10 +33,6 @@ at its core. The servers resources are stateless and do not rely
 on sessions. JSON Web Tokens (JWT) are used to maintain some state
 and are signed with an HMAC.
 
-* **API Documentation** - 
-Swagger support is built-in, allowing you to document APIs and generate
-Swagger 2.0 definitions with ease.
-
 * **Authentications** - 
 Alpine supports multiple types of principals including LDAP users and 
 API keys, both of which can be integrated into teams for access control.
@@ -77,7 +73,6 @@ The following features are free and require little or no coding just for using A
 * Authentication via API keys
 * Authentication via JWT
 * Stateless API-first design
-* Automatic generation of Swagger 2.0 definitions
 * REST resources are locked down by default (requires authentication)
 * Configurable enforcement of authentication and authorization
 * Built-in support for BCrypt for the hashing and salting of passwords for managed users

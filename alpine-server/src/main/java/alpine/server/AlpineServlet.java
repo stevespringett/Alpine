@@ -21,22 +21,13 @@ package alpine.server;
 import alpine.Config;
 import alpine.common.logging.Logger;
 import alpine.security.crypto.KeyManager;
-import io.jsonwebtoken.lang.Collections;
-import io.swagger.jaxrs.config.SwaggerContextService;
-import io.swagger.models.Info;
-import io.swagger.models.Swagger;
-import io.swagger.models.auth.ApiKeyAuthDefinition;
-import io.swagger.models.auth.In;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.owasp.security.logging.util.IntervalLoggerController;
 import org.owasp.security.logging.util.SecurityLoggingFactory;
 import org.owasp.security.logging.util.SecurityUtil;
 
 import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRegistration;
-import java.util.Collection;
 
 /**
  * The AlpineServlet is the main servlet which extends
@@ -56,36 +47,13 @@ public class AlpineServlet extends ServletContainer {
     /**
      * Overrides the servlet init method and loads sets the InputStream necessary
      * to load application.properties.
+     *
      * @throws ServletException a general error that occurs during initialization
      */
     @Override
     public void init(ServletConfig config) throws ServletException {
         LOGGER.info("Starting " + Config.getInstance().getApplicationName());
         super.init(config);
-
-        final Info info = new Info()
-                .title(Config.getInstance().getApplicationName() + " API")
-                .version(Config.getInstance().getApplicationVersion());
-
-        final Swagger swagger = new Swagger()
-                .info(info)
-                .securityDefinition("X-Api-Key", new ApiKeyAuthDefinition("X-Api-Key", In.HEADER));
-
-        // Dynamically get the url-pattern from web.xml and use that as the 'baseUrl' for
-        // the API documentation
-        final ServletContext servletContext = getServletContext();
-        final ServletRegistration servletRegistration = servletContext.getServletRegistration(config.getServletName());
-        final Collection<String> mappings = servletRegistration.getMappings();
-        if (! Collections.isEmpty(mappings)) {
-            String baseUrl = mappings.iterator().next();
-            if (baseUrl.charAt(0) != '/') {
-                baseUrl = "/" + baseUrl;
-            }
-            baseUrl = baseUrl.replace("/*", "").replaceAll("\\/$", "");
-            swagger.basePath(config.getServletContext().getContextPath() + baseUrl);
-        }
-
-        new SwaggerContextService().withServletConfig(config).updateSwagger(swagger).initScanner();
 
         // Initializes the KeyManager
         KeyManager.getInstance();
