@@ -22,7 +22,7 @@
         <servlet-class>alpine.AlpineServlet</servlet-class>
         <init-param>
             <param-name>jersey.config.server.provider.packages</param-name>
-            <param-value>io.swagger.jaxrs.listing,alpine.filters,alpine.resources,com.example.resources</param-value>
+            <param-value>alpine.filters,alpine.resources,com.example.resources</param-value>
         </init-param>
         <init-param>
             <param-name>jersey.config.server.provider.classnames</param-name>
