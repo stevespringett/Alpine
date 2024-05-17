@@ -28,10 +28,10 @@ import org.glassfish.jersey.server.monitoring.ApplicationEventListener;
 import org.glassfish.jersey.server.monitoring.RequestEvent;
 import org.glassfish.jersey.server.monitoring.RequestEventListener;
 
+import jakarta.ws.rs.ext.Provider;
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.datastore.JDOConnection;
-import javax.ws.rs.ext.Provider;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

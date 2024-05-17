@@ -24,7 +24,6 @@ import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
-import javax.inject.Singleton;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,7 +37,6 @@ import java.util.ServiceLoader;
  * @author Steve Springett
  * @since 1.0.0
  */
-@Singleton
 public class About implements Serializable {
 
     private static final long serialVersionUID = -7573425245706188307L;

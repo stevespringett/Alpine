@@ -22,8 +22,8 @@ import alpine.auth.PasswordService;
 import alpine.model.ManagedUser;
 import alpine.model.Team;
 import alpine.persistence.AlpineQueryManager;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
 
 /**
  * This class simply creates objects on startup. The example application uses

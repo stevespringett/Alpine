@@ -22,8 +22,8 @@ import alpine.event.LdapSyncEvent;
 import alpine.event.framework.EventService;
 import alpine.tasks.LdapSyncTask;
 import com.example.tasks.TaskScheduler;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
 
 /**
  * Initializes the event subsystem.

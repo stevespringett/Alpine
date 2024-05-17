@@ -18,8 +18,8 @@
  */
 package alpine.server.util;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * This class contains a collection of useful utility methods for various HTTP tasks.

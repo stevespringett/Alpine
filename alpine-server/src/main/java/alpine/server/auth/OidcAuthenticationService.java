@@ -26,7 +26,7 @@ import alpine.persistence.AlpineQueryManager;
 import alpine.server.util.OidcUtil;
 import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import java.security.Principal;
 import java.util.Objects;
 

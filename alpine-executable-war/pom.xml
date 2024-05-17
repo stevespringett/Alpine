@@ -32,15 +32,13 @@
         <maven.uuidgenerator.plugin.version>1.0.1</maven.uuidgenerator.plugin.version>
 
         <!-- Dependency Versions -->
-        <lib.servlet-api.version>4.0.2</lib.servlet-api.version>
-        <lib.jetty.version>10.0.18</lib.jetty.version>
+        <lib.jetty.version>12.0.9</lib.jetty.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
-            <version>${lib.servlet-api.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -49,8 +47,8 @@
             <version>${lib.jetty.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-webapp</artifactId>
+            <groupId>org.eclipse.jetty.ee10</groupId>
+            <artifactId>jetty-ee10-webapp</artifactId>
             <version>${lib.jetty.version}</version>
         </dependency>
         <dependency>
@@ -61,12 +59,10 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>${lib.slf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>${lib.logback.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>

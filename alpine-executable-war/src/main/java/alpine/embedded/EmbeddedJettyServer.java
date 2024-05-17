@@ -18,20 +18,19 @@
  */
 package alpine.embedded;
 
+import org.eclipse.jetty.ee10.servlet.ErrorPageErrorHandler;
+import org.eclipse.jetty.ee10.webapp.WebAppContext;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.servlet.ErrorPageErrorHandler;
-import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.util.Callback;
 import org.slf4j.Logger;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.security.ProtectionDomain;
@@ -86,9 +85,9 @@ public final class EmbeddedJettyServer {
         context.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern", ".*/[^/]*taglibs.*\\.jar$");
 
         // Prevent loading of logging classes
-        context.getSystemClassMatcher().add("org.apache.log4j.");
-        context.getSystemClassMatcher().add("org.slf4j.");
-        context.getSystemClassMatcher().add("org.apache.commons.logging.");
+        context.getProtectedClassMatcher().add("org.apache.log4j.");
+        context.getProtectedClassMatcher().add("org.slf4j.");
+        context.getProtectedClassMatcher().add("org.apache.commons.logging.");
 
         final ProtectionDomain protectionDomain = EmbeddedJettyServer.class.getProtectionDomain();
         final URL location = protectionDomain.getCodeSource().getLocation();
@@ -118,8 +117,10 @@ public final class EmbeddedJettyServer {
      */
     private static class ErrorHandler extends ErrorPageErrorHandler {
         @Override
-        public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        public boolean handle(final Request request, final Response response, final Callback callback) throws Exception {
             response.setStatus(response.getStatus());
+            callback.succeeded();
+            return true;
         }
     }
 

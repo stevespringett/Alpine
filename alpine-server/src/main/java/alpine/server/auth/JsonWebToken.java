@@ -31,14 +31,13 @@ import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import org.owasp.security.logging.SecurityMarkers;
 
-import javax.crypto.SecretKey;
-import java.security.Key;
 import java.security.Principal;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -66,23 +65,11 @@ public class JsonWebToken {
         }
     }
 
-    private final Key key;
+    private final PrivateKey privateKey;
+    private final PublicKey publicKey;
     private String subject;
     private Date expiration;
     private IdentityProvider identityProvider;
-
-    /**
-     * Constructs a new JsonWekToken object using the specified SecretKey which can
-     * be retrieved from {@link KeyManager#getSecretKey()} to use the Alpine-generated
-     * secret key. Usage of other SecretKeys is allowed but management of those keys
-     * is up to the implementor.
-     *
-     * @param key the SecretKey to use in generating or validating the token
-     * @since 1.0.0
-     */
-    public JsonWebToken(final SecretKey key) {
-        this.key = key;
-    }
 
     /**
      * Constructs a new JsonWebToken object using the default Alpine-generated
@@ -92,7 +79,8 @@ public class JsonWebToken {
      * @since 1.0.0
      */
     public JsonWebToken() {
-        this.key = KeyManager.getInstance().getSecretKey();
+        this.privateKey = KeyManager.getInstance().getPrivateKey();
+        this.publicKey = KeyManager.getInstance().getPublicKey();
     }
 
     /**
@@ -133,10 +121,10 @@ public class JsonWebToken {
     public String createToken(final Principal principal, final List<Permission> permissions, final IdentityProvider identityProvider) {
         final Date today = new Date();
         final JwtBuilder jwtBuilder = Jwts.builder();
-        jwtBuilder.setSubject(principal.getName());
-        jwtBuilder.setIssuer(ISSUER);
-        jwtBuilder.setIssuedAt(today);
-        jwtBuilder.setExpiration(addDays(today, 7));
+        jwtBuilder.subject(principal.getName());
+        jwtBuilder.issuer(ISSUER);
+        jwtBuilder.issuedAt(today);
+        jwtBuilder.expiration(addDays(today, 7));
         if (permissions != null) {
             jwtBuilder.claim("permissions", permissions.stream()
                     .map(Permission::getName)
@@ -154,7 +142,7 @@ public class JsonWebToken {
                 jwtBuilder.claim(IDENTITY_PROVIDER_CLAIM, IdentityProvider.LOCAL.name());
             }
         }
-        return jwtBuilder.signWith(SignatureAlgorithm.HS256, key).compact();
+        return jwtBuilder.signWith(privateKey).compact();
     }
 
     /**
@@ -167,8 +155,8 @@ public class JsonWebToken {
      */
     public String createToken(final Map<String, Object> claims) {
         final JwtBuilder jwtBuilder = Jwts.builder();
-        jwtBuilder.setClaims(claims);
-        return jwtBuilder.signWith(SignatureAlgorithm.HS256, key).compact();
+        jwtBuilder.claims(claims);
+        return jwtBuilder.signWith(privateKey).compact();
     }
 
     /**
@@ -181,11 +169,11 @@ public class JsonWebToken {
      */
     public boolean validateToken(final String token) {
         try {
-            final JwtParser jwtParser = Jwts.parser().setSigningKey(key);
-            final Jws<Claims> claims = jwtParser.parseClaimsJws(token);
-            this.subject = claims.getBody().getSubject();
-            this.expiration = claims.getBody().getExpiration();
-            this.identityProvider = IdentityProvider.forName(claims.getBody().get(IDENTITY_PROVIDER_CLAIM, String.class));
+            final JwtParser jwtParser = Jwts.parser().verifyWith(publicKey).build();
+            final Jws<Claims> claims = jwtParser.parseSignedClaims(token);
+            this.subject = claims.getPayload().getSubject();
+            this.expiration = claims.getPayload().getExpiration();
+            this.identityProvider = IdentityProvider.forName(claims.getPayload().get(IDENTITY_PROVIDER_CLAIM, String.class));
             return true;
         } catch (SignatureException e) {
             LOGGER.info(SecurityMarkers.SECURITY_FAILURE, "Received token that did not pass signature verification");

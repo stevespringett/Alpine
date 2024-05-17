@@ -23,8 +23,8 @@ import alpine.common.logging.Logger;
 import org.apache.commons.lang3.StringUtils;
 import org.h2.tools.Server;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
 import java.sql.SQLException;
 
 /**
