@@ -32,12 +32,12 @@ import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import org.owasp.security.logging.SecurityMarkers;
 
+import javax.crypto.SecretKey;
 import java.security.Principal;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -65,11 +65,26 @@ public class JsonWebToken {
         }
     }
 
-    private final PrivateKey privateKey;
-    private final PublicKey publicKey;
+    private final SecretKey key;
     private String subject;
     private Date expiration;
     private IdentityProvider identityProvider;
+
+    /**
+     * Constructs a new JsonWekToken object using the specified SecretKey which can
+     * be retrieved from {@link KeyManager#getSecretKey()} to use the Alpine-generated
+     * secret key. Usage of other SecretKeys is allowed but management of those keys
+     * is up to the implementor.
+     *
+     * @param key the SecretKey to use in generating or validating the token
+     * @since 1.0.0
+     */
+    public JsonWebToken(final SecretKey key) {
+        // NB: JJWT will throw if the key's algorithm is not explicitly any of: HmacSHA512, HmacSHA384, or HmacSHA256.
+        // Alpine generates its secret key with algorithm AES per default.
+        // Keys#hmacShaKeyFor will pick the correct HmacSHA* algorithm based on the key's bit length.
+        this.key = Keys.hmacShaKeyFor(key.getEncoded());
+    }
 
     /**
      * Constructs a new JsonWebToken object using the default Alpine-generated
@@ -79,8 +94,7 @@ public class JsonWebToken {
      * @since 1.0.0
      */
     public JsonWebToken() {
-        this.privateKey = KeyManager.getInstance().getPrivateKey();
-        this.publicKey = KeyManager.getInstance().getPublicKey();
+        this(KeyManager.getInstance().getSecretKey());
     }
 
     /**
@@ -159,7 +173,7 @@ public class JsonWebToken {
                 jwtBuilder.claim(IDENTITY_PROVIDER_CLAIM, IdentityProvider.LOCAL.name());
             }
         }
-        return jwtBuilder.signWith(privateKey).compact();
+        return jwtBuilder.signWith(key).compact();
     }
 
     /**
@@ -173,7 +187,7 @@ public class JsonWebToken {
     public String createToken(final Map<String, Object> claims) {
         final JwtBuilder jwtBuilder = Jwts.builder();
         jwtBuilder.claims(claims);
-        return jwtBuilder.signWith(privateKey).compact();
+        return jwtBuilder.signWith(key).compact();
     }
 
     /**
@@ -186,7 +200,7 @@ public class JsonWebToken {
      */
     public boolean validateToken(final String token) {
         try {
-            final JwtParser jwtParser = Jwts.parser().verifyWith(publicKey).build();
+            final JwtParser jwtParser = Jwts.parser().verifyWith(key).build();
             final Jws<Claims> claims = jwtParser.parseSignedClaims(token);
             this.subject = claims.getPayload().getSubject();
             this.expiration = claims.getPayload().getExpiration();
