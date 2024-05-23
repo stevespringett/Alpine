@@ -118,13 +118,30 @@ public class JsonWebToken {
      * @return a String representation of the generated token
      * @since 1.8.0
      */
-    public String createToken(final Principal principal, final List<Permission> permissions, final IdentityProvider identityProvider) {
-        final Date today = new Date();
+    public String createToken(final Principal principal, final List<Permission> permissions,
+            final IdentityProvider identityProvider) {
+        final int ttl = Config.getInstance().getPropertyAsInt(Config.AlpineKey.AUTH_JWT_TTL_SECONDS);
+        return createToken(principal, permissions, identityProvider, ttl);
+    }
+
+    /**
+     * Creates a new JWT for the specified principal. Token is signed using
+     * the SecretKey with an HMAC 256 algorithm.
+     *
+     * @param principal the Principal to create the token for
+     * @param permissions the effective list of permissions for the principal
+     * @param identityProvider the identity provider the principal was authenticated with. If null, it will be derived from principal
+     * @param ttlSeconds the token time-to-live in seconds
+     * @return a String representation of the generated token
+     * @since 2.2.6
+     */
+    public String createToken(final Principal principal, final List<Permission> permissions, final IdentityProvider identityProvider, final int ttlSeconds) {
+        final Date now = new Date();
         final JwtBuilder jwtBuilder = Jwts.builder();
         jwtBuilder.subject(principal.getName());
         jwtBuilder.issuer(ISSUER);
-        jwtBuilder.issuedAt(today);
-        jwtBuilder.expiration(addDays(today, 7));
+        jwtBuilder.issuedAt(now);
+        jwtBuilder.expiration(addSeconds(now, ttlSeconds));
         if (permissions != null) {
             jwtBuilder.claim("permissions", permissions.stream()
                     .map(Permission::getName)
@@ -191,14 +208,14 @@ public class JsonWebToken {
     /**
      * Create a new future Date from the specified Date.
      *
-     * @param date The date to base the future date from
-     * @param days The number of dates to + offset
+     * @param date    The date to base the future date from
+     * @param seconds The number of seconds to + offset
      * @return a future date
      */
-    private Date addDays(final Date date, final int days) {
+    private Date addSeconds(final Date date, final int seconds) {
         final Calendar cal = Calendar.getInstance();
         cal.setTime(date);
-        cal.add(Calendar.DATE, days); //minus number would decrement the days
+        cal.add(Calendar.SECOND, seconds); //minus number would decrement the seconds
         return cal.getTime();
     }
 
