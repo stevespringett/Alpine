@@ -147,7 +147,7 @@ public class JsonWebToken {
      * @param identityProvider the identity provider the principal was authenticated with. If null, it will be derived from principal
      * @param ttlSeconds the token time-to-live in seconds
      * @return a String representation of the generated token
-     * @since 2.2.6
+     * @since 3.0.0
      */
     public String createToken(final Principal principal, final List<Permission> permissions, final IdentityProvider identityProvider, final int ttlSeconds) {
         final Date now = new Date();

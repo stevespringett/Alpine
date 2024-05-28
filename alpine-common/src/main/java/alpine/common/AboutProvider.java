@@ -21,7 +21,7 @@ package alpine.common;
 import java.util.Map;
 
 /**
- * @since 2.2.6
+ * @since 3.0.0
  */
 public interface AboutProvider {
 

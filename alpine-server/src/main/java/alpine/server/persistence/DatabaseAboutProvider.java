@@ -34,7 +34,7 @@ import static alpine.server.persistence.PersistenceManagerFactory.createPersiste
 /**
  * An {@link AboutProvider} for database information.
  *
- * @since 2.2.6
+ * @since 3.0.0
  */
 public class DatabaseAboutProvider implements AboutProvider {
 

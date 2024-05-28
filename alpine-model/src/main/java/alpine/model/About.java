@@ -99,7 +99,7 @@ public class About implements Serializable {
 
     /**
      * @return Additional information provided by {@link AboutProvider}s
-     * @since 2.2.6
+     * @since 3.0.0
      */
     @JsonAnyGetter
     @JsonInclude(Include.NON_EMPTY)
