@@ -158,6 +158,7 @@
 
         <!-- Dependency Versions -->
         <lib.alpine.executable.war.version>2.2.6-SNAPSHOT</lib.alpine.executable.war.version>
+        <lib.angus-mail.version>2.0.3</lib.angus-mail.version>
         <lib.bcrypt.version>0.4</lib.bcrypt.version>
         <lib.caffeine.version>3.1.8</lib.caffeine.version>
         <lib.commons.collections4.version>4.4</lib.commons.collections4.version>
@@ -171,27 +172,25 @@
         <lib.javassist.version>3.29.2-GA</lib.javassist.version>
         <lib.jackson.version>2.17.0</lib.jackson.version>
         <lib.jackson-databind.version>2.17.1</lib.jackson-databind.version>
-        <lib.javamail.version>1.6.7</lib.javamail.version>
-        <lib.jaxb.api.version>2.3.1</lib.jaxb.api.version>
-        <lib.jaxb.core.version>2.3.0.1</lib.jaxb.core.version>
-        <lib.jaxb.impl.version>2.3.6</lib.jaxb.impl.version>
+        <lib.jakarta-json-api.version>2.1.3</lib.jakarta-json-api.version>
+        <lib.jakarta-mail-api.version>2.1.3</lib.jakarta-mail-api.version>
+        <lib.jakarta-servlet-api.version>6.0.0</lib.jakarta-servlet-api.version>
+        <lib.jakarta-xml-bind-api.version>4.0.2</lib.jakarta-xml-bind-api.version>
+        <lib.jaxb-runtime.version>4.0.5</lib.jaxb-runtime.version>
         <lib.jdo.api.version>3.2.1</lib.jdo.api.version>
-        <lib.jersey.version>2.41</lib.jersey.version>
+        <lib.jersey.version>3.1.6</lib.jersey.version>
         <lib.json-unit.version>2.37.0</lib.json-unit.version>
-        <lib.jsp.api.version>2.2</lib.jsp.api.version>
-        <lib.jsonwebtoken.version>0.9.1</lib.jsonwebtoken.version>
+        <lib.jsonwebtoken.version>0.12.5</lib.jsonwebtoken.version>
         <lib.jsr305.version>3.0.2</lib.jsr305.version>
-        <lib.jsr353-impl.version>1.1.4</lib.jsr353-impl.version>
-        <lib.jsr353-spec.version>1.1.4</lib.jsr353-spec.version>
-        <lib.jstl.version>1.2.5</lib.jstl.version>
         <lib.logback.version>1.3.14</lib.logback.version>
         <!-- Keep at 7.3! logstash-logback-encoder >= v7.4 requires logback v2 -->
         <lib.logstash-logback-encoder.version>7.3</lib.logstash-logback-encoder.version>
         <lib.micrometer.version>1.11.4</lib.micrometer.version>
-        <lib.microprofile-health-api.version>3.1</lib.microprofile-health-api.version>
+        <lib.microprofile-health-api.version>4.0.1</lib.microprofile-health-api.version>
         <lib.nimbus-oauth2-oidc-sdk.version>11.12</lib.nimbus-oauth2-oidc-sdk.version>
         <lib.owasp.encoder.version>1.2.3</lib.owasp.encoder.version>
         <lib.owasp.security-logging.version>1.1.7</lib.owasp.security-logging.version>
+        <lib.parsson.version>1.1.6</lib.parsson.version>
         <lib.slf4j.version>2.0.12</lib.slf4j.version>
         <lib.swagger.version>2.2.22</lib.swagger.version>
         <!-- Unit test libraries -->
@@ -231,9 +230,9 @@
             </dependency>
             <!-- Server architecture -->
             <dependency>
-                <groupId>javax.servlet</groupId>
-                <artifactId>javax.servlet-api</artifactId>
-                <version>4.0.1</version>
+                <groupId>jakarta.servlet</groupId>
+                <artifactId>jakarta.servlet-api</artifactId>
+                <version>${lib.jakarta-servlet-api.version}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
@@ -263,34 +262,30 @@
             </dependency>
             <!-- JAXB -->
             <dependency>
-                <groupId>javax.xml.bind</groupId>
-                <artifactId>jaxb-api</artifactId>
-                <version>${lib.jaxb.api.version}</version>
+                <groupId>jakarta.xml.bind</groupId>
+                <artifactId>jakarta.xml.bind-api</artifactId>
+                <version>${lib.jakarta-xml-bind-api.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.sun.xml.bind</groupId>
-                <artifactId>jaxb-core</artifactId>
-                <version>${lib.jaxb.core.version}</version>
+                <groupId>org.glassfish.jaxb</groupId>
+                <artifactId>jaxb-runtime</artifactId>
+                <version>${lib.jaxb-runtime.version}</version>
+            </dependency>
+            <!-- JSON API specification and default implementation -->
+            <dependency>
+                <groupId>jakarta.json</groupId>
+                <artifactId>jakarta.json-api</artifactId>
+                <version>${lib.jakarta-json-api.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.sun.xml.bind</groupId>
-                <artifactId>jaxb-impl</artifactId>
-                <version>${lib.jaxb.impl.version}</version>
+                <groupId>org.eclipse.parsson</groupId>
+                <artifactId>jakarta.json</artifactId>
+                <version>${lib.parsson.version}</version>
             </dependency>
-            <!-- JSON API specification and default implementation of JSR 353 -->
-            <dependency>
-                <groupId>javax.json</groupId>
-                <artifactId>javax.json-api</artifactId>
-                <version>${lib.jsr353-spec.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.glassfish</groupId>
-                <artifactId>javax.json</artifactId>
-                <version>${lib.jsr353-impl.version}</version>
-            </dependency>
+            <!-- OpenAPI -->
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
-                <artifactId>swagger-annotations</artifactId>
+                <artifactId>swagger-annotations-jakarta</artifactId>
                 <version>${lib.swagger.version}</version>
             </dependency>
             <!-- Persistence -->
@@ -369,13 +364,13 @@
                 <version>${lib.jackson.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.fasterxml.jackson.jaxrs</groupId>
-                <artifactId>jackson-jaxrs-base</artifactId>
+                <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
+                <artifactId>jackson-jakarta-rs-base</artifactId>
                 <version>${lib.jackson.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.fasterxml.jackson.jaxrs</groupId>
-                <artifactId>jackson-jaxrs-json-provider</artifactId>
+                <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
+                <artifactId>jackson-jakarta-rs-json-provider</artifactId>
                 <version>${lib.jackson.version}</version>
             </dependency>
             <dependency>
@@ -440,9 +435,14 @@
             </dependency>
             <!-- JavaMail API -->
             <dependency>
-                <groupId>com.sun.mail</groupId>
-                <artifactId>jakarta.mail</artifactId>
-                <version>${lib.javamail.version}</version>
+                <groupId>jakarta.mail</groupId>
+                <artifactId>jakarta.mail-api</artifactId>
+                <version>${lib.jakarta-mail-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.angus</groupId>
+                <artifactId>angus-mail</artifactId>
+                <version>${lib.angus-mail.version}</version>
             </dependency>
             <!-- Quality -->
             <dependency>

@@ -18,7 +18,7 @@
  */
 package alpine.server.auth;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import javax.naming.AuthenticationException;
 import java.security.Principal;
 

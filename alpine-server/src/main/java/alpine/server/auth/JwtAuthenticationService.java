@@ -22,12 +22,11 @@ import alpine.model.LdapUser;
 import alpine.model.ManagedUser;
 import alpine.model.OidcUser;
 import alpine.persistence.AlpineQueryManager;
-import alpine.security.crypto.KeyManager;
 import org.glassfish.jersey.server.ContainerRequest;
 
+import jakarta.ws.rs.core.Cookie;
+import jakarta.ws.rs.core.HttpHeaders;
 import javax.naming.AuthenticationException;
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.HttpHeaders;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
@@ -63,9 +62,8 @@ public class JwtAuthenticationService implements AuthenticationService {
      * {@inheritDoc}
      */
     public Principal authenticate() throws AuthenticationException {
-        final KeyManager keyManager = KeyManager.getInstance();
         if (bearer != null) {
-            final JsonWebToken jwt = new JsonWebToken(keyManager.getSecretKey());
+            final JsonWebToken jwt = new JsonWebToken();
             final boolean isValid = jwt.validateToken(bearer);
             if (isValid) {
                 try (AlpineQueryManager qm = new AlpineQueryManager()) {

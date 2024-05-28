@@ -26,8 +26,8 @@ import org.owasp.security.logging.util.IntervalLoggerController;
 import org.owasp.security.logging.util.SecurityLoggingFactory;
 import org.owasp.security.logging.util.SecurityUtil;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
 
 /**
  * The AlpineServlet is the main servlet which extends

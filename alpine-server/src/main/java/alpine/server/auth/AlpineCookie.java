@@ -18,7 +18,7 @@
  */
 package alpine.server.auth;
 
-import javax.ws.rs.core.NewCookie;
+import jakarta.ws.rs.core.NewCookie;
 
 /**
  * Alpine Cookies are secure with the HttpOnly, Secure, and Samesite flags enabled.

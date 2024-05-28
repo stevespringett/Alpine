@@ -31,13 +31,12 @@ import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import org.owasp.security.logging.SecurityMarkers;
 
 import javax.crypto.SecretKey;
-import java.security.Key;
 import java.security.Principal;
 import java.util.Calendar;
 import java.util.Date;
@@ -66,7 +65,7 @@ public class JsonWebToken {
         }
     }
 
-    private final Key key;
+    private final SecretKey key;
     private String subject;
     private Date expiration;
     private IdentityProvider identityProvider;
@@ -81,7 +80,10 @@ public class JsonWebToken {
      * @since 1.0.0
      */
     public JsonWebToken(final SecretKey key) {
-        this.key = key;
+        // NB: JJWT will throw if the key's algorithm is not explicitly any of: HmacSHA512, HmacSHA384, or HmacSHA256.
+        // Alpine generates its secret key with algorithm AES per default.
+        // Keys#hmacShaKeyFor will pick the correct HmacSHA* algorithm based on the key's bit length.
+        this.key = Keys.hmacShaKeyFor(key.getEncoded());
     }
 
     /**
@@ -92,7 +94,7 @@ public class JsonWebToken {
      * @since 1.0.0
      */
     public JsonWebToken() {
-        this.key = KeyManager.getInstance().getSecretKey();
+        this(KeyManager.getInstance().getSecretKey());
     }
 
     /**
@@ -150,10 +152,10 @@ public class JsonWebToken {
     public String createToken(final Principal principal, final List<Permission> permissions, final IdentityProvider identityProvider, final int ttlSeconds) {
         final Date now = new Date();
         final JwtBuilder jwtBuilder = Jwts.builder();
-        jwtBuilder.setSubject(principal.getName());
-        jwtBuilder.setIssuer(ISSUER);
-        jwtBuilder.setIssuedAt(now);
-        jwtBuilder.setExpiration(addSeconds(now, ttlSeconds));
+        jwtBuilder.subject(principal.getName());
+        jwtBuilder.issuer(ISSUER);
+        jwtBuilder.issuedAt(now);
+        jwtBuilder.expiration(addSeconds(now, ttlSeconds));
         if (permissions != null) {
             jwtBuilder.claim("permissions", permissions.stream()
                     .map(Permission::getName)
@@ -171,7 +173,7 @@ public class JsonWebToken {
                 jwtBuilder.claim(IDENTITY_PROVIDER_CLAIM, IdentityProvider.LOCAL.name());
             }
         }
-        return jwtBuilder.signWith(SignatureAlgorithm.HS256, key).compact();
+        return jwtBuilder.signWith(key).compact();
     }
 
     /**
@@ -184,8 +186,8 @@ public class JsonWebToken {
      */
     public String createToken(final Map<String, Object> claims) {
         final JwtBuilder jwtBuilder = Jwts.builder();
-        jwtBuilder.setClaims(claims);
-        return jwtBuilder.signWith(SignatureAlgorithm.HS256, key).compact();
+        jwtBuilder.claims(claims);
+        return jwtBuilder.signWith(key).compact();
     }
 
     /**
@@ -198,11 +200,11 @@ public class JsonWebToken {
      */
     public boolean validateToken(final String token) {
         try {
-            final JwtParser jwtParser = Jwts.parser().setSigningKey(key);
-            final Jws<Claims> claims = jwtParser.parseClaimsJws(token);
-            this.subject = claims.getBody().getSubject();
-            this.expiration = claims.getBody().getExpiration();
-            this.identityProvider = IdentityProvider.forName(claims.getBody().get(IDENTITY_PROVIDER_CLAIM, String.class));
+            final JwtParser jwtParser = Jwts.parser().verifyWith(key).build();
+            final Jws<Claims> claims = jwtParser.parseSignedClaims(token);
+            this.subject = claims.getPayload().getSubject();
+            this.expiration = claims.getPayload().getExpiration();
+            this.identityProvider = IdentityProvider.forName(claims.getPayload().get(IDENTITY_PROVIDER_CLAIM, String.class));
             return true;
         } catch (SignatureException e) {
             LOGGER.info(SecurityMarkers.SECURITY_FAILURE, "Received token that did not pass signature verification");
