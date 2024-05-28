@@ -36,7 +36,7 @@ public class AboutTest {
         Assert.assertNull(about.getUuid());
 
         Assert.assertEquals("alpine-model", about.getFramework().getName());
-        Assert.assertTrue(about.getFramework().getVersion().startsWith("2."));
+        Assert.assertTrue(about.getFramework().getVersion().startsWith("3."));
         Assert.assertTrue(about.getFramework().getTimestamp().startsWith("20"));
         Assert.assertTrue(UuidUtil.isValidUUID(about.getFramework().getUuid()));
 
