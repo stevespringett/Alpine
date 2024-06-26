@@ -195,7 +195,7 @@
         <lib.swagger.version>2.2.22</lib.swagger.version>
         <!-- Unit test libraries -->
         <lib.junit.version>4.13.2</lib.junit.version>
-        <lib.mockito.version>5.5.0</lib.mockito.version>
+        <lib.mockito.version>5.12.0</lib.mockito.version>
         <lib.assertj.version>3.24.2</lib.assertj.version>
         <lib.wiremock.version>2.35.1</lib.wiremock.version>
 
