@@ -695,7 +695,7 @@ public abstract class AbstractAlpineQueryManager implements AutoCloseable {
      * @param <T>         Type of the {@link Query}'s result
      * @return The {@link Query}'s result
      */
-    protected <T> List<T> executeAndCloseResultList(final Query<T> query, final Class<T> resultClass) {
+    protected <T> List<T> executeAndCloseResultList(final Query<?> query, final Class<T> resultClass) {
         try {
             return new ArrayList<>(query.executeResultList(resultClass));
         } finally {
