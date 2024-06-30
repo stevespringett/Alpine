@@ -24,21 +24,24 @@ public class NotSortableException extends IllegalArgumentException {
     private final String fieldName;
     private final String reason;
 
-    NotSortableException(final String resourceName, final String fieldName, final String reason) {
+    public NotSortableException(final String resourceName, final String fieldName, final String reason) {
         super("Can not sort by %s#%s: %s".formatted(resourceName, fieldName, reason));
         this.resourceName = resourceName;
         this.fieldName = fieldName;
         this.reason = reason;
     }
 
+    @SuppressWarnings("unused")
     public String getResourceName() {
         return resourceName;
     }
 
+    @SuppressWarnings("unused")
     public String getFieldName() {
         return fieldName;
     }
 
+    @SuppressWarnings("unused")
     public String getReason() {
         return reason;
     }

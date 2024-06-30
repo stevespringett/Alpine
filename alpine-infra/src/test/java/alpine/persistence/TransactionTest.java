@@ -68,7 +68,7 @@ public class TransactionTest {
 
     @Test
     public void testTransactionRollback() {
-        assertThatExceptionOfType(RuntimeException.class)
+        assertThatExceptionOfType(IllegalStateException.class)
                 .isThrownBy(() -> qm.runInTransaction(() -> {
                     final ManagedUser user = qm.createManagedUser("username", "passwordHash");
                     final Team team = qm.createTeam("foo", true);
@@ -76,8 +76,7 @@ public class TransactionTest {
                     assertThat(added).isTrue();
 
                     throw new IllegalStateException();
-                }))
-                .withCauseInstanceOf(IllegalStateException.class);
+                }));
 
         // Changes made in the transaction must have been rolled back.
         assertThat(qm.getManagedUser("username")).isNull();
@@ -98,7 +97,7 @@ public class TransactionTest {
             // The transaction should join the currently active one.
             // Throw an exception at the end. The exception must not cause
             // the transaction to be rolled back.
-            assertThatExceptionOfType(RuntimeException.class)
+            assertThatExceptionOfType(IllegalStateException.class)
                     .isThrownBy(() -> qm.runInTransaction(() -> {
                         final boolean addedUserB = qm.addUserToTeam(userB, team);
                         assertThat(addedUserB).isTrue();
