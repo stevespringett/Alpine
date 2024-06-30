@@ -98,64 +98,65 @@ public final class Transaction {
         // Changes made to a transaction object will persist until the owning PM is closed.
         // Ensure we're doing our best to leave the transaction as we found it.
         final var cleanups = new ArrayList<Runnable>();
-
-        final boolean isJoiningExisting = jdoTransaction.isActive();
-        if (isJoiningExisting && options.propagation == Propagation.REQUIRES_NEW) {
-            throw new IllegalStateException("Propagation is set to %s, but a transaction is already active"
-                    .formatted(Propagation.REQUIRES_NEW));
-        }
-
-        final Isolation currentIsolation = Isolation.fromJdoName(jdoTransaction.getIsolationLevel());
-        final Isolation requestedIsolation = options.isolation;
-        if (requestedIsolation != null && currentIsolation != requestedIsolation) {
-            if (isJoiningExisting) {
-                throw new IllegalStateException("""
-                        Requested isolation is %s, but transaction is already \
-                        active with isolation %s""".formatted(requestedIsolation, currentIsolation));
-            }
-
-            cleanups.add(() -> jdoTransaction.setIsolationLevel(currentIsolation.jdoName()));
-            jdoTransaction.setIsolationLevel(requestedIsolation.jdoName());
-        }
-
-        final Boolean currentSerializeRead = jdoTransaction.getSerializeRead();
-        final Boolean requestedSerializeRead = options.serializeRead;
-        if (requestedSerializeRead != null && currentSerializeRead != requestedSerializeRead) {
-            if (isJoiningExisting) {
-                throw new IllegalStateException("""
-                        Requested serializeRead=%s, but transaction is already \
-                        active with serializeRead=%s""".formatted(requestedSerializeRead, currentSerializeRead));
-            }
-
-            cleanups.add(() -> jdoTransaction.setSerializeRead(currentSerializeRead));
-            jdoTransaction.setSerializeRead(requestedSerializeRead);
-        }
-
         try {
-            if (!isJoiningExisting) {
-                jdoTransaction.begin();
+            final boolean isJoiningExisting = jdoTransaction.isActive();
+            if (isJoiningExisting && options.propagation == Propagation.REQUIRES_NEW) {
+                throw new IllegalStateException("Propagation is set to %s, but a transaction is already active"
+                        .formatted(Propagation.REQUIRES_NEW));
             }
 
-            final T result = callable.call();
+            final Isolation currentIsolation = Isolation.fromJdoName(jdoTransaction.getIsolationLevel());
+            final Isolation requestedIsolation = options.isolation;
+            if (requestedIsolation != null && currentIsolation != requestedIsolation) {
+                if (isJoiningExisting) {
+                    throw new IllegalStateException("""
+                            Requested isolation is %s, but transaction is already \
+                            active with isolation %s""".formatted(requestedIsolation, currentIsolation));
+                }
 
-            if (!isJoiningExisting) {
-                jdoTransaction.commit();
+                cleanups.add(() -> jdoTransaction.setIsolationLevel(currentIsolation.jdoName()));
+                jdoTransaction.setIsolationLevel(requestedIsolation.jdoName());
             }
 
-            return result;
-        } catch (Exception e) {
-            if (e instanceof final RuntimeException re) {
-                // Avoid unnecessary wrapping if we're
-                // already dealing with a RuntimeException.
-                throw re;
+            final Boolean currentSerializeRead = jdoTransaction.getSerializeRead();
+            final Boolean requestedSerializeRead = options.serializeRead;
+            if (requestedSerializeRead != null && currentSerializeRead != requestedSerializeRead) {
+                if (isJoiningExisting) {
+                    throw new IllegalStateException("""
+                            Requested serializeRead=%s, but transaction is already \
+                            active with serializeRead=%s""".formatted(requestedSerializeRead, currentSerializeRead));
+                }
+
+                cleanups.add(() -> jdoTransaction.setSerializeRead(currentSerializeRead));
+                jdoTransaction.setSerializeRead(requestedSerializeRead);
             }
 
-            throw new RuntimeException(e);
+            try {
+                if (!isJoiningExisting) {
+                    jdoTransaction.begin();
+                }
+
+                final T result = callable.call();
+
+                if (!isJoiningExisting) {
+                    jdoTransaction.commit();
+                }
+
+                return result;
+            } catch (Exception e) {
+                if (e instanceof final RuntimeException re) {
+                    // Avoid unnecessary wrapping if we're
+                    // already dealing with a RuntimeException.
+                    throw re;
+                }
+
+                throw new RuntimeException(e);
+            } finally {
+                if (jdoTransaction.isActive() && !isJoiningExisting) {
+                    jdoTransaction.rollback();
+                }
+            }
         } finally {
-            if (jdoTransaction.isActive() && !isJoiningExisting) {
-                jdoTransaction.rollback();
-            }
-
             cleanups.forEach(Runnable::run);
         }
     }
