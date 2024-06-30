@@ -144,6 +144,12 @@ public final class Transaction {
 
             return result;
         } catch (Exception e) {
+            if (e instanceof final RuntimeException re) {
+                // Avoid unnecessary wrapping if we're
+                // already dealing with a RuntimeException.
+                throw re;
+            }
+
             throw new RuntimeException(e);
         } finally {
             if (jdoTransaction.isActive() && !isJoiningExisting) {
