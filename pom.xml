@@ -184,7 +184,7 @@
         <lib.jsr305.version>3.0.2</lib.jsr305.version>
         <lib.logback.version>1.5.6</lib.logback.version>
         <!-- Keep at 7.3! logstash-logback-encoder >= v7.4 requires logback v2 -->
-        <lib.logstash-logback-encoder.version>7.3</lib.logstash-logback-encoder.version>
+        <lib.logstash-logback-encoder.version>7.4</lib.logstash-logback-encoder.version>
         <lib.micrometer.version>1.11.4</lib.micrometer.version>
         <lib.microprofile-health-api.version>4.0.1</lib.microprofile-health-api.version>
         <lib.nimbus-oauth2-oidc-sdk.version>11.13</lib.nimbus-oauth2-oidc-sdk.version>
