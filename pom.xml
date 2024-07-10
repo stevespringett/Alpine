@@ -180,7 +180,7 @@
         <lib.jdo.api.version>3.2.1</lib.jdo.api.version>
         <lib.jersey.version>3.1.7</lib.jersey.version>
         <lib.json-unit.version>3.4.0</lib.json-unit.version>
-        <lib.jsonwebtoken.version>0.12.5</lib.jsonwebtoken.version>
+        <lib.jsonwebtoken.version>0.12.6</lib.jsonwebtoken.version>
         <lib.jsr305.version>3.0.2</lib.jsr305.version>
         <lib.logback.version>1.5.6</lib.logback.version>
         <!-- Keep at 7.3! logstash-logback-encoder >= v7.4 requires logback v2 -->
