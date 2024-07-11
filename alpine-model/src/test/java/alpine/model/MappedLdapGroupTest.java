@@ -18,8 +18,8 @@
  */
 package alpine.model;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
@@ -29,7 +29,7 @@ public class MappedLdapGroupTest {
     public void idTest() {
         MappedLdapGroup mapping = new MappedLdapGroup();
         mapping.setId(123L);
-        Assert.assertEquals(123L, mapping.getId());
+        Assertions.assertEquals(123L, mapping.getId());
     }
 
     @Test
@@ -37,14 +37,14 @@ public class MappedLdapGroupTest {
         Team team = new Team();
         MappedLdapGroup mapping = new MappedLdapGroup();
         mapping.setTeam(team);
-        Assert.assertEquals(team, mapping.getTeam());
+        Assertions.assertEquals(team, mapping.getTeam());
     }
 
     @Test
     public void dnTest() {
         MappedLdapGroup mapping = new MappedLdapGroup();
         mapping.setDn("cn=TeamA,ou=groups,o=example.com");
-        Assert.assertEquals("cn=TeamA,ou=groups,o=example.com", mapping.getDn());
+        Assertions.assertEquals("cn=TeamA,ou=groups,o=example.com", mapping.getDn());
     }
 
     @Test
@@ -52,6 +52,6 @@ public class MappedLdapGroupTest {
         UUID uuid = UUID.randomUUID();
         MappedLdapGroup mapping = new MappedLdapGroup();
         mapping.setUuid(uuid);
-        Assert.assertEquals(uuid, mapping.getUuid());
+        Assertions.assertEquals(uuid, mapping.getUuid());
     }
 }

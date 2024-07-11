@@ -18,8 +18,8 @@
  */
 package alpine.server.util;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -35,15 +35,15 @@ public class HttpUtilTest {
     public void getSessionAttributeTest() {
         HttpSession session = mock(HttpSession.class);
         when(session.getAttribute("myobject")).thenReturn(new TestObject());
-        Assert.assertTrue(HttpUtil.getSessionAttribute(session, "myobject") instanceof TestObject);
-        Assert.assertTrue(HttpUtil.getSessionAttribute(session, "foo") == null);
+        Assertions.assertTrue(HttpUtil.getSessionAttribute(session, "myobject") instanceof TestObject);
+        Assertions.assertTrue(HttpUtil.getSessionAttribute(session, "foo") == null);
     }
 
     @Test
     public void getRequestAttributeTest() {
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getAttribute("myobject")).thenReturn(new TestObject());
-        Assert.assertTrue(HttpUtil.getRequestAttribute(request, "myobject") instanceof TestObject);
-        Assert.assertTrue(HttpUtil.getRequestAttribute(request, "foo") == null);
+        Assertions.assertTrue(HttpUtil.getRequestAttribute(request, "myobject") instanceof TestObject);
+        Assertions.assertTrue(HttpUtil.getRequestAttribute(request, "foo") == null);
     }
 }

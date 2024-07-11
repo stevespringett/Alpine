@@ -18,8 +18,8 @@
  */
 package alpine.model;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class SchemaVersionTest {
 
@@ -27,14 +27,14 @@ public class SchemaVersionTest {
     public void idTest() {
         SchemaVersion sv = new SchemaVersion();
         sv.setId(123L);
-        Assert.assertEquals(123L, sv.getId());
+        Assertions.assertEquals(123L, sv.getId());
     }
 
     @Test
     public void versionTest() {
         SchemaVersion sv = new SchemaVersion();
         sv.setVersion("3.5.0");
-        Assert.assertEquals("3.5.0", sv.getVersion());
+        Assertions.assertEquals("3.5.0", sv.getVersion());
     }
 
 }

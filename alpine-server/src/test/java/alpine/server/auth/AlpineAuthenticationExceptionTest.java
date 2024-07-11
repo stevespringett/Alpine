@@ -18,8 +18,8 @@
  */
 package alpine.server.auth;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.security.Principal;
@@ -28,27 +28,27 @@ public class AlpineAuthenticationExceptionTest {
 
     @Test
     public void causeTypeTest() {
-        Assert.assertEquals(6, AlpineAuthenticationException.CauseType.values().length);
-        Assert.assertEquals("INVALID_CREDENTIALS", AlpineAuthenticationException.CauseType.INVALID_CREDENTIALS.name());
-        Assert.assertEquals("EXPIRED_CREDENTIALS", AlpineAuthenticationException.CauseType.EXPIRED_CREDENTIALS.name());
-        Assert.assertEquals("FORCE_PASSWORD_CHANGE", AlpineAuthenticationException.CauseType.FORCE_PASSWORD_CHANGE.name());
-        Assert.assertEquals("SUSPENDED", AlpineAuthenticationException.CauseType.SUSPENDED.name());
-        Assert.assertEquals("UNMAPPED_ACCOUNT", AlpineAuthenticationException.CauseType.UNMAPPED_ACCOUNT.name());
-        Assert.assertEquals("OTHER", AlpineAuthenticationException.CauseType.OTHER.name());
+        Assertions.assertEquals(6, AlpineAuthenticationException.CauseType.values().length);
+        Assertions.assertEquals("INVALID_CREDENTIALS", AlpineAuthenticationException.CauseType.INVALID_CREDENTIALS.name());
+        Assertions.assertEquals("EXPIRED_CREDENTIALS", AlpineAuthenticationException.CauseType.EXPIRED_CREDENTIALS.name());
+        Assertions.assertEquals("FORCE_PASSWORD_CHANGE", AlpineAuthenticationException.CauseType.FORCE_PASSWORD_CHANGE.name());
+        Assertions.assertEquals("SUSPENDED", AlpineAuthenticationException.CauseType.SUSPENDED.name());
+        Assertions.assertEquals("UNMAPPED_ACCOUNT", AlpineAuthenticationException.CauseType.UNMAPPED_ACCOUNT.name());
+        Assertions.assertEquals("OTHER", AlpineAuthenticationException.CauseType.OTHER.name());
     }
 
     @Test
     public void constructorATest() {
         AlpineAuthenticationException e = new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.UNMAPPED_ACCOUNT);
-        Assert.assertEquals(AlpineAuthenticationException.CauseType.UNMAPPED_ACCOUNT, e.getCauseType());
-        Assert.assertNull(e.getPrincipal());
+        Assertions.assertEquals(AlpineAuthenticationException.CauseType.UNMAPPED_ACCOUNT, e.getCauseType());
+        Assertions.assertNull(e.getPrincipal());
     }
 
     @Test
     public void constructorBTest() {
         Principal p = Mockito.mock(Principal.class);
         AlpineAuthenticationException e = new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.UNMAPPED_ACCOUNT, p);
-        Assert.assertEquals(AlpineAuthenticationException.CauseType.UNMAPPED_ACCOUNT, e.getCauseType());
-        Assert.assertEquals(p, e.getPrincipal());
+        Assertions.assertEquals(AlpineAuthenticationException.CauseType.UNMAPPED_ACCOUNT, e.getCauseType());
+        Assertions.assertEquals(p, e.getPrincipal());
     }
 }

@@ -18,14 +18,14 @@
  */
 package alpine.common.util;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class ByteUtilTest {
 
     @Test
     public void toBytesTest() {
         char[] chars={'a', 'b', 'c', 'd'};
-        Assert.assertNotNull(ByteUtil.toBytes(chars));
+        Assertions.assertNotNull(ByteUtil.toBytes(chars));
     }
 }

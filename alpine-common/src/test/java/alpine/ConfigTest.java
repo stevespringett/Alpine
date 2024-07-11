@@ -1,11 +1,11 @@
 package alpine;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
-import org.junit.contrib.java.lang.system.RestoreSystemProperties;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.RestoreEnvironmentVariables;
+import org.junitpioneer.jupiter.RestoreSystemProperties;
+import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
 import java.net.URL;
 import java.util.Map;
@@ -14,18 +14,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ConfigTest {
 
-    @Rule
-    public final RestoreSystemProperties restoreSystemProperties = new RestoreSystemProperties();
-
-    @Rule
-    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
-
-    @After
+    @AfterEach
     public void tearDown() {
         Config.reset();
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() {
         Config.getInstance().init(); // Ensure we're not affecting other tests
     }
@@ -38,6 +32,17 @@ public class ConfigTest {
     }
 
     @Test
+    @RestoreEnvironmentVariables
+    @RestoreSystemProperties
+    @SetEnvironmentVariable(key = "ALPINE_FOO", value = "fromEnv1")
+    @SetEnvironmentVariable(key = "ALPINE_DATANUCLEUS", value = "fromEnv2")
+    @SetEnvironmentVariable(key = "ALPINE_DATANUCLEUS_FOO", value = "fromEnv3")
+    @SetEnvironmentVariable(key = "ALPINE_DATANUCLEUS_FOO_BAR", value = "fromEnv4")
+    @SetEnvironmentVariable(key = "ALPINE_DATA_NUCLEUS_FOO", value = "fromEnv5")
+    @SetEnvironmentVariable(key = "DATANUCLEUS_FOO", value = "fromEnv6")
+    @SetEnvironmentVariable(key = "ALPINE_DATANUCLEUS_FROM_ENV", value = "fromEnv7")
+    @SetEnvironmentVariable(key = "alpine_datanucleus_from_env_lowercase", value = "fromEnv8")
+    @SetEnvironmentVariable(key = "Alpine_DataNucleus_From_Env_MixedCase", value = "fromEnv9")
     public void testGetPassThroughProperties() {
         final URL propertiesUrl = ConfigTest.class.getResource("/Config_testGetPassThroughProperties.properties");
         assertThat(propertiesUrl).isNotNull();
@@ -45,16 +50,6 @@ public class ConfigTest {
         System.setProperty("alpine.application.properties", propertiesUrl.getPath());
 
         Config.getInstance().init();
-
-        environmentVariables.set("ALPINE_FOO", "fromEnv1");
-        environmentVariables.set("ALPINE_DATANUCLEUS", "fromEnv2");
-        environmentVariables.set("ALPINE_DATANUCLEUS_FOO", "fromEnv3");
-        environmentVariables.set("ALPINE_DATANUCLEUS_FOO_BAR", "fromEnv4");
-        environmentVariables.set("ALPINE_DATA_NUCLEUS_FOO", "fromEnv5");
-        environmentVariables.set("DATANUCLEUS_FOO", "fromEnv6");
-        environmentVariables.set("ALPINE_DATANUCLEUS_FROM_ENV", "fromEnv7");
-        environmentVariables.set("alpine_datanucleus_from_env_lowercase", "fromEnv8");
-        environmentVariables.set("Alpine_DataNucleus_From_Env_MixedCase", "fromEnv9");
 
         assertThat(Config.getInstance().getPassThroughProperties("datanucleus"))
                 .containsExactlyInAnyOrderEntriesOf(Map.of(

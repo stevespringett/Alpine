@@ -27,10 +27,10 @@ import alpine.model.Team;
 import alpine.persistence.AlpineQueryManager;
 import alpine.server.persistence.PersistenceManagerFactory;
 import org.assertj.core.api.Assertions;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
@@ -50,12 +50,12 @@ public class OidcAuthenticationServiceTest {
     private OidcIdTokenAuthenticator idTokenAuthenticatorMock;
     private OidcUserInfoAuthenticator userInfoAuthenticatorMock;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
         Config.enableUnitTests();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         configMock = Mockito.mock(Config.class);
         oidcConfigurationMock = Mockito.mock(OidcConfiguration.class);
@@ -65,7 +65,7 @@ public class OidcAuthenticationServiceTest {
         Mockito.when(configMock.getProperty(ArgumentMatchers.eq(Config.AlpineKey.OIDC_USERNAME_CLAIM))).thenReturn(USERNAME_CLAIM_NAME);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         PersistenceManagerFactory.tearDown();
     }

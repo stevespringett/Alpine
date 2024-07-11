@@ -20,8 +20,8 @@ package alpine.server.servlets;
 
 import alpine.Config;
 import io.prometheus.client.exporter.common.TextFormat;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -43,7 +43,7 @@ public class MetricsServletTest {
     private ByteArrayOutputStream responseOutputStream;
     private PrintWriter responseWriter;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         configMock = mock(Config.class);
         requestMock = mock(HttpServletRequest.class);

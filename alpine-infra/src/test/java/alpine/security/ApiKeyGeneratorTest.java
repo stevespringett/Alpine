@@ -19,8 +19,9 @@
 package alpine.security;
 
 import alpine.Config;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import java.util.regex.Pattern;
 
 public class ApiKeyGeneratorTest {
@@ -31,16 +32,16 @@ public class ApiKeyGeneratorTest {
     @Test
     public void defaultGenerateTest() {
         String key = ApiKeyGenerator.generate();
-        Assert.assertEquals(apiKeyPrefix.length() + 32, key.length());
-        Assert.assertTrue(key.startsWith(apiKeyPrefix));
-        Assert.assertTrue(pattern.matcher(key).matches());
+        Assertions.assertEquals(apiKeyPrefix.length() + 32, key.length());
+        Assertions.assertTrue(key.startsWith(apiKeyPrefix));
+        Assertions.assertTrue(pattern.matcher(key).matches());
     }
 
     @Test
     public void generateTest() {
         String key = ApiKeyGenerator.generate(4096);
-        Assert.assertEquals(apiKeyPrefix.length() + 4096, key.length());
-        Assert.assertTrue(key.startsWith(apiKeyPrefix));
-        Assert.assertTrue(pattern.matcher(key).matches());
+        Assertions.assertEquals(apiKeyPrefix.length() + 4096, key.length());
+        Assertions.assertTrue(key.startsWith(apiKeyPrefix));
+        Assertions.assertTrue(pattern.matcher(key).matches());
     }
 }

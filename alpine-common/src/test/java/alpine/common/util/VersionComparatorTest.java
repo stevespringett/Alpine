@@ -18,47 +18,47 @@
  */
 package alpine.common.util;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class VersionComparatorTest {
 
     @Test
     public void isNewerThanTest() {
         VersionComparator vc = new VersionComparator("2.1.0");
-        Assert.assertFalse(vc.isNewerThan(new VersionComparator("2.1.0")));
-        Assert.assertFalse(vc.isNewerThan(new VersionComparator("2.2.0")));
-        Assert.assertFalse(vc.isNewerThan(new VersionComparator("3.0.0")));
-        Assert.assertTrue(vc.isNewerThan(new VersionComparator("2.0.0")));
-        Assert.assertTrue(vc.isNewerThan(new VersionComparator("1.9.0")));
+        Assertions.assertFalse(vc.isNewerThan(new VersionComparator("2.1.0")));
+        Assertions.assertFalse(vc.isNewerThan(new VersionComparator("2.2.0")));
+        Assertions.assertFalse(vc.isNewerThan(new VersionComparator("3.0.0")));
+        Assertions.assertTrue(vc.isNewerThan(new VersionComparator("2.0.0")));
+        Assertions.assertTrue(vc.isNewerThan(new VersionComparator("1.9.0")));
     }
 
     @Test
     public void isOlderThanTest() {
         VersionComparator vc = new VersionComparator("2.1.0");
-        Assert.assertFalse(vc.isOlderThan(new VersionComparator("2.1.0")));
-        Assert.assertTrue(vc.isOlderThan(new VersionComparator("2.2.0")));
-        Assert.assertTrue(vc.isOlderThan(new VersionComparator("3.0.0")));
-        Assert.assertFalse(vc.isOlderThan(new VersionComparator("2.0.0")));
-        Assert.assertFalse(vc.isOlderThan(new VersionComparator("1.9.0")));
+        Assertions.assertFalse(vc.isOlderThan(new VersionComparator("2.1.0")));
+        Assertions.assertTrue(vc.isOlderThan(new VersionComparator("2.2.0")));
+        Assertions.assertTrue(vc.isOlderThan(new VersionComparator("3.0.0")));
+        Assertions.assertFalse(vc.isOlderThan(new VersionComparator("2.0.0")));
+        Assertions.assertFalse(vc.isOlderThan(new VersionComparator("1.9.0")));
     }
 
     @Test
     public void equalsTest() {
         VersionComparator vc = new VersionComparator("2.1.0");
-        Assert.assertTrue(vc.equals(new VersionComparator("2.1.0")));
-        Assert.assertFalse(vc.equals(new VersionComparator("2.2.0")));
-        Assert.assertFalse(vc.equals(new VersionComparator("3.0.0")));
-        Assert.assertFalse(vc.equals(new VersionComparator("2.0.0")));
-        Assert.assertFalse(vc.equals(new VersionComparator("1.9.0")));
+        Assertions.assertTrue(vc.equals(new VersionComparator("2.1.0")));
+        Assertions.assertFalse(vc.equals(new VersionComparator("2.2.0")));
+        Assertions.assertFalse(vc.equals(new VersionComparator("3.0.0")));
+        Assertions.assertFalse(vc.equals(new VersionComparator("2.0.0")));
+        Assertions.assertFalse(vc.equals(new VersionComparator("1.9.0")));
     }
 
     @Test
     public void getterTest() {
         VersionComparator vc = new VersionComparator("2.1.0-SNAPSHOT.5");
-        Assert.assertEquals(2, vc.getMajor());
-        Assert.assertEquals(1, vc.getMinor());
-        Assert.assertEquals(0, vc.getRevision());
-        Assert.assertEquals(5, vc.getPrereleaseNumber());
+        Assertions.assertEquals(2, vc.getMajor());
+        Assertions.assertEquals(1, vc.getMinor());
+        Assertions.assertEquals(0, vc.getRevision());
+        Assertions.assertEquals(5, vc.getPrereleaseNumber());
     }
 }

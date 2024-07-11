@@ -19,15 +19,15 @@
 package alpine.server.auth;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.http.Fault;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
+import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.RestoreEnvironmentVariables;
+import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import wiremock.org.apache.hc.core5.http.ContentType;
 import wiremock.org.apache.hc.core5.http.HttpHeaders;
 import wiremock.org.apache.hc.core5.http.HttpStatus;
@@ -36,6 +36,7 @@ import java.net.URI;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@WireMockTest
 public class OidcUserInfoAuthenticatorTest {
 
     private static final String USERNAME_CLAIM_NAME = "username";
@@ -49,23 +50,17 @@ public class OidcUserInfoAuthenticatorTest {
         return profile;
     };
 
-    @Rule
-    public WireMockRule wireMockRule = new WireMockRule(WireMockConfiguration.options().dynamicPort());
-
-    @Rule
-    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
-
     private OidcConfiguration oidcConfiguration;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         oidcConfiguration = new OidcConfiguration();
     }
 
     @Test
-    public void authenticateShouldReturnOidcProfile() throws Exception {
+    public void authenticateShouldReturnOidcProfile(final WireMockRuntimeInfo wmRuntimeInfo) throws Exception {
         // Provide a UserInfo response with all required claims
-        wireMockRule.stubFor(WireMock.get(WireMock.urlPathEqualTo("/userinfo"))
+        WireMock.stubFor(WireMock.get(WireMock.urlPathEqualTo("/userinfo"))
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.SC_OK)
                         .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
@@ -77,7 +72,7 @@ public class OidcUserInfoAuthenticatorTest {
                                 "  \"" + UserInfo.EMAIL_CLAIM_NAME + "\": \"username@example.com\"" +
                                 "}")));
 
-        oidcConfiguration.setUserInfoEndpointUri(new URI(wireMockRule.url("/userinfo")));
+        oidcConfiguration.setUserInfoEndpointUri(new URI(wmRuntimeInfo.getHttpBaseUrl() + "/userinfo"));
 
         final var authenticator = new OidcUserInfoAuthenticator(oidcConfiguration);
 
@@ -89,12 +84,12 @@ public class OidcUserInfoAuthenticatorTest {
     }
 
     @Test
-    public void authenticateShouldThrowWhenUserInfoRequestFailed() throws Exception {
+    public void authenticateShouldThrowWhenUserInfoRequestFailed(final WireMockRuntimeInfo wmRuntimeInfo) throws Exception {
         // Simulate an error during the request
-        wireMockRule.stubFor(WireMock.get(WireMock.urlPathEqualTo("/userinfo"))
+        WireMock.stubFor(WireMock.get(WireMock.urlPathEqualTo("/userinfo"))
                 .willReturn(WireMock.aResponse().withFault(Fault.CONNECTION_RESET_BY_PEER)));
 
-        oidcConfiguration.setUserInfoEndpointUri(new URI(wireMockRule.url("/userinfo")));
+        oidcConfiguration.setUserInfoEndpointUri(new URI(wmRuntimeInfo.getHttpBaseUrl() + "/userinfo"));
 
         final var authenticator = new OidcUserInfoAuthenticator(oidcConfiguration);
 
@@ -105,15 +100,15 @@ public class OidcUserInfoAuthenticatorTest {
     }
 
     @Test
-    public void authenticateShouldThrowWhenParsingUserInfoResponseFailed() throws Exception {
+    public void authenticateShouldThrowWhenParsingUserInfoResponseFailed(final WireMockRuntimeInfo wmRuntimeInfo) throws Exception {
         // Simulate a response with unparseable body
-        wireMockRule.stubFor(WireMock.get(WireMock.urlPathEqualTo("/userinfo"))
+        WireMock.stubFor(WireMock.get(WireMock.urlPathEqualTo("/userinfo"))
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.SC_OK)
                         .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_XML.getMimeType())
                         .withBody("<?xml version=\"1.0\"?>")));
 
-        oidcConfiguration.setUserInfoEndpointUri(new URI(wireMockRule.url("/userinfo")));
+        oidcConfiguration.setUserInfoEndpointUri(new URI(wmRuntimeInfo.getHttpBaseUrl() + "/userinfo"));
 
         final var authenticator = new OidcUserInfoAuthenticator(oidcConfiguration);
 
@@ -124,14 +119,14 @@ public class OidcUserInfoAuthenticatorTest {
     }
 
     @Test
-    public void authenticateShouldThrowWhenUserInfoResponseIndicatesError() throws Exception {
+    public void authenticateShouldThrowWhenUserInfoResponseIndicatesError(final WireMockRuntimeInfo wmRuntimeInfo) throws Exception {
         // Simulate a response indicating an invalid access token
-        wireMockRule.stubFor(WireMock.get(WireMock.urlPathEqualTo("/userinfo"))
+        WireMock.stubFor(WireMock.get(WireMock.urlPathEqualTo("/userinfo"))
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.SC_UNAUTHORIZED)
                         .withHeader("WWW-Authenticate", "Bearer error=invalid_token")));
 
-        oidcConfiguration.setUserInfoEndpointUri(new URI(wireMockRule.url("/userinfo")));
+        oidcConfiguration.setUserInfoEndpointUri(new URI(wmRuntimeInfo.getHttpBaseUrl() + "/userinfo"));
 
         final var authenticator = new OidcUserInfoAuthenticator(oidcConfiguration);
 
@@ -142,14 +137,14 @@ public class OidcUserInfoAuthenticatorTest {
     }
 
     @Test
-    public void authenticateShouldUseHttpProxyIfConfigured() throws Exception {
-        environmentVariables.set("http_proxy", "http://localhost:6666");
-
-        wireMockRule.stubFor(WireMock.get(WireMock.urlPathEqualTo("/userinfo"))
+    @RestoreEnvironmentVariables
+    @SetEnvironmentVariable(key = "http_proxy", value = "http://localhost:6666")
+    public void authenticateShouldUseHttpProxyIfConfigured(final WireMockRuntimeInfo wmRuntimeInfo) throws Exception {
+        WireMock.stubFor(WireMock.get(WireMock.urlPathEqualTo("/userinfo"))
                 .willReturn(WireMock.aResponse()
                         .withStatus(418)));
 
-        oidcConfiguration.setUserInfoEndpointUri(new URI(wireMockRule.url("/userinfo")));
+        oidcConfiguration.setUserInfoEndpointUri(new URI(wmRuntimeInfo.getHttpBaseUrl() + "/userinfo"));
 
         final var authenticator = new OidcUserInfoAuthenticator(oidcConfiguration);
 

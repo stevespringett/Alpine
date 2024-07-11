@@ -21,37 +21,32 @@ package alpine.server.auth;
 
 import alpine.server.cache.CacheManager;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
+import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
+import com.github.tomakehurst.wiremock.junit5.WireMockTest;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.RestoreEnvironmentVariables;
+import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import wiremock.org.apache.hc.core5.http.ContentType;
 import wiremock.org.apache.hc.core5.http.HttpHeaders;
 import wiremock.org.apache.hc.core5.http.HttpStatus;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@WireMockTest
 public class OidcConfigurationResolverTest {
 
     private static final String OPENID_CONFIGURATION_PATH = "/.well-known/openid-configuration";
 
-    @Rule
-    public WireMockRule wireMockRule = new WireMockRule(WireMockConfiguration.options().dynamicPort());
-
-    @Rule
-    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
-
-    @After
+    @AfterEach
     public void tearDown() {
         // Remove configs from cache to keep testing environment clean
         CacheManager.getInstance().remove(OidcConfiguration.class, OidcConfigurationResolver.CONFIGURATION_CACHE_KEY);
     }
 
     @Test
-    public void resolveShouldReturnNullWhenOidcIsNotEnabled() {
-        assertThat(new OidcConfigurationResolver(false, wireMockRule.baseUrl()).resolve()).isNull();
+    public void resolveShouldReturnNullWhenOidcIsNotEnabled(final WireMockRuntimeInfo wmRuntimeInfo) {
+        assertThat(new OidcConfigurationResolver(false, wmRuntimeInfo.getHttpBaseUrl()).resolve()).isNull();
     }
 
     @Test
@@ -60,73 +55,73 @@ public class OidcConfigurationResolverTest {
     }
 
     @Test
-    public void resolveShouldReturnCachedValueWhenAvailable() {
+    public void resolveShouldReturnCachedValueWhenAvailable(final WireMockRuntimeInfo wmRuntimeInfo) {
         final OidcConfiguration cachedConfiguration = new OidcConfiguration();
         CacheManager.getInstance().put(OidcConfigurationResolver.CONFIGURATION_CACHE_KEY, cachedConfiguration);
 
-        assertThat(new OidcConfigurationResolver(true, wireMockRule.baseUrl()).resolve()).isEqualTo(cachedConfiguration);
+        assertThat(new OidcConfigurationResolver(true, wmRuntimeInfo.getHttpBaseUrl()).resolve()).isEqualTo(cachedConfiguration);
     }
 
     @Test
-    public void resolveShouldReturnNullWhenServerRespondsWithNon200StatusCode() {
-        wireMockRule.stubFor(WireMock.get(WireMock.urlPathEqualTo(OPENID_CONFIGURATION_PATH))
+    public void resolveShouldReturnNullWhenServerRespondsWithNon200StatusCode(final WireMockRuntimeInfo wmRuntimeInfo) {
+        WireMock.stubFor(WireMock.get(WireMock.urlPathEqualTo(OPENID_CONFIGURATION_PATH))
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.SC_NOT_FOUND)));
 
-        assertThat(new OidcConfigurationResolver(true, wireMockRule.baseUrl()).resolve()).isNull();
+        assertThat(new OidcConfigurationResolver(true, wmRuntimeInfo.getHttpBaseUrl()).resolve()).isNull();
         WireMock.verify(WireMock.getRequestedFor(WireMock.urlPathEqualTo(OPENID_CONFIGURATION_PATH)));
     }
 
     @Test
-    public void resolveShouldReturnNullWhenServerRespondsWithInvalidJson() {
-        wireMockRule.stubFor(WireMock.get(WireMock.urlPathEqualTo(OPENID_CONFIGURATION_PATH))
+    public void resolveShouldReturnNullWhenServerRespondsWithInvalidJson(final WireMockRuntimeInfo wmRuntimeInfo) {
+        WireMock.stubFor(WireMock.get(WireMock.urlPathEqualTo(OPENID_CONFIGURATION_PATH))
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.SC_OK)
                         .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
                         .withBody("<?xml version=\"1.0\" ?>")));
 
-        assertThat(new OidcConfigurationResolver(true, wireMockRule.baseUrl()).resolve()).isNull();
+        assertThat(new OidcConfigurationResolver(true, wmRuntimeInfo.getHttpBaseUrl()).resolve()).isNull();
         WireMock.verify(WireMock.getRequestedFor(WireMock.urlPathEqualTo(OPENID_CONFIGURATION_PATH)));
     }
 
     @Test
-    public void resolveShouldReturnConfigurationAndStoreItInCache() {
-        wireMockRule.stubFor(WireMock.get(WireMock.urlPathEqualTo(OPENID_CONFIGURATION_PATH))
+    public void resolveShouldReturnConfigurationAndStoreItInCache(final WireMockRuntimeInfo wmRuntimeInfo) {
+        WireMock.stubFor(WireMock.get(WireMock.urlPathEqualTo(OPENID_CONFIGURATION_PATH))
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.SC_OK)
                         .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
                         .withBody("" +
                                 "{\n" +
-                                "  \"issuer\": \"" + wireMockRule.baseUrl() + "\",\n" +
-                                "  \"userinfo_endpoint\": \"" + wireMockRule.baseUrl() + "/protocol/openid-connect/userinfo\",\n" +
-                                "  \"jwks_uri\": \"" + wireMockRule.baseUrl() + "/protocol/openid-connect/certs\",\n" +
+                                "  \"issuer\": \"" + wmRuntimeInfo.getHttpBaseUrl() + "\",\n" +
+                                "  \"userinfo_endpoint\": \"" + wmRuntimeInfo.getHttpBaseUrl() + "/protocol/openid-connect/userinfo\",\n" +
+                                "  \"jwks_uri\": \"" + wmRuntimeInfo.getHttpBaseUrl() + "/protocol/openid-connect/certs\",\n" +
                                 "  \"subject_types_supported\": [\"public\",\"pairwise\"]" +
                                 "}")));
 
-        final OidcConfiguration oidcConfiguration = new OidcConfigurationResolver(true, wireMockRule.baseUrl()).resolve();
+        final OidcConfiguration oidcConfiguration = new OidcConfigurationResolver(true, wmRuntimeInfo.getHttpBaseUrl()).resolve();
         assertThat(oidcConfiguration).isNotNull();
-        assertThat(oidcConfiguration.getIssuer()).isEqualTo(wireMockRule.baseUrl());
-        assertThat(oidcConfiguration.getUserInfoEndpointUri().toString()).isEqualTo(wireMockRule.baseUrl() + "/protocol/openid-connect/userinfo");
-        assertThat(oidcConfiguration.getJwksUri().toString()).isEqualTo(wireMockRule.baseUrl() + "/protocol/openid-connect/certs");
+        assertThat(oidcConfiguration.getIssuer()).isEqualTo(wmRuntimeInfo.getHttpBaseUrl());
+        assertThat(oidcConfiguration.getUserInfoEndpointUri().toString()).isEqualTo(wmRuntimeInfo.getHttpBaseUrl() + "/protocol/openid-connect/userinfo");
+        assertThat(oidcConfiguration.getJwksUri().toString()).isEqualTo(wmRuntimeInfo.getHttpBaseUrl() + "/protocol/openid-connect/certs");
 
         // On the next invocation, the configuration should be loaded from cache
-        assertThat(new OidcConfigurationResolver(true, wireMockRule.baseUrl()).resolve()).isEqualTo(oidcConfiguration);
+        assertThat(new OidcConfigurationResolver(true, wmRuntimeInfo.getHttpBaseUrl()).resolve()).isEqualTo(oidcConfiguration);
 
         // Only one request should've been made
         WireMock.verify(1, WireMock.getRequestedFor(WireMock.urlPathEqualTo(OPENID_CONFIGURATION_PATH)));
     }
 
     @Test
-    public void resolveShouldUseHttpProxyIfConfigured() {
-        environmentVariables.set("http_proxy", "http://localhost:6666");
-
-        wireMockRule.stubFor(WireMock.get(WireMock.urlPathEqualTo(OPENID_CONFIGURATION_PATH))
+    @RestoreEnvironmentVariables
+    @SetEnvironmentVariable(key = "http_proxy", value = "http://localhost:6666")
+    public void resolveShouldUseHttpProxyIfConfigured(final WireMockRuntimeInfo wmRuntimeInfo) {
+        WireMock.stubFor(WireMock.get(WireMock.urlPathEqualTo(OPENID_CONFIGURATION_PATH))
                 .willReturn(WireMock.aResponse()
                         .withStatus(418)));
 
         // Attempt to resolve.
         // Should try to use the configured HTTP proxy, which will fail.
-        assertThat(new OidcConfigurationResolver(true, wireMockRule.baseUrl()).resolve()).isNull();
+        assertThat(new OidcConfigurationResolver(true, wmRuntimeInfo.getHttpBaseUrl()).resolve()).isNull();
 
         // No request should've reached its target.
         WireMock.verify(0, WireMock.getRequestedFor(WireMock.urlPathEqualTo(OPENID_CONFIGURATION_PATH)));

@@ -28,9 +28,9 @@ import alpine.persistence.AlpineQueryManager;
 import alpine.server.persistence.PersistenceManagerFactory;
 import org.assertj.core.api.Assertions;
 import org.glassfish.jersey.server.ContainerRequest;
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import wiremock.org.apache.hc.core5.http.HttpHeaders;
@@ -46,12 +46,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class JwtAuthenticationServiceTest {
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
         Config.enableUnitTests();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         PersistenceManagerFactory.tearDown();
     }

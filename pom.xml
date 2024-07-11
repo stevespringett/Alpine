@@ -194,7 +194,8 @@
         <lib.slf4j.version>2.0.12</lib.slf4j.version>
         <lib.swagger.version>2.2.22</lib.swagger.version>
         <!-- Unit test libraries -->
-        <lib.junit.version>4.13.2</lib.junit.version>
+        <lib.junit-jupiter.version>5.10.3</lib.junit-jupiter.version>
+        <lib.junit-pioneer.version>2.2.0</lib.junit-pioneer.version>
         <lib.mockito.version>5.12.0</lib.mockito.version>
         <lib.assertj.version>3.26.3</lib.assertj.version>
         <lib.wiremock.version>2.35.2</lib.wiremock.version>
@@ -457,9 +458,15 @@
             </dependency>
             <!-- Unit Tests -->
             <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>${lib.junit.version}</version>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>${lib.junit-jupiter.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit-pioneer</groupId>
+                <artifactId>junit-pioneer</artifactId>
+                <version>${lib.junit-pioneer.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -472,12 +479,6 @@
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
                 <version>${lib.mockito.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.github.stefanbirkner</groupId>
-                <artifactId>system-rules</artifactId>
-                <version>1.19.0</version>
                 <scope>test</scope>
             </dependency>
             <dependency>

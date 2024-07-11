@@ -18,8 +18,8 @@
  */
 package alpine.model;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,22 +30,22 @@ public class LdapUserTest {
     public void idTest() {
         LdapUser user = new LdapUser();
         user.setId(123L);
-        Assert.assertEquals(123L, user.getId());
+        Assertions.assertEquals(123L, user.getId());
     }
 
     @Test
     public void usernameTest() {
         LdapUser user = new LdapUser();
         user.setUsername("myUsername");
-        Assert.assertEquals("myUsername", user.getUsername());
-        Assert.assertEquals("myUsername", user.getName());
+        Assertions.assertEquals("myUsername", user.getUsername());
+        Assertions.assertEquals("myUsername", user.getName());
     }
 
     @Test
     public void dnTest() {
         LdapUser user = new LdapUser();
         user.setDN("ou=users,o=example.com");
-        Assert.assertEquals("ou=users,o=example.com", user.getDN());
+        Assertions.assertEquals("ou=users,o=example.com", user.getDN());
     }
 
     @Test
@@ -54,15 +54,15 @@ public class LdapUserTest {
         teams.add(new Team());
         LdapUser user = new LdapUser();
         user.setTeams(teams);
-        Assert.assertEquals(teams, user.getTeams());
-        Assert.assertEquals(1, user.getTeams().size());
+        Assertions.assertEquals(teams, user.getTeams());
+        Assertions.assertEquals(1, user.getTeams().size());
     }
 
     @Test
     public void emailTest() {
         LdapUser user = new LdapUser();
         user.setEmail("me@example.com");
-        Assert.assertEquals("me@example.com", user.getEmail());
+        Assertions.assertEquals("me@example.com", user.getEmail());
     }
 
     @Test
@@ -71,7 +71,7 @@ public class LdapUserTest {
         permissions.add(new Permission());
         LdapUser user = new LdapUser();
         user.setPermissions(permissions);
-        Assert.assertEquals(permissions, user.getPermissions());
-        Assert.assertEquals(1, user.getPermissions().size());
+        Assertions.assertEquals(permissions, user.getPermissions());
+        Assertions.assertEquals(1, user.getPermissions().size());
     }
 }

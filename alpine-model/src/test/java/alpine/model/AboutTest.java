@@ -20,8 +20,8 @@ package alpine.model;
 
 import alpine.common.AboutProvider;
 import alpine.common.util.UuidUtil;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
@@ -30,21 +30,21 @@ public class AboutTest {
     @Test
     public void getterTest() {
         About about = new About();
-        Assert.assertEquals("Unknown Alpine Application", about.getApplication());
-        Assert.assertEquals("0.0.0", about.getVersion());
-        Assert.assertEquals("1970-01-01 00:00:00", about.getTimestamp());
-        Assert.assertNull(about.getUuid());
+        Assertions.assertEquals("Unknown Alpine Application", about.getApplication());
+        Assertions.assertEquals("0.0.0", about.getVersion());
+        Assertions.assertEquals("1970-01-01 00:00:00", about.getTimestamp());
+        Assertions.assertNull(about.getUuid());
 
-        Assert.assertEquals("alpine-model", about.getFramework().getName());
-        Assert.assertTrue(about.getFramework().getVersion().startsWith("3."));
-        Assert.assertTrue(about.getFramework().getTimestamp().startsWith("20"));
-        Assert.assertTrue(UuidUtil.isValidUUID(about.getFramework().getUuid()));
+        Assertions.assertEquals("alpine-model", about.getFramework().getName());
+        Assertions.assertTrue(about.getFramework().getVersion().startsWith("3."));
+        Assertions.assertTrue(about.getFramework().getTimestamp().startsWith("20"));
+        Assertions.assertTrue(UuidUtil.isValidUUID(about.getFramework().getUuid()));
 
         final Map<String, Object> providerData = about.getProviderData();
-        Assert.assertEquals(1, providerData.size());
-        Assert.assertNotNull(providerData.get("test"));
-        Assert.assertTrue(providerData.get("test") instanceof Map);
-        Assert.assertEquals("bar", ((Map<String, Object>) providerData.get("test")).get("foo"));
+        Assertions.assertEquals(1, providerData.size());
+        Assertions.assertNotNull(providerData.get("test"));
+        Assertions.assertTrue(providerData.get("test") instanceof Map);
+        Assertions.assertEquals("bar", ((Map<String, Object>) providerData.get("test")).get("foo"));
     }
 
     public static class TestProvider implements AboutProvider {

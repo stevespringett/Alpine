@@ -18,8 +18,8 @@
  */
 package alpine.common.util;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,26 +33,26 @@ public class PageableTest {
             list.add(String.valueOf(i));
         }
         Pageable pageable = new Pageable(100, list);
-        Assert.assertEquals(1, pageable.getCurrentPage());
-        Assert.assertEquals(13, pageable.getTotalPages());
-        Assert.assertEquals(100, pageable.getPageSize());
-        Assert.assertTrue(pageable.hasMorePages());
-        Assert.assertFalse(pageable.isPaginationComplete());
+        Assertions.assertEquals(1, pageable.getCurrentPage());
+        Assertions.assertEquals(13, pageable.getTotalPages());
+        Assertions.assertEquals(100, pageable.getPageSize());
+        Assertions.assertTrue(pageable.hasMorePages());
+        Assertions.assertFalse(pageable.isPaginationComplete());
 
         for (int i=1; i<=13; i++) {
             if (i <= 12) {
-                Assert.assertEquals(100, pageable.getPaginatedList().size());
-                Assert.assertTrue(pageable.hasMorePages());
+                Assertions.assertEquals(100, pageable.getPaginatedList().size());
+                Assertions.assertTrue(pageable.hasMorePages());
             } else if (i == 13) {
-                Assert.assertEquals(40, pageable.getPaginatedList().size());
-                Assert.assertFalse(pageable.hasMorePages());
+                Assertions.assertEquals(40, pageable.getPaginatedList().size());
+                Assertions.assertFalse(pageable.hasMorePages());
             }
-            Assert.assertEquals(i, pageable.getCurrentPage());
+            Assertions.assertEquals(i, pageable.getCurrentPage());
             pageable.nextPage();
             if (i <= 12) {
-                Assert.assertFalse(pageable.isPaginationComplete());
+                Assertions.assertFalse(pageable.isPaginationComplete());
             } else if (i == 13) {
-                Assert.assertTrue(pageable.isPaginationComplete());
+                Assertions.assertTrue(pageable.isPaginationComplete());
             }
         }
     }

@@ -25,9 +25,9 @@ import org.datanucleus.api.jdo.JDOPersistenceManagerFactory;
 import org.datanucleus.store.connection.ConnectionFactory;
 import org.datanucleus.store.connection.ConnectionManagerImpl;
 import org.eclipse.microprofile.health.HealthCheckResponse;
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import javax.jdo.PersistenceManager;
 import java.util.Map;
@@ -36,12 +36,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class DatabaseHealthCheckTest {
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
         Config.enableUnitTests();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         PersistenceManagerFactory.tearDown();
     }

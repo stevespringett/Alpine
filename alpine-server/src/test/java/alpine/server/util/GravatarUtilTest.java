@@ -19,8 +19,8 @@
 package alpine.server.util;
 
 import alpine.model.UserPrincipal;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -29,34 +29,34 @@ public class GravatarUtilTest {
 
     @Test
     public void generateHashTest() {
-        Assert.assertEquals("e64c7d89f26bd1972efa854d13d7dd61", GravatarUtil.generateHash("admin@example.com"));
+        Assertions.assertEquals("e64c7d89f26bd1972efa854d13d7dd61", GravatarUtil.generateHash("admin@example.com"));
     }
 
     @Test
     public void getGravatarUrlFromPrincipalTest() {
         UserPrincipal user = mock(UserPrincipal.class);
         when(user.getEmail()).thenReturn("admin@example.com");
-        Assert.assertEquals("https://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61.jpg?d=mm", GravatarUtil.getGravatarUrl(user));
+        Assertions.assertEquals("https://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61.jpg?d=mm", GravatarUtil.getGravatarUrl(user));
     }
 
     @Test
     public void getGravatarUrlFromPrincipalSizeTest() {
         UserPrincipal user = mock(UserPrincipal.class);
         when(user.getEmail()).thenReturn("admin@example.com");
-        Assert.assertEquals("https://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61.jpg?d=mm&s=200", GravatarUtil.getGravatarUrl(user, 200));
+        Assertions.assertEquals("https://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61.jpg?d=mm&s=200", GravatarUtil.getGravatarUrl(user, 200));
     }
 
     @Test
     public void getGravatarUrlTest() {
-        Assert.assertEquals("https://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61.jpg?d=mm", GravatarUtil.getGravatarUrl("admin@example.com"));
+        Assertions.assertEquals("https://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61.jpg?d=mm", GravatarUtil.getGravatarUrl("admin@example.com"));
         String s = null;
-        Assert.assertEquals("https://www.gravatar.com/avatar/00000000000000000000000000000000.jpg?d=mm", GravatarUtil.getGravatarUrl(s));
+        Assertions.assertEquals("https://www.gravatar.com/avatar/00000000000000000000000000000000.jpg?d=mm", GravatarUtil.getGravatarUrl(s));
     }
 
     @Test
     public void getGravatarUrlSizeTest() {
-        Assert.assertEquals("https://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61.jpg?d=mm&s=200", GravatarUtil.getGravatarUrl("admin@example.com", 200));
+        Assertions.assertEquals("https://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61.jpg?d=mm&s=200", GravatarUtil.getGravatarUrl("admin@example.com", 200));
         String s = null;
-        Assert.assertEquals("https://www.gravatar.com/avatar/00000000000000000000000000000000.jpg?d=mm&s=200", GravatarUtil.getGravatarUrl(s, 200));
+        Assertions.assertEquals("https://www.gravatar.com/avatar/00000000000000000000000000000000.jpg?d=mm&s=200", GravatarUtil.getGravatarUrl(s, 200));
     }
 }

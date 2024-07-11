@@ -19,8 +19,8 @@
 package alpine.model;
 
 import alpine.Config;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +32,7 @@ public class ApiKeyTest {
     public void idTest() {
         ApiKey key = new ApiKey();
         key.setId(123L);
-        Assert.assertEquals(123L, key.getId());
+        Assertions.assertEquals(123L, key.getId());
     }
 
     @Test
@@ -40,14 +40,14 @@ public class ApiKeyTest {
         {
             ApiKey key = new ApiKey();
             key.setKey("12345678901234567890");
-            Assert.assertEquals("12345678901234567890", key.getKey());
-            Assert.assertEquals("****************7890", key.getName());
+            Assertions.assertEquals("12345678901234567890", key.getKey());
+            Assertions.assertEquals("****************7890", key.getName());
         }
         {
             ApiKey key = new ApiKey();
             key.setKey(prefix + "12345678901234567890");
-            Assert.assertEquals(prefix + "12345678901234567890", key.getKey());
-            Assert.assertEquals(prefix + "****************7890", key.getName());
+            Assertions.assertEquals(prefix + "12345678901234567890", key.getKey());
+            Assertions.assertEquals(prefix + "****************7890", key.getName());
         }
     }
 
@@ -56,23 +56,23 @@ public class ApiKeyTest {
         {
             ApiKey key = new ApiKey();
             key.setKey("12345678901234567890");
-            Assert.assertEquals("****************7890", key.getMaskedKey());
+            Assertions.assertEquals("****************7890", key.getMaskedKey());
         }
         {
             ApiKey key = new ApiKey();
             key.setKey("1234ABCabc+_=!?-*");
-            Assert.assertEquals("*************!?-*", key.getMaskedKey());
+            Assertions.assertEquals("*************!?-*", key.getMaskedKey());
         }
         {
             ApiKey key = new ApiKey();
             key.setKey("1234");
-            Assert.assertEquals("1234", key.getMaskedKey());
+            Assertions.assertEquals("1234", key.getMaskedKey());
         }
         {
             // test with prefix
             ApiKey key = new ApiKey();
             key.setKey(prefix + "1234567890");
-            Assert.assertEquals(prefix + "******7890", key.getMaskedKey());
+            Assertions.assertEquals(prefix + "******7890", key.getMaskedKey());
         }
     }
 
@@ -82,7 +82,7 @@ public class ApiKeyTest {
         teams.add(new Team());
         ApiKey key = new ApiKey();
         key.setTeams(teams);
-        Assert.assertEquals(teams, key.getTeams());
-        Assert.assertEquals(1, key.getTeams().size());
+        Assertions.assertEquals(teams, key.getTeams());
+        Assertions.assertEquals(1, key.getTeams().size());
     }
 }

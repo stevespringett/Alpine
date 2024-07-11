@@ -18,25 +18,25 @@
  */
 package alpine.common.util;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.RestoreEnvironmentVariables;
+import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
-public class ThreadUtilTest {
-
-    @Rule
-    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+class ThreadUtilTest {
 
     @Test
-    public void determineNumberOfWorkerThreadsTest() {
-        // TODO: FIX ME
-        //environmentVariables.set("ALPINE_WORKER_THREADS", "10");
-        //Assert.assertEquals(10, ThreadUtil.determineNumberOfWorkerThreads());
-        //environmentVariables.set("ALPINE_WORKER_THREADS", "0");
-        //Assert.assertTrue(ThreadUtil.determineNumberOfWorkerThreads() > 0);
+    @RestoreEnvironmentVariables
+    @SetEnvironmentVariable(key = "ALPINE_WORKER_THREADS", value = "10")
+    void determineNumberOfWorkerThreadsStaticTest() {
+        Assertions.assertEquals(10, ThreadUtil.determineNumberOfWorkerThreads());
     }
+
+    @Test
+    @RestoreEnvironmentVariables
+    @SetEnvironmentVariable(key = "ALPINE_WORKER_THREADS", value = "0")
+    void determineNumberOfWorkerThreadsDynamicTest() {
+        Assertions.assertTrue(ThreadUtil.determineNumberOfWorkerThreads() > 0);
+    }
+
 }

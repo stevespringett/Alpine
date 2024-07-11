@@ -19,8 +19,8 @@
 package alpine.server.filters;
 
 import org.assertj.core.api.SoftAssertions;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
@@ -42,7 +42,7 @@ public class RequestIdFilterTest {
     private ContainerRequestContext requestContextMock;
     private ContainerResponseContext responseContextMock;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         requestIdFilter = new RequestIdFilter();
         requestContextMock = mock(ContainerRequestContext.class);

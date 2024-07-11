@@ -20,9 +20,9 @@ package alpine.persistence;
 
 import org.datanucleus.api.jdo.JDOPersistenceManager;
 import org.datanucleus.api.jdo.JDOPersistenceManagerFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.jdo.JDOHelper;
 
@@ -36,13 +36,13 @@ public class ScopedCustomizationTest {
     private JDOPersistenceManagerFactory pmf;
     private JDOPersistenceManager pm;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         pmf = (JDOPersistenceManagerFactory) JDOHelper.getPersistenceManagerFactory(JdoProperties.unit(), "Alpine");
         pm = (JDOPersistenceManager) pmf.getPersistenceManager();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         if (pm != null) {
             pm.close();

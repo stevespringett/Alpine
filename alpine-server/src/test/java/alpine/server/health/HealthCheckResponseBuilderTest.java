@@ -19,7 +19,7 @@
 package alpine.server.health;
 
 import org.eclipse.microprofile.health.HealthCheckResponse;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
