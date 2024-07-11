@@ -18,8 +18,8 @@
  */
 package alpine.common.util;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -30,38 +30,38 @@ public class ProxyConfigTest {
     @Test
     public void shouldProxyWithoutHostTest() throws MalformedURLException {
         final var proxyCfg = new ProxyConfig();
-        Assert.assertFalse(proxyCfg.shouldProxy(null));
-        Assert.assertFalse(proxyCfg.shouldProxy(new URL("ftp://example.com:21")));
-        Assert.assertFalse(proxyCfg.shouldProxy(new URL("http://example.com:443")));
-        Assert.assertFalse(proxyCfg.shouldProxy(new URL("http://example.com:8080")));
-        Assert.assertFalse(proxyCfg.shouldProxy(new URL("http://www.example.com:443")));
-        Assert.assertFalse(proxyCfg.shouldProxy(new URL("http://foo.example.com:80")));
-        Assert.assertFalse(proxyCfg.shouldProxy(new URL("http://fooexample.com:80")));
-        Assert.assertFalse(proxyCfg.shouldProxy(new URL("http://foo.bar.example.com:8000")));
-        Assert.assertFalse(proxyCfg.shouldProxy(new URL("http://www.example.net:80")));
-        Assert.assertFalse(proxyCfg.shouldProxy(new URL("http://foo.example.net:80")));
-        Assert.assertFalse(proxyCfg.shouldProxy(new URL("http://example.org:443")));
-        Assert.assertFalse(proxyCfg.shouldProxy(new URL("http://127.0.0.1:8080")));
-        Assert.assertFalse(proxyCfg.shouldProxy(new URL("http://127.0.0.1:8000")));
+        Assertions.assertFalse(proxyCfg.shouldProxy(null));
+        Assertions.assertFalse(proxyCfg.shouldProxy(new URL("ftp://example.com:21")));
+        Assertions.assertFalse(proxyCfg.shouldProxy(new URL("http://example.com:443")));
+        Assertions.assertFalse(proxyCfg.shouldProxy(new URL("http://example.com:8080")));
+        Assertions.assertFalse(proxyCfg.shouldProxy(new URL("http://www.example.com:443")));
+        Assertions.assertFalse(proxyCfg.shouldProxy(new URL("http://foo.example.com:80")));
+        Assertions.assertFalse(proxyCfg.shouldProxy(new URL("http://fooexample.com:80")));
+        Assertions.assertFalse(proxyCfg.shouldProxy(new URL("http://foo.bar.example.com:8000")));
+        Assertions.assertFalse(proxyCfg.shouldProxy(new URL("http://www.example.net:80")));
+        Assertions.assertFalse(proxyCfg.shouldProxy(new URL("http://foo.example.net:80")));
+        Assertions.assertFalse(proxyCfg.shouldProxy(new URL("http://example.org:443")));
+        Assertions.assertFalse(proxyCfg.shouldProxy(new URL("http://127.0.0.1:8080")));
+        Assertions.assertFalse(proxyCfg.shouldProxy(new URL("http://127.0.0.1:8000")));
     }
 
     @Test
     public void shouldProxyWithoutNoProxyTest() throws MalformedURLException {
         final var proxyCfg = new ProxyConfig();
         proxyCfg.setHost("proxy.example.com");
-        Assert.assertFalse(proxyCfg.shouldProxy(null));
-        Assert.assertFalse(proxyCfg.shouldProxy(new URL("ftp://example.com:21")));
-        Assert.assertTrue(proxyCfg.shouldProxy(new URL("http://example.com:443")));
-        Assert.assertTrue(proxyCfg.shouldProxy(new URL("http://example.com:8080")));
-        Assert.assertTrue(proxyCfg.shouldProxy(new URL("http://www.example.com:443")));
-        Assert.assertTrue(proxyCfg.shouldProxy(new URL("http://foo.example.com:80")));
-        Assert.assertTrue(proxyCfg.shouldProxy(new URL("http://fooexample.com:80")));
-        Assert.assertTrue(proxyCfg.shouldProxy(new URL("http://foo.bar.example.com:8000")));
-        Assert.assertTrue(proxyCfg.shouldProxy(new URL("http://www.example.net:80")));
-        Assert.assertTrue(proxyCfg.shouldProxy(new URL("http://foo.example.net:80")));
-        Assert.assertTrue(proxyCfg.shouldProxy(new URL("http://example.org:443")));
-        Assert.assertTrue(proxyCfg.shouldProxy(new URL("http://127.0.0.1:8080")));
-        Assert.assertTrue(proxyCfg.shouldProxy(new URL("http://127.0.0.1:8000")));
+        Assertions.assertFalse(proxyCfg.shouldProxy(null));
+        Assertions.assertFalse(proxyCfg.shouldProxy(new URL("ftp://example.com:21")));
+        Assertions.assertTrue(proxyCfg.shouldProxy(new URL("http://example.com:443")));
+        Assertions.assertTrue(proxyCfg.shouldProxy(new URL("http://example.com:8080")));
+        Assertions.assertTrue(proxyCfg.shouldProxy(new URL("http://www.example.com:443")));
+        Assertions.assertTrue(proxyCfg.shouldProxy(new URL("http://foo.example.com:80")));
+        Assertions.assertTrue(proxyCfg.shouldProxy(new URL("http://fooexample.com:80")));
+        Assertions.assertTrue(proxyCfg.shouldProxy(new URL("http://foo.bar.example.com:8000")));
+        Assertions.assertTrue(proxyCfg.shouldProxy(new URL("http://www.example.net:80")));
+        Assertions.assertTrue(proxyCfg.shouldProxy(new URL("http://foo.example.net:80")));
+        Assertions.assertTrue(proxyCfg.shouldProxy(new URL("http://example.org:443")));
+        Assertions.assertTrue(proxyCfg.shouldProxy(new URL("http://127.0.0.1:8080")));
+        Assertions.assertTrue(proxyCfg.shouldProxy(new URL("http://127.0.0.1:8000")));
     }
 
     @Test
@@ -69,19 +69,19 @@ public class ProxyConfigTest {
         final var proxyCfg = new ProxyConfig();
         proxyCfg.setHost("proxy.example.com");
         proxyCfg.setNoProxy(Set.of("localhost:443", "127.0.0.1:8080", "example.com", "www.example.net"));
-        Assert.assertFalse(proxyCfg.shouldProxy(null));
-        Assert.assertFalse(proxyCfg.shouldProxy(new URL("ftp://example.com:21")));
-        Assert.assertFalse(proxyCfg.shouldProxy(new URL("http://example.com:443")));
-        Assert.assertFalse(proxyCfg.shouldProxy(new URL("http://example.com:8080")));
-        Assert.assertFalse(proxyCfg.shouldProxy(new URL("http://www.example.com:443")));
-        Assert.assertFalse(proxyCfg.shouldProxy(new URL("http://foo.example.com:80")));
-        Assert.assertTrue(proxyCfg.shouldProxy(new URL("http://fooexample.com:80")));
-        Assert.assertFalse(proxyCfg.shouldProxy(new URL("http://foo.bar.example.com:8000")));
-        Assert.assertFalse(proxyCfg.shouldProxy(new URL("http://www.example.net:80")));
-        Assert.assertTrue(proxyCfg.shouldProxy(new URL("http://foo.example.net:80")));
-        Assert.assertTrue(proxyCfg.shouldProxy(new URL("http://example.org:443")));
-        Assert.assertFalse(proxyCfg.shouldProxy(new URL("http://127.0.0.1:8080")));
-        Assert.assertTrue(proxyCfg.shouldProxy(new URL("http://127.0.0.1:8000")));
+        Assertions.assertFalse(proxyCfg.shouldProxy(null));
+        Assertions.assertFalse(proxyCfg.shouldProxy(new URL("ftp://example.com:21")));
+        Assertions.assertFalse(proxyCfg.shouldProxy(new URL("http://example.com:443")));
+        Assertions.assertFalse(proxyCfg.shouldProxy(new URL("http://example.com:8080")));
+        Assertions.assertFalse(proxyCfg.shouldProxy(new URL("http://www.example.com:443")));
+        Assertions.assertFalse(proxyCfg.shouldProxy(new URL("http://foo.example.com:80")));
+        Assertions.assertTrue(proxyCfg.shouldProxy(new URL("http://fooexample.com:80")));
+        Assertions.assertFalse(proxyCfg.shouldProxy(new URL("http://foo.bar.example.com:8000")));
+        Assertions.assertFalse(proxyCfg.shouldProxy(new URL("http://www.example.net:80")));
+        Assertions.assertTrue(proxyCfg.shouldProxy(new URL("http://foo.example.net:80")));
+        Assertions.assertTrue(proxyCfg.shouldProxy(new URL("http://example.org:443")));
+        Assertions.assertFalse(proxyCfg.shouldProxy(new URL("http://127.0.0.1:8080")));
+        Assertions.assertTrue(proxyCfg.shouldProxy(new URL("http://127.0.0.1:8000")));
     }
 
     @Test
@@ -89,19 +89,19 @@ public class ProxyConfigTest {
         final var proxyCfg = new ProxyConfig();
         proxyCfg.setHost("proxy.example.com");
         proxyCfg.setNoProxy(Set.of("*"));
-        Assert.assertFalse(proxyCfg.shouldProxy(null));
-        Assert.assertFalse(proxyCfg.shouldProxy(new URL("ftp://example.com:21")));
-        Assert.assertFalse(proxyCfg.shouldProxy(new URL("http://example.com:443")));
-        Assert.assertFalse(proxyCfg.shouldProxy(new URL("http://example.com:8080")));
-        Assert.assertFalse(proxyCfg.shouldProxy(new URL("http://www.example.com:443")));
-        Assert.assertFalse(proxyCfg.shouldProxy(new URL("http://foo.example.com:80")));
-        Assert.assertFalse(proxyCfg.shouldProxy(new URL("http://fooexample.com:80")));
-        Assert.assertFalse(proxyCfg.shouldProxy(new URL("http://foo.bar.example.com:8000")));
-        Assert.assertFalse(proxyCfg.shouldProxy(new URL("http://www.example.net:80")));
-        Assert.assertFalse(proxyCfg.shouldProxy(new URL("http://foo.example.net:80")));
-        Assert.assertFalse(proxyCfg.shouldProxy(new URL("http://example.org:443")));
-        Assert.assertFalse(proxyCfg.shouldProxy(new URL("http://127.0.0.1:8080")));
-        Assert.assertFalse(proxyCfg.shouldProxy(new URL("http://127.0.0.1:8000")));
+        Assertions.assertFalse(proxyCfg.shouldProxy(null));
+        Assertions.assertFalse(proxyCfg.shouldProxy(new URL("ftp://example.com:21")));
+        Assertions.assertFalse(proxyCfg.shouldProxy(new URL("http://example.com:443")));
+        Assertions.assertFalse(proxyCfg.shouldProxy(new URL("http://example.com:8080")));
+        Assertions.assertFalse(proxyCfg.shouldProxy(new URL("http://www.example.com:443")));
+        Assertions.assertFalse(proxyCfg.shouldProxy(new URL("http://foo.example.com:80")));
+        Assertions.assertFalse(proxyCfg.shouldProxy(new URL("http://fooexample.com:80")));
+        Assertions.assertFalse(proxyCfg.shouldProxy(new URL("http://foo.bar.example.com:8000")));
+        Assertions.assertFalse(proxyCfg.shouldProxy(new URL("http://www.example.net:80")));
+        Assertions.assertFalse(proxyCfg.shouldProxy(new URL("http://foo.example.net:80")));
+        Assertions.assertFalse(proxyCfg.shouldProxy(new URL("http://example.org:443")));
+        Assertions.assertFalse(proxyCfg.shouldProxy(new URL("http://127.0.0.1:8080")));
+        Assertions.assertFalse(proxyCfg.shouldProxy(new URL("http://127.0.0.1:8000")));
     }
 
 }

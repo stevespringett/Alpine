@@ -24,9 +24,9 @@ import alpine.persistence.Transaction.Isolation;
 import alpine.persistence.Transaction.Options;
 import alpine.persistence.Transaction.Propagation;
 import org.datanucleus.api.jdo.JDOPersistenceManagerFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.jdo.JDOHelper;
 
@@ -39,13 +39,13 @@ public class TransactionTest {
     private JDOPersistenceManagerFactory pmf;
     private AlpineQueryManager qm;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         pmf = (JDOPersistenceManagerFactory) JDOHelper.getPersistenceManagerFactory(JdoProperties.unit(), "Alpine");
         qm = new AlpineQueryManager(pmf.getPersistenceManager());
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         if (qm != null) {
             qm.close();

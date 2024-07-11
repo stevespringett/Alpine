@@ -18,8 +18,8 @@
  */
 package alpine.model;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,15 +31,15 @@ public class ManagedUserTest {
     public void idTest() {
         ManagedUser user = new ManagedUser();
         user.setId(123L);
-        Assert.assertEquals(123L, user.getId());
+        Assertions.assertEquals(123L, user.getId());
     }
 
     @Test
     public void usernameTest() {
         ManagedUser user = new ManagedUser();
         user.setUsername("myUsername");
-        Assert.assertEquals("myUsername", user.getUsername());
-        Assert.assertEquals("myUsername", user.getName());
+        Assertions.assertEquals("myUsername", user.getUsername());
+        Assertions.assertEquals("myUsername", user.getName());
     }
 
     @Test
@@ -48,9 +48,9 @@ public class ManagedUserTest {
         user.setPassword("Password123!");
         user.setNewPassword("Password1234!");
         user.setConfirmPassword("Password1234!");
-        Assert.assertEquals("Password123!", user.getPassword());
-        Assert.assertEquals("Password1234!", user.getNewPassword());
-        Assert.assertEquals("Password1234!", user.getConfirmPassword());
+        Assertions.assertEquals("Password123!", user.getPassword());
+        Assertions.assertEquals("Password1234!", user.getNewPassword());
+        Assertions.assertEquals("Password1234!", user.getConfirmPassword());
     }
 
     @Test
@@ -58,45 +58,45 @@ public class ManagedUserTest {
         Date date = new Date();
         ManagedUser user = new ManagedUser();
         user.setLastPasswordChange(date);
-        Assert.assertEquals(date, user.getLastPasswordChange());
+        Assertions.assertEquals(date, user.getLastPasswordChange());
     }
 
     @Test
     public void fullnameTest() {
         ManagedUser user = new ManagedUser();
         user.setFullname("My Full Name");
-        Assert.assertEquals("My Full Name", user.getFullname());
+        Assertions.assertEquals("My Full Name", user.getFullname());
     }
 
     @Test
     public void emailTest() {
         ManagedUser user = new ManagedUser();
         user.setEmail("me@example.com");
-        Assert.assertEquals("me@example.com", user.getEmail());
+        Assertions.assertEquals("me@example.com", user.getEmail());
     }
 
     @Test
     public void suspendedTest() {
         ManagedUser user = new ManagedUser();
-        Assert.assertFalse(user.isSuspended());
+        Assertions.assertFalse(user.isSuspended());
         user.setSuspended(true);
-        Assert.assertTrue(user.isSuspended());
+        Assertions.assertTrue(user.isSuspended());
     }
 
     @Test
     public void forcePasswordChangeTest() {
         ManagedUser user = new ManagedUser();
-        Assert.assertFalse(user.isForcePasswordChange());
+        Assertions.assertFalse(user.isForcePasswordChange());
         user.setForcePasswordChange(true);
-        Assert.assertTrue(user.isForcePasswordChange());
+        Assertions.assertTrue(user.isForcePasswordChange());
     }
 
     @Test
     public void nonExpiryPasswordTest() {
         ManagedUser user = new ManagedUser();
-        Assert.assertFalse(user.isNonExpiryPassword());
+        Assertions.assertFalse(user.isNonExpiryPassword());
         user.setNonExpiryPassword(true);
-        Assert.assertTrue(user.isNonExpiryPassword());
+        Assertions.assertTrue(user.isNonExpiryPassword());
     }
 
     @Test
@@ -105,8 +105,8 @@ public class ManagedUserTest {
         teams.add(new Team());
         ManagedUser user = new ManagedUser();
         user.setTeams(teams);
-        Assert.assertEquals(teams, user.getTeams());
-        Assert.assertEquals(1, user.getTeams().size());
+        Assertions.assertEquals(teams, user.getTeams());
+        Assertions.assertEquals(1, user.getTeams().size());
     }
 
     @Test
@@ -115,7 +115,7 @@ public class ManagedUserTest {
         permissions.add(new Permission());
         ManagedUser user = new ManagedUser();
         user.setPermissions(permissions);
-        Assert.assertEquals(permissions, user.getPermissions());
-        Assert.assertEquals(1, user.getPermissions().size());
+        Assertions.assertEquals(permissions, user.getPermissions());
+        Assertions.assertEquals(1, user.getPermissions().size());
     }
 }

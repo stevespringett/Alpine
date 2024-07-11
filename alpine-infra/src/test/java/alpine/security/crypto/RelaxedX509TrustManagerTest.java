@@ -18,20 +18,18 @@
  */
 package alpine.security.crypto;
 
-import alpine.security.crypto.RelaxedX509TrustManager;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import java.security.cert.X509Certificate;
 
-import static org.mockito.Mockito.mock;
+import java.security.cert.X509Certificate;
 
 public class RelaxedX509TrustManagerTest {
 
     @Test
     public void basicTest() throws Exception {
         RelaxedX509TrustManager trustManager = new RelaxedX509TrustManager();
-        Assert.assertNull(trustManager.getAcceptedIssuers());
+        Assertions.assertNull(trustManager.getAcceptedIssuers());
         X509Certificate[] certs = {Mockito.mock(X509Certificate.class)};
         trustManager.checkClientTrusted(certs, null);
         trustManager.checkServerTrusted(certs, null);

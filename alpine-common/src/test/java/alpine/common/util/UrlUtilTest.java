@@ -18,8 +18,8 @@
  */
 package alpine.common.util;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.net.URL;
 
@@ -27,15 +27,15 @@ public class UrlUtilTest {
 
     @Test
     public void normalizationStringTest() {
-        Assert.assertEquals("http://www.example.com", UrlUtil.normalize("http://www.example.com"));
-        Assert.assertEquals("http://www.example.com", UrlUtil.normalize("http://www.example.com/"));
-        Assert.assertEquals("http://www.example.com", UrlUtil.normalize("http://www.example.com//////"));
+        Assertions.assertEquals("http://www.example.com", UrlUtil.normalize("http://www.example.com"));
+        Assertions.assertEquals("http://www.example.com", UrlUtil.normalize("http://www.example.com/"));
+        Assertions.assertEquals("http://www.example.com", UrlUtil.normalize("http://www.example.com//////"));
     }
 
     @Test
     public void normalizationURLTest() throws Exception {
-        Assert.assertEquals("http://www.example.com", new URL(UrlUtil.normalize("http://www.example.com")).toExternalForm());
-        Assert.assertEquals("http://www.example.com", new URL(UrlUtil.normalize("http://www.example.com/")).toExternalForm());
-        Assert.assertEquals("http://www.example.com", new URL(UrlUtil.normalize("http://www.example.com//////")).toExternalForm());
+        Assertions.assertEquals("http://www.example.com", new URL(UrlUtil.normalize("http://www.example.com")).toExternalForm());
+        Assertions.assertEquals("http://www.example.com", new URL(UrlUtil.normalize("http://www.example.com/")).toExternalForm());
+        Assertions.assertEquals("http://www.example.com", new URL(UrlUtil.normalize("http://www.example.com//////")).toExternalForm());
     }
 }

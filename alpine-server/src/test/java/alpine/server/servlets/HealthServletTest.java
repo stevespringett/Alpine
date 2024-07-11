@@ -7,8 +7,8 @@ import org.eclipse.microprofile.health.HealthCheckResponse;
 import org.eclipse.microprofile.health.Liveness;
 import org.eclipse.microprofile.health.Readiness;
 import org.eclipse.microprofile.health.Startup;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -33,7 +33,7 @@ public class HealthServletTest {
     private ByteArrayOutputStream responseOutputStream;
     private PrintWriter responseWriter;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         requestMock = mock(HttpServletRequest.class);
         responseMock = mock(HttpServletResponse.class);

@@ -18,20 +18,20 @@
  */
 package alpine.model;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class IConfigPropertyTest {
 
     @Test
     public void testEnums() {
-        Assert.assertEquals("BOOLEAN", IConfigProperty.PropertyType.BOOLEAN.name());
-        Assert.assertEquals("INTEGER", IConfigProperty.PropertyType.INTEGER.name());
-        Assert.assertEquals("NUMBER", IConfigProperty.PropertyType.NUMBER.name());
-        Assert.assertEquals("STRING", IConfigProperty.PropertyType.STRING.name());
-        Assert.assertEquals("ENCRYPTEDSTRING", IConfigProperty.PropertyType.ENCRYPTEDSTRING.name());
-        Assert.assertEquals("TIMESTAMP", IConfigProperty.PropertyType.TIMESTAMP.name());
-        Assert.assertEquals("URL", IConfigProperty.PropertyType.URL.name());
-        Assert.assertEquals("UUID", IConfigProperty.PropertyType.UUID.name());
+        Assertions.assertEquals("BOOLEAN", IConfigProperty.PropertyType.BOOLEAN.name());
+        Assertions.assertEquals("INTEGER", IConfigProperty.PropertyType.INTEGER.name());
+        Assertions.assertEquals("NUMBER", IConfigProperty.PropertyType.NUMBER.name());
+        Assertions.assertEquals("STRING", IConfigProperty.PropertyType.STRING.name());
+        Assertions.assertEquals("ENCRYPTEDSTRING", IConfigProperty.PropertyType.ENCRYPTEDSTRING.name());
+        Assertions.assertEquals("TIMESTAMP", IConfigProperty.PropertyType.TIMESTAMP.name());
+        Assertions.assertEquals("URL", IConfigProperty.PropertyType.URL.name());
+        Assertions.assertEquals("UUID", IConfigProperty.PropertyType.UUID.name());
     }
 }

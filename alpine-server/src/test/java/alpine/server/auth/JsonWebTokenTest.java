@@ -22,8 +22,8 @@ import alpine.model.LdapUser;
 import alpine.model.ManagedUser;
 import alpine.model.OidcUser;
 import alpine.model.Permission;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.security.Principal;
@@ -40,10 +40,10 @@ public class JsonWebTokenTest {
         Mockito.when(user.getName()).thenReturn("admin");
         JsonWebToken jwt = new JsonWebToken();
         String token = jwt.createToken(user);
-        Assert.assertNotNull(token);
-        Assert.assertTrue(jwt.validateToken(token));
-        Assert.assertEquals("admin", jwt.getSubject());
-        Assert.assertNotNull(jwt.getExpiration());
+        Assertions.assertNotNull(token);
+        Assertions.assertTrue(jwt.validateToken(token));
+        Assertions.assertEquals("admin", jwt.getSubject());
+        Assertions.assertNotNull(jwt.getExpiration());
     }
 
     @Test
@@ -59,10 +59,10 @@ public class JsonWebTokenTest {
         Mockito.when(user.getName()).thenReturn("admin");
         JsonWebToken jwt = new JsonWebToken();
         String token = jwt.createToken(user, permissions);
-        Assert.assertNotNull(token);
-        Assert.assertTrue(jwt.validateToken(token));
-        Assert.assertEquals("admin", jwt.getSubject());
-        Assert.assertNotNull(jwt.getExpiration());
+        Assertions.assertNotNull(token);
+        Assertions.assertTrue(jwt.validateToken(token));
+        Assertions.assertEquals("admin", jwt.getSubject());
+        Assertions.assertNotNull(jwt.getExpiration());
     }
 
     @Test

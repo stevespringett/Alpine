@@ -21,8 +21,8 @@ package alpine.server.auth;
 
 import alpine.server.cache.CacheManager;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
+import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSObject;
@@ -36,11 +36,11 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet;
 import org.assertj.core.api.Assertions;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.RestoreEnvironmentVariables;
+import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import wiremock.org.apache.hc.core5.http.ContentType;
 import wiremock.org.apache.hc.core5.http.HttpHeaders;
 import wiremock.org.apache.hc.core5.http.HttpStatus;
@@ -56,6 +56,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
+@WireMockTest
 public class OidcIdTokenAuthenticatorTest {
 
     private static final String USERNAME_CLAIM_NAME = "username";
@@ -70,40 +71,34 @@ public class OidcIdTokenAuthenticatorTest {
         return profile;
     };
 
-    @Rule
-    public WireMockRule wireMockRule = new WireMockRule(WireMockConfiguration.options().dynamicPort());
-
-    @Rule
-    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
-
     private OidcConfiguration oidcConfiguration;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         oidcConfiguration = new OidcConfiguration();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         // Remove JWK sets from cache to keep testing environment clean
         CacheManager.getInstance().remove(JWKSet.class, OidcIdTokenAuthenticator.JWK_SET_CACHE_KEY);
     }
 
     @Test
-    public void authenticateShouldReturnOidcProfile() throws Exception {
+    public void authenticateShouldReturnOidcProfile(final WireMockRuntimeInfo wmRuntimeInfo) throws Exception {
         // Generate a JWK to sign the token with
         final RSAKey jwk = new RSAKeyGenerator(2048).keyUse(KeyUse.SIGNATURE).keyID(UUID.randomUUID().toString()).generate();
         final var jwkSet = new JWKSet(jwk.toPublicJWK());
 
         // Register endpoint for JWK set retrieval
-        wireMockRule.stubFor(WireMock.get(WireMock.urlPathEqualTo("/jwks"))
+        WireMock.stubFor(WireMock.get(WireMock.urlPathEqualTo("/jwks"))
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.SC_OK)
                         .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
                         .withBody(jwkSet.toString())));
 
-        oidcConfiguration.setIssuer(wireMockRule.baseUrl());
-        oidcConfiguration.setJwksUri(new URI(wireMockRule.url("/jwks")));
+        oidcConfiguration.setIssuer(wmRuntimeInfo.getHttpBaseUrl());
+        oidcConfiguration.setJwksUri(new URI(wmRuntimeInfo.getHttpBaseUrl() + "/jwks"));
 
         // Construct a JWS object with all required claims
         final var token = new JWSObject(
@@ -111,7 +106,7 @@ public class OidcIdTokenAuthenticatorTest {
                 new Payload(Map.of(
                         IDTokenClaimsSet.SUB_CLAIM_NAME, "subject",
                         IDTokenClaimsSet.AUD_CLAIM_NAME, "clientId",
-                        IDTokenClaimsSet.ISS_CLAIM_NAME, wireMockRule.baseUrl(),
+                        IDTokenClaimsSet.ISS_CLAIM_NAME, wmRuntimeInfo.getHttpBaseUrl(),
                         IDTokenClaimsSet.EXP_CLAIM_NAME, LocalDateTime.now().plusMinutes(1).atZone(ZoneId.systemDefault()).toEpochSecond(),
                         IDTokenClaimsSet.IAT_CLAIM_NAME, LocalDateTime.now().minusMinutes(1).atZone(ZoneId.systemDefault()).toEpochSecond(),
                         USERNAME_CLAIM_NAME, "username",
@@ -134,27 +129,27 @@ public class OidcIdTokenAuthenticatorTest {
     }
 
     @Test
-    public void authenticateShouldThrowWhenTokenIsNotSigned() throws Exception {
+    public void authenticateShouldThrowWhenTokenIsNotSigned(final WireMockRuntimeInfo wmRuntimeInfo) throws Exception {
         // Generate a JWK to sign the token with
         final RSAKey jwk = new RSAKeyGenerator(2048).keyUse(KeyUse.SIGNATURE).keyID(UUID.randomUUID().toString()).generate();
         final var jwkSet = new JWKSet(jwk.toPublicJWK());
 
         // Register endpoint for JWK set retrieval
-        wireMockRule.stubFor(WireMock.get(WireMock.urlPathEqualTo("/jwks"))
+        WireMock.stubFor(WireMock.get(WireMock.urlPathEqualTo("/jwks"))
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.SC_OK)
                         .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
                         .withBody(jwkSet.toString())));
 
-        oidcConfiguration.setIssuer(wireMockRule.baseUrl());
-        oidcConfiguration.setJwksUri(new URI(wireMockRule.url("/jwks")));
+        oidcConfiguration.setIssuer(wmRuntimeInfo.getHttpBaseUrl());
+        oidcConfiguration.setJwksUri(new URI(wmRuntimeInfo.getHttpBaseUrl() + "/jwks"));
 
         // Construct an unsigned token with all required claims
         final var token = new PlainObject(
                 new Payload(Map.of(
                         IDTokenClaimsSet.SUB_CLAIM_NAME, "subject",
                         IDTokenClaimsSet.AUD_CLAIM_NAME, "clientId",
-                        IDTokenClaimsSet.ISS_CLAIM_NAME, wireMockRule.baseUrl(),
+                        IDTokenClaimsSet.ISS_CLAIM_NAME, wmRuntimeInfo.getHttpBaseUrl(),
                         IDTokenClaimsSet.EXP_CLAIM_NAME, LocalDateTime.now().plusMinutes(1).atZone(ZoneId.systemDefault()).toEpochSecond(),
                         IDTokenClaimsSet.IAT_CLAIM_NAME, LocalDateTime.now().minusMinutes(1).atZone(ZoneId.systemDefault()).toEpochSecond()
                 ))
@@ -170,14 +165,14 @@ public class OidcIdTokenAuthenticatorTest {
     }
 
     @Test
-    public void authenticateShouldThrowWhenResolvingJwkSetFailed() throws Exception {
+    public void authenticateShouldThrowWhenResolvingJwkSetFailed(final WireMockRuntimeInfo wmRuntimeInfo) throws Exception {
         // Register endpoint for JWK set retrieval
-        wireMockRule.stubFor(WireMock.get(WireMock.urlPathEqualTo("/jwks"))
+        WireMock.stubFor(WireMock.get(WireMock.urlPathEqualTo("/jwks"))
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.SC_NOT_FOUND)));
 
-        oidcConfiguration.setIssuer(wireMockRule.baseUrl());
-        oidcConfiguration.setJwksUri(new URI(wireMockRule.url("/jwks")));
+        oidcConfiguration.setIssuer(wmRuntimeInfo.getHttpBaseUrl());
+        oidcConfiguration.setJwksUri(new URI(wmRuntimeInfo.getHttpBaseUrl() + "/jwks"));
 
         // Generate a JWK to sign the token with
         final RSAKey jwk = new RSAKeyGenerator(2048).keyUse(KeyUse.SIGNATURE).keyID(UUID.randomUUID().toString()).generate();
@@ -188,7 +183,7 @@ public class OidcIdTokenAuthenticatorTest {
                 new Payload(Map.of(
                         IDTokenClaimsSet.SUB_CLAIM_NAME, "subject",
                         IDTokenClaimsSet.AUD_CLAIM_NAME, "clientId",
-                        IDTokenClaimsSet.ISS_CLAIM_NAME, wireMockRule.baseUrl(),
+                        IDTokenClaimsSet.ISS_CLAIM_NAME, wmRuntimeInfo.getHttpBaseUrl(),
                         IDTokenClaimsSet.EXP_CLAIM_NAME, LocalDateTime.now().plusMinutes(1).atZone(ZoneId.systemDefault()).toEpochSecond(),
                         IDTokenClaimsSet.IAT_CLAIM_NAME, LocalDateTime.now().minusMinutes(1).atZone(ZoneId.systemDefault()).toEpochSecond()
                 ))
@@ -208,20 +203,20 @@ public class OidcIdTokenAuthenticatorTest {
     }
 
     @Test
-    public void authenticateShouldThrowWhenValidatingIdTokenFailed() throws Exception {
+    public void authenticateShouldThrowWhenValidatingIdTokenFailed(final WireMockRuntimeInfo wmRuntimeInfo) throws Exception {
         // Generate a JWK to sign the token with
         final RSAKey jwk = new RSAKeyGenerator(2048).keyUse(KeyUse.SIGNATURE).keyID(UUID.randomUUID().toString()).generate();
         final var jwkSet = new JWKSet(jwk.toPublicJWK());
 
         // Register endpoint for JWK set retrieval
-        wireMockRule.stubFor(WireMock.get(WireMock.urlPathEqualTo("/jwks"))
+        WireMock.stubFor(WireMock.get(WireMock.urlPathEqualTo("/jwks"))
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.SC_OK)
                         .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
                         .withBody(jwkSet.toString())));
 
-        oidcConfiguration.setIssuer(wireMockRule.baseUrl());
-        oidcConfiguration.setJwksUri(new URI(wireMockRule.url("/jwks")));
+        oidcConfiguration.setIssuer(wmRuntimeInfo.getHttpBaseUrl());
+        oidcConfiguration.setJwksUri(new URI(wmRuntimeInfo.getHttpBaseUrl() + "/jwks"));
 
         // Construct a JWS object with all required claims
         final var token = new JWSObject(
@@ -229,7 +224,7 @@ public class OidcIdTokenAuthenticatorTest {
                 new Payload(Map.of(
                         IDTokenClaimsSet.SUB_CLAIM_NAME, "subject",
                         IDTokenClaimsSet.AUD_CLAIM_NAME, "clientId",
-                        IDTokenClaimsSet.ISS_CLAIM_NAME, wireMockRule.baseUrl(),
+                        IDTokenClaimsSet.ISS_CLAIM_NAME, wmRuntimeInfo.getHttpBaseUrl(),
                         IDTokenClaimsSet.EXP_CLAIM_NAME, LocalDateTime.now().plusMinutes(1).atZone(ZoneId.systemDefault()).toEpochSecond(),
                         IDTokenClaimsSet.IAT_CLAIM_NAME, LocalDateTime.now().minusMinutes(1).atZone(ZoneId.systemDefault()).toEpochSecond()
                 ))
@@ -259,8 +254,8 @@ public class OidcIdTokenAuthenticatorTest {
     }
 
     @Test
-    public void resolveJwkSetShouldReturnJwkSetAndStoreItInCache() throws Exception {
-        wireMockRule.stubFor(WireMock.get(WireMock.urlPathEqualTo("/jwks"))
+    public void resolveJwkSetShouldReturnJwkSetAndStoreItInCache(final WireMockRuntimeInfo wmRuntimeInfo) throws Exception {
+        WireMock.stubFor(WireMock.get(WireMock.urlPathEqualTo("/jwks"))
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.SC_OK)
                         .withHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType())
@@ -286,7 +281,7 @@ public class OidcIdTokenAuthenticatorTest {
                                 "  ]\n" +
                                 "}")));
 
-        oidcConfiguration.setJwksUri(new URI(wireMockRule.url("/jwks")));
+        oidcConfiguration.setJwksUri(new URI(wmRuntimeInfo.getHttpBaseUrl() + "/jwks"));
 
         final var authenticator = new OidcIdTokenAuthenticator(oidcConfiguration, "clientId");
 
@@ -304,14 +299,14 @@ public class OidcIdTokenAuthenticatorTest {
     }
 
     @Test
-    public void resolveJwkSetShouldUseHttpProxyIfConfigured() throws Exception {
-        environmentVariables.set("http_proxy", "http://localhost:6666");
-
-        wireMockRule.stubFor(WireMock.get(WireMock.urlPathEqualTo("/jwks"))
+    @RestoreEnvironmentVariables
+    @SetEnvironmentVariable(key = "http_proxy", value = "http://localhost:6666")
+    public void resolveJwkSetShouldUseHttpProxyIfConfigured(final WireMockRuntimeInfo wmRuntimeInfo) throws Exception {
+        WireMock.stubFor(WireMock.get(WireMock.urlPathEqualTo("/jwks"))
                 .willReturn(WireMock.aResponse()
                         .withStatus(418)));
 
-        oidcConfiguration.setJwksUri(new URI(wireMockRule.url("/jwks")));
+        oidcConfiguration.setJwksUri(new URI(wmRuntimeInfo.getHttpBaseUrl() + "/jwks"));
 
         final var authenticator = new OidcIdTokenAuthenticator(oidcConfiguration, "clientId");
 
