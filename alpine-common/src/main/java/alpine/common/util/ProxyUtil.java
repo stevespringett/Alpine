@@ -25,7 +25,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -166,7 +166,7 @@ public final class ProxyUtil {
             return null;
         }
 
-        final var proxyUrl = new URL(proxy);
+        final var proxyUrl = URI.create(proxy).toURL();
         final var proxyCfg = new ProxyConfig();
         proxyCfg.setHost(proxyUrl.getHost());
         proxyCfg.setPort(proxyUrl.getPort());

@@ -21,7 +21,7 @@ package alpine.common.util;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.net.URL;
+import java.net.URI;
 
 public class UrlUtilTest {
 
@@ -34,8 +34,8 @@ public class UrlUtilTest {
 
     @Test
     public void normalizationURLTest() throws Exception {
-        Assertions.assertEquals("http://www.example.com", new URL(UrlUtil.normalize("http://www.example.com")).toExternalForm());
-        Assertions.assertEquals("http://www.example.com", new URL(UrlUtil.normalize("http://www.example.com/")).toExternalForm());
-        Assertions.assertEquals("http://www.example.com", new URL(UrlUtil.normalize("http://www.example.com//////")).toExternalForm());
+        Assertions.assertEquals("http://www.example.com", URI.create(UrlUtil.normalize("http://www.example.com")).toURL().toExternalForm());
+        Assertions.assertEquals("http://www.example.com", URI.create(UrlUtil.normalize("http://www.example.com/")).toURL().toExternalForm());
+        Assertions.assertEquals("http://www.example.com", URI.create(UrlUtil.normalize("http://www.example.com//////")).toURL().toExternalForm());
     }
 }

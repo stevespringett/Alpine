@@ -21,6 +21,7 @@ package alpine.common.util;
 import org.apache.commons.lang3.StringUtils;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 
 public class UrlUtil {
@@ -54,6 +55,6 @@ public class UrlUtil {
      * @throws MalformedURLException when a URL is invalid
      */
     public static URL normalize(URL url) throws MalformedURLException {
-        return new URL(normalize(url.toExternalForm()));
+        return URI.create(normalize(url.toExternalForm())).toURL();
     }
 }
