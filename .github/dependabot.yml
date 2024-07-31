@@ -4,19 +4,6 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
-    ignore:
-    # logstash-logback-encoder >= v7.4 requires logback v2,
-    # but Alpine is still using logback v1. Do not suggest
-    # updates beyond v7.3.x for now.
-    - dependency-name: logstash-logback-encoder
-      update-types:
-      - version-update:semver-major
-      - version-update:semver-minor
-    # logback-classic 1.4.x uses Jakarta EE namespace whereas Alpine is still on legacy Java EE.
-    - dependency-name: ch.qos.logback:logback-classic
-      update-types:
-      - version-update:semver-major
-      - version-update:semver-minor
 
   - package-ecosystem: "maven"
     directory: "/executable-war/"
