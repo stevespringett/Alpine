@@ -189,7 +189,7 @@
         <lib.nimbus-oauth2-oidc-sdk.version>11.13</lib.nimbus-oauth2-oidc-sdk.version>
         <lib.owasp.encoder.version>1.2.3</lib.owasp.encoder.version>
         <lib.owasp.security-logging.version>1.1.7</lib.owasp.security-logging.version>
-        <lib.parsson.version>1.1.6</lib.parsson.version>
+        <lib.parsson.version>1.1.7</lib.parsson.version>
         <lib.slf4j.version>2.0.12</lib.slf4j.version>
         <lib.swagger.version>2.2.22</lib.swagger.version>
         <!-- Unit test libraries -->
