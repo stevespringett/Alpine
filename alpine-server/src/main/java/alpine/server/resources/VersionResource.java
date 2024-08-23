@@ -50,7 +50,11 @@ public final class VersionResource {
             summary = "Returns application version information",
             description = "Returns a simple json object containing the name of the application and the version"
     )
-    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = About.class)))
+    @ApiResponse(
+            responseCode = "200",
+            description = "Application version information",
+            content = @Content(schema = @Schema(implementation = About.class))
+    )
     @AuthenticationNotRequired
     public Response getVersion() {
         return Response.ok(new GenericEntity<>(new About()) { }).build();
