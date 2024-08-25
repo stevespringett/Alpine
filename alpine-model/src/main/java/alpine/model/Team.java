@@ -85,7 +85,7 @@ public class Team implements Serializable {
     private UUID uuid;
 
     @Persistent
-    @Column(name = "NAME", jdbcType = "VARCHAR", length = 50, allowsNull = "false")
+    @Column(name = "NAME", jdbcType = "VARCHAR", length = 255, allowsNull = "false")
     @NotBlank
     @Size(min = 1, max = 255)
     @Pattern(regexp = "[\\P{Cc}]+", message = "The team name must not contain control characters")
