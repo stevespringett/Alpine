@@ -37,12 +37,16 @@ public class ApiKeyAuthenticationService implements AuthenticationService {
 
     /**
      * Given the specified ContainerRequest, the constructor retrieves a header
-     * named 'X-Api-Key', if it exists.
+     * named 'X-Api-Key' or a URI query parameter named 'apiKey', if they exist.
      * @param request the ContainerRequest object
      * @since 1.0.0
      */
-    public ApiKeyAuthenticationService(final ContainerRequest request) {
-        this.assertedApiKey = request.getHeaderString("X-Api-Key");
+    public ApiKeyAuthenticationService(final ContainerRequest request, boolean byQuery) {
+        if (byQuery) {
+            this.assertedApiKey = request.getUriInfo().getQueryParameters().getFirst("apiKey");
+        } else {
+            this.assertedApiKey = request.getHeaderString("X-Api-Key");
+        }
     }
 
     /**
@@ -55,9 +59,9 @@ public class ApiKeyAuthenticationService implements AuthenticationService {
     }
 
     /**
-     * Authenticates the API key (if it was specified in the X-Api-Key header)
-     * and returns a Principal if authentication is successful. Otherwise,
-     * returns an AuthenticationException.
+     * Authenticates the API key (if it was specified in the X-Api-Key header
+     * or apiKey query param and returns a Principal if authentication is
+     * successful. Otherwise, returns an AuthenticationException.
      * @return a Principal of which ApiKey is an instance of
      * @throws AuthenticationException upon an authentication failure
      * @since 1.0.0
