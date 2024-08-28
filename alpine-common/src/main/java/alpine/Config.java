@@ -272,6 +272,28 @@ public class Config {
             LOGGER.error("A fatal error occurred loading application version information. Please correct the issue and restart the application.");
         }
 
+        final File dataDirectory = getDataDirectorty();
+        if (!dataDirectory.exists()) {
+            if (!dataDirectory.mkdirs()) {
+                LOGGER.warn("""
+                        Data directory %s does not exist, and could not be created. \
+                        Please ensure that the user running the JVM has sufficient permissions.\
+                        """.formatted(dataDirectory.getAbsolutePath()));
+            }
+        }
+        if (!dataDirectory.canRead()) {
+            LOGGER.warn("""
+                    Data directory %s is not readable. \
+                    Please ensure that the user running the JVM has sufficient permissions.\
+                    """.formatted(dataDirectory.getAbsolutePath()));
+        }
+        if (!dataDirectory.canWrite()) {
+            LOGGER.warn("""
+                    Data directory %s is not writable. \
+                    Please ensure that the user running the JVM has sufficient permissions.\
+                    """.formatted(dataDirectory.getAbsolutePath()));
+        }
+
         final File systemIdFile = getSystemIdFilePath();
         if (!systemIdFile.exists()) {
             try (OutputStream fos = Files.newOutputStream(systemIdFile.toPath())) {
