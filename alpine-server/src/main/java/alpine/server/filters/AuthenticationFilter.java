@@ -21,7 +21,7 @@ package alpine.server.filters;
 import alpine.common.logging.Logger;
 import alpine.model.ApiKey;
 import alpine.server.auth.ApiKeyAuthenticationService;
-import alpine.server.auth.AuthenticationWithUriQuery;
+import alpine.server.auth.AllowApiKeyInQueryParameter;
 import alpine.server.auth.JwtAuthenticationService;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.owasp.security.logging.SecurityMarkers;
@@ -65,7 +65,7 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
             Principal principal = null;
 
-            final boolean authenticatesByQuery = resourceInfo.getResourceMethod().isAnnotationPresent(AuthenticationWithUriQuery.class);
+            final boolean authenticatesByQuery = resourceInfo.getResourceMethod().isAnnotationPresent(AllowApiKeyInQueryParameter.class);
             final ApiKeyAuthenticationService apiKeyAuthService = new ApiKeyAuthenticationService(request, authenticatesByQuery);
             if (apiKeyAuthService.isSpecified()) {
                 try {
