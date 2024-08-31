@@ -65,8 +65,8 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
             Principal principal = null;
 
-            final boolean authenticatesByQuery = resourceInfo.getResourceMethod().isAnnotationPresent(AllowApiKeyInQueryParameter.class);
-            final ApiKeyAuthenticationService apiKeyAuthService = new ApiKeyAuthenticationService(request, authenticatesByQuery);
+            final boolean allowsApiKeyInQueryParameter = resourceInfo.getResourceMethod().isAnnotationPresent(AllowApiKeyInQueryParameter.class);
+            final ApiKeyAuthenticationService apiKeyAuthService = new ApiKeyAuthenticationService(request, allowsApiKeyInQueryParameter);
             if (apiKeyAuthService.isSpecified()) {
                 try {
                     principal = apiKeyAuthService.authenticate();
