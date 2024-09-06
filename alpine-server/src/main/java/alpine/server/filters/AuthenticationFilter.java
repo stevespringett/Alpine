@@ -21,6 +21,7 @@ package alpine.server.filters;
 import alpine.common.logging.Logger;
 import alpine.model.ApiKey;
 import alpine.server.auth.ApiKeyAuthenticationService;
+import alpine.server.auth.AllowApiKeyInQueryParameter;
 import alpine.server.auth.JwtAuthenticationService;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.owasp.security.logging.SecurityMarkers;
@@ -31,6 +32,8 @@ import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.container.ResourceInfo;
+import jakarta.ws.rs.core.Context;
 import javax.naming.AuthenticationException;
 import java.security.Principal;
 
@@ -48,6 +51,9 @@ public class AuthenticationFilter implements ContainerRequestFilter {
     // Setup logging
     private static final Logger LOGGER = Logger.getLogger(AuthenticationFilter.class);
 
+    @Context
+    private ResourceInfo resourceInfo;
+
     @Override
     public void filter(ContainerRequestContext requestContext) {
         if (requestContext instanceof ContainerRequest) {
@@ -59,7 +65,8 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
             Principal principal = null;
 
-            final ApiKeyAuthenticationService apiKeyAuthService = new ApiKeyAuthenticationService(request);
+            final boolean allowsApiKeyInQueryParameter = resourceInfo.getResourceMethod().isAnnotationPresent(AllowApiKeyInQueryParameter.class);
+            final ApiKeyAuthenticationService apiKeyAuthService = new ApiKeyAuthenticationService(request, allowsApiKeyInQueryParameter);
             if (apiKeyAuthService.isSpecified()) {
                 try {
                     principal = apiKeyAuthService.authenticate();
