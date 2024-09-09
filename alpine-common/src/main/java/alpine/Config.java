@@ -114,6 +114,7 @@ public class Config {
         DATABASE_PASSWORD_FILE                 ("alpine.database.password.file",     null),
         DATABASE_MIGRATION_ENABLED             ("alpine.database.migration.enabled", true),
         DATABASE_POOL_ENABLED                  ("alpine.database.pool.enabled",      true),
+        DATABASE_POOL_TX_ONLY                  ("alpine.database.pool.tx.only",      false),
         @Deprecated
         DATABASE_POOL_MAX_SIZE                 ("alpine.database.pool.max.size",     20),
         DATABASE_POOL_TX_MAX_SIZE              ("alpine.database.pool.tx.max.size", null),        // null for backward compatibility
