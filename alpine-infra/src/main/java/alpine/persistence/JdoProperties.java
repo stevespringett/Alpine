@@ -77,6 +77,7 @@ public final class JdoProperties {
         properties.put(PropertyNames.PROPERTY_SCHEMA_GENERATE_DATABASE_MODE, "create");
         properties.put(PropertyNames.PROPERTY_QUERY_JDOQL_ALLOWALL, "true");
         properties.put(PropertyNames.PROPERTY_RETAIN_VALUES, "true");
+        properties.putAll(Config.getInstance().getPassThroughProperties("datanucleus"));
         return properties;
     }
 }
