@@ -29,13 +29,13 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.micrometer.core.instrument.FunctionCounter;
 import io.micrometer.core.instrument.Gauge;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
 import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.api.jdo.JDOPersistenceManagerFactory;
 import org.datanucleus.store.schema.SchemaAwareStoreManager;
 
-import jakarta.servlet.ServletContextEvent;
-import jakarta.servlet.ServletContextListener;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.sql.DataSource;
@@ -97,10 +97,19 @@ public class PersistenceManagerFactory implements IPersistenceManagerFactory, Se
             //  - https://datanucleus.groups.io/g/main/topic/95191894#490
 
             LOGGER.info("Creating transactional connection pool");
-            dnProps.put(PropertyNames.PROPERTY_CONNECTION_FACTORY, createTxPooledDataSource());
+            final DataSource txPooledDataSource = createTxPooledDataSource();
+            dnProps.put(PropertyNames.PROPERTY_CONNECTION_FACTORY, txPooledDataSource);
 
-            LOGGER.info("Creating non-transactional connection pool");
-            dnProps.put(PropertyNames.PROPERTY_CONNECTION_FACTORY2, createNonTxPooledDataSource());
+            // For some applications, the overhead of maintaining two separate connection pools cannot be justified.
+            // Allow the transactional (primary) connection pool to be reused for non-transactional operations.
+            // https://groups.io/g/datanucleus/topic/side_effects_of_setting/108286305
+            if (Config.getInstance().getPropertyAsBoolean(Config.AlpineKey.DATABASE_POOL_TX_ONLY)) {
+                LOGGER.info("Reusing transactional connection pool for non-transactional operations");
+                dnProps.put(PropertyNames.PROPERTY_CONNECTION_FACTORY2, txPooledDataSource);
+            } else {
+                LOGGER.info("Creating non-transactional connection pool");
+                dnProps.put(PropertyNames.PROPERTY_CONNECTION_FACTORY2, createNonTxPooledDataSource());
+            }
         } else {
             // No connection pooling; Let DataNucleus handle the datasource setup
             dnProps.put(PropertyNames.PROPERTY_CONNECTION_URL, Config.getInstance().getProperty(Config.AlpineKey.DATABASE_URL));
