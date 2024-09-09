@@ -28,6 +28,9 @@ import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.Callback;
+import org.eclipse.jetty.util.resource.Resource;
+import org.eclipse.jetty.util.resource.URLResourceFactory;
+import org.eclipse.jetty.xml.XmlConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
@@ -92,6 +95,19 @@ public final class EmbeddedJettyServer {
         final ProtectionDomain protectionDomain = EmbeddedJettyServer.class.getProtectionDomain();
         final URL location = protectionDomain.getCodeSource().getLocation();
         context.setWar(location.toExternalForm());
+
+        // Allow applications to customize the WebAppContext via Jetty context XML file.
+        // An example use-case is the customization of JARs that Jetty shall scan for annotations.
+        //
+        // https://jetty.org/docs/jetty/12/operations-guide/xml/index.html
+        // https://jetty.org/docs/jetty/12/operations-guide/annotations/index.html
+        final URL jettyContextUrl = Thread.currentThread().getContextClassLoader().getResource("WEB-INF/jetty-context.xml");
+        if (jettyContextUrl != null) {
+            LOGGER.debug("Applying Jetty customization from {}", jettyContextUrl);
+            final Resource jettyContextResource = new URLResourceFactory().newResource(jettyContextUrl);
+            final var xmlConfiguration = new XmlConfiguration(jettyContextResource);
+            xmlConfiguration.configure(context);
+        }
 
         server.setHandler(context);
         server.addBean(new ErrorHandler());
