@@ -113,7 +113,7 @@
         <maven.uuidgenerator.plugin.version>1.0.1</maven.uuidgenerator.plugin.version>
         <maven.jacoco.plugin.version>0.8.12</maven.jacoco.plugin.version>
         <maven.antrun.plugin.version>3.1.0</maven.antrun.plugin.version>
-        <maven.jarsigner.plugin.veresion>3.0.0</maven.jarsigner.plugin.veresion>
+        <maven.jarsigner.plugin.veresion>3.1.0</maven.jarsigner.plugin.veresion>
 
         <!-- Software Security: Fortify SCA -->
         <maven.fortify.plugin.version>18.20</maven.fortify.plugin.version>
