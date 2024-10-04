@@ -93,6 +93,12 @@ public class ApiKey implements Serializable, Principal {
     @JsonIgnore
     private List<Team> teams;
 
+    @Persistent(table = "APIKEYS_PERMISSIONS", defaultFetchGroup = "true")
+    @Join(column = "APIKEY_ID")
+    @Element(column = "PERMISSION_ID")
+    @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "name ASC"))
+    private List<Permission> permissions;
+
     @Persistent
     @Unique(name = "APIKEY_PUBLIC_IDX") 
     @Column(name = "PUBLIC_ID")
@@ -213,6 +219,14 @@ public class ApiKey implements Serializable, Principal {
 
     public void setTeams(List<Team> teams) {
         this.teams = teams;
+    }
+
+    public List<Permission> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(List<Permission> permissions) {
+        this.permissions = permissions;
     }
 
     public String getPublicId() {
