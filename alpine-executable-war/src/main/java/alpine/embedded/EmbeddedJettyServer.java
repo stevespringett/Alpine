@@ -19,7 +19,9 @@
 package alpine.embedded;
 
 import org.eclipse.jetty.ee10.servlet.ErrorPageErrorHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHandler;
 import org.eclipse.jetty.ee10.webapp.WebAppContext;
+import org.eclipse.jetty.http.UriCompliance;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
@@ -73,6 +75,20 @@ public final class EmbeddedJettyServer {
         final HttpConfiguration httpConfig = new HttpConfiguration();
         httpConfig.addCustomizer( new org.eclipse.jetty.server.ForwardedRequestCustomizer() ); // Add support for X-Forwarded headers
 
+        // Enable legacy (mimicking Jetty 9) URI compliance.
+        // This is required to allow URL encoding in path segments, e.g. "/foo/bar%2Fbaz".
+        // https://github.com/jetty/jetty.project/issues/12162
+        // https://github.com/jetty/jetty.project/issues/11448
+        // https://jetty.org/docs/jetty/12/programming-guide/server/compliance.html#uri
+        //
+        // NB: The setting on its own is not sufficient. Decoding of ambiguous URIs
+        // must additionally be enabled in the servlet handler. This can only be done
+        // after the server is started, further down below.
+        //
+        // TODO: Remove this for the next major version bump. Since we're going against Servlet API
+        //  here, the only viable long-term solution is to adapt REST APIs to follow Servlet API 6 spec.
+        httpConfig.setUriCompliance(UriCompliance.LEGACY);
+
         final HttpConnectionFactory connectionFactory = new HttpConnectionFactory( httpConfig );
         final ServerConnector connector = new ServerConnector(server, connectionFactory);
         connector.setHost(host);
@@ -113,6 +129,10 @@ public final class EmbeddedJettyServer {
         server.addBean(new ErrorHandler());
         try {
             server.start();
+            for (final ServletHandler handler : server.getContainedBeans(ServletHandler.class)) {
+                LOGGER.debug("Enabling decoding of ambiguous URIs for servlet handler: {}", handler.getClass().getName());
+                handler.setDecodeAmbiguousURIs(true);
+            }
             addJettyShutdownHook(server);
             server.join();
         } catch (Exception e) {
