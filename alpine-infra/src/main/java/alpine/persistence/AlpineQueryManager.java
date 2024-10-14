@@ -18,6 +18,7 @@
  */
 package alpine.persistence;
 
+import alpine.Config;
 import alpine.common.logging.Logger;
 import alpine.event.LdapSyncEvent;
 import alpine.event.framework.EventService;
@@ -40,8 +41,12 @@ import alpine.security.ApiKeyGenerator;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+
+import org.mindrot.jbcrypt.BCrypt;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -56,6 +61,8 @@ import java.util.List;
 public class AlpineQueryManager extends AbstractAlpineQueryManager {
 
     private static final Logger LOGGER = Logger.getLogger(AlpineQueryManager.class);
+    private static final int ROUNDS = Config.getInstance().getPropertyAsInt(Config.AlpineKey.BCRYPT_ROUNDS);
+    private static final int SUFFIX_LENGTH = 5;
 
     /**
      * Default constructor.
@@ -98,9 +105,10 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      */
     public ApiKey getApiKey(final String key) {
         return callInTransaction(() -> {
-            final Query<ApiKey> query = pm.newQuery(ApiKey.class, "key == :key");
-            query.setParameters(key);
-            return executeAndCloseUnique(query);
+            final Query<ApiKey> query = pm.newQuery(ApiKey.class, "suffix == :suffix");
+            query.setParameters(key.substring(key.length() - SUFFIX_LENGTH));
+            ApiKey apiKey = executeAndCloseUnique(query);
+            return BCrypt.checkpw(key.substring(0, key.length() - SUFFIX_LENGTH), apiKey.getKey()) ? apiKey : null;
         });
     }
 
@@ -114,7 +122,13 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      */
     public ApiKey regenerateApiKey(final ApiKey apiKey) {
         return callInTransaction(() -> {
-            apiKey.setKey(ApiKeyGenerator.generate());
+            String clearKey = ApiKeyGenerator.generate();
+            String hashedKey = BCrypt.hashpw(new String(Base64.getDecoder().decode(clearKey)), BCrypt.gensalt(ROUNDS))
+                    .toCharArray().toString();
+            apiKey.setKey(hashedKey);
+            apiKey.setSuffix(ApiKeyGenerator.generate(SUFFIX_LENGTH));
+            pm.makeTransient(apiKey);
+            apiKey.setKey(clearKey + apiKey.getSuffix());
             return apiKey;
         });
     }
@@ -128,10 +142,17 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     public ApiKey createApiKey(final Team team) {
         return callInTransaction(() -> {
             final var apiKey = new ApiKey();
-            apiKey.setKey(ApiKeyGenerator.generate());
+            String clearKey = ApiKeyGenerator.generate();
+            String hashedKey = BCrypt.hashpw(new String(Base64.getDecoder().decode(clearKey)), BCrypt.gensalt(ROUNDS))
+                    .toCharArray().toString();
+            apiKey.setKey(hashedKey);
+            apiKey.setSuffix(ApiKeyGenerator.generate(SUFFIX_LENGTH));
             apiKey.setCreated(new Date());
             apiKey.setTeams(List.of(team));
-            return pm.makePersistent(apiKey);
+            pm.makePersistent(apiKey);
+            pm.makeTransient(apiKey);
+            apiKey.setKey(clearKey + apiKey.getSuffix());
+            return apiKey;
         });
     }
 
