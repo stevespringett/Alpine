@@ -64,6 +64,7 @@ public class ApiKey implements Serializable, Principal {
     @Size(min = 32, max = 255)
     @Pattern(regexp = RegexSequence.Definition.WORD_CHARS,
             message = "The API key must contain only alpha, numeric and/or underscore characters")
+    @JsonIgnore
     private String key;
 
     @Persistent
@@ -85,6 +86,11 @@ public class ApiKey implements Serializable, Principal {
     @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "name ASC"))
     @JsonIgnore
     private List<Team> teams;
+
+    @Persistent
+    @Unique
+    @Column(name = "SUFFIX")
+    private String suffix;
 
     public long getId() {
         return id;
@@ -115,9 +121,9 @@ public class ApiKey implements Serializable, Principal {
         if (key.startsWith(prefix))
             maskedKey.append(prefix);
 
-        // mask all characters except the last four
-        maskedKey.append("*".repeat(key.length() - maskedKey.length() - 4));
-        maskedKey.append(key.substring(key.length() - 4));
+        // mask all characters except for the suffix
+        maskedKey.append("*".repeat(key.length() - maskedKey.length() - suffix.length()));
+        maskedKey.append(suffix);
 
         return maskedKey.toString();
     }
@@ -166,5 +172,11 @@ public class ApiKey implements Serializable, Principal {
         this.teams = teams;
     }
 
-}
+    public String getSuffix() {
+        return suffix;
+    }
 
+    public void setSuffix(String suffix) {
+        this.suffix = suffix;
+    }
+}
