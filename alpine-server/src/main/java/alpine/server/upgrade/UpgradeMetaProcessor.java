@@ -181,7 +181,7 @@ public class UpgradeMetaProcessor implements Closeable {
         final String driver = Config.getInstance().getProperty(Config.AlpineKey.DATABASE_DRIVER);
         final String dbUrl = Config.getInstance().getProperty(Config.AlpineKey.DATABASE_URL);
         final String user = Config.getInstance().getProperty(Config.AlpineKey.DATABASE_USERNAME);
-        final String password = Config.getInstance().getProperty(Config.AlpineKey.DATABASE_PASSWORD);
+        final String password = Config.getInstance().getPropertyOrFile(Config.AlpineKey.DATABASE_PASSWORD);
         try {
             Class.forName(driver);
             return DriverManager.getConnection(dbUrl, user, password);
