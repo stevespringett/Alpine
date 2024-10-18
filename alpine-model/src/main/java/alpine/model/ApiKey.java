@@ -86,6 +86,11 @@ public class ApiKey implements Serializable, Principal {
     @JsonIgnore
     private List<Team> teams;
 
+    @Persistent(table = "APIKEYS_PERMISSIONS", defaultFetchGroup = "true")
+    @Join(column = "APIKEY_ID")
+    @Element(column = "PERMISSION_ID")
+    @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "name ASC"))
+    private List<Permission> permissions;
     public long getId() {
         return id;
     }
@@ -166,5 +171,12 @@ public class ApiKey implements Serializable, Principal {
         this.teams = teams;
     }
 
-}
+    public List<Permission> getPermissions() {
+        return permissions;
+    }
 
+    public void setPermissions(List<Permission> permissions) {
+        this.permissions = permissions;
+    }
+
+}
