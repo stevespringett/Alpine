@@ -22,10 +22,12 @@ import alpine.common.logging.Logger;
 import alpine.common.util.ByteFormat;
 import alpine.common.util.PathUtil;
 import alpine.common.util.SystemUtil;
+import io.smallrye.config.ExpressionConfigSourceInterceptor;
+import io.smallrye.config.SmallRyeConfig;
+import io.smallrye.config.SmallRyeConfigBuilder;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -37,6 +39,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
+import static io.smallrye.config.PropertiesConfigSourceLoader.inFileSystem;
+
 /**
  * The Config class is responsible for reading the application.properties file.
  *
@@ -47,14 +51,13 @@ public class Config {
 
     private static final Logger LOGGER = Logger.getLogger(Config.class);
     private static final String ALPINE_APP_PROP = "alpine.application.properties";
-    private static final String PROP_FILE = "application.properties";
     private static final String ALPINE_VERSION_PROP_FILE = "alpine.version";
     private static final String APPLICATION_VERSION_PROP_FILE = "application.version";
     private static final Config INSTANCE;
-    private static Properties properties;
     private static Properties alpineVersionProperties;
     private static Properties applicationVersionProperties;
     private static String systemId;
+    private static org.eclipse.microprofile.config.Config delegateConfig;
 
     static {
         LOGGER.info(StringUtils.repeat("-", 80));
@@ -215,39 +218,42 @@ public class Config {
      * Initialize the Config object. This method should only be called once.
      */
     void init() {
-        if (properties != null) {
+        if (delegateConfig != null) {
             return;
         }
 
         LOGGER.info("Initializing Configuration");
-        properties = new Properties();
+        final SmallRyeConfigBuilder configBuilder = new SmallRyeConfigBuilder()
+                .forClassLoader(Thread.currentThread().getContextClassLoader())
+                // Enable default config sources:
+                //
+                // | Source                                               | Priority |
+                // | :--------------------------------------------------- | :------- |
+                // | System properties                                    | 400      |
+                // | Environment variables                                | 300      |
+                // | ${pwd}/.env file                                     | 295      |
+                // | ${pwd}/config/application.properties                 | 260      |
+                // | ${classpath}/application.properties                  | 250      |
+                // | ${classpath}/META-INF/microprofile-config.properties | 100      |
+                //
+                // https://smallrye.io/smallrye-config/3.10.0/config/getting-started/#config-sources
+                .addDefaultSources()
+                // Support expressions.
+                // https://smallrye.io/smallrye-config/3.10.0/config/expressions/
+                .withInterceptors(new ExpressionConfigSourceInterceptor())
+                // Allow applications to customize the Config via SPI.
+                // https://smallrye.io/smallrye-config/3.10.0/config/customizer/
+                .addDiscoveredCustomizers();
 
+        // If a custom properties file is specified via "alpine.application.properties" system property,
+        // register it as additional config source. The file has a higher priority than any of the default
+        // properties sources.
         final String alpineAppProp = PathUtil.resolve(System.getProperty(ALPINE_APP_PROP));
         if (StringUtils.isNotBlank(alpineAppProp)) {
-            LOGGER.info("Loading application properties from " + alpineAppProp);
-            try (InputStream fileInputStream = Files.newInputStream((new File(alpineAppProp)).toPath())) {
-                properties.load(fileInputStream);
-            } catch (FileNotFoundException e) {
-                LOGGER.error("Could not find property file " + alpineAppProp);
-            } catch (IOException e) {
-                LOGGER.error("Unable to load " + alpineAppProp);
-            }
-        } else {
-            LOGGER.info("System property " + ALPINE_APP_PROP + " not specified");
-            LOGGER.info("Loading " + PROP_FILE + " from classpath");
-            try (InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(PROP_FILE)) {
-                if (in != null) {
-                    properties.load(in);
-                } else {
-                    LOGGER.error("Unable to load (resourceStream is null) " + PROP_FILE);
-                }
-            } catch (IOException e) {
-                LOGGER.error("Unable to load " + PROP_FILE);
-            }
+            configBuilder.withSources(inFileSystem(alpineAppProp, 275, Thread.currentThread().getContextClassLoader()));
         }
-        if (properties.size() == 0) {
-            LOGGER.error("A fatal error occurred loading application properties. Please correct the issue and restart the application.");
-        }
+
+        delegateConfig = configBuilder.build();
 
         alpineVersionProperties = new Properties();
         try (InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(ALPINE_VERSION_PROP_FILE)) {
@@ -308,6 +314,20 @@ public class Config {
         } catch (IOException e) {
             LOGGER.error("Unable to read the contents of " + systemIdFile.getAbsolutePath(), e);
         }
+    }
+
+    /**
+     * @since 3.2.0
+     */
+    public org.eclipse.microprofile.config.Config getDelegate() {
+        return delegateConfig;
+    }
+
+    /**
+     * @since 3.2.0
+     */
+    public <T> T getMapping(final Class<T> mappingClass) {
+        return delegateConfig.unwrap(SmallRyeConfig.class).getConfigMapping(mappingClass);
     }
 
     /**
@@ -429,15 +449,10 @@ public class Config {
      * @since 1.0.0
      */
     public String getProperty(Key key) {
-        final String envVariable = getPropertyFromEnvironment(key);
-        if (envVariable != null) {
-            return envVariable;
-        }
-        if (key.getDefaultValue() == null) {
-            return properties.getProperty(key.getPropertyName());
-        } else {
-            return properties.getProperty(key.getPropertyName(), String.valueOf(key.getDefaultValue()));
-        }
+        return delegateConfig.getOptionalValue(key.getPropertyName(), String.class)
+                .orElseGet(() -> key.getDefaultValue() != null
+                        ? String.valueOf(key.getDefaultValue())
+                        : null);
     }
 
     /**
@@ -452,21 +467,17 @@ public class Config {
      * @since 1.7.0
      */
     public String getPropertyOrFile(AlpineKey key) {
-    	final AlpineKey fileKey = AlpineKey.valueOf(key.toString()+"_FILE");
-    	final String filePath = getProperty(fileKey);
-    	final String prop = getProperty(key);
-        if (StringUtils.isNotBlank(filePath)) {
-        	if (prop != null && !prop.equals(String.valueOf(key.getDefaultValue()))) {
-        		LOGGER.warn(fileKey.getPropertyName() + " overrides value from property " + key.getPropertyName());
-        	}
-        	try {
-				return new String(Files.readAllBytes(new File(PathUtil.resolve(filePath)).toPath())).replaceAll("\\s+", "");
-			} catch (IOException e) {
-        		LOGGER.error(filePath + " file doesn't exist or not readable.");
-        		return null;
-			}
-        }
-        return prop;
+        return delegateConfig.getOptionalValue(key.getPropertyName() + ".file", String.class)
+                .map(filePath -> {
+                    try {
+                        return new String(Files.readAllBytes(new File(PathUtil.resolve(filePath)).toPath())).replaceAll("\\s+", "");
+                    } catch (IOException e) {
+                        LOGGER.error(filePath + " file doesn't exist or not readable.", e);
+                        return null;
+                    }
+                })
+                .or(() -> delegateConfig.getOptionalValue(key.getPropertyName(), String.class))
+                .orElse(null);
     }
 
     /**
@@ -532,9 +543,6 @@ public class Config {
      * Their main use-case is to allow users to configure certain aspects of libraries and frameworks used by Alpine,
      * without Alpine having to introduce {@link AlpineKey}s for every single option.
      * <p>
-     * Properties are read from both environment variables, and {@link #PROP_FILE}.
-     * When a property is defined in both environment and {@code application.properties}, environment takes precedence.
-     * <p>
      * Properties <strong>must</strong> be prefixed with {@code ALPINE_} (for environment variables) or {@code alpine.}
      * (for {@code application.properties}) respectively. The Alpine prefix will be removed in keys of the returned
      * {@link Map}, but the given {@code prefix} will be retained.
@@ -545,33 +553,19 @@ public class Config {
      */
     public Map<String, String> getPassThroughProperties(final String prefix) {
         final var passThroughProperties = new HashMap<String, String>();
-        try {
-            for (final Map.Entry<String, String> envVar : System.getenv().entrySet()) {
-                if (envVar.getKey().startsWith("ALPINE_%s_".formatted(prefix.toUpperCase().replace(".", "_")))) {
-                    final String key = envVar.getKey().replaceFirst("^ALPINE_", "").toLowerCase().replace("_", ".");
-                    passThroughProperties.put(key, envVar.getValue());
-                }
+        for (final String propertyName : delegateConfig.getPropertyNames()) {
+            if (!propertyName.startsWith("alpine.%s.".formatted(prefix))) {
+                continue;
             }
-        } catch (SecurityException e) {
-            LOGGER.warn("""
-                    Unable to retrieve pass-through properties for prefix "%s" \
-                    from environment variables. Using defaults.""".formatted(prefix), e);
-        }
-        for (final Map.Entry<Object, Object> property : properties.entrySet()) {
-            if (property.getKey() instanceof String key
-                    && key.startsWith("alpine.%s.".formatted(prefix))
-                    && property.getValue() instanceof final String value) {
-                key = key.replaceFirst("^alpine\\.", "");
-                if (!passThroughProperties.containsKey(key)) { // Environment variables take precedence
-                    passThroughProperties.put(key, value);
-                }
-            }
+
+            final String key = propertyName.replaceFirst("^alpine\\.", "");
+            passThroughProperties.put(key, delegateConfig.getValue(propertyName, String.class));
         }
         return passThroughProperties;
     }
 
     static void reset() {
-        properties = null;
+        delegateConfig = null;
     }
 
     /**
@@ -583,7 +577,7 @@ public class Config {
      */
     @Deprecated
     public String getProperty(String key) {
-        return properties.getProperty(key);
+        return delegateConfig.getOptionalValue(key, String.class).orElse(null);
     }
 
     /**
@@ -596,31 +590,7 @@ public class Config {
      */
     @Deprecated
     public String getProperty(String key, String defaultValue) {
-        return properties.getProperty(key, defaultValue);
-    }
-
-    /**
-     * Attempts to retrieve the key via environment variable. Property names are
-     * always upper case with periods replaced with underscores.
-     *
-     * alpine.worker.threads
-     *    becomes
-     * ALPINE_WORKER_THREADS
-     *
-     * @param key the key to retrieve from environment
-     * @return the value of the key (if set), null otherwise.
-     * @since 1.4.3
-     */
-    private String getPropertyFromEnvironment(Key key) {
-        final String envVariable = key.getPropertyName().toUpperCase().replace(".", "_");
-        try {
-            return StringUtils.trimToNull(System.getenv(envVariable));
-        } catch (SecurityException e) {
-            LOGGER.warn("A security exception prevented access to the environment variable. Using defaults.");
-        } catch (NullPointerException e) {
-            // Do nothing. The key was not specified in an environment variable. Continue along.
-        }
-        return null;
+        return delegateConfig.getOptionalValue(key, String.class).orElse(defaultValue);
     }
 
     /**
