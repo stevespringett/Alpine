@@ -18,24 +18,52 @@
  */
 package alpine.common.util;
 
+import alpine.Config;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.RestoreEnvironmentVariables;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
+import java.lang.reflect.Method;
+
 class ThreadUtilTest {
+
+    private static Method configReloadMethod;
+
+    @BeforeAll
+    public static void setUp() throws Exception {
+        configReloadMethod = Config.class.getDeclaredMethod("reload");
+        configReloadMethod.setAccessible(true);
+    }
+
+    @AfterEach
+    public void tearDown() throws Exception {
+        configReloadMethod.invoke(Config.getInstance());
+    }
+
+    @AfterAll
+    public static void tearDownClass() throws Exception {
+        configReloadMethod.invoke(Config.getInstance()); // Ensure we're not affecting other tests.
+    }
 
     @Test
     @RestoreEnvironmentVariables
     @SetEnvironmentVariable(key = "ALPINE_WORKER_THREADS", value = "10")
-    void determineNumberOfWorkerThreadsStaticTest() {
+    void determineNumberOfWorkerThreadsStaticTest() throws Exception {
+        configReloadMethod.invoke(Config.getInstance());
+
         Assertions.assertEquals(10, ThreadUtil.determineNumberOfWorkerThreads());
     }
 
     @Test
     @RestoreEnvironmentVariables
     @SetEnvironmentVariable(key = "ALPINE_WORKER_THREADS", value = "0")
-    void determineNumberOfWorkerThreadsDynamicTest() {
+    void determineNumberOfWorkerThreadsDynamicTest() throws Exception {
+        configReloadMethod.invoke(Config.getInstance());
+
         Assertions.assertTrue(ThreadUtil.determineNumberOfWorkerThreads() > 0);
     }
 
