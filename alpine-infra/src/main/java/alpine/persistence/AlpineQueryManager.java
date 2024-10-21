@@ -18,7 +18,6 @@
  */
 package alpine.persistence;
 
-import alpine.Config;
 import alpine.common.logging.Logger;
 import alpine.event.LdapSyncEvent;
 import alpine.event.framework.EventService;
@@ -42,12 +41,12 @@ import alpine.security.ApiKeyGenerator;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
-import org.mindrot.jbcrypt.BCrypt;
-
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Date;
+import java.util.HexFormat;
 import java.util.LinkedHashSet;
 import java.util.List;
 
@@ -61,7 +60,7 @@ import java.util.List;
 public class AlpineQueryManager extends AbstractAlpineQueryManager {
 
     private static final Logger LOGGER = Logger.getLogger(AlpineQueryManager.class);
-    private static final int ROUNDS = Config.getInstance().getPropertyAsInt(Config.AlpineKey.BCRYPT_ROUNDS);
+    private static final String HASH_METHOD = "SHA3-256";
     private static final int SUFFIX_LENGTH = 5;
 
     /**
@@ -108,7 +107,9 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
             final Query<ApiKey> query = pm.newQuery(ApiKey.class, "suffix == :suffix");
             query.setParameters(key.substring(key.length() - SUFFIX_LENGTH));
             ApiKey apiKey = executeAndCloseUnique(query);
-            return BCrypt.checkpw(key.substring(0, key.length() - SUFFIX_LENGTH), apiKey.getKey()) ? apiKey : null;
+            MessageDigest digest = MessageDigest.getInstance(HASH_METHOD);
+            byte[] hashedKey = digest.digest(key.getBytes(StandardCharsets.UTF_8));
+            return apiKey != null && MessageDigest.isEqual(hashedKey, apiKey.getKey().getBytes()) ? apiKey : null;
         });
     }
 
@@ -123,12 +124,12 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     public ApiKey regenerateApiKey(final ApiKey apiKey) {
         return callInTransaction(() -> {
             String clearKey = ApiKeyGenerator.generate();
-            String hashedKey = BCrypt.hashpw(new String(Base64.getDecoder().decode(clearKey)), BCrypt.gensalt(ROUNDS))
-                    .toCharArray().toString();
+            MessageDigest digest = MessageDigest.getInstance(HASH_METHOD);
+            String hashedKey = HexFormat.of().formatHex(digest.digest(clearKey.getBytes(StandardCharsets.UTF_8)));
             apiKey.setKey(hashedKey);
-            apiKey.setSuffix(ApiKeyGenerator.generate(SUFFIX_LENGTH));
+            apiKey.setSuffix(clearKey.substring(clearKey.length() - SUFFIX_LENGTH));
             pm.makeTransient(apiKey);
-            apiKey.setKey(clearKey + apiKey.getSuffix());
+            apiKey.setKey(clearKey);
             return apiKey;
         });
     }
@@ -140,20 +141,21 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @return an ApiKey
      */
     public ApiKey createApiKey(final Team team) {
-        return callInTransaction(() -> {
-            final var apiKey = new ApiKey();
-            String clearKey = ApiKeyGenerator.generate();
-            String hashedKey = BCrypt.hashpw(new String(Base64.getDecoder().decode(clearKey)), BCrypt.gensalt(ROUNDS))
-                    .toCharArray().toString();
-            apiKey.setKey(hashedKey);
-            apiKey.setSuffix(ApiKeyGenerator.generate(SUFFIX_LENGTH));
-            apiKey.setCreated(new Date());
-            apiKey.setTeams(List.of(team));
-            pm.makePersistent(apiKey);
-            pm.makeTransient(apiKey);
-            apiKey.setKey(clearKey + apiKey.getSuffix());
-            return apiKey;
+        String clearKey = ApiKeyGenerator.generate();
+        ApiKey apiKey = callInTransaction(() -> {
+            final var apiKeyPers = new ApiKey();
+            MessageDigest digest = MessageDigest.getInstance(HASH_METHOD);
+            String hashedKey = HexFormat.of().formatHex(digest.digest(clearKey.getBytes(StandardCharsets.UTF_8)));
+            apiKeyPers.setKey(hashedKey);
+            apiKeyPers.setSuffix(clearKey.substring(clearKey.length() - SUFFIX_LENGTH));
+            apiKeyPers.setCreated(new Date());
+            apiKeyPers.setTeams(List.of(team));
+            pm.makePersistent(apiKeyPers);
+            return apiKeyPers;
         });
+            ApiKey copiedApiKey = pm.detachCopy(apiKey);
+            copiedApiKey.setKey(clearKey);
+            return copiedApiKey;
     }
 
     public ApiKey updateApiKey(final ApiKey transientApiKey) {
