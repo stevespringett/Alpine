@@ -90,6 +90,7 @@ public class ApiKey implements Serializable, Principal {
     @Persistent
     @Unique
     @Column(name = "SUFFIX")
+    @JsonIgnore
     private String suffix;
 
     public long getId() {
