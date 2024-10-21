@@ -40,9 +40,13 @@ import alpine.security.ApiKeyGenerator;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HexFormat;
 import java.util.LinkedHashSet;
 import java.util.List;
 
@@ -56,6 +60,8 @@ import java.util.List;
 public class AlpineQueryManager extends AbstractAlpineQueryManager {
 
     private static final Logger LOGGER = Logger.getLogger(AlpineQueryManager.class);
+    private static final String HASH_METHOD = "SHA3-256";
+    private static final int SUFFIX_LENGTH = 5;
 
     /**
      * Default constructor.
@@ -98,9 +104,12 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      */
     public ApiKey getApiKey(final String key) {
         return callInTransaction(() -> {
-            final Query<ApiKey> query = pm.newQuery(ApiKey.class, "key == :key");
-            query.setParameters(key);
-            return executeAndCloseUnique(query);
+            final Query<ApiKey> query = pm.newQuery(ApiKey.class, "suffix == :suffix");
+            query.setParameters(key.substring(key.length() - SUFFIX_LENGTH));
+            ApiKey apiKey = executeAndCloseUnique(query);
+            MessageDigest digest = MessageDigest.getInstance(HASH_METHOD);
+            byte[] hashedKey = digest.digest(key.getBytes(StandardCharsets.UTF_8));
+            return apiKey != null && MessageDigest.isEqual(hashedKey, apiKey.getKey().getBytes()) ? apiKey : null;
         });
     }
 
@@ -114,7 +123,13 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      */
     public ApiKey regenerateApiKey(final ApiKey apiKey) {
         return callInTransaction(() -> {
-            apiKey.setKey(ApiKeyGenerator.generate());
+            String clearKey = ApiKeyGenerator.generate();
+            MessageDigest digest = MessageDigest.getInstance(HASH_METHOD);
+            String hashedKey = HexFormat.of().formatHex(digest.digest(clearKey.getBytes(StandardCharsets.UTF_8)));
+            apiKey.setKey(hashedKey);
+            apiKey.setSuffix(clearKey.substring(clearKey.length() - SUFFIX_LENGTH));
+            pm.makeTransient(apiKey);
+            apiKey.setKey(clearKey);
             return apiKey;
         });
     }
@@ -126,13 +141,21 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @return an ApiKey
      */
     public ApiKey createApiKey(final Team team) {
-        return callInTransaction(() -> {
-            final var apiKey = new ApiKey();
-            apiKey.setKey(ApiKeyGenerator.generate());
-            apiKey.setCreated(new Date());
-            apiKey.setTeams(List.of(team));
-            return pm.makePersistent(apiKey);
+        String clearKey = ApiKeyGenerator.generate();
+        ApiKey apiKey = callInTransaction(() -> {
+            final var apiKeyPers = new ApiKey();
+            MessageDigest digest = MessageDigest.getInstance(HASH_METHOD);
+            String hashedKey = HexFormat.of().formatHex(digest.digest(clearKey.getBytes(StandardCharsets.UTF_8)));
+            apiKeyPers.setKey(hashedKey);
+            apiKeyPers.setSuffix(clearKey.substring(clearKey.length() - SUFFIX_LENGTH));
+            apiKeyPers.setCreated(new Date());
+            apiKeyPers.setTeams(List.of(team));
+            pm.makePersistent(apiKeyPers);
+            return apiKeyPers;
         });
+            ApiKey copiedApiKey = pm.detachCopy(apiKey);
+            copiedApiKey.setKey(clearKey);
+            return copiedApiKey;
     }
 
     public ApiKey updateApiKey(final ApiKey transientApiKey) {
