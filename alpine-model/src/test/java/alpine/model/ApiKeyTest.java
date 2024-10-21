@@ -40,14 +40,16 @@ public class ApiKeyTest {
         {
             ApiKey key = new ApiKey();
             key.setKey("12345678901234567890");
+            key.setSuffix(key.getKey().substring(key.getKey().length() - 5));
             Assertions.assertEquals("12345678901234567890", key.getKey());
-            Assertions.assertEquals("****************7890", key.getName());
+            Assertions.assertEquals("***************67890", key.getName());
         }
         {
             ApiKey key = new ApiKey();
             key.setKey(prefix + "12345678901234567890");
+            key.setSuffix(key.getKey().substring(key.getKey().length() - 5));
             Assertions.assertEquals(prefix + "12345678901234567890", key.getKey());
-            Assertions.assertEquals(prefix + "****************7890", key.getName());
+            Assertions.assertEquals(prefix + "***************67890", key.getName());
         }
     }
 
@@ -56,23 +58,27 @@ public class ApiKeyTest {
         {
             ApiKey key = new ApiKey();
             key.setKey("12345678901234567890");
-            Assertions.assertEquals("****************7890", key.getMaskedKey());
+            key.setSuffix(key.getKey().substring(key.getKey().length() - 5));
+            Assertions.assertEquals("***************67890", key.getMaskedKey());
         }
         {
             ApiKey key = new ApiKey();
             key.setKey("1234ABCabc+_=!?-*");
-            Assertions.assertEquals("*************!?-*", key.getMaskedKey());
+            key.setSuffix(key.getKey().substring(key.getKey().length() - 5));
+            Assertions.assertEquals("************=!?-*", key.getMaskedKey());
         }
         {
             ApiKey key = new ApiKey();
-            key.setKey("1234");
-            Assertions.assertEquals("1234", key.getMaskedKey());
+            key.setKey("12345");
+            key.setSuffix(key.getKey().substring(key.getKey().length() - 5));
+            Assertions.assertEquals("12345", key.getMaskedKey());
         }
         {
             // test with prefix
             ApiKey key = new ApiKey();
             key.setKey(prefix + "1234567890");
-            Assertions.assertEquals(prefix + "******7890", key.getMaskedKey());
+            key.setSuffix(key.getKey().substring(key.getKey().length() - 5));
+            Assertions.assertEquals(prefix + "*****67890", key.getMaskedKey());
         }
     }
 
