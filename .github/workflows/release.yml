@@ -50,20 +50,18 @@ jobs:
             echo "options=release:clean release:prepare release:perform -Prelease" >> $GITHUB_ENV
           fi
 
-      - name: Run Maven command
-        # This requires the connection and developerConnection elements in the scm section of the pom
-        # to be set to "scm:git:https:...." thus preventing the release plugin from using SSH.
+      - name: Run Maven command and capture exit code
+        id: run_maven
         run: |
-          mvn -B ${{ env.options }}
+          mvn -B ${{ env.options }} || echo "Maven failed" > /tmp/maven_failed
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        continue-on-error: ${{ github.event.inputs.dry_run == false }}
 
       - name: Rollback if release fails
-        if: failure() && github.event.inputs.dry_run == false
+        if: ${{ steps.run_maven.outcome == 'failure' && github.event.inputs.dry_run == false }}
         run: |
           echo "Release failed. Rolling back..."
           mvn -B release:rollback -Prelease
