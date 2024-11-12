@@ -179,7 +179,7 @@
         <lib.jaxb-runtime.version>4.0.5</lib.jaxb-runtime.version>
         <lib.jdo.api.version>3.2.1</lib.jdo.api.version>
         <lib.jersey.version>3.1.9</lib.jersey.version>
-        <lib.json-unit.version>3.4.1</lib.json-unit.version>
+        <lib.json-unit.version>3.5.0</lib.json-unit.version>
         <lib.jsonwebtoken.version>0.12.6</lib.jsonwebtoken.version>
         <lib.jsr305.version>3.0.2</lib.jsr305.version>
         <lib.logback.version>1.5.12</lib.logback.version>
