@@ -168,7 +168,7 @@
         <lib.datanucleus.version>6.0.9</lib.datanucleus.version>
         <lib.datanucleus-rdbms.version>6.0.9</lib.datanucleus-rdbms.version>
         <lib.h2.version>2.3.232</lib.h2.version>
-        <lib.hikaricp.version>5.1.0</lib.hikaricp.version>
+        <lib.hikaricp.version>6.2.1</lib.hikaricp.version>
         <lib.javassist.version>3.30.2-GA</lib.javassist.version>
         <lib.jackson.version>2.18.1</lib.jackson.version>
         <lib.jackson-databind.version>2.18.1</lib.jackson-databind.version>
