@@ -30,12 +30,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
+
+import static java.util.function.Predicate.not;
 
 /**
  * The Config class is responsible for reading the application.properties file.
@@ -521,7 +524,10 @@ public class Config {
         if (property == null) {
             return Collections.emptyList();
         } else {
-            return List.of(property.split(","));
+            return Arrays.stream(property.split(","))
+                    .map(String::trim)
+                    .filter(not(String::isEmpty))
+                    .toList();
         }
     }
 
