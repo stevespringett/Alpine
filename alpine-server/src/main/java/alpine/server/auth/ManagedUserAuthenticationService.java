@@ -81,6 +81,10 @@ public class ManagedUserAuthenticationService implements AuthenticationService {
                     }
                     return user;
                 }
+            } else {
+                // Hash the provided password anyway to prevent different timings
+                // giving away the existence of a user.
+                char[] ignored = PasswordService.createHash(password.toCharArray());
             }
         }
         throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.INVALID_CREDENTIALS);
