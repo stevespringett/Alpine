@@ -33,6 +33,7 @@ import javax.jdo.JDOHelper;
 import static alpine.persistence.Transaction.defaultOptions;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TransactionTest {
 
@@ -58,12 +59,12 @@ public class TransactionTest {
 
     @Test
     public void testRetainValues() {
-        final Team team = qm.callInTransaction(() -> qm.createTeam("foo", true));
+        final Team team = qm.callInTransaction(() -> qm.createTeam("foo"));
         qm.close(); // Close PM to prevent lazy loading of values when getters are called.
 
         // Ensure the values assigned during the transaction are present.
         assertThat(team.getName()).isEqualTo("foo");
-        assertThat(team.getApiKeys()).satisfiesExactly(apiKey -> assertThat(apiKey.getKey()).isNotNull());
+        assertEquals(0, team.getApiKeys().size());
     }
 
     @Test
@@ -71,7 +72,7 @@ public class TransactionTest {
         assertThatExceptionOfType(IllegalStateException.class)
                 .isThrownBy(() -> qm.runInTransaction(() -> {
                     final ManagedUser user = qm.createManagedUser("username", "passwordHash");
-                    final Team team = qm.createTeam("foo", true);
+                    final Team team = qm.createTeam("foo");
                     final boolean added = qm.addUserToTeam(user, team);
                     assertThat(added).isTrue();
 
@@ -88,7 +89,7 @@ public class TransactionTest {
         qm.runInTransaction(() -> {
             final ManagedUser userA = qm.createManagedUser("usernameA", "passwordHash");
             final ManagedUser userB = qm.createManagedUser("usernameB", "passwordHash");
-            final Team team = qm.createTeam("foo", true);
+            final Team team = qm.createTeam("foo");
 
             final boolean addedUserA = qm.addUserToTeam(userA, team);
             assertThat(addedUserA).isTrue();
