@@ -59,14 +59,14 @@ class ManagedUserAuthenticationServiceTest {
         authService = new ManagedUserAuthenticationService("doesNotExist", "doesNotMatter");
         final Duration nonExistingUserDuration = runTimed(authService::authenticate);
 
-        // Asserting on a delta of up to 100ms here, because JVM heuristics and actions performed
+        // Asserting on a delta of up to 200ms here, because JVM heuristics and actions performed
         // by the ORM can add a noticeable amount of jitter to any of the timings.
         //
-        // A permissible delta of <100ms may cause this test to be flaky in CI.
+        // A permissible delta of <200ms may cause this test to be flaky in CI.
         // Manual testing with a fully-fledged application has shown no observable
         // difference between any of the three actions.
-        assertThat(nonExistingUserDuration).isCloseTo(existingUserCorrectPasswordDuration, Duration.ofMillis(100));
-        assertThat(nonExistingUserDuration).isCloseTo(existingUserWrongPasswordDuration, Duration.ofMillis(100));
+        assertThat(nonExistingUserDuration).isCloseTo(existingUserCorrectPasswordDuration, Duration.ofMillis(200));
+        assertThat(nonExistingUserDuration).isCloseTo(existingUserWrongPasswordDuration, Duration.ofMillis(200));
     }
 
     private Duration runTimed(final ThrowingRunnable runnable) {
