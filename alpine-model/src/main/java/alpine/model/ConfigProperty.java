@@ -66,8 +66,7 @@ public class ConfigProperty implements IConfigProperty, Serializable {
     private String propertyName;
 
     @Persistent
-    @Column(name = "PROPERTYVALUE", length = 1024)
-    @Size(min = 0, max = 1024)
+    @Column(name = "PROPERTYVALUE", jdbcType = "CLOB")
     @Pattern(regexp = "[\\P{Cc}]+", message = "The propertyValue must not contain control characters")
     private String propertyValue;
 
