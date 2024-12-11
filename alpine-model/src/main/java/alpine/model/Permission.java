@@ -86,7 +86,6 @@ public class Permission implements Serializable {
     private List<ManagedUser> managedUsers;
 
     @Persistent(mappedBy = "permissions")
-    @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "username ASC"))
     @JsonIgnore
     private List<ApiKey> apiKeys;
 
