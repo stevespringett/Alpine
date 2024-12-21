@@ -19,44 +19,61 @@
 package alpine.server.servlets;
 
 import alpine.Config;
+import alpine.common.metrics.Metrics;
+import io.micrometer.core.instrument.Gauge;
 import io.prometheus.client.exporter.common.TextFormat;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
+import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.core.HttpHeaders;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintWriter;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class MetricsServletTest {
 
+    private static Gauge gauge;
+
     private Config configMock;
     private HttpServletRequest requestMock;
     private HttpServletResponse responseMock;
-    private ByteArrayOutputStream responseOutputStream;
-    private PrintWriter responseWriter;
+    private ServletOutputStream responseOutputStreamMock;
+
+    @BeforeAll
+    public static void setUpClass() {
+        gauge = Gauge.builder("alpine.foo.bar", () -> 666).register(Metrics.getRegistry());
+    }
 
     @BeforeEach
     public void setUp() {
         configMock = mock(Config.class);
         requestMock = mock(HttpServletRequest.class);
         responseMock = mock(HttpServletResponse.class);
-        responseOutputStream = new ByteArrayOutputStream();
-        responseWriter = new PrintWriter(responseOutputStream);
+        responseOutputStreamMock = mock(ServletOutputStream.class);
+    }
+
+    @AfterAll
+    public static void tearDownClass() {
+        Metrics.getRegistry().remove(gauge);
     }
 
     @Test
     public void shouldRespondWithMetricsWhenEnabled() throws Exception {
         when(configMock.getPropertyAsBoolean(eq(Config.AlpineKey.METRICS_ENABLED))).thenReturn(true);
 
-        when(responseMock.getWriter()).thenReturn(responseWriter);
+        when(responseMock.getOutputStream()).thenReturn(responseOutputStreamMock);
 
         final var servlet = new MetricsServlet(configMock);
         servlet.init();
@@ -64,19 +81,26 @@ public class MetricsServletTest {
 
         verify(responseMock).setStatus(eq(HttpServletResponse.SC_OK));
         verify(responseMock).setHeader(eq(HttpHeaders.CONTENT_TYPE), eq(TextFormat.CONTENT_TYPE_004));
-        assertThat(responseOutputStream.toString()).isEmpty();
+
+        final var responseBodyCaptor = ArgumentCaptor.forClass(byte[].class);
+        verify(responseOutputStreamMock).write(responseBodyCaptor.capture(), anyInt(), anyInt());
+
+        assertThat(responseBodyCaptor.getValue()).asString().startsWith("""
+                # HELP alpine_foo_bar \s
+                # TYPE alpine_foo_bar gauge
+                alpine_foo_bar 666.0""");
     }
 
     @Test
     public void shouldRespondWithNotFoundWhenNotEnabled() throws Exception {
-        when(responseMock.getWriter()).thenReturn(responseWriter);
+        when(responseMock.getOutputStream()).thenReturn(responseOutputStreamMock);
 
         final var servlet = new MetricsServlet(configMock);
         servlet.init();
         servlet.doGet(requestMock, responseMock);
 
         verify(responseMock).setStatus(eq(HttpServletResponse.SC_NOT_FOUND));
-        assertThat(responseOutputStream.toString()).isEmpty();
+        verify(responseOutputStreamMock, never()).write(any(byte[].class), anyInt(), anyInt());
     }
 
     @Test
@@ -87,7 +111,7 @@ public class MetricsServletTest {
 
         when(requestMock.getHeader(eq(HttpHeaders.AUTHORIZATION))).thenReturn("Basic bWV0cmljcy11c2VyOm1ldHJpY3MtcGFzc3dvcmQ");
 
-        when(responseMock.getWriter()).thenReturn(responseWriter);
+        when(responseMock.getOutputStream()).thenReturn(responseOutputStreamMock);
 
         final var servlet = new MetricsServlet(configMock);
         servlet.init();
@@ -95,7 +119,14 @@ public class MetricsServletTest {
 
         verify(responseMock).setStatus(eq(HttpServletResponse.SC_OK));
         verify(responseMock).setHeader(eq(HttpHeaders.CONTENT_TYPE), eq(TextFormat.CONTENT_TYPE_004));
-        assertThat(responseOutputStream.toString()).isEmpty();
+
+        final var responseBodyCaptor = ArgumentCaptor.forClass(byte[].class);
+        verify(responseOutputStreamMock).write(responseBodyCaptor.capture(), anyInt(), anyInt());
+
+        assertThat(responseBodyCaptor.getValue()).asString().startsWith("""
+                # HELP alpine_foo_bar \s
+                # TYPE alpine_foo_bar gauge
+                alpine_foo_bar 666.0""");
     }
 
     @Test
@@ -106,14 +137,14 @@ public class MetricsServletTest {
 
         when(requestMock.getHeader(eq(HttpHeaders.AUTHORIZATION))).thenReturn("Basic Zm9vOmJhcg");
 
-        when(responseMock.getWriter()).thenReturn(responseWriter);
+        when(responseMock.getOutputStream()).thenReturn(responseOutputStreamMock);
 
         final var servlet = new MetricsServlet(configMock);
         servlet.init();
         servlet.doGet(requestMock, responseMock);
 
         verify(responseMock).setStatus(eq(HttpServletResponse.SC_UNAUTHORIZED));
-        assertThat(responseOutputStream.toString()).isEmpty();
+        verify(responseOutputStreamMock, never()).write(any(byte[].class), anyInt(), anyInt());
     }
 
 }

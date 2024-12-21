@@ -75,7 +75,7 @@ public class MetricsServlet extends HttpServlet {
         if (metricsEnabled) {
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.setHeader(HttpHeaders.CONTENT_TYPE, TextFormat.CONTENT_TYPE_004);
-            Metrics.getRegistry().scrape(resp.getWriter());
+            Metrics.getRegistry().scrape(resp.getOutputStream());
         } else {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
