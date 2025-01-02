@@ -196,6 +196,7 @@ public class SendMail {
                 throw new SendMailException("An error occurred while configuring trust managers", e);
             }
             props.put("mail.smtp.ssl.socketFactory", sf);
+            props.put("mail.smtp.ssl.checkserveridentity", false);
         } else if (useStartTLS) {
             props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
         }
