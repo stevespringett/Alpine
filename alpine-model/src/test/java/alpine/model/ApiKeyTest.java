@@ -85,4 +85,14 @@ public class ApiKeyTest {
         Assertions.assertEquals(teams, key.getTeams());
         Assertions.assertEquals(1, key.getTeams().size());
     }
+
+    @Test
+    public void permissionsTest() {
+        List<Permission> permissions = new ArrayList<>();
+        permissions.add(new Permission());
+        ApiKey user = new ApiKey();
+        user.setPermissions(permissions);
+        Assertions.assertEquals(permissions, user.getPermissions());
+        Assertions.assertEquals(1, user.getPermissions().size());
+    }
 }
