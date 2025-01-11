@@ -54,7 +54,7 @@ jobs:
         # This requires the connection and developerConnection elements in the scm section of the pom
         # to be set to "scm:git:https:...." thus preventing the release plugin from using SSH.
         run: |
-          mvn -B ${{ env.options }}
+          mvn -B --no-transfer-progress ${{ env.options }}
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
@@ -66,7 +66,7 @@ jobs:
         if: failure() && github.event.inputs.dry_run == false
         run: |
           echo "Release failed. Rolling back..."
-          mvn -B release:rollback -Prelease
+          mvn -B --no-transfer-progress release:rollback -Prelease
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}

@@ -1,12 +1,17 @@
 name: Maven CI
 
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+    branches:
+    - 'master'
+  pull_request:
+    branches:
+    - 'master'
+  workflow_dispatch: {}
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v4.2.2
     - name: Set up JDK 21
@@ -19,4 +24,4 @@ jobs:
         sudo apt-get install jq
         wget -O ~/codacy-coverage-reporter-assembly.jar https://github.com/codacy/codacy-coverage-reporter/releases/download/4.0.5/codacy-coverage-reporter-4.0.5-assembly.jar
     - name: Build with Maven
-      run: mvn clean install
+      run: mvn -B --no-transfer-progress clean install
