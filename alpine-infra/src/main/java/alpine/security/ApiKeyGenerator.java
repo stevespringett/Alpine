@@ -30,6 +30,7 @@ import java.security.SecureRandom;
 public final class ApiKeyGenerator {
 
     private static final char[] VALID_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456879".toCharArray();
+    private static final int PUBLIC_ID_LENGTH = Config.getInstance().getPropertyAsInt(Config.AlpineKey.API_KEY_PUBLIC_ID_LENGTH);
 
     /**
      * Private constructor
@@ -42,7 +43,7 @@ public final class ApiKeyGenerator {
      * @since 1.0.0
      */
     public static String generate() {
-        return generate(32);
+        return generate(32 + PUBLIC_ID_LENGTH);
     }
 
     /**

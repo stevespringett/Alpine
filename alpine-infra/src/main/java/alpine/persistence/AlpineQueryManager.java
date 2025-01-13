@@ -41,7 +41,6 @@ import alpine.security.ApiKeyGenerator;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
-import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -61,7 +60,6 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
 
     private static final Logger LOGGER = Logger.getLogger(AlpineQueryManager.class);
     private static final String HASH_METHOD = "SHA3-256";
-    private static final int SUFFIX_LENGTH = 5;
 
     /**
      * Default constructor.
@@ -100,15 +98,15 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * Returns an API key.
      * @param key the key to return
      * @return an ApiKey
-     * @since 1.0.0
+     * @since 3.2.0
      */
     public ApiKey getApiKey(final String key) {
         return callInTransaction(() -> {
             final Query<ApiKey> query = pm.newQuery(ApiKey.class, "suffix == :suffix");
-            query.setParameters(key.substring(key.length() - SUFFIX_LENGTH));
+            query.setParameters(ApiKey.getPublicID(key));
             ApiKey apiKey = executeAndCloseUnique(query);
             MessageDigest digest = MessageDigest.getInstance(HASH_METHOD);
-            byte[] hashedKey = digest.digest(key.getBytes(StandardCharsets.UTF_8));
+            byte[] hashedKey = digest.digest(ApiKey.getOnlyKeyAsBytes(key));
             return apiKey != null && MessageDigest.isEqual(hashedKey, apiKey.getKey().getBytes()) ? apiKey : null;
         });
     }
@@ -119,15 +117,15 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * key string.
      * @param apiKey the ApiKey object to regenerate the key of.
      * @return an ApiKey
-     * @since 1.0.0
+     * @since 3.2.0
      */
     public ApiKey regenerateApiKey(final ApiKey apiKey) {
         return callInTransaction(() -> {
             String clearKey = ApiKeyGenerator.generate();
             MessageDigest digest = MessageDigest.getInstance(HASH_METHOD);
-            String hashedKey = HexFormat.of().formatHex(digest.digest(clearKey.getBytes(StandardCharsets.UTF_8)));
+            String hashedKey = HexFormat.of().formatHex(digest.digest(ApiKey.getOnlyKeyAsBytes(clearKey)));
             apiKey.setKey(hashedKey);
-            apiKey.setSuffix(clearKey.substring(clearKey.length() - SUFFIX_LENGTH));
+            apiKey.setPublicID(ApiKey.getPublicID(clearKey));
             pm.makeTransient(apiKey);
             apiKey.setKey(clearKey);
             return apiKey;
@@ -139,15 +137,16 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * API key string.
      * @param team The team to create the key for
      * @return an ApiKey
+     * @since 3.2.0
      */
     public ApiKey createApiKey(final Team team) {
         String clearKey = ApiKeyGenerator.generate();
         ApiKey apiKey = callInTransaction(() -> {
             final var apiKeyPers = new ApiKey();
             MessageDigest digest = MessageDigest.getInstance(HASH_METHOD);
-            String hashedKey = HexFormat.of().formatHex(digest.digest(clearKey.getBytes(StandardCharsets.UTF_8)));
+            String hashedKey = HexFormat.of().formatHex(digest.digest(ApiKey.getOnlyKeyAsBytes(clearKey)));
             apiKeyPers.setKey(hashedKey);
-            apiKeyPers.setSuffix(clearKey.substring(clearKey.length() - SUFFIX_LENGTH));
+            apiKeyPers.setPublicID(ApiKey.getPublicID(clearKey));
             apiKeyPers.setCreated(new Date());
             apiKeyPers.setTeams(List.of(team));
             pm.makePersistent(apiKeyPers);
@@ -577,12 +576,10 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     }
 
     /**
-     * Creates a new Team with the specified name. If createApiKey is true,
-     * then {@link #createApiKey} is invoked and a cryptographically secure
-     * API key is generated.
+     * Creates a new Team with the specified name.
      * @param name The name of the team
      * @return a Team
-     * @since 1.0.0
+     * @since 3.2.0
      */
     public Team createTeam(final String name) {
         return callInTransaction(() -> {

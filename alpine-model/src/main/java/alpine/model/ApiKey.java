@@ -25,6 +25,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.Element;
 import javax.jdo.annotations.Extension;
@@ -36,6 +37,7 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.annotations.Unique;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Date;
 import java.util.List;
@@ -51,6 +53,7 @@ public class ApiKey implements Serializable, Principal {
 
     private static final long serialVersionUID = 1582714693932260365L;
     private static final String prefix = Config.getInstance().getProperty(Config.AlpineKey.API_KEY_PREFIX);
+    private static final int PUBLIC_ID_LENGTH = Config.getInstance().getPropertyAsInt(Config.AlpineKey.API_KEY_PUBLIC_ID_LENGTH);
 
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.NATIVE)
@@ -88,10 +91,10 @@ public class ApiKey implements Serializable, Principal {
     private List<Team> teams;
 
     @Persistent
-    @Unique
-    @Column(name = "SUFFIX")
+    @Unique(name = "APIKEY_PUBLIC_IDX") 
+    @Column(name = "PUBLIC_ID")
     @JsonIgnore
-    private String suffix;
+    private String publicID;
 
     public long getId() {
         return id;
@@ -123,10 +126,42 @@ public class ApiKey implements Serializable, Principal {
             maskedKey.append(prefix);
 
         // mask all characters except for the suffix
-        maskedKey.append("*".repeat(key.length() - maskedKey.length() - suffix.length()));
-        maskedKey.append(suffix);
+        maskedKey.append(publicID);
+        maskedKey.append("*".repeat(getOnlyKey(key).length()));
 
         return maskedKey.toString();
+    }
+
+    /**
+     * Gets part of key, which should be hashed.
+     *
+     * @param key The key to get from
+     * @return only hashable key
+     */
+    public static String getOnlyKey(String key) {
+        var prefix_length = prefix.length();
+        return key.substring(prefix_length + PUBLIC_ID_LENGTH);
+    }
+
+    /**
+     * Gets part of key, which should be hashed, as a byte Array.
+     *
+     * @param key The key to get from
+     * @return only hashable key
+     */
+    public static byte[] getOnlyKeyAsBytes(String key) {
+        return getOnlyKey(key).getBytes(StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Gets Public Id from a full key.
+     *
+     * @param key The key to get from
+     * @return Public ID
+     */
+    public static String getPublicID(String key) {
+        var prefix_length = prefix.length();
+        return key.substring(prefix_length, prefix_length + PUBLIC_ID_LENGTH);
     }
 
     /**
@@ -173,11 +208,11 @@ public class ApiKey implements Serializable, Principal {
         this.teams = teams;
     }
 
-    public String getSuffix() {
-        return suffix;
+    public String getPublicID() {
+        return publicID;
     }
 
-    public void setSuffix(String suffix) {
-        this.suffix = suffix;
+    public void setPublicID(String publicID) {
+        this.publicID = publicID;
     }
 }

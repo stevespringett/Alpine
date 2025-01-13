@@ -28,11 +28,12 @@ public class ApiKeyGeneratorTest {
 
     private Pattern pattern = Pattern.compile("^[A-Za-z_0-9]*$");
     private String apiKeyPrefix = Config.getInstance().getProperty(Config.AlpineKey.API_KEY_PREFIX);
+    private static final int PUBLIC_ID_LENGTH = Config.getInstance().getPropertyAsInt(Config.AlpineKey.API_KEY_PUBLIC_ID_LENGTH);
 
     @Test
     public void defaultGenerateTest() {
         String key = ApiKeyGenerator.generate();
-        Assertions.assertEquals(apiKeyPrefix.length() + 32, key.length());
+        Assertions.assertEquals(apiKeyPrefix.length() + 32 + PUBLIC_ID_LENGTH, key.length());
         Assertions.assertTrue(key.startsWith(apiKeyPrefix));
         Assertions.assertTrue(pattern.matcher(key).matches());
     }
