@@ -123,16 +123,18 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @since 3.2.0
      */
     public ApiKey regenerateApiKey(final ApiKey apiKey) {
-        return callInTransaction(() -> {
-            String clearKey = ApiKeyGenerator.generate();
+        String clearKey = ApiKeyGenerator.generate();
+        ApiKey regeneratedApiKey = callInTransaction(() -> {
             MessageDigest digest = MessageDigest.getInstance(HASH_METHOD);
             String hashedKey = HexFormat.of().formatHex(digest.digest(ApiKey.getOnlyKeyAsBytes(clearKey)));
             apiKey.setKey(hashedKey);
             apiKey.setPublicId(ApiKey.getPublicId(clearKey));
-            pm.makeTransient(apiKey);
-            apiKey.setKey(clearKey);
+            pm.makePersistent(apiKey);
             return apiKey;
         });
+        ApiKey copiedApiKey = pm.detachCopy(regeneratedApiKey);
+        copiedApiKey.setKey(clearKey);
+        return copiedApiKey;
     }
 
     /**

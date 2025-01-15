@@ -71,6 +71,41 @@ public class ApiKeyAuthenticationServiceTest {
     }
 
     @Test
+    public void authenticationWorksWithRegeneratedKey() throws AuthenticationException {
+        ApiKey apiKey;
+        try (final AlpineQueryManager qm = new AlpineQueryManager()) {
+            final var team = qm.createTeam("Test");
+            var originalApiKey = qm.createApiKey(team);
+            apiKey = qm.regenerateApiKey(originalApiKey);
+        }
+        final ContainerRequest containerRequestMock = Mockito.mock(ContainerRequest.class);
+        Mockito.when(containerRequestMock.getHeaderString("X-Api-Key"))
+                .thenReturn(apiKey.getKey());
+        final ApiKeyAuthenticationService authService = new ApiKeyAuthenticationService(containerRequestMock, false);
+
+        final ApiKey authenticatedUser = (ApiKey) authService.authenticate();
+        Assertions.assertThat(authenticatedUser).isNotNull();
+        Assertions.assertThat(authenticatedUser.getId() == apiKey.getId());
+    }
+
+    @Test
+    public void authenticationShouldThrowAuthenticationExceptionForOldKeyAfterRegeneration() {
+        ApiKey apiKey;
+        try (final AlpineQueryManager qm = new AlpineQueryManager()) {
+            final var team = qm.createTeam("Test");
+            apiKey = qm.createApiKey(team);
+            qm.regenerateApiKey(apiKey);
+        }
+        final ContainerRequest containerRequestMock = Mockito.mock(ContainerRequest.class);
+        Mockito.when(containerRequestMock.getHeaderString("X-Api-Key"))
+                .thenReturn(apiKey.getKey());
+        final ApiKeyAuthenticationService authService = new ApiKeyAuthenticationService(containerRequestMock, false);
+
+        Assertions.assertThatExceptionOfType(AuthenticationException.class)
+                .isThrownBy(authService::authenticate);
+    }
+
+    @Test
     public void authenticationShouldThrowAuthenticationExceptionForInvalidKey() {
         ApiKey apiKey;
         try (final AlpineQueryManager qm = new AlpineQueryManager()) {
