@@ -101,13 +101,16 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @since 3.2.0
      */
     public ApiKey getApiKey(final String key) {
+        if (key.length() != ApiKey.FULL_KEY_LENGTH && key.length() != ApiKey.LEGACY_FULL_KEY_LENGTH) {
+            return null;
+        }
         return callInTransaction(() -> {
-            final Query<ApiKey> query = pm.newQuery(ApiKey.class, "suffix == :suffix");
-            query.setParameters(ApiKey.getPublicID(key));
+            final Query<ApiKey> query = pm.newQuery(ApiKey.class, "publicId == :publicId");
+            query.setParameters(ApiKey.getPublicId(key));
             ApiKey apiKey = executeAndCloseUnique(query);
             MessageDigest digest = MessageDigest.getInstance(HASH_METHOD);
-            byte[] hashedKey = digest.digest(ApiKey.getOnlyKeyAsBytes(key));
-            return apiKey != null && MessageDigest.isEqual(hashedKey, apiKey.getKey().getBytes()) ? apiKey : null;
+            String hashedKey = HexFormat.of().formatHex(digest.digest(ApiKey.getOnlyKeyAsBytes(key)));
+            return apiKey != null && MessageDigest.isEqual(hashedKey.getBytes(), apiKey.getKey().getBytes()) ? apiKey : null;
         });
     }
 
@@ -125,7 +128,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
             MessageDigest digest = MessageDigest.getInstance(HASH_METHOD);
             String hashedKey = HexFormat.of().formatHex(digest.digest(ApiKey.getOnlyKeyAsBytes(clearKey)));
             apiKey.setKey(hashedKey);
-            apiKey.setPublicID(ApiKey.getPublicID(clearKey));
+            apiKey.setPublicId(ApiKey.getPublicId(clearKey));
             pm.makeTransient(apiKey);
             apiKey.setKey(clearKey);
             return apiKey;
@@ -146,7 +149,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
             MessageDigest digest = MessageDigest.getInstance(HASH_METHOD);
             String hashedKey = HexFormat.of().formatHex(digest.digest(ApiKey.getOnlyKeyAsBytes(clearKey)));
             apiKeyPers.setKey(hashedKey);
-            apiKeyPers.setPublicID(ApiKey.getPublicID(clearKey));
+            apiKeyPers.setPublicId(ApiKey.getPublicId(clearKey));
             apiKeyPers.setCreated(new Date());
             apiKeyPers.setTeams(List.of(team));
             pm.makePersistent(apiKeyPers);

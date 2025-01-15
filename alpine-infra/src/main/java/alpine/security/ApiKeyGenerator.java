@@ -19,6 +19,7 @@
 package alpine.security;
 
 import alpine.Config;
+import alpine.model.ApiKey;
 
 import java.security.SecureRandom;
 
@@ -30,7 +31,8 @@ import java.security.SecureRandom;
 public final class ApiKeyGenerator {
 
     private static final char[] VALID_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456879".toCharArray();
-    private static final int PUBLIC_ID_LENGTH = Config.getInstance().getPropertyAsInt(Config.AlpineKey.API_KEY_PUBLIC_ID_LENGTH);
+    private static final int PUBLIC_ID_LENGTH = ApiKey.PUBLIC_ID_LENGTH;
+    private static final int API_KEY_LENGTH = ApiKey.API_KEY_LENGTH;
 
     /**
      * Private constructor
@@ -43,7 +45,7 @@ public final class ApiKeyGenerator {
      * @since 1.0.0
      */
     public static String generate() {
-        return generate(32 + PUBLIC_ID_LENGTH);
+        return generate(API_KEY_LENGTH + PUBLIC_ID_LENGTH);
     }
 
     /**
