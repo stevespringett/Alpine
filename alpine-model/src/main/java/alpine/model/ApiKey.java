@@ -25,6 +25,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.Element;
 import javax.jdo.annotations.Extension;
@@ -36,6 +37,7 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.annotations.Unique;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Date;
 import java.util.List;
@@ -51,6 +53,10 @@ public class ApiKey implements Serializable, Principal {
 
     private static final long serialVersionUID = 1582714693932260365L;
     private static final String prefix = Config.getInstance().getProperty(Config.AlpineKey.API_KEY_PREFIX);
+    public static final int PUBLIC_ID_LENGTH = 5;
+    public static final int API_KEY_LENGTH = 32;
+    public static int FULL_KEY_LENGTH = prefix.length() + PUBLIC_ID_LENGTH + API_KEY_LENGTH;
+    public static int LEGACY_FULL_KEY_LENGTH = prefix.length() + API_KEY_LENGTH;
 
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.NATIVE)
@@ -64,6 +70,7 @@ public class ApiKey implements Serializable, Principal {
     @Size(min = 32, max = 255)
     @Pattern(regexp = RegexSequence.Definition.WORD_CHARS,
             message = "The API key must contain only alpha, numeric and/or underscore characters")
+    @JsonIgnore
     private String key;
 
     @Persistent
@@ -85,6 +92,15 @@ public class ApiKey implements Serializable, Principal {
     @Order(extensions = @Extension(vendorName = "datanucleus", key = "list-ordering", value = "name ASC"))
     @JsonIgnore
     private List<Team> teams;
+
+    @Persistent
+    @Unique(name = "APIKEY_PUBLIC_IDX") 
+    @Column(name = "PUBLIC_ID")
+    private String publicId;
+
+    @Persistent
+    @Column(name = "IS_LEGACY", allowsNull = "false", defaultValue = "false")
+    private boolean isLegacy = false;
 
     public long getId() {
         return id;
@@ -115,11 +131,44 @@ public class ApiKey implements Serializable, Principal {
         if (key.startsWith(prefix))
             maskedKey.append(prefix);
 
-        // mask all characters except the last four
-        maskedKey.append("*".repeat(key.length() - maskedKey.length() - 4));
-        maskedKey.append(key.substring(key.length() - 4));
+        // mask all characters except for the public ID
+        maskedKey.append(publicId);
+        maskedKey.append("*".repeat(getOnlyKey(key).length()));
 
         return maskedKey.toString();
+    }
+
+    /**
+     * Gets part of key, which should be hashed.
+     *
+     * @param key The key to get from
+     * @return only hashable key
+     */
+    public static String getOnlyKey(String key) {
+        var startKey = prefix.length() + PUBLIC_ID_LENGTH;
+        return key.substring(startKey);
+    }
+
+    /**
+     * Gets part of key, which should be hashed, as a byte Array.
+     *
+     * @param key The key to get from
+     * @return only hashable key
+     */
+    public static byte[] getOnlyKeyAsBytes(String key) {
+        return getOnlyKey(key).getBytes(StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Gets Public Id from a full key.
+     *
+     * @param key The key to get from
+     * @return Public ID
+     */
+    public static String getPublicId(String key) {
+        var startPublicId = prefix.length();
+        var endPublicId = startPublicId + PUBLIC_ID_LENGTH;
+        return key.substring(startPublicId, endPublicId);
     }
 
     /**
@@ -166,5 +215,11 @@ public class ApiKey implements Serializable, Principal {
         this.teams = teams;
     }
 
-}
+    public String getPublicId() {
+        return publicId;
+    }
 
+    public void setPublicId(String publicID) {
+        this.publicId = publicID;
+    }
+}

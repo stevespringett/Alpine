@@ -40,9 +40,12 @@ import alpine.security.ApiKeyGenerator;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+
+import java.security.MessageDigest;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HexFormat;
 import java.util.LinkedHashSet;
 import java.util.List;
 
@@ -56,6 +59,7 @@ import java.util.List;
 public class AlpineQueryManager extends AbstractAlpineQueryManager {
 
     private static final Logger LOGGER = Logger.getLogger(AlpineQueryManager.class);
+    private static final String HASH_METHOD = "SHA3-256";
 
     /**
      * Default constructor.
@@ -94,13 +98,19 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * Returns an API key.
      * @param key the key to return
      * @return an ApiKey
-     * @since 1.0.0
+     * @since 3.2.0
      */
     public ApiKey getApiKey(final String key) {
+        if (key.length() != ApiKey.FULL_KEY_LENGTH && key.length() != ApiKey.LEGACY_FULL_KEY_LENGTH) {
+            return null;
+        }
         return callInTransaction(() -> {
-            final Query<ApiKey> query = pm.newQuery(ApiKey.class, "key == :key");
-            query.setParameters(key);
-            return executeAndCloseUnique(query);
+            final Query<ApiKey> query = pm.newQuery(ApiKey.class, "publicId == :publicId");
+            query.setParameters(ApiKey.getPublicId(key));
+            ApiKey apiKey = executeAndCloseUnique(query);
+            MessageDigest digest = MessageDigest.getInstance(HASH_METHOD);
+            String hashedKey = HexFormat.of().formatHex(digest.digest(ApiKey.getOnlyKeyAsBytes(key)));
+            return apiKey != null && MessageDigest.isEqual(hashedKey.getBytes(), apiKey.getKey().getBytes()) ? apiKey : null;
         });
     }
 
@@ -110,13 +120,21 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * key string.
      * @param apiKey the ApiKey object to regenerate the key of.
      * @return an ApiKey
-     * @since 1.0.0
+     * @since 3.2.0
      */
     public ApiKey regenerateApiKey(final ApiKey apiKey) {
-        return callInTransaction(() -> {
-            apiKey.setKey(ApiKeyGenerator.generate());
+        String clearKey = ApiKeyGenerator.generate();
+        ApiKey regeneratedApiKey = callInTransaction(() -> {
+            MessageDigest digest = MessageDigest.getInstance(HASH_METHOD);
+            String hashedKey = HexFormat.of().formatHex(digest.digest(ApiKey.getOnlyKeyAsBytes(clearKey)));
+            apiKey.setKey(hashedKey);
+            apiKey.setPublicId(ApiKey.getPublicId(clearKey));
+            pm.makePersistent(apiKey);
             return apiKey;
         });
+        ApiKey copiedApiKey = pm.detachCopy(regeneratedApiKey);
+        copiedApiKey.setKey(clearKey);
+        return copiedApiKey;
     }
 
     /**
@@ -124,15 +142,24 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * API key string.
      * @param team The team to create the key for
      * @return an ApiKey
+     * @since 3.2.0
      */
     public ApiKey createApiKey(final Team team) {
-        return callInTransaction(() -> {
-            final var apiKey = new ApiKey();
-            apiKey.setKey(ApiKeyGenerator.generate());
-            apiKey.setCreated(new Date());
-            apiKey.setTeams(List.of(team));
-            return pm.makePersistent(apiKey);
+        String clearKey = ApiKeyGenerator.generate();
+        ApiKey apiKey = callInTransaction(() -> {
+            final var apiKeyPers = new ApiKey();
+            MessageDigest digest = MessageDigest.getInstance(HASH_METHOD);
+            String hashedKey = HexFormat.of().formatHex(digest.digest(ApiKey.getOnlyKeyAsBytes(clearKey)));
+            apiKeyPers.setKey(hashedKey);
+            apiKeyPers.setPublicId(ApiKey.getPublicId(clearKey));
+            apiKeyPers.setCreated(new Date());
+            apiKeyPers.setTeams(List.of(team));
+            pm.makePersistent(apiKeyPers);
+            return apiKeyPers;
         });
+            ApiKey copiedApiKey = pm.detachCopy(apiKey);
+            copiedApiKey.setKey(clearKey);
+            return copiedApiKey;
     }
 
     public ApiKey updateApiKey(final ApiKey transientApiKey) {
@@ -543,20 +570,28 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * Creates a new Team with the specified name. If createApiKey is true,
      * then {@link #createApiKey} is invoked and a cryptographically secure
      * API key is generated.
-     * @param name The name of th team
+     * @param name The name of the team
      * @param createApiKey whether to create an API key for the team
+     * @deprecated `createApiKey` is deprecated and will be removed in future versions
      * @return a Team
      * @since 1.0.0
      */
     public Team createTeam(final String name, final boolean createApiKey) {
+        return createTeam(name);
+    }
+
+    /**
+     * Creates a new Team with the specified name.
+     * @param name The name of the team
+     * @return a Team
+     * @since 3.2.0
+     */
+    public Team createTeam(final String name) {
         return callInTransaction(() -> {
             final var team = new Team();
             team.setName(name);
             //todo assign permissions
             pm.makePersistent(team);
-            if (createApiKey) {
-                createApiKey(team);
-            }
             return team;
         });
     }
