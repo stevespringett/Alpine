@@ -212,7 +212,7 @@ public class ApiKeyAuthenticationServiceTest {
             final var team = qm.createTeam("Test");
             final MessageDigest digest = MessageDigest.getInstance("SHA3-256");
             final String hashedKey = HexFormat.of().formatHex(digest.digest(ApiKey.getOnlyKeyAsBytes(clearKey)));
-            apiKey.setKey(hashedKey);
+            apiKey.setKey(prefix + hashedKey);
             apiKey.setPublicId(ApiKey.getPublicId(clearKey));
             apiKey.setCreated(new Date());
             apiKey.setTeams(List.of(team));

@@ -94,8 +94,9 @@ public class ApiKey implements Serializable, Principal {
     private List<Team> teams;
 
     @Persistent
-    @Unique(name = "APIKEY_PUBLIC_IDX") 
-    @Column(name = "PUBLIC_ID")
+    @Unique(name = "APIKEY_PUBLIC_IDX")
+    @Size(min = PUBLIC_ID_LENGTH, max = PUBLIC_ID_LENGTH)
+    @Column(name = "PUBLIC_ID", allowsNull = "false")
     private String publicId;
 
     @Persistent
