@@ -18,6 +18,7 @@
  */
 package alpine.persistence;
 
+import alpine.Config;
 import alpine.common.logging.Logger;
 import alpine.event.LdapSyncEvent;
 import alpine.event.framework.EventService;
@@ -42,6 +43,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -60,6 +62,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
 
     private static final Logger LOGGER = Logger.getLogger(AlpineQueryManager.class);
     private static final String HASH_METHOD = "SHA3-256";
+    private static final String PREFIX = Config.getInstance().getProperty(Config.AlpineKey.API_KEY_PREFIX);
 
     /**
      * Default constructor.
@@ -95,6 +98,21 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     }
 
     /**
+     * Returns an API key by the public ID.
+     * @param publicId the public ID for the key to return
+     * @return an ApiKey
+     * @since 3.2.0
+     */
+    public ApiKey getApiKeyBypublicId(final String publicId) {
+        return callInTransaction(() -> {
+            final Query<ApiKey> query = pm.newQuery(ApiKey.class, "publicId == :publicId");
+            query.setParameters(publicId);
+            ApiKey apiKey = executeAndCloseUnique(query);
+            return apiKey != null ? apiKey : null;
+        });
+    }
+
+    /**
      * Returns an API key.
      * @param key the key to return
      * @return an ApiKey
@@ -104,14 +122,17 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
         if (key.length() != ApiKey.FULL_KEY_LENGTH && key.length() != ApiKey.LEGACY_FULL_KEY_LENGTH) {
             return null;
         }
-        return callInTransaction(() -> {
-            final Query<ApiKey> query = pm.newQuery(ApiKey.class, "publicId == :publicId");
-            query.setParameters(ApiKey.getPublicId(key));
-            ApiKey apiKey = executeAndCloseUnique(query);
-            MessageDigest digest = MessageDigest.getInstance(HASH_METHOD);
-            String hashedKey = HexFormat.of().formatHex(digest.digest(ApiKey.getOnlyKeyAsBytes(key)));
-            return apiKey != null && MessageDigest.isEqual(hashedKey.getBytes(), apiKey.getKey().getBytes()) ? apiKey : null;
-        });
+        ApiKey apiKey = getApiKeyBypublicId(ApiKey.getPublicId(key));
+        MessageDigest digest;
+        try {
+            digest = MessageDigest.getInstance(HASH_METHOD);
+        } catch (NoSuchAlgorithmException e) {
+            LOGGER.warn("This hashing Algorithm is unknow: " + HASH_METHOD);
+            return null;
+        }
+        String hashedKey = HexFormat.of().formatHex(digest.digest(ApiKey.getOnlyKeyAsBytes(key)));
+        String keyPrefix = key.startsWith(PREFIX) ? PREFIX : "";
+        return apiKey != null && MessageDigest.isEqual((keyPrefix + hashedKey).getBytes(), apiKey.getKey().getBytes()) ? apiKey : null;
     }
 
     /**
@@ -127,7 +148,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
         ApiKey regeneratedApiKey = callInTransaction(() -> {
             MessageDigest digest = MessageDigest.getInstance(HASH_METHOD);
             String hashedKey = HexFormat.of().formatHex(digest.digest(ApiKey.getOnlyKeyAsBytes(clearKey)));
-            apiKey.setKey(hashedKey);
+            apiKey.setKey(PREFIX + hashedKey);
             apiKey.setPublicId(ApiKey.getPublicId(clearKey));
             pm.makePersistent(apiKey);
             return apiKey;
@@ -150,7 +171,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
             final var apiKeyPers = new ApiKey();
             MessageDigest digest = MessageDigest.getInstance(HASH_METHOD);
             String hashedKey = HexFormat.of().formatHex(digest.digest(ApiKey.getOnlyKeyAsBytes(clearKey)));
-            apiKeyPers.setKey(hashedKey);
+            apiKeyPers.setKey(PREFIX + hashedKey);
             apiKeyPers.setPublicId(ApiKey.getPublicId(clearKey));
             apiKeyPers.setCreated(new Date());
             apiKeyPers.setTeams(List.of(team));
