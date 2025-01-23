@@ -18,6 +18,7 @@
  */
 package alpine.persistence;
 
+import alpine.Config;
 import alpine.common.logging.Logger;
 import alpine.event.LdapSyncEvent;
 import alpine.event.framework.EventService;
@@ -42,6 +43,8 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.lang.IllegalStateException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -60,6 +63,7 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
 
     private static final Logger LOGGER = Logger.getLogger(AlpineQueryManager.class);
     private static final String HASH_METHOD = "SHA3-256";
+    private static final String PREFIX = Config.getInstance().getProperty(Config.AlpineKey.API_KEY_PREFIX);
 
     /**
      * Default constructor.
@@ -95,6 +99,21 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
     }
 
     /**
+     * Returns an API key by the public ID.
+     * @param publicId the public ID for the key to return
+     * @return an ApiKey
+     * @since 3.2.0
+     */
+    public ApiKey getApiKeyByPublicId(final String publicId) {
+        return callInTransaction(() -> {
+            final Query<ApiKey> query = pm.newQuery(ApiKey.class, "publicId == :publicId");
+            query.setParameters(publicId);
+            ApiKey apiKey = executeAndCloseUnique(query);
+            return apiKey != null ? apiKey : null;
+        });
+    }
+
+    /**
      * Returns an API key.
      * @param key the key to return
      * @return an ApiKey
@@ -104,14 +123,17 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
         if (key.length() != ApiKey.FULL_KEY_LENGTH && key.length() != ApiKey.LEGACY_FULL_KEY_LENGTH) {
             return null;
         }
-        return callInTransaction(() -> {
-            final Query<ApiKey> query = pm.newQuery(ApiKey.class, "publicId == :publicId");
-            query.setParameters(ApiKey.getPublicId(key));
-            ApiKey apiKey = executeAndCloseUnique(query);
-            MessageDigest digest = MessageDigest.getInstance(HASH_METHOD);
-            String hashedKey = HexFormat.of().formatHex(digest.digest(ApiKey.getOnlyKeyAsBytes(key)));
-            return apiKey != null && MessageDigest.isEqual(hashedKey.getBytes(), apiKey.getKey().getBytes()) ? apiKey : null;
-        });
+        ApiKey apiKey = getApiKeyByPublicId(ApiKey.getPublicId(key));
+        MessageDigest digest;
+        try {
+            digest = MessageDigest.getInstance(HASH_METHOD);
+        } catch (NoSuchAlgorithmException e) {
+            LOGGER.warn("This hashing Algorithm is unknow: " + HASH_METHOD);
+            throw new IllegalStateException("This hashing Algorithm is unknow: " + HASH_METHOD);
+        }
+        String hashedKey = HexFormat.of().formatHex(digest.digest(ApiKey.getOnlyKeyAsBytes(key)));
+        String keyPrefix = key.startsWith(PREFIX) ? PREFIX : "";
+        return apiKey != null && MessageDigest.isEqual((keyPrefix + hashedKey).getBytes(), apiKey.getKey().getBytes()) ? apiKey : null;
     }
 
     /**
@@ -123,18 +145,16 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @since 3.2.0
      */
     public ApiKey regenerateApiKey(final ApiKey apiKey) {
-        String clearKey = ApiKeyGenerator.generate();
-        ApiKey regeneratedApiKey = callInTransaction(() -> {
+        return callInTransaction(() -> {
+            String clearKey = ApiKeyGenerator.generate();
             MessageDigest digest = MessageDigest.getInstance(HASH_METHOD);
             String hashedKey = HexFormat.of().formatHex(digest.digest(ApiKey.getOnlyKeyAsBytes(clearKey)));
-            apiKey.setKey(hashedKey);
+            apiKey.setKey(PREFIX + hashedKey);
             apiKey.setPublicId(ApiKey.getPublicId(clearKey));
             pm.makePersistent(apiKey);
+            apiKey.setClearTextKey(clearKey);
             return apiKey;
         });
-        ApiKey copiedApiKey = pm.detachCopy(regeneratedApiKey);
-        copiedApiKey.setKey(clearKey);
-        return copiedApiKey;
     }
 
     /**
@@ -145,21 +165,19 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @since 3.2.0
      */
     public ApiKey createApiKey(final Team team) {
-        String clearKey = ApiKeyGenerator.generate();
-        ApiKey apiKey = callInTransaction(() -> {
+        return callInTransaction(() -> {
+            String clearKey = ApiKeyGenerator.generate();
             final var apiKeyPers = new ApiKey();
             MessageDigest digest = MessageDigest.getInstance(HASH_METHOD);
             String hashedKey = HexFormat.of().formatHex(digest.digest(ApiKey.getOnlyKeyAsBytes(clearKey)));
-            apiKeyPers.setKey(hashedKey);
+            apiKeyPers.setKey(PREFIX + hashedKey);
             apiKeyPers.setPublicId(ApiKey.getPublicId(clearKey));
             apiKeyPers.setCreated(new Date());
             apiKeyPers.setTeams(List.of(team));
             pm.makePersistent(apiKeyPers);
+            apiKeyPers.setClearTextKey(clearKey);
             return apiKeyPers;
         });
-            ApiKey copiedApiKey = pm.detachCopy(apiKey);
-            copiedApiKey.setKey(clearKey);
-            return copiedApiKey;
     }
 
     public ApiKey updateApiKey(final ApiKey transientApiKey) {
