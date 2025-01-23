@@ -52,6 +52,10 @@
             <groupId>org.glassfish.jersey.ext</groupId>
             <artifactId>jersey-bean-validation</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations-jakarta</artifactId>
+        </dependency>
         <!-- Unit Tests -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

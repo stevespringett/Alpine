@@ -22,6 +22,7 @@ import alpine.Config;
 import alpine.common.validation.RegexSequence;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -103,6 +104,14 @@ public class ApiKey implements Serializable, Principal {
     @Column(name = "IS_LEGACY", allowsNull = "false", defaultValue = "false")
     private boolean isLegacy = false;
 
+    /**
+     * Is set to the clearTextKey, if it's (re)generated,
+     * so the user can use this to authenticate.
+     * On all other requests, this will be null
+     */
+    @Schema(nullable = true)
+    private transient String clearTextKey;
+
     public long getId() {
         return id;
     }
@@ -120,23 +129,13 @@ public class ApiKey implements Serializable, Principal {
     }
 
     /**
-     * Masks all key characters except the prefix and last four characters with *. If the key does not have the
-     * currently configured prefix, do not return it.
+     * Masks all key characters except the prefix and the public ID with *.
      *
      * @return Masked key.
      */
     public String getMaskedKey() {
-        final StringBuilder maskedKey = new StringBuilder();
-
-        // if key does not have the current prefix, do not return a prefix
-        if (key.startsWith(prefix))
-            maskedKey.append(prefix);
-
-        // mask all characters except for the public ID
-        maskedKey.append(publicId);
-        maskedKey.append("*".repeat(getOnlyKey(key).length()));
-
-        return maskedKey.toString();
+        final String maskedKey = prefix + publicId + "*".repeat(API_KEY_LENGTH);
+        return maskedKey;
     }
 
     /**
@@ -222,5 +221,21 @@ public class ApiKey implements Serializable, Principal {
 
     public void setPublicId(String publicID) {
         this.publicId = publicID;
+    }
+
+    public boolean isLegacy() {
+        return isLegacy;
+    }
+
+    public void setLegacy(boolean isLegacy) {
+        this.isLegacy = isLegacy;
+    }
+
+    public String getClearTextKey() {
+        return clearTextKey;
+    }
+
+    public void setClearTextKey(String clearTextKey) {
+        this.clearTextKey = clearTextKey;
     }
 }
