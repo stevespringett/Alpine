@@ -97,19 +97,14 @@ public class ApiKey implements Serializable, Principal {
     @Persistent
     @Unique(name = "APIKEY_PUBLIC_IDX")
     @Size(min = PUBLIC_ID_LENGTH, max = PUBLIC_ID_LENGTH)
-    @Column(name = "PUBLIC_ID", allowsNull = "false")
+    @Column(name = "PUBLIC_ID", allowsNull = "true")
     private String publicId;
 
     @Persistent
     @Column(name = "IS_LEGACY", allowsNull = "false", defaultValue = "false")
     private boolean isLegacy = false;
 
-    /**
-     * Is set to the clearTextKey, if it's (re)generated,
-     * so the user can use this to authenticate.
-     * On all other requests, this will be null
-     */
-    @Schema(nullable = true)
+    @Schema(nullable = true, description = "Is set to the clearTextKey, if it's (re)generated, so the user can use this to authenticate. On all other requests, this will be null.")
     private transient String clearTextKey;
 
     public long getId() {
