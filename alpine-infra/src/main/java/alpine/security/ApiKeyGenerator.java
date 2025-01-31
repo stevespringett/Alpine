@@ -31,8 +31,10 @@ import java.security.SecureRandom;
 public final class ApiKeyGenerator {
 
     private static final char[] VALID_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456879".toCharArray();
+    private static final String prefix = Config.getInstance().getProperty(Config.AlpineKey.API_KEY_PREFIX);
     private static final int PUBLIC_ID_LENGTH = ApiKey.PUBLIC_ID_LENGTH;
     private static final int API_KEY_LENGTH = ApiKey.API_KEY_LENGTH;
+    private static final char API_KEY_SEPERATOR  = ApiKey.API_KEY_SEPERATOR;
 
     /**
      * Private constructor
@@ -45,28 +47,27 @@ public final class ApiKeyGenerator {
      * @since 1.0.0
      */
     public static String generate() {
-        return generate(API_KEY_LENGTH + PUBLIC_ID_LENGTH);
+        return generate(PUBLIC_ID_LENGTH, API_KEY_LENGTH);
     }
 
     /**
-     * Generates a cryptographically secure API key of the specified length having the configured API key prefix.
-     * @param chars the length of the API key to generate not including the prefix length
+     * Generates a cryptographically secure API key of the specified length having the configured API key prefix and the public ID.
+     * @param pubIdLength the length of the Public ID to generate not including the prefix length
+     * @param keyLength the length of the API key to generate not including the prefix length
      * @return a String representation of the API key
      */
-    public static String generate(final int chars) {
+    public static String generate(final int pubIdLength, final int keyLength) {
         final SecureRandom secureRandom = new SecureRandom();
-        final char[] buff = new char[chars];
-        for (int i = 0; i < chars; ++i) {
+        final char[] buff = new char[pubIdLength + keyLength + 1];
+        for (int i = 0; i < pubIdLength + keyLength + 1; ++i) {
             if (i % 10 == 0) {
                 secureRandom.setSeed(secureRandom.nextLong());
             }
             buff[i] = VALID_CHARACTERS[secureRandom.nextInt(VALID_CHARACTERS.length)];
         }
+        buff[pubIdLength] = API_KEY_SEPERATOR;
+        var separatorIfNeeded = prefix.endsWith(Character.toString(API_KEY_SEPERATOR)) ? "" : API_KEY_SEPERATOR;
 
-        return getApiKeyPrefix() + String.valueOf(buff);
-    }
-
-    private static String getApiKeyPrefix() {
-        return Config.getInstance().getProperty(Config.AlpineKey.API_KEY_PREFIX);
+        return prefix + separatorIfNeeded + String.valueOf(buff);
     }
 }

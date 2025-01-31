@@ -96,7 +96,7 @@ public class ApiKeyAuthenticationServiceTest {
             final var team = qm.createTeam("Test");
             apiKey = qm.createApiKey(team);
             oldKey = apiKey.getClearTextKey();
-            var a = qm.regenerateApiKey(apiKey);
+            qm.regenerateApiKey(apiKey);
         }
         final ContainerRequest containerRequestMock = Mockito.mock(ContainerRequest.class);
         Mockito.when(containerRequestMock.getHeaderString("X-Api-Key"))
@@ -132,7 +132,7 @@ public class ApiKeyAuthenticationServiceTest {
         }
         final ContainerRequest containerRequestMock = Mockito.mock(ContainerRequest.class);
         Mockito.when(containerRequestMock.getHeaderString("X-Api-Key"))
-                .thenReturn(prefix + "0".repeat(ApiKey.PUBLIC_ID_LENGTH) + ApiKey.getOnlyKey(apiKey.getKey()));
+                .thenReturn(prefix + "0".repeat(ApiKey.PUBLIC_ID_LENGTH) + ApiKey.getOnlyKey(apiKey.getKey(), false));
         final ApiKeyAuthenticationService authService = new ApiKeyAuthenticationService(containerRequestMock, false);
 
         Assertions.assertThatExceptionOfType(AuthenticationException.class)
@@ -200,7 +200,7 @@ public class ApiKeyAuthenticationServiceTest {
         final var apiKey = genLegacyKey();
         final ContainerRequest containerRequestMock = Mockito.mock(ContainerRequest.class);
         Mockito.when(containerRequestMock.getHeaderString("X-Api-Key"))
-                .thenReturn(prefix + "0".repeat(ApiKey.PUBLIC_ID_LENGTH) + ApiKey.getOnlyKey(apiKey.getKey()));
+                .thenReturn(prefix + "0".repeat(ApiKey.PUBLIC_ID_LENGTH) + ApiKey.getOnlyKey(apiKey.getKey(), true));
         final ApiKeyAuthenticationService authService = new ApiKeyAuthenticationService(containerRequestMock, false);
 
         Assertions.assertThatExceptionOfType(AuthenticationException.class)
@@ -210,12 +210,12 @@ public class ApiKeyAuthenticationServiceTest {
     private ApiKey genLegacyKey() throws NoSuchAlgorithmException {
         final var apiKey = new ApiKey();
         try (final AlpineQueryManager qm = new AlpineQueryManager()) {
-            final String clearKey = ApiKeyGenerator.generate(32);
+            final String clearKey = ApiKeyGenerator.generate(0, 31);
             final var team = qm.createTeam("Test");
             final MessageDigest digest = MessageDigest.getInstance("SHA3-256");
-            final String hashedKey = HexFormat.of().formatHex(digest.digest(ApiKey.getOnlyKeyAsBytes(clearKey)));
+            final String hashedKey = HexFormat.of().formatHex(digest.digest(ApiKey.getOnlyKeyAsBytes(clearKey, true)));
             apiKey.setKey(hashedKey);
-            apiKey.setPublicId(ApiKey.getPublicId(clearKey));
+            apiKey.setPublicId(ApiKey.getPublicId(clearKey, true));
             apiKey.setCreated(new Date());
             apiKey.setTeams(List.of(team));
             qm.persist(apiKey);
