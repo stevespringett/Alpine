@@ -35,15 +35,15 @@ public class ApiKeyGeneratorTest {
     @Test
     public void defaultGenerateTest() {
         String key = ApiKeyGenerator.generate();
-        Assertions.assertEquals(apiKeyPrefix.length() + 32 + PUBLIC_ID_LENGTH, key.length());
+        Assertions.assertEquals(apiKeyPrefix.length() + 32 + PUBLIC_ID_LENGTH + 1, key.length());
         Assertions.assertTrue(key.startsWith(apiKeyPrefix));
         Assertions.assertTrue(pattern.matcher(key).matches());
     }
 
     @Test
     public void generateTest() {
-        String key = ApiKeyGenerator.generate(4096);
-        Assertions.assertEquals(apiKeyPrefix.length() + 4096, key.length());
+        String key = ApiKeyGenerator.generate(5, 4096);
+        Assertions.assertEquals(apiKeyPrefix.length() + 5 + 4096 + 1, key.length());
         Assertions.assertTrue(key.startsWith(apiKeyPrefix));
         Assertions.assertTrue(pattern.matcher(key).matches());
     }
