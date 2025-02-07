@@ -22,6 +22,7 @@ package alpine.server.auth;
 import net.minidev.json.JSONObject;
 
 import alpine.Config;
+import alpine.model.OidcUser;
 
 import com.nimbusds.openid.connect.sdk.claims.ClaimsSet;
 import com.nimbusds.openid.connect.sdk.claims.UserInfo;
@@ -32,6 +33,7 @@ public class DefaultOidcAuthenticationCustomizer implements OidcAuthenticationCu
 
     }
 
+    @Override
     public OidcProfile createProfile(ClaimsSet claimsSet) {
         final String teamsClaimName = Config.getInstance().getProperty(Config.AlpineKey.OIDC_TEAMS_CLAIM);
         final String usernameClaimName = Config.getInstance().getProperty(Config.AlpineKey.OIDC_USERNAME_CLAIM);
@@ -53,11 +55,13 @@ public class DefaultOidcAuthenticationCustomizer implements OidcAuthenticationCu
         return profile;
     }
 
+    @Override
     public boolean isProfileComplete(final OidcProfile profile, final boolean teamSyncEnabled) {
         return profile.getSubject() != null && profile.getUsername() != null
                 && (!teamSyncEnabled || (profile.getGroups() != null));
     }
 
+    @Override
     public OidcProfile mergeProfiles(final OidcProfile left, final OidcProfile right) {
         final var profile = new OidcProfile();
 
@@ -73,8 +77,9 @@ public class DefaultOidcAuthenticationCustomizer implements OidcAuthenticationCu
         return profile;
     }
 
-    public void onAuthenticationSuccess(OidcProfile profile, String idToken, String accessToken) {
-
+    @Override
+    public OidcUser onAuthenticationSuccess(OidcUser user, OidcProfile profile, String idToken, String accessToken) {
+        return user;
     }
 
     private <T> T selectProfileClaim(final T left, final T right) {

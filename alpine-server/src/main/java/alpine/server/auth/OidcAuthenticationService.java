@@ -186,31 +186,31 @@ public class OidcAuthenticationService implements AuthenticationService {
                     LOGGER.debug("Assigning subject identifier " + profile.getSubject() + " to user " + user.getUsername());
                     user.setSubjectIdentifier(profile.getSubject());
                     user.setEmail(profile.getEmail());
-                    user = qm.updateOidcUser(user);
-                    customizer.onAuthenticationSuccess(profile, idToken, accessToken);
-                    return user;
+
+                    return customizer.onAuthenticationSuccess(qm.updateOidcUser(user), profile, idToken, accessToken);
                 } else if (!user.getSubjectIdentifier().equals(profile.getSubject())) {
                     LOGGER.error("Refusing to authenticate user " + user.getUsername() + ": subject identifier has changed (" +
                             user.getSubjectIdentifier() + " to " + profile.getSubject() + ")");
                     throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.INVALID_CREDENTIALS);
                 }
+
                 if (!Objects.equals(user.getEmail(), profile.getEmail())) {
                     LOGGER.debug("Updating email of user " + user.getUsername() + ": " + user.getEmail() + " -> " + profile.getEmail());
-                    user.setEmail(profile.getEmail());
-                    user = qm.updateOidcUser(user);
+                    return customizer.onAuthenticationSuccess(qm.updateOidcUser(user), profile, idToken, accessToken);
                 }
+
                 if (config.getPropertyAsBoolean(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION)) {
-                    user = qm.synchronizeTeamMembership(user, profile.getGroups());
-                    customizer.onAuthenticationSuccess(profile, idToken, accessToken);
-                    return user;
+                    return customizer.onAuthenticationSuccess(
+                            qm.synchronizeTeamMembership(user, profile.getGroups()),
+                            profile,
+                            idToken,
+                            accessToken);
                 }
-                customizer.onAuthenticationSuccess(profile, idToken, accessToken);
-                return user;
+
+                return customizer.onAuthenticationSuccess(user, profile, idToken, accessToken);
             } else if (config.getPropertyAsBoolean(Config.AlpineKey.OIDC_USER_PROVISIONING)) {
                 LOGGER.debug("The user (" + profile.getUsername() + ") authenticated successfully but the account has not been provisioned");
-                user = autoProvision(qm, profile);
-                customizer.onAuthenticationSuccess(profile, idToken, accessToken);
-                return user;
+                return customizer.onAuthenticationSuccess(autoProvision(qm, profile), profile, idToken, accessToken);
             } else {
                 LOGGER.debug("The user (" + profile.getUsername() + ") is unmapped and user provisioning is not enabled");
                 throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.UNMAPPED_ACCOUNT);
@@ -227,15 +227,21 @@ public class OidcAuthenticationService implements AuthenticationService {
 
         if (config.getPropertyAsBoolean(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION)) {
             LOGGER.debug("Synchronizing teams for user " + user.getUsername());
-            user = qm.synchronizeTeamMembership(user, profile.getGroups());
-            customizer.onAuthenticationSuccess(profile, idToken, accessToken);
-            return user;
+            return customizer.onAuthenticationSuccess(
+                    qm.synchronizeTeamMembership(user, profile.getGroups()),
+                    profile,
+                    idToken,
+                    accessToken);
         }
 
         final List<String> defaultTeams = config.getPropertyAsList(Config.AlpineKey.OIDC_TEAMS_DEFAULT);
         if (!defaultTeams.isEmpty()) {
             LOGGER.debug("Assigning default teams %s to user %s".formatted(defaultTeams, user.getUsername()));
-            return qm.addUserToTeams(user, defaultTeams);
+            return customizer.onAuthenticationSuccess(
+                    qm.addUserToTeams(user, defaultTeams),
+                    profile,
+                    idToken,
+                    accessToken);
         }
 
         return user;
