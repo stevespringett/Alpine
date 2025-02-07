@@ -30,7 +30,7 @@ public class OidcProfile {
 
     private String subject, username, email;
     private List<String> groups;
-    private JSONObject customValues;
+    private JSONObject customValues = new JSONObject();
 
     public Object getCustomValue(final String key) {
         return customValues.get(key);
