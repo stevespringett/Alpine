@@ -21,8 +21,6 @@ package alpine.server.auth;
 
 import com.nimbusds.openid.connect.sdk.claims.ClaimsSet;
 
-import alpine.model.OidcUser;
-
 public interface OidcAuthenticationCustomizer {
 
     OidcProfile createProfile(ClaimsSet claimsSet);
@@ -31,6 +29,6 @@ public interface OidcAuthenticationCustomizer {
 
     OidcProfile mergeProfiles(OidcProfile left, OidcProfile right);
 
-    OidcUser onAuthenticationSuccess(OidcProfile profile) throws AlpineAuthenticationException;
+    void onAuthenticationSuccess(OidcProfile profile, String idToken, String accessToken);
 
 }
