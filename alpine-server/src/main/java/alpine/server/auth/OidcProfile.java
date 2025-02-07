@@ -21,56 +21,69 @@ package alpine.server.auth;
 
 import java.util.List;
 
+import net.minidev.json.JSONObject;
+
 /**
  * @since 1.10.0
  */
-class OidcProfile {
+public class OidcProfile {
 
-    private String subject;
-    private String username;
+    private String subject, username, email;
     private List<String> groups;
-    private String email;
+    private JSONObject customValues;
 
-    String getSubject() {
+    public Object getCustomValue(final String key) {
+        return customValues.get(key);
+    }
+
+    public Object putCustomValue(final String key, final Object value) {
+        return customValues.put(key, value);
+    }
+
+    public JSONObject getCustomValues() {
+        return customValues;
+    }
+
+    public void setCustomValues(JSONObject customValues) {
+        this.customValues = customValues;
+    }
+
+    public String getSubject() {
         return subject;
     }
 
-    void setSubject(final String subject) {
+    public void setSubject(final String subject) {
         this.subject = subject;
     }
 
-    String getUsername() {
+    public String getUsername() {
         return username;
     }
 
-    void setUsername(final String username) {
+    public void setUsername(final String username) {
         this.username = username;
     }
 
-    List<String> getGroups() {
+    public List<String> getGroups() {
         return groups;
     }
 
-    void setGroups(final List<String> groups) {
+    public void setGroups(final List<String> groups) {
         this.groups = groups;
     }
 
-    String getEmail() {
+    public String getEmail() {
         return email;
     }
 
-    void setEmail(final String email) {
+    public void setEmail(final String email) {
         this.email = email;
     }
 
     @Override
     public String toString() {
-        return "OidcProfile{" +
-                "subject='" + subject + '\'' +
-                ", username='" + username + '\'' +
-                ", groups=" + groups +
-                ", email='" + email + '\'' +
-                '}';
+        return "%s{subject='%s', username='%s', groups=%s, email='%s', customValues=%s"
+                .formatted(getClass().getName(), subject, username, groups, email, customValues);
     }
 
 }
