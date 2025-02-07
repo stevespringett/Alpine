@@ -210,7 +210,7 @@ public class OidcAuthenticationService implements AuthenticationService {
                 return customizer.onAuthenticationSuccess(user, profile, idToken, accessToken);
             } else if (config.getPropertyAsBoolean(Config.AlpineKey.OIDC_USER_PROVISIONING)) {
                 LOGGER.debug("The user (" + profile.getUsername() + ") authenticated successfully but the account has not been provisioned");
-                return customizer.onAuthenticationSuccess(autoProvision(qm, profile), profile, idToken, accessToken);
+                return autoProvision(qm, profile);
             } else {
                 LOGGER.debug("The user (" + profile.getUsername() + ") is unmapped and user provisioning is not enabled");
                 throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.UNMAPPED_ACCOUNT);
