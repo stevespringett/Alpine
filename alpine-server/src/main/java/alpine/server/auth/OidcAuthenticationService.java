@@ -186,8 +186,9 @@ public class OidcAuthenticationService implements AuthenticationService {
                     LOGGER.debug("Assigning subject identifier " + profile.getSubject() + " to user " + user.getUsername());
                     user.setSubjectIdentifier(profile.getSubject());
                     user.setEmail(profile.getEmail());
+                    user = qm.updateOidcUser(user);
                     customizer.onAuthenticationSuccess(profile, idToken, accessToken);
-                    return qm.updateOidcUser(user);
+                    return user;
                 } else if (!user.getSubjectIdentifier().equals(profile.getSubject())) {
                     LOGGER.error("Refusing to authenticate user " + user.getUsername() + ": subject identifier has changed (" +
                             user.getSubjectIdentifier() + " to " + profile.getSubject() + ")");
@@ -199,15 +200,17 @@ public class OidcAuthenticationService implements AuthenticationService {
                     user = qm.updateOidcUser(user);
                 }
                 if (config.getPropertyAsBoolean(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION)) {
+                    user = qm.synchronizeTeamMembership(user, profile.getGroups());
                     customizer.onAuthenticationSuccess(profile, idToken, accessToken);
-                    return qm.synchronizeTeamMembership(user, profile.getGroups());
+                    return user;
                 }
                 customizer.onAuthenticationSuccess(profile, idToken, accessToken);
                 return user;
             } else if (config.getPropertyAsBoolean(Config.AlpineKey.OIDC_USER_PROVISIONING)) {
                 LOGGER.debug("The user (" + profile.getUsername() + ") authenticated successfully but the account has not been provisioned");
+                user = autoProvision(qm, profile);
                 customizer.onAuthenticationSuccess(profile, idToken, accessToken);
-                return autoProvision(qm, profile);
+                return user;
             } else {
                 LOGGER.debug("The user (" + profile.getUsername() + ") is unmapped and user provisioning is not enabled");
                 throw new AlpineAuthenticationException(AlpineAuthenticationException.CauseType.UNMAPPED_ACCOUNT);
@@ -224,8 +227,9 @@ public class OidcAuthenticationService implements AuthenticationService {
 
         if (config.getPropertyAsBoolean(Config.AlpineKey.OIDC_TEAM_SYNCHRONIZATION)) {
             LOGGER.debug("Synchronizing teams for user " + user.getUsername());
+            user = qm.synchronizeTeamMembership(user, profile.getGroups());
             customizer.onAuthenticationSuccess(profile, idToken, accessToken);
-            return qm.synchronizeTeamMembership(user, profile.getGroups());
+            return user;
         }
 
         final List<String> defaultTeams = config.getPropertyAsList(Config.AlpineKey.OIDC_TEAMS_DEFAULT);
