@@ -196,6 +196,7 @@ public class OidcAuthenticationService implements AuthenticationService {
 
                 if (!Objects.equals(user.getEmail(), profile.getEmail())) {
                     LOGGER.debug("Updating email of user " + user.getUsername() + ": " + user.getEmail() + " -> " + profile.getEmail());
+                    user.setEmail(profile.getEmail());
                     return customizer.onAuthenticationSuccess(qm.updateOidcUser(user), profile, idToken, accessToken);
                 }
 
