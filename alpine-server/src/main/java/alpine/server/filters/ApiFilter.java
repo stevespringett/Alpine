@@ -32,6 +32,7 @@ import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.ext.Provider;
 import java.security.Principal;
+import java.util.Set;
 
 @Provider
 @Priority(Priorities.USER)
@@ -71,7 +72,8 @@ public class ApiFilter implements ContainerRequestFilter {
             } else {
                 pagination = new Pagination(Pagination.Strategy.OFFSET, 0, 100); // Always paginate queries from resources
             }
-            final AlpineRequest alpineRequest = new AlpineRequest(getPrincipal(requestContext), pagination, filter, orderBy, orderDirection);
+            final AlpineRequest alpineRequest = new AlpineRequest(
+                    getPrincipal(requestContext), pagination, filter, orderBy, orderDirection, getEffectivePermissions(requestContext));
             requestContext.setProperty("AlpineRequest", alpineRequest);
         }
     }
@@ -107,4 +109,10 @@ public class ApiFilter implements ContainerRequestFilter {
             return null;
         }
     }
+
+    @SuppressWarnings("unchecked")
+    private Set<String> getEffectivePermissions(final ContainerRequestContext requestContext) {
+        return (Set<String>) requestContext.getProperty(AuthorizationFilter.EFFECTIVE_PERMISSIONS_PROPERTY);
+    }
+
 }

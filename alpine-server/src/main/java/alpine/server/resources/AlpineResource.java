@@ -28,6 +28,7 @@ import alpine.model.OidcUser;
 import alpine.model.UserPrincipal;
 import alpine.persistence.AlpineQueryManager;
 import alpine.resources.AlpineRequest;
+import alpine.server.filters.AuthorizationFilter;
 import io.jsonwebtoken.lang.Collections;
 import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.server.validation.ValidationError;
@@ -336,6 +337,15 @@ public abstract class AlpineResource {
             }
             return hasPermission;
         }
+    }
+
+    /**
+     * @since 3.2.0
+     */
+    @SuppressWarnings("unchecked")
+    protected Set<String> getEffectivePermissions() {
+        return (Set<String>) requestContext.getProperty(
+                AuthorizationFilter.EFFECTIVE_PERMISSIONS_PROPERTY);
     }
 
     /**

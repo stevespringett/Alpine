@@ -22,6 +22,8 @@ import alpine.persistence.OrderDirection;
 import alpine.persistence.Pagination;
 
 import java.security.Principal;
+import java.util.Collections;
+import java.util.Set;
 
 public class AlpineRequest {
 
@@ -30,6 +32,7 @@ public class AlpineRequest {
     private String filter;
     private String orderBy;
     private OrderDirection orderDirection;
+    private Set<String> effectivePermissions;
 
     /**
      * Default constructor
@@ -53,6 +56,24 @@ public class AlpineRequest {
         this.orderDirection = orderDirection;
     }
 
+    /**
+     * @since 3.2.0
+     */
+    public AlpineRequest(
+            final Principal principal,
+            final Pagination pagination,
+            final String filter,
+            final String orderBy,
+            final OrderDirection orderDirection,
+            final Set<String> effectivePermissions) {
+        this.principal = principal;
+        this.pagination = pagination;
+        this.filter = filter;
+        this.orderBy = orderBy;
+        this.orderDirection = orderDirection;
+        this.effectivePermissions = effectivePermissions;
+    }
+
     public Principal getPrincipal() {
         return principal;
     }
@@ -71,6 +92,15 @@ public class AlpineRequest {
 
     public OrderDirection getOrderDirection() {
         return orderDirection;
+    }
+
+    /**
+     * @since 3.2.0
+     */
+    public Set<String> getEffectivePermissions() {
+        return effectivePermissions == null
+                ? Collections.emptySet()
+                : effectivePermissions;
     }
 
 }
