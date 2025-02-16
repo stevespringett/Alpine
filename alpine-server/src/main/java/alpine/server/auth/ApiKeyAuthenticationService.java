@@ -18,11 +18,15 @@
  */
 package alpine.server.auth;
 
+import alpine.common.logging.Logger;
 import alpine.model.ApiKey;
 import alpine.persistence.AlpineQueryManager;
+import alpine.security.ApiKeyDecoder;
+import alpine.security.InvalidApiKeyFormatException;
 import org.glassfish.jersey.server.ContainerRequest;
 
 import javax.naming.AuthenticationException;
+import java.security.MessageDigest;
 import java.security.Principal;
 
 /**
@@ -32,6 +36,8 @@ import java.security.Principal;
  * @since 1.0.0
  */
 public class ApiKeyAuthenticationService implements AuthenticationService {
+
+    private static final Logger LOGGER = Logger.getLogger(ApiKeyAuthenticationService.class);
 
     private final String assertedApiKey;
 
@@ -72,13 +78,27 @@ public class ApiKeyAuthenticationService implements AuthenticationService {
      * @since 1.0.0
      */
     public Principal authenticate() throws AuthenticationException {
-        try (AlpineQueryManager qm = new AlpineQueryManager()) {
-            final ApiKey apiKey = qm.getApiKey(assertedApiKey);
+        final ApiKey decodedApiKey;
+        try {
+            decodedApiKey = ApiKeyDecoder.decode(assertedApiKey);
+        } catch (InvalidApiKeyFormatException e) {
+            LOGGER.debug("Format of the provided API key is invalid", e);
+            throw new AuthenticationException();
+        }
+
+        try (final var qm = new AlpineQueryManager()) {
+            final ApiKey apiKey = qm.getApiKeyByPublicId(decodedApiKey.getPublicId());
             if (apiKey == null) {
+                LOGGER.debug("No API key found for public ID " + decodedApiKey.getPublicId());
                 throw new AuthenticationException();
-            } else {
-                return apiKey;
             }
+
+            if (!MessageDigest.isEqual(decodedApiKey.getSecretHash().getBytes(), apiKey.getSecretHash().getBytes())) {
+                LOGGER.debug("API key secret hashes do not match");
+                throw new AuthenticationException();
+            }
+
+            return apiKey;
         }
     }
 

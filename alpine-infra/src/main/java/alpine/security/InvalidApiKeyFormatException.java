@@ -16,19 +16,15 @@
  * SPDX-License-Identifier: Apache-2.0
  * Copyright (c) Steve Springett. All Rights Reserved.
  */
-package alpine.model;
+package alpine.security;
 
-import org.junit.jupiter.api.Test;
+/**
+ * @since 3.2.0
+ */
+public class InvalidApiKeyFormatException extends RuntimeException {
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-public class ApiKeyTest {
-
-    @Test
-    public void maskTest() {
-        final var apiKey = new ApiKey();
-        apiKey.setPublicId("TL1xa");
-        assertThat(apiKey.getMaskedKey()).isEqualTo("alpine_TL1xa********************************");
+    InvalidApiKeyFormatException(final String message) {
+        super(message);
     }
 
 }
