@@ -40,11 +40,15 @@ import alpine.security.ApiKeyGenerator;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import java.security.Principal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This QueryManager provides a concrete extension of {@link AbstractAlpineQueryManager} by
@@ -720,8 +724,10 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * team membership.
      * @param user the user to retrieve permissions for
      * @return a List of Permission objects
+     * @deprecated Use {@link #getEffectivePermissions(Principal)} instead.
      * @since 1.1.0
      */
+    @Deprecated(forRemoval = true, since = "3.2.0")
     public List<Permission> getEffectivePermissions(UserPrincipal user) {
         final LinkedHashSet<Permission> permissions = new LinkedHashSet<>();
         if (user.getPermissions() != null) {
@@ -736,6 +742,119 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
             }
         }
         return new ArrayList<>(permissions);
+    }
+
+    /**
+     * Retrieve the effective permissions of a {@link Principal}.
+     *
+     * @param principal The {@link Principal} to retrieve permissions for.
+     * @return Permissions of {@code principal}
+     * @since 3.2.0
+     */
+    public Set<String> getEffectivePermissions(final Principal principal) {
+        return switch (principal) {
+            case ApiKey apiKey -> getEffectivePermissions(apiKey);
+            case LdapUser ldapUser -> getEffectivePermissions(ldapUser);
+            case ManagedUser managedUser -> getEffectivePermissions(managedUser);
+            case OidcUser oidcUser -> getEffectivePermissions(oidcUser);
+            default -> Collections.emptySet();
+        };
+    }
+
+    private Set<String> getEffectivePermissions(final ApiKey apiKey) {
+        final Query<?> query = pm.newQuery(Query.SQL, /* language=SQL */ """
+                SELECT "PERMISSION"."NAME"
+                  FROM "APIKEY"
+                 INNER JOIN "APIKEYS_TEAMS"
+                    ON "APIKEYS_TEAMS"."APIKEY_ID" = "APIKEY"."ID"
+                 INNER JOIN "TEAM"
+                    ON "TEAM"."ID" = "APIKEYS_TEAMS"."TEAM_ID"
+                 INNER JOIN "TEAMS_PERMISSIONS"
+                    ON "TEAMS_PERMISSIONS"."TEAM_ID" = "TEAM"."ID"
+                 INNER JOIN "PERMISSION"
+                    ON "PERMISSION"."ID" = "TEAMS_PERMISSIONS"."PERMISSION_ID"
+                 WHERE "APIKEY"."ID" = :apiKeyId
+                """);
+        query.setNamedParameters(Map.of("apiKeyId", apiKey.getId()));
+        return Set.copyOf(executeAndCloseResultList(query, String.class));
+    }
+
+    private Set<String> getEffectivePermissions(final LdapUser ldapUser) {
+        final Query<?> query = pm.newQuery(Query.SQL, /* language=SQL */ """
+                SELECT "PERMISSION"."NAME"
+                  FROM "LDAPUSER"
+                 INNER JOIN "LDAPUSERS_TEAMS"
+                    ON "LDAPUSERS_TEAMS"."LDAPUSER_ID" = "LDAPUSER"."ID"
+                 INNER JOIN "TEAM"
+                    ON "TEAM"."ID" = "LDAPUSERS_TEAMS"."TEAM_ID"
+                 INNER JOIN "TEAMS_PERMISSIONS"
+                    ON "TEAMS_PERMISSIONS"."TEAM_ID" = "TEAM"."ID"
+                 INNER JOIN "PERMISSION"
+                    ON "PERMISSION"."ID" = "TEAMS_PERMISSIONS"."PERMISSION_ID"
+                 WHERE "LDAPUSER"."ID" = :ldapUserId
+                 UNION ALL
+                SELECT "PERMISSION"."NAME"
+                  FROM "LDAPUSER"
+                 INNER JOIN "LDAPUSERS_PERMISSIONS"
+                    ON "LDAPUSERS_PERMISSIONS"."LDAPUSER_ID" = "LDAPUSER"."ID"
+                 INNER JOIN "PERMISSION"
+                    ON "PERMISSION"."ID" = "LDAPUSERS_PERMISSIONS"."PERMISSION_ID"
+                 WHERE "LDAPUSER"."ID" = :ldapUserId
+                """);
+        query.setNamedParameters(Map.of("ldapUserId", ldapUser.getId()));
+        return Set.copyOf(executeAndCloseResultList(query, String.class));
+    }
+
+    private Set<String> getEffectivePermissions(final ManagedUser managedUser) {
+        final Query<?> query = pm.newQuery(Query.SQL, /* language=SQL */ """
+                SELECT "PERMISSION"."NAME"
+                  FROM "MANAGEDUSER"
+                 INNER JOIN "MANAGEDUSERS_TEAMS"
+                    ON "MANAGEDUSERS_TEAMS"."MANAGEDUSER_ID" = "MANAGEDUSER"."ID"
+                 INNER JOIN "TEAM"
+                    ON "TEAM"."ID" = "MANAGEDUSERS_TEAMS"."TEAM_ID"
+                 INNER JOIN "TEAMS_PERMISSIONS"
+                    ON "TEAMS_PERMISSIONS"."TEAM_ID" = "TEAM"."ID"
+                 INNER JOIN "PERMISSION"
+                    ON "PERMISSION"."ID" = "TEAMS_PERMISSIONS"."PERMISSION_ID"
+                 WHERE "MANAGEDUSER"."ID" = :managedUserId
+                 UNION ALL
+                SELECT "PERMISSION"."NAME"
+                  FROM "MANAGEDUSER"
+                 INNER JOIN "MANAGEDUSERS_PERMISSIONS"
+                    ON "MANAGEDUSERS_PERMISSIONS"."MANAGEDUSER_ID" = "MANAGEDUSER"."ID"
+                 INNER JOIN "PERMISSION"
+                    ON "PERMISSION"."ID" = "MANAGEDUSERS_PERMISSIONS"."PERMISSION_ID"
+                 WHERE "MANAGEDUSER"."ID" = :managedUserId
+                """);
+        query.setNamedParameters(Map.of("managedUserId", managedUser.getId()));
+        return Set.copyOf(executeAndCloseResultList(query, String.class));
+    }
+
+    private Set<String> getEffectivePermissions(final OidcUser oidcUser) {
+        final Query<?> query = pm.newQuery(Query.SQL, /* language=SQL */ """
+                SELECT "PERMISSION"."NAME"
+                  FROM "OIDCUSER"
+                 INNER JOIN "OIDCUSERS_TEAMS"
+                    ON "OIDCUSERS_TEAMS"."OIDCUSERS_ID" = "OIDCUSER"."ID"
+                 INNER JOIN "TEAM"
+                    ON "TEAM"."ID" = "OIDCUSERS_TEAMS"."TEAM_ID"
+                 INNER JOIN "TEAMS_PERMISSIONS"
+                    ON "TEAMS_PERMISSIONS"."TEAM_ID" = "TEAM"."ID"
+                 INNER JOIN "PERMISSION"
+                    ON "PERMISSION"."ID" = "TEAMS_PERMISSIONS"."PERMISSION_ID"
+                 WHERE "OIDCUSER"."ID" = :oidcUserId
+                 UNION ALL
+                SELECT "PERMISSION"."NAME"
+                  FROM "OIDCUSER"
+                 INNER JOIN "OIDCUSERS_PERMISSIONS"
+                    ON "OIDCUSERS_PERMISSIONS"."OIDCUSER_ID" = "OIDCUSER"."ID"
+                 INNER JOIN "PERMISSION"
+                    ON "PERMISSION"."ID" = "OIDCUSERS_PERMISSIONS"."PERMISSION_ID"
+                 WHERE "OIDCUSER"."ID" = :oidcUserId
+                """);
+        query.setNamedParameters(Map.of("oidcUserId", oidcUser.getId()));
+        return Set.copyOf(executeAndCloseResultList(query, String.class));
     }
 
     /**
