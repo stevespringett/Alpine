@@ -31,7 +31,7 @@ public class ApiKeyGeneratorTest {
     @Test
     void shouldGenerateApiKey() {
         final ApiKey apiKey = ApiKeyGenerator.generate(null);
-        assertThat(apiKey.getPublicId()).matches("^[A-Za-z_0-9]{5}$");
+        assertThat(apiKey.getPublicId()).matches("^[A-Za-z_0-9]{8}$");
         assertThat(apiKey.getSecret()).matches("^[A-Za-z0-9]{32}$");
         assertThat(apiKey.getSecretHash()).matches("^[a-z0-9]{64}$");
         assertThat(apiKey.getKey()).matches("^alpine_%s_%s$".formatted(
@@ -40,6 +40,15 @@ public class ApiKeyGeneratorTest {
 
     @Test
     void shouldUseProvidedPublicId() {
+        final ApiKey apiKey = ApiKeyGenerator.generate("b0RmmAbC");
+        assertThat(apiKey.getPublicId()).isEqualTo("b0RmmAbC");
+        assertThat(apiKey.getSecret()).matches("^[A-Za-z0-9]{32}$");
+        assertThat(apiKey.getSecretHash()).matches("^[a-z0-9]{64}$");
+        assertThat(apiKey.getKey()).matches("^alpine_b0RmmAbC_%s$".formatted(Pattern.quote(apiKey.getSecret())));
+    }
+
+    @Test
+    void shouldUseProvidedLegacyPublicId() {
         final ApiKey apiKey = ApiKeyGenerator.generate("b0Rmm");
         assertThat(apiKey.getPublicId()).isEqualTo("b0Rmm");
         assertThat(apiKey.getSecret()).matches("^[A-Za-z0-9]{32}$");
@@ -51,7 +60,7 @@ public class ApiKeyGeneratorTest {
     void shouldThrowWhenProvidedPublicIdIsInvalid() {
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> ApiKeyGenerator.generate("foo"))
-                .withMessage("Expected provided public ID foo to be null or having length of 5, but has length of 3");
+                .withMessage("Expected provided public ID foo to be null or having length of 8 or 5, but has length of 3");
     }
 
 }

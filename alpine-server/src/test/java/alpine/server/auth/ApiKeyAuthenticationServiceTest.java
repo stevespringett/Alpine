@@ -163,7 +163,7 @@ public class ApiKeyAuthenticationServiceTest {
         }
         final ContainerRequest containerRequestMock = mock(ContainerRequest.class);
         when(containerRequestMock.getHeaderString("X-Api-Key"))
-                .thenReturn(ApiKey.PREFIX + apiKey.getPublicId() + "0".repeat(ApiKey.API_KEY_LENGTH - ApiKey.PUBLIC_ID_LENGTH));
+                .thenReturn(ApiKey.PREFIX + apiKey.getPublicId() + "0".repeat(ApiKey.API_KEY_LENGTH - ApiKey.LEGACY_PUBLIC_ID_LENGTH));
         final ApiKeyAuthenticationService authService = new ApiKeyAuthenticationService(containerRequestMock, false);
 
         assertThatExceptionOfType(AuthenticationException.class)
@@ -179,7 +179,7 @@ public class ApiKeyAuthenticationServiceTest {
         }
         final ContainerRequest containerRequestMock = mock(ContainerRequest.class);
         when(containerRequestMock.getHeaderString("X-Api-Key"))
-                .thenReturn(ApiKey.PREFIX + "0".repeat(ApiKey.PUBLIC_ID_LENGTH) + apiKey.getSecret());
+                .thenReturn(ApiKey.PREFIX + "0".repeat(ApiKey.LEGACY_PUBLIC_ID_LENGTH) + apiKey.getSecret());
         final ApiKeyAuthenticationService authService = new ApiKeyAuthenticationService(containerRequestMock, false);
 
         assertThatExceptionOfType(AuthenticationException.class)
@@ -222,7 +222,7 @@ public class ApiKeyAuthenticationServiceTest {
         final var apiKey = createLegacyApiKey(true);
         final ContainerRequest containerRequestMock = mock(ContainerRequest.class);
         when(containerRequestMock.getHeaderString("X-Api-Key"))
-                .thenReturn(ApiKey.PREFIX + apiKey.getPublicId() + "0".repeat(ApiKey.API_KEY_LENGTH - ApiKey.PUBLIC_ID_LENGTH));
+                .thenReturn(ApiKey.PREFIX + apiKey.getPublicId() + "0".repeat(ApiKey.API_KEY_LENGTH - ApiKey.LEGACY_PUBLIC_ID_LENGTH));
         final ApiKeyAuthenticationService authService = new ApiKeyAuthenticationService(containerRequestMock, false);
 
         assertThatExceptionOfType(AuthenticationException.class)
@@ -234,7 +234,7 @@ public class ApiKeyAuthenticationServiceTest {
         final var apiKey = createLegacyApiKey(true);
         final ContainerRequest containerRequestMock = mock(ContainerRequest.class);
         when(containerRequestMock.getHeaderString("X-Api-Key"))
-                .thenReturn(ApiKey.PREFIX + "0".repeat(ApiKey.PUBLIC_ID_LENGTH) + apiKey.getSecret());
+                .thenReturn(ApiKey.PREFIX + "0".repeat(ApiKey.LEGACY_PUBLIC_ID_LENGTH) + apiKey.getSecret());
         final ApiKeyAuthenticationService authService = new ApiKeyAuthenticationService(containerRequestMock, false);
 
         assertThatExceptionOfType(AuthenticationException.class)

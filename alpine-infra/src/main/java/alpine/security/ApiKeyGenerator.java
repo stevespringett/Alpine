@@ -30,6 +30,7 @@ import static java.util.Objects.requireNonNullElseGet;
 
 /**
  * Class used to securely generate API keys.
+ *
  * @author Steve Springett
  * @since 1.0.0
  */
@@ -40,7 +41,8 @@ public final class ApiKeyGenerator {
     /**
      * Private constructor
      */
-    private ApiKeyGenerator() { }
+    private ApiKeyGenerator() {
+    }
 
     /**
      * @param publicId The public ID of an existing key. May be {@code null}.
@@ -49,10 +51,12 @@ public final class ApiKeyGenerator {
      * @since 3.2.0
      */
     public static ApiKey generate(String publicId) {
-        if (publicId != null && publicId.length() != ApiKey.PUBLIC_ID_LENGTH) {
+        if (publicId != null
+            && publicId.length() != ApiKey.PUBLIC_ID_LENGTH
+            && publicId.length() != ApiKey.LEGACY_PUBLIC_ID_LENGTH) {
             throw new IllegalArgumentException(
-                    "Expected provided public ID %s to be null or having length of %s, but has length of %d".formatted(
-                            publicId, ApiKey.PUBLIC_ID_LENGTH, publicId.length()));
+                    "Expected provided public ID %s to be null or having length of %d or %d, but has length of %d".formatted(
+                            publicId, ApiKey.PUBLIC_ID_LENGTH, ApiKey.LEGACY_PUBLIC_ID_LENGTH, publicId.length()));
         }
 
         // NB: The default prefix value has historically been "alpine_".
