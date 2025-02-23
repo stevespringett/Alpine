@@ -28,6 +28,19 @@ class ApiKeyDecoderTest {
 
     @Test
     void shouldDecodeNewApiKeyFormat() {
+        final String rawKey = "alpine_b0RmmAbC_tl3ZWy61Znje6jNl7PwEQxSn4bSxpZBA";
+        final ApiKey decodedKey = ApiKeyDecoder.decode(rawKey);
+
+        assertThat(decodedKey).isNotNull();
+        assertThat(decodedKey.getPublicId()).isEqualTo("b0RmmAbC");
+        assertThat(decodedKey.getSecret()).isEqualTo("tl3ZWy61Znje6jNl7PwEQxSn4bSxpZBA");
+        assertThat(decodedKey.getSecretHash()).isEqualTo("95072472e6928f97b069fc3ec59b87532a7e97898a404053043536082d3f7463");
+        assertThat(decodedKey.getKey()).isEqualTo("alpine_b0RmmAbC_tl3ZWy61Znje6jNl7PwEQxSn4bSxpZBA");
+        assertThat(decodedKey.isLegacy()).isFalse();
+    }
+
+    @Test
+    void shouldDecodeNewApiKeyFormatWithLegacyPublicId() {
         final String rawKey = "alpine_b0Rmm_tl3ZWy61Znje6jNl7PwEQxSn4bSxpZBA";
         final ApiKey decodedKey = ApiKeyDecoder.decode(rawKey);
 
@@ -83,11 +96,11 @@ class ApiKeyDecoderTest {
 
     @Test
     void shouldThrowWhenPublicIdHasInvalidFormat() {
-        final String rawKey = "alpine_b0Rmm666_tl3ZWy61Znje6jNl7PwEQxSn4bSxpZBA";
+        final String rawKey = "alpine_b0Rmm66_tl3ZWy61Znje6jNl7PwEQxSn4bSxpZBA";
 
         assertThatExceptionOfType(InvalidApiKeyFormatException.class)
                 .isThrownBy(() -> ApiKeyDecoder.decode(rawKey))
-                .withMessage("Expected public ID of exactly 5 characters, but got 8");
+                .withMessage("Expected public ID of 8 or 5 characters, but got 7");
     }
 
     @Test

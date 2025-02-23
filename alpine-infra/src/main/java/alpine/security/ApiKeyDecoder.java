@@ -42,14 +42,14 @@ public final class ApiKeyDecoder {
         apiKey.setKey(apiKeyString);
 
         if (apiKeyString.length() == ApiKey.LEGACY_FULL_KEY_LENGTH) {
-            apiKey.setPublicId(apiKeyString.substring(0, ApiKey.PUBLIC_ID_LENGTH));
-            apiKey.setSecret(apiKeyString.substring(ApiKey.PUBLIC_ID_LENGTH));
+            apiKey.setPublicId(apiKeyString.substring(0, ApiKey.LEGACY_PUBLIC_ID_LENGTH));
+            apiKey.setSecret(apiKeyString.substring(ApiKey.LEGACY_PUBLIC_ID_LENGTH));
             apiKey.setSecretHash(ApiKeyGenerator.hashSecret(apiKey.getSecret()));
             apiKey.setLegacy(true);
             return apiKey;
         } else if (apiKeyString.length() == ApiKey.LEGACY_WITH_PREFIX_FULL_KEY_LENGTH) {
-            apiKey.setPublicId(apiKeyString.substring(ApiKey.PREFIX_LENGTH, ApiKey.PREFIX_LENGTH + ApiKey.PUBLIC_ID_LENGTH));
-            apiKey.setSecret(apiKeyString.substring(ApiKey.PREFIX_LENGTH + ApiKey.PUBLIC_ID_LENGTH));
+            apiKey.setPublicId(apiKeyString.substring(ApiKey.PREFIX_LENGTH, ApiKey.PREFIX_LENGTH + ApiKey.LEGACY_PUBLIC_ID_LENGTH));
+            apiKey.setSecret(apiKeyString.substring(ApiKey.PREFIX_LENGTH + ApiKey.LEGACY_PUBLIC_ID_LENGTH));
             apiKey.setSecretHash(ApiKeyGenerator.hashSecret(apiKey.getSecret()));
             apiKey.setLegacy(true);
             return apiKey;
@@ -58,17 +58,18 @@ public final class ApiKeyDecoder {
         final String[] parts = apiKeyString.split(String.valueOf(ApiKey.API_KEY_SEPARATOR));
         if (parts.length != 3) {
             throw new InvalidApiKeyFormatException("Expected exactly 3 parts, but got " + parts.length);
-        } else if (parts[1].length() != ApiKey.PUBLIC_ID_LENGTH) {
+        } else if (parts[1].length() != ApiKey.PUBLIC_ID_LENGTH
+                   && parts[1].length() != ApiKey.LEGACY_PUBLIC_ID_LENGTH) {
             throw new InvalidApiKeyFormatException(
-                    "Expected public ID of exactly %d characters, but got %d".formatted(
-                            ApiKey.PUBLIC_ID_LENGTH, parts[1].length()));
+                    "Expected public ID of %d or %d characters, but got %d".formatted(
+                            ApiKey.PUBLIC_ID_LENGTH, ApiKey.LEGACY_PUBLIC_ID_LENGTH, parts[1].length()));
         } else if (parts[2].length() != ApiKey.API_KEY_LENGTH
-                   && parts[2].length() != ApiKey.API_KEY_LENGTH - ApiKey.PUBLIC_ID_LENGTH) {
+                   && parts[2].length() != ApiKey.API_KEY_LENGTH - ApiKey.LEGACY_PUBLIC_ID_LENGTH) {
             // Legacy keys that were migrated to the new format have their first $PUBLIC_ID_LENGTH
             // characters re-purposed as public ID, and are thus shorter than normal.
             throw new InvalidApiKeyFormatException(
                     "Expected secret of %d or %d characters, but got %d".formatted(
-                            ApiKey.API_KEY_LENGTH, ApiKey.API_KEY_LENGTH - ApiKey.PUBLIC_ID_LENGTH, parts[2].length()));
+                            ApiKey.API_KEY_LENGTH, ApiKey.API_KEY_LENGTH - ApiKey.LEGACY_PUBLIC_ID_LENGTH, parts[2].length()));
         }
 
         apiKey.setPublicId(parts[1]);
