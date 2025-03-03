@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>us.springett</groupId>
+        <artifactId>alpine-parent</artifactId>
+        <version>3.2.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>alpine-test</artifactId>
+    <packaging>jar</packaging>
+    <version>3.2.0-SNAPSHOT</version>
+
+    <name>alpine-test</name>
+    <description>
+        An opinionated scaffolding library that jumpstarts Java projects with an API-first design,
+        secure defaults, and minimal dependencies.
+    </description>
+    <url>https://github.com/stevespringett/Alpine</url>
+    <inceptionYear>2016</inceptionYear>
+
+    <properties>
+        <lib.junit4.version>4.13.2</lib.junit4.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>us.springett</groupId>
+            <artifactId>alpine-common</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${lib.junit4.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <version>${lib.junit-jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>
