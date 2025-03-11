@@ -191,7 +191,7 @@
         <lib.owasp.security-logging.version>1.1.7</lib.owasp.security-logging.version>
         <lib.parsson.version>1.1.7</lib.parsson.version>
         <lib.slf4j.version>2.0.17</lib.slf4j.version>
-        <lib.swagger.version>2.2.28</lib.swagger.version>
+        <lib.swagger.version>2.2.29</lib.swagger.version>
         <!-- Unit test libraries -->
         <lib.junit-jupiter.version>5.11.4</lib.junit-jupiter.version>
         <lib.junit-pioneer.version>2.3.0</lib.junit-pioneer.version>
