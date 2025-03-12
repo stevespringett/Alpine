@@ -24,16 +24,17 @@ import alpine.model.LdapUser;
 import alpine.model.OidcUser;
 import alpine.model.Permission;
 import alpine.security.crypto.KeyManager;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
+
 import org.owasp.security.logging.SecurityMarkers;
 
 import javax.crypto.SecretKey;
@@ -42,6 +43,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -56,19 +58,19 @@ public class JsonWebToken {
 
     private static final Logger LOGGER = Logger.getLogger(JsonWebToken.class);
     private static final String IDENTITY_PROVIDER_CLAIM = "idp";
-    private static String ISSUER = "Alpine";
+    private static final String PERMISSIONS_CLAIM = "permissions";
+    private static String ISSUER = Config.getInstance().getApplicationName();
     static {
-        if (Config.getInstance().getApplicationName() != null) {
-            ISSUER = Config.getInstance().getApplicationName();
-        } else {
-            Config.getInstance().getFrameworkName();
-        }
+        ISSUER = ISSUER != null ? ISSUER : Config.getInstance().getFrameworkName();
     }
 
     private final SecretKey key;
     private String subject;
+    private int ttl = Config.getInstance().getPropertyAsInt(Config.AlpineKey.AUTH_JWT_TTL_SECONDS);
     private Date expiration;
     private IdentityProvider identityProvider;
+    private List<Permission> permissions;
+    private Map<String, Object> extraClaims;
 
     /**
      * Constructs a new JsonWekToken object using the specified SecretKey which can
@@ -95,6 +97,90 @@ public class JsonWebToken {
      */
     public JsonWebToken() {
         this(KeyManager.getInstance().getSecretKey());
+    }
+
+    /**
+     * Finalize and generate the encoded String representation of the JsonWebToken.
+     *
+     * @return a String representation of the generated token
+     * @since 3.2.0
+     */
+    public String build() {
+        final Date now = new Date();
+        this.expiration = addSeconds(now, ttl);
+
+        return Jwts.builder().subject(subject)
+                .issuedAt(now)
+                .issuer(ISSUER)
+                .expiration(expiration)
+                .claim(PERMISSIONS_CLAIM, this.permissions == null ? null
+                        : permissions.stream()
+                                .map(Permission::getName)
+                                .collect(Collectors.joining(",")))
+                .claim(IDENTITY_PROVIDER_CLAIM, identityProvider)
+                .claims(extraClaims)
+                .signWith(key)
+                .compact();
+    }
+
+    /**
+     * Builder method to set the value of the {@code exp} claim.
+     *
+     * @param date the expiration date
+     * @return the updated JsonWebToken object
+     * @since 3.2.0
+     */
+    public JsonWebToken expiration(Date date) {
+        this.expiration = date;
+        return this;
+    }
+
+    /**
+     * Builder method to set claims explicitly.
+     *
+     * @param extraClaims a Map of claims to set
+     * @return the updated JsonWebToken object
+     * @since 3.2.0
+     */
+    public JsonWebToken extraClaims(Map<String, Object> extraClaims) {
+        this.extraClaims = extraClaims;
+        return this;
+    }
+
+    /**
+     * Builder method to set the value of the {@code idp} claim.
+     *
+     * @param identityProvider the {@link IdentityProvider} to set
+     * @return the updated JsonWebToken object
+     * @since 3.2.0
+     */
+    public JsonWebToken identityProvider(IdentityProvider identityProvider) {
+        this.identityProvider = identityProvider;
+        return this;
+    }
+
+    /**
+     * Builder method to set the value of the {@code permissions} claim.
+     *
+     * @param permissions the list of {@link Permission}s to set
+     * @return the updated JsonWebToken object
+     * @since 3.2.0
+     */
+    public JsonWebToken permissions(List<Permission> permissions) {
+        this.permissions = permissions;
+        return this;
+    }
+
+    /**
+     * Builder method to set the value of the {@code sub} claim.
+     *
+     * @param subject the subject of the token
+     * @return the updated JsonWebToken object
+     * @since 3.2.0
+     */
+    public JsonWebToken subject(String subject) {
+        this.subject = subject;
+        return this;
     }
 
     /**
@@ -132,9 +218,10 @@ public class JsonWebToken {
      * @return a String representation of the generated token
      * @since 1.8.0
      */
-    public String createToken(final Principal principal, final List<Permission> permissions,
+    public String createToken(
+            final Principal principal,
+            final List<Permission> permissions,
             final IdentityProvider identityProvider) {
-        final int ttl = Config.getInstance().getPropertyAsInt(Config.AlpineKey.AUTH_JWT_TTL_SECONDS);
         return createToken(principal, permissions, identityProvider, ttl);
     }
 
@@ -149,31 +236,43 @@ public class JsonWebToken {
      * @return a String representation of the generated token
      * @since 3.0.0
      */
-    public String createToken(final Principal principal, final List<Permission> permissions, final IdentityProvider identityProvider, final int ttlSeconds) {
-        final Date now = new Date();
-        final JwtBuilder jwtBuilder = Jwts.builder();
-        jwtBuilder.subject(principal.getName());
-        jwtBuilder.issuer(ISSUER);
-        jwtBuilder.issuedAt(now);
-        jwtBuilder.expiration(addSeconds(now, ttlSeconds));
-        if (permissions != null) {
-            jwtBuilder.claim("permissions", permissions.stream()
-                    .map(Permission::getName)
-                    .collect(Collectors.joining(","))
-            );
-        }
-        if (identityProvider != null) {
-            jwtBuilder.claim(IDENTITY_PROVIDER_CLAIM, identityProvider.name());
-        } else {
-            if (principal instanceof LdapUser) {
-                jwtBuilder.claim(IDENTITY_PROVIDER_CLAIM, IdentityProvider.LDAP.name());
-            } else if (principal instanceof OidcUser) {
-                jwtBuilder.claim(IDENTITY_PROVIDER_CLAIM, IdentityProvider.OPENID_CONNECT.name());
-            } else {
-                jwtBuilder.claim(IDENTITY_PROVIDER_CLAIM, IdentityProvider.LOCAL.name());
-            }
-        }
-        return jwtBuilder.signWith(key).compact();
+    public String createToken(
+            final Principal principal,
+            final List<Permission> permissions,
+            final IdentityProvider identityProvider,
+            final int ttlSeconds) {
+        return createToken(principal, permissions, identityProvider, ttlSeconds, null);
+    }
+
+    /**
+     * Creates a new JWT for the specified principal. Token is signed using
+     * the SecretKey with an HMAC 256 algorithm.
+     *
+     * @param principal the Principal to create the token for
+     * @param permissions the effective list of permissions for the principal
+     * @param identityProvider the identity provider the principal was authenticated with. If null, it will be derived from principal
+     * @param ttlSeconds the token time-to-live in seconds
+     * @param extraClaims map of additional claims to include
+     * @return a String representation of the generated token
+     * @since 3.2.0
+     */
+    public String createToken(
+            final Principal principal,
+            final List<Permission> permissions,
+            final IdentityProvider identityProvider,
+            final int ttlSeconds,
+            final Map<String, Object> extraClaims) {
+        this.ttl = ttlSeconds;
+
+        return this.subject(principal.getName())
+                .permissions(permissions)
+                .identityProvider(Objects.requireNonNullElse(identityProvider, switch (principal) {
+                    case LdapUser user -> IdentityProvider.LDAP;
+                    case OidcUser user -> IdentityProvider.OPENID_CONNECT;
+                    default -> IdentityProvider.LOCAL;
+                }))
+                .extraClaims(extraClaims)
+                .build();
     }
 
     /**
@@ -185,9 +284,10 @@ public class JsonWebToken {
      * @since 1.0.0
      */
     public String createToken(final Map<String, Object> claims) {
-        final JwtBuilder jwtBuilder = Jwts.builder();
-        jwtBuilder.claims(claims);
-        return jwtBuilder.signWith(key).compact();
+        return Jwts.builder()
+                .claims(claims)
+                .signWith(key)
+                .compact();
     }
 
     /**
@@ -202,9 +302,12 @@ public class JsonWebToken {
         try {
             final JwtParser jwtParser = Jwts.parser().verifyWith(key).build();
             final Jws<Claims> claims = jwtParser.parseSignedClaims(token);
-            this.subject = claims.getPayload().getSubject();
-            this.expiration = claims.getPayload().getExpiration();
-            this.identityProvider = IdentityProvider.forName(claims.getPayload().get(IDENTITY_PROVIDER_CLAIM, String.class));
+            final Claims payload = claims.getPayload();
+
+            this.subject(payload.getSubject())
+                    .expiration(payload.getExpiration())
+                    .identityProvider(IdentityProvider.forName(payload.get(IDENTITY_PROVIDER_CLAIM, String.class)));
+
             return true;
         } catch (SignatureException e) {
             LOGGER.info(SecurityMarkers.SECURITY_FAILURE, "Received token that did not pass signature verification");
@@ -216,6 +319,7 @@ public class JsonWebToken {
         } catch (UnsupportedJwtException | IllegalArgumentException e) {
             LOGGER.error(SecurityMarkers.SECURITY_FAILURE, e.getMessage());
         }
+
         return false;
     }
 
@@ -229,7 +333,7 @@ public class JsonWebToken {
     private Date addSeconds(final Date date, final int seconds) {
         final Calendar cal = Calendar.getInstance();
         cal.setTime(date);
-        cal.add(Calendar.SECOND, seconds); //minus number would decrement the seconds
+        cal.add(Calendar.SECOND, seconds); // minus number would decrement the seconds
         return cal.getTime();
     }
 
@@ -255,6 +359,22 @@ public class JsonWebToken {
      */
     public IdentityProvider getIdentityProvider() {
         return identityProvider;
+    }
+
+    /**
+     * Returns the permissions of the token.
+     * @return list of {@link Permission}s
+     */
+    public List<Permission> getPermissions() {
+        return permissions;
+    }
+
+    /**
+     * Returns the extra claims of the token.
+     * @return map of claims
+     */
+    public Map<String, Object> getExtraClaims() {
+        return extraClaims;
     }
 
 }
