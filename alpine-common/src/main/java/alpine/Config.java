@@ -168,6 +168,7 @@ public class Config {
         OIDC_TEAM_SYNCHRONIZATION              ("alpine.oidc.team.synchronization", false),
         OIDC_TEAMS_CLAIM                       ("alpine.oidc.teams.claim",       "groups"),
         OIDC_TEAMS_DEFAULT                     ("alpine.oidc.teams.default",         null),
+        OIDC_AUTH_CUSTOMIZER                   ("alpine.oidc.auth.customizer",       "alpine.server.auth.DefaultOidcAuthenticationCustomizer"),
         HTTP_PROXY_ADDRESS                     ("alpine.http.proxy.address",         null),
         HTTP_PROXY_PORT                        ("alpine.http.proxy.port",            null),
         HTTP_PROXY_USERNAME                    ("alpine.http.proxy.username",        null),
