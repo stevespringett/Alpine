@@ -20,9 +20,6 @@ package alpine.server.filters;
 
 import alpine.common.logging.Logger;
 import alpine.model.ApiKey;
-import alpine.model.LdapUser;
-import alpine.model.ManagedUser;
-import alpine.model.OidcUser;
 import alpine.model.UserPrincipal;
 import alpine.persistence.AlpineQueryManager;
 import alpine.server.auth.PermissionRequired;
@@ -37,20 +34,23 @@ import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
 import java.security.Principal;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * A filter that ensures that all principals making calls that are going
  * through this filter have the necessary permissions to do so.
  *
- * @see AuthorizationFeature
  * @author Steve Springett
+ * @see AuthorizationFeature
  * @since 1.0.0
  */
 @Priority(Priorities.AUTHORIZATION)
 public class AuthorizationFilter implements ContainerRequestFilter {
 
-    // Setup logging
     private static final Logger LOGGER = Logger.getLogger(AuthorizationFilter.class);
+
+    public static final String EFFECTIVE_PERMISSIONS_PROPERTY = "effectivePermissions";
 
     @Context
     private ResourceInfo resourceInfo;
@@ -67,42 +67,34 @@ public class AuthorizationFilter implements ContainerRequestFilter {
             }
 
             final PermissionRequired annotation = resourceInfo.getResourceMethod().getDeclaredAnnotation(PermissionRequired.class);
-            final String[] permissions = annotation.value();
+            final Set<String> permissions = Set.of(annotation.value());
 
-            try (AlpineQueryManager qm = new AlpineQueryManager()) {
-                if (principal instanceof ApiKey) {
-                    final ApiKey apiKey = (ApiKey)principal;
-                    for (final String permission: permissions) {
-                        if (qm.hasPermission(apiKey, permission)) {
-                            return;
-                        }
-                    }
-                    LOGGER.info(SecurityMarkers.SECURITY_FAILURE, "Unauthorized access attempt made by API Key "
-                            + apiKey.getMaskedKey() + " to " + ((ContainerRequest) requestContext).getRequestUri().toString());
-                } else {
-                    UserPrincipal user = null;
-                    if (principal instanceof ManagedUser) {
-                        user = qm.getManagedUser(((ManagedUser) principal).getUsername());
-                    } else if (principal instanceof LdapUser) {
-                        user = qm.getLdapUser(((LdapUser) principal).getUsername());
-                    } else if (principal instanceof OidcUser) {
-                        user = qm.getOidcUser(((OidcUser) principal).getUsername());
-                    }
-                    if (user == null) {
-                        LOGGER.info(SecurityMarkers.SECURITY_FAILURE, "A request was made but the system in unable to find the user principal");
-                        requestContext.abortWith(Response.status(Response.Status.FORBIDDEN).build());
-                        return;
-                    }
-                    for (final String permission : permissions) {
-                        if (qm.hasPermission(user, permission, true)) {
-                            return;
-                        }
-                    }
-                    LOGGER.info(SecurityMarkers.SECURITY_FAILURE, "Unauthorized access attempt made by "
-                            + user.getUsername() + " to " + ((ContainerRequest) requestContext).getRequestUri().toString());
-                }
+            final Set<String> effectivePermissions;
+            try (final var qm = new AlpineQueryManager()) {
+                effectivePermissions = qm.getEffectivePermissions(principal);
             }
-            requestContext.abortWith(Response.status(Response.Status.FORBIDDEN).build());
+
+            final boolean hasNoRequiredPermission = Collections.disjoint(permissions, effectivePermissions);
+            if (hasNoRequiredPermission) {
+                final String requestUri = requestContext.getUriInfo().getRequestUri().toString();
+
+                if (principal instanceof final ApiKey apiKey) {
+                    LOGGER.info(
+                            SecurityMarkers.SECURITY_FAILURE,
+                            "Unauthorized access attempt made by API Key %s to %s".formatted(
+                                    apiKey.getMaskedKey(), requestUri));
+                } else if (principal instanceof final UserPrincipal user) {
+                    LOGGER.info(
+                            SecurityMarkers.SECURITY_FAILURE,
+                            "Unauthorized access attempt made by %s to %s".formatted(user.getUsername(), requestUri));
+                } else {
+                    throw new IllegalStateException("Unexpected principal type: " + principal.getClass().getName());
+                }
+
+                requestContext.abortWith(Response.status(Response.Status.FORBIDDEN).build());
+            } else {
+                requestContext.setProperty(EFFECTIVE_PERMISSIONS_PROPERTY, effectivePermissions);
+            }
         }
     }
 

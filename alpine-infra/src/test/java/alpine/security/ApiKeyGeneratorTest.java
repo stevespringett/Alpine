@@ -18,33 +18,49 @@
  */
 package alpine.security;
 
-import alpine.Config;
 import alpine.model.ApiKey;
-
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.regex.Pattern;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+
 public class ApiKeyGeneratorTest {
 
-    private Pattern pattern = Pattern.compile("^[A-Za-z_0-9]*$");
-    private String apiKeyPrefix = Config.getInstance().getProperty(Config.AlpineKey.API_KEY_PREFIX);
-    private static final int PUBLIC_ID_LENGTH = ApiKey.PUBLIC_ID_LENGTH;
-
     @Test
-    public void defaultGenerateTest() {
-        String key = ApiKeyGenerator.generate();
-        Assertions.assertEquals(apiKeyPrefix.length() + 32 + PUBLIC_ID_LENGTH + 1, key.length());
-        Assertions.assertTrue(key.startsWith(apiKeyPrefix));
-        Assertions.assertTrue(pattern.matcher(key).matches());
+    void shouldGenerateApiKey() {
+        final ApiKey apiKey = ApiKeyGenerator.generate(null);
+        assertThat(apiKey.getPublicId()).matches("^[A-Za-z_0-9]{8}$");
+        assertThat(apiKey.getSecret()).matches("^[A-Za-z0-9]{32}$");
+        assertThat(apiKey.getSecretHash()).matches("^[a-z0-9]{64}$");
+        assertThat(apiKey.getKey()).matches("^alpine_%s_%s$".formatted(
+                Pattern.quote(apiKey.getPublicId()), Pattern.quote(apiKey.getSecret())));
     }
 
     @Test
-    public void generateTest() {
-        String key = ApiKeyGenerator.generate(5, 4096);
-        Assertions.assertEquals(apiKeyPrefix.length() + 5 + 4096 + 1, key.length());
-        Assertions.assertTrue(key.startsWith(apiKeyPrefix));
-        Assertions.assertTrue(pattern.matcher(key).matches());
+    void shouldUseProvidedPublicId() {
+        final ApiKey apiKey = ApiKeyGenerator.generate("b0RmmAbC");
+        assertThat(apiKey.getPublicId()).isEqualTo("b0RmmAbC");
+        assertThat(apiKey.getSecret()).matches("^[A-Za-z0-9]{32}$");
+        assertThat(apiKey.getSecretHash()).matches("^[a-z0-9]{64}$");
+        assertThat(apiKey.getKey()).matches("^alpine_b0RmmAbC_%s$".formatted(Pattern.quote(apiKey.getSecret())));
     }
+
+    @Test
+    void shouldUseProvidedLegacyPublicId() {
+        final ApiKey apiKey = ApiKeyGenerator.generate("b0Rmm");
+        assertThat(apiKey.getPublicId()).isEqualTo("b0Rmm");
+        assertThat(apiKey.getSecret()).matches("^[A-Za-z0-9]{32}$");
+        assertThat(apiKey.getSecretHash()).matches("^[a-z0-9]{64}$");
+        assertThat(apiKey.getKey()).matches("^alpine_b0Rmm_%s$".formatted(Pattern.quote(apiKey.getSecret())));
+    }
+
+    @Test
+    void shouldThrowWhenProvidedPublicIdIsInvalid() {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> ApiKeyGenerator.generate("foo"))
+                .withMessage("Expected provided public ID foo to be null or having length of 8 or 5, but has length of 3");
+    }
+
 }

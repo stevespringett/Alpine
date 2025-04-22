@@ -25,16 +25,20 @@ import alpine.server.auth.AllowApiKeyInQueryParameter;
 import alpine.server.auth.JwtAuthenticationService;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.owasp.security.logging.SecurityMarkers;
+import org.slf4j.MDC;
 
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.HttpMethod;
 import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.container.ContainerResponseContext;
+import jakarta.ws.rs.container.ContainerResponseFilter;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.Context;
 import javax.naming.AuthenticationException;
+import java.io.IOException;
 import java.security.Principal;
 
 /**
@@ -46,7 +50,7 @@ import java.security.Principal;
  * @since 1.0.0
  */
 @Priority(Priorities.AUTHENTICATION)
-public class AuthenticationFilter implements ContainerRequestFilter {
+public class AuthenticationFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
     // Setup logging
     private static final Logger LOGGER = Logger.getLogger(AuthenticationFilter.class);
@@ -95,8 +99,14 @@ public class AuthenticationFilter implements ContainerRequestFilter {
                 requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
             } else {
                 requestContext.setProperty("Principal", principal);
+                MDC.put("principal", principal.getName());
             }
         }
+    }
+
+    @Override
+    public void filter(final ContainerRequestContext requestContext, final ContainerResponseContext responseContext) throws IOException {
+        MDC.remove("principal");
     }
 
 }
