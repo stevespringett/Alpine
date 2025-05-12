@@ -184,7 +184,7 @@
         <lib.jsr305.version>3.0.2</lib.jsr305.version>
         <lib.logback.version>1.5.18</lib.logback.version>
         <lib.logstash-logback-encoder.version>8.1</lib.logstash-logback-encoder.version>
-        <lib.micrometer.version>1.14.6</lib.micrometer.version>
+        <lib.micrometer.version>1.14.7</lib.micrometer.version>
         <lib.microprofile-health-api.version>4.0.1</lib.microprofile-health-api.version>
         <lib.nimbus-oauth2-oidc-sdk.version>11.23.1</lib.nimbus-oauth2-oidc-sdk.version>
         <lib.owasp.encoder.version>1.3.1</lib.owasp.encoder.version>
