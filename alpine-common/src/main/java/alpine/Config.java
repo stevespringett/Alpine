@@ -186,7 +186,8 @@ public class Config {
         CORS_MAX_AGE                           ("alpine.cors.max.age",               3600),
         WATCHDOG_LOGGING_INTERVAL              ("alpine.watchdog.logging.interval",  0),
         API_KEY_PREFIX                         ("alpine.api.key.prefix",             "alpine_"),
-        AUTH_JWT_TTL_SECONDS                   ("alpine.auth.jwt.ttl.seconds",       7 * 24 * 60 * 60);
+        AUTH_JWT_TTL_SECONDS                   ("alpine.auth.jwt.ttl.seconds",       7 * 24 * 60 * 60),
+        USERNAMEPASSWORD_ENABLED               ("alpine.usernamepassword.enabled",    true);
 
 
         private String propertyName;
