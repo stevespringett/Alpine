@@ -184,7 +184,6 @@ public class Config {
         CORS_EXPOSE_HEADERS                    ("alpine.cors.expose.headers",        "Origin, Content-Type, Authorization, X-Requested-With, Content-Length, Accept, Origin, X-Api-Key, X-Total-Count"),
         CORS_ALLOW_CREDENTIALS                 ("alpine.cors.allow.credentials",     true),
         CORS_MAX_AGE                           ("alpine.cors.max.age",               3600),
-        WATCHDOG_LOGGING_INTERVAL              ("alpine.watchdog.logging.interval",  0),
         API_KEY_PREFIX                         ("alpine.api.key.prefix",             "alpine_"),
         AUTH_JWT_TTL_SECONDS                   ("alpine.auth.jwt.ttl.seconds",       7 * 24 * 60 * 60);
 

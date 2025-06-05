@@ -22,8 +22,6 @@ import alpine.Config;
 import alpine.common.logging.Logger;
 import alpine.security.crypto.KeyManager;
 import org.glassfish.jersey.servlet.ServletContainer;
-import org.owasp.security.logging.util.IntervalLoggerController;
-import org.owasp.security.logging.util.SecurityLoggingFactory;
 import org.owasp.security.logging.util.SecurityUtil;
 
 import jakarta.servlet.ServletConfig;
@@ -61,12 +59,6 @@ public class AlpineServlet extends ServletContainer {
         // Log all Java System Properties
         SecurityUtil.logJavaSystemProperties();
 
-        // Determine if Watchdog logging is enabled and if so, start interval logging
-        final int interval = Config.getInstance().getPropertyAsInt(Config.AlpineKey.WATCHDOG_LOGGING_INTERVAL);
-        if (interval > 0) {
-            final IntervalLoggerController wd = SecurityLoggingFactory.getControllerInstance();
-            wd.start(interval * 1000); // Interval is defined in seconds
-        }
         LOGGER.info(Config.getInstance().getApplicationName() + " is ready");
     }
 
