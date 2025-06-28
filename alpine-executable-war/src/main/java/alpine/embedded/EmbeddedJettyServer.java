@@ -43,6 +43,7 @@ import java.util.Properties;
 
 /**
  * The primary class that starts an embedded Jetty server
+ *
  * @author Steve Springett
  * @since 1.0.0
  */
@@ -73,7 +74,7 @@ public final class EmbeddedJettyServer {
 
         final Server server = new Server();
         final HttpConfiguration httpConfig = new HttpConfiguration();
-        httpConfig.addCustomizer( new org.eclipse.jetty.server.ForwardedRequestCustomizer() ); // Add support for X-Forwarded headers
+        httpConfig.addCustomizer(new org.eclipse.jetty.server.ForwardedRequestCustomizer()); // Add support for X-Forwarded headers
 
         // Enable legacy (mimicking Jetty 9) URI compliance.
         // This is required to allow URL encoding in path segments, e.g. "/foo/bar%2Fbaz".
@@ -89,7 +90,7 @@ public final class EmbeddedJettyServer {
         //  here, the only viable long-term solution is to adapt REST APIs to follow Servlet API 6 spec.
         httpConfig.setUriCompliance(UriCompliance.LEGACY);
 
-        final HttpConnectionFactory connectionFactory = new HttpConnectionFactory( httpConfig );
+        final HttpConnectionFactory connectionFactory = new HttpConnectionFactory(httpConfig);
         final ServerConnector connector = new ServerConnector(server, connectionFactory);
         connector.setHost(host);
         connector.setPort(port);
@@ -102,6 +103,7 @@ public final class EmbeddedJettyServer {
         context.setErrorHandler(new ErrorHandler());
         context.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
         context.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern", ".*/[^/]*taglibs.*\\.jar$");
+        context.setThrowUnavailableOnStartupException(true);
 
         // Prevent loading of logging classes
         context.getProtectedClassMatcher().add("org.apache.log4j.");
