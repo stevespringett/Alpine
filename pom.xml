@@ -160,7 +160,7 @@
         <lib.alpine.executable.war.version>3.2.1-SNAPSHOT</lib.alpine.executable.war.version>
         <lib.angus-mail.version>2.0.3</lib.angus-mail.version>
         <lib.bcrypt.version>0.4</lib.bcrypt.version>
-        <lib.caffeine.version>3.2.1</lib.caffeine.version>
+        <lib.caffeine.version>3.2.2</lib.caffeine.version>
         <lib.commons.collections4.version>4.5.0</lib.commons.collections4.version>
         <lib.commons.io.version>2.19.0</lib.commons.io.version>
         <lib.commons.lang3.version>3.17.0</lib.commons.lang3.version>
