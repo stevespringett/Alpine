@@ -173,7 +173,7 @@
         <lib.jackson.version>2.20.0</lib.jackson.version>
         <lib.jakarta.version>10.0.0</lib.jakarta.version>
         <lib.jaxb-runtime.version>4.0.5</lib.jaxb-runtime.version>
-        <lib.jetty.version>12.1.0</lib.jetty.version>
+        <lib.jetty.version>12.1.1</lib.jetty.version>
         <lib.jdo.api.version>3.2.1</lib.jdo.api.version>
         <lib.jersey.version>3.1.11</lib.jersey.version>
         <lib.json-unit.version>4.1.1</lib.json-unit.version>
