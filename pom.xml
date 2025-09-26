@@ -60,9 +60,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:https://github.com/stevespringett/Alpine.git</connection>
-        <developerConnection>scm:git:https://github.com/stevespringett/Alpine.git</developerConnection>
-        <url>https://github.com/stevespringett/Alpine.git</url>
+        <connection>${scm.connection}</connection>
+        <developerConnection>${scm.developerConnection}</developerConnection>
+        <url>${scm.url}</url>
         <tag>HEAD</tag>
     </scm>
 
@@ -75,17 +75,6 @@
         <system>GitHub-Actions</system>
         <url>https://github.com/stevespringett/Alpine/actions</url>
     </ciManagement>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
 
     <properties>
         <!-- Maven Build Properties -->
@@ -200,6 +189,11 @@
 
         <!-- Logback configuration - Used for Embedded Jetty profile -->
         <logback.configuration.file>${project.build.directory}/classes/logback.xml</logback.configuration.file>
+
+        <!-- Default SCM Properties -->
+        <scm.connection>scm:git:https://github.com/stevespringett/Alpine.git</scm.connection>
+        <scm.developerConnection>scm:git:https://github.com/stevespringett/Alpine.git</scm.developerConnection>
+        <scm.url>https://github.com/stevespringett/Alpine.git</scm.url>
     </properties>
 
     <dependencyManagement>
@@ -623,6 +617,28 @@
                     <destFile>target/jacoco.exec</destFile>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>3.1.1</version>
+                <configuration>
+                    <projectVersionPolicyId>SemVerVersionPolicy</projectVersionPolicyId>
+                    <tagNameFormat>@{project.artifactId}-@{project.version}</tagNameFormat>
+                    <useReleaseProfile>false</useReleaseProfile>
+                    <releaseProfiles>release</releaseProfiles>
+                    <goals>deploy</goals>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.8.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <autoPublish>true</autoPublish>
+                    <publishingServerId>central</publishingServerId>
+                </configuration>
+            </plugin>
         </plugins>
 
         <resources>
@@ -642,6 +658,27 @@
     </build>
 
     <profiles>
+        <profile>
+            <!--
+              When running in GitHub Actions, the SCM connection must be via HTTPS
+              so that the GITHUB_TOKEN injected by Actions can be used to authenticate.
+
+              Connection URLs target the repository for which the Actions workflow is
+              running, enabling the release process to be tested in forks.
+            -->
+            <id>github-actions</id>
+            <activation>
+                <property>
+                    <name>env.GITHUB_ACTIONS</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <properties>
+                <scm.connection>scm:git:https://github.com/${env.GITHUB_REPOSITORY}.git</scm.connection>
+                <scm.developerConnection>scm:git:https://github.com/${env.GITHUB_REPOSITORY}.git</scm.developerConnection>
+                <scm.url>https://github.com/${env.GITHUB_REPOSITORY}.git</scm.url>
+            </properties>
+        </profile>
         <profile>
             <id>enhance</id>
             <build>
