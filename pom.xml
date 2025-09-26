@@ -156,7 +156,7 @@
         <lib.datanucleus-api-jdo.version>6.0.5</lib.datanucleus-api-jdo.version>
         <lib.datanucleus.version>6.0.11</lib.datanucleus.version>
         <lib.datanucleus-rdbms.version>6.0.10</lib.datanucleus-rdbms.version>
-        <lib.h2.version>2.3.232</lib.h2.version>
+        <lib.h2.version>2.4.240</lib.h2.version>
         <lib.hikaricp.version>7.0.2</lib.hikaricp.version>
         <lib.javassist.version>3.30.2-GA</lib.javassist.version>
         <lib.jackson.version>2.20.0</lib.jackson.version>
