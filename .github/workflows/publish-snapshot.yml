@@ -15,10 +15,10 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
         server-id: ossrh
-        server-username: MAVEN_USERNAME
-        server-password: MAVEN_PASSWORD
+        server-username: MAVEN_CENTRAL_USERNAME
+        server-password: MAVEN_CENTRAL_USERNAME
     - name: Publish snapshot
       run: mvn -B --no-transfer-progress deploy
       env:
-        MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-        MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+        MAVEN_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+        MAVEN_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
