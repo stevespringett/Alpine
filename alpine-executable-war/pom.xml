@@ -28,6 +28,8 @@
     <artifactId>alpine-executable-war</artifactId>
     <packaging>jar</packaging>
 
+    <name>${project.artifactId}</name>
+
     <properties>
         <maven.uuidgenerator.plugin.version>1.0.1</maven.uuidgenerator.plugin.version>
     </properties>
