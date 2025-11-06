@@ -302,13 +302,16 @@ public class Config {
             try (OutputStream fos = Files.newOutputStream(systemIdFile.toPath())) {
                 fos.write(UUID.randomUUID().toString().getBytes());
             } catch (IOException e) {
-                LOGGER.error("An error occurred writing to " + systemIdFile.getAbsolutePath(), e);
+                throw new IllegalStateException("An error occurred writing to " + systemIdFile.getAbsolutePath(), e);
             }
         }
         try {
-            systemId = new String(Files.readAllBytes(systemIdFile.toPath()));
+            systemId = Files.readString(systemIdFile.toPath());
+            if (StringUtils.isBlank(systemId)) {
+                throw new IllegalStateException("System ID file exists but is empty: " + systemIdFile.getAbsolutePath());
+            }
         } catch (IOException e) {
-            LOGGER.error("Unable to read the contents of " + systemIdFile.getAbsolutePath(), e);
+            throw new IllegalStateException("Unable to read the contents of " + systemIdFile.getAbsolutePath(), e);
         }
     }
 
