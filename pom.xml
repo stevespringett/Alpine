@@ -152,7 +152,7 @@
         <lib.caffeine.version>3.2.3</lib.caffeine.version>
         <lib.commons.collections4.version>4.5.0</lib.commons.collections4.version>
         <lib.commons.io.version>2.20.0</lib.commons.io.version>
-        <lib.commons.lang3.version>3.19.0</lib.commons.lang3.version>
+        <lib.commons.lang3.version>3.20.0</lib.commons.lang3.version>
         <lib.datanucleus-api-jdo.version>6.0.5</lib.datanucleus-api-jdo.version>
         <lib.datanucleus.version>6.0.11</lib.datanucleus.version>
         <lib.datanucleus-rdbms.version>6.0.10</lib.datanucleus-rdbms.version>
