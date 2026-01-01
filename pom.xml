@@ -22,7 +22,7 @@
     <groupId>us.springett</groupId>
     <artifactId>alpine-parent</artifactId>
     <packaging>pom</packaging>
-    <version>3.5.0</version>
+    <version>3.5.0-SNAPSHOT</version>
 
     <modules>
         <module>alpine-common</module>
@@ -63,7 +63,7 @@
         <connection>${scm.connection}</connection>
         <developerConnection>${scm.developerConnection}</developerConnection>
         <url>${scm.url}</url>
-        <tag>alpine-parent-3.5.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <issueManagement>
@@ -144,7 +144,7 @@
         <plugin.cyclonedx.outputReactorProjects>true</plugin.cyclonedx.outputReactorProjects>
 
         <!-- Dependency Versions -->
-        <lib.alpine.executable.war.version>3.5.0</lib.alpine.executable.war.version>
+        <lib.alpine.executable.war.version>3.5.0-SNAPSHOT</lib.alpine.executable.war.version>
         <lib.angus-mail.version>2.0.5</lib.angus-mail.version>
         <lib.bcrypt.version>0.4</lib.bcrypt.version>
         <lib.caffeine.version>3.2.3</lib.caffeine.version>
