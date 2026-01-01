@@ -79,8 +79,6 @@
     <properties>
         <!-- Maven Build Properties -->
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <timestamp>${maven.build.timestamp}</timestamp>
@@ -331,13 +329,10 @@
             <!-- Metrics -->
             <dependency>
                 <groupId>io.micrometer</groupId>
-                <artifactId>micrometer-registry-prometheus</artifactId>
+                <artifactId>micrometer-bom</artifactId>
                 <version>${lib.micrometer.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.micrometer</groupId>
-                <artifactId>micrometer-registry-prometheus-simpleclient</artifactId>
-                <version>${lib.micrometer.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
             </dependency>
             <!-- Health -->
             <dependency>
@@ -349,8 +344,10 @@
             <!-- Overriding OWASP Security Logging dependencies with newer versions -->
             <dependency>
                 <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
+                <artifactId>slf4j-bom</artifactId>
                 <version>${lib.slf4j.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>
@@ -408,10 +405,11 @@
             </dependency>
             <!-- Unit Tests -->
             <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter</artifactId>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
                 <version>${lib.junit-jupiter.version}</version>
-                <scope>test</scope>
+                <scope>import</scope>
+                <type>pom</type>
             </dependency>
             <dependency>
                 <groupId>org.junit-pioneer</groupId>
@@ -421,9 +419,10 @@
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
-                <artifactId>mockito-core</artifactId>
+                <artifactId>mockito-bom</artifactId>
                 <version>${lib.mockito.version}</version>
-                <scope>test</scope>
+                <scope>import</scope>
+                <type>pom</type>
             </dependency>
             <dependency>
                 <groupId>org.assertj</groupId>
@@ -485,8 +484,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven.compiler.plugin.version}</version>
                 <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
+                    <release>21</release>
                     <compilerArgs>
                         <arg>-Xlint:all</arg>
                         <arg>-Xlint:-processing</arg>
