@@ -162,7 +162,7 @@
         <lib.jetty.version>12.1.5</lib.jetty.version>
         <lib.jdo.api.version>3.2.1</lib.jdo.api.version>
         <lib.jersey.version>4.0.0</lib.jersey.version>
-        <lib.json-unit.version>5.0.0</lib.json-unit.version>
+        <lib.json-unit.version>5.1.0</lib.json-unit.version>
         <lib.jsonwebtoken.version>0.13.0</lib.jsonwebtoken.version>
         <lib.jsr305.version>3.0.2</lib.jsr305.version>
         <lib.logback.version>1.5.23</lib.logback.version>
