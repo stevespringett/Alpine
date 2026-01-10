@@ -176,7 +176,7 @@
         <lib.slf4j.version>2.0.17</lib.slf4j.version>
         <lib.swagger.version>2.2.41</lib.swagger.version>
         <!-- Unit test libraries -->
-        <lib.junit-jupiter.version>6.0.1</lib.junit-jupiter.version>
+        <lib.junit-jupiter.version>6.0.2</lib.junit-jupiter.version>
         <lib.junit-pioneer.version>2.3.0</lib.junit-pioneer.version>
         <lib.mockito.version>5.21.0</lib.mockito.version>
         <lib.assertj.version>3.27.6</lib.assertj.version>
