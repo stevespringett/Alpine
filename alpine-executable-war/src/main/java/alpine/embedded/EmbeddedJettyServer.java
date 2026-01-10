@@ -36,10 +36,17 @@ import org.eclipse.jetty.xml.XmlConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.ProtectionDomain;
+import java.util.Comparator;
+import java.util.Optional;
 import java.util.Properties;
+import java.util.stream.Stream;
 
 /**
  * The primary class that starts an embedded Jetty server
@@ -58,10 +65,13 @@ public final class EmbeddedJettyServer {
     }
 
     public static void main(final String[] args) throws Exception {
-        try (final InputStream fis = Thread.currentThread().getContextClassLoader().getResourceAsStream("alpine-executable-war.version")) {
-            final Properties properties = new Properties();
-            properties.load(fis);
-            LOGGER.info(properties.getProperty("name") + " v" + properties.getProperty("version") + " (" + properties.getProperty("uuid") + ") built on: " + properties.getProperty("timestamp"));
+        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+
+        final Properties execWarProperties;
+        try (final InputStream fis = contextClassLoader.getResourceAsStream("alpine-executable-war.version")) {
+            execWarProperties = new Properties();
+            execWarProperties.load(fis);
+            LOGGER.info(execWarProperties.getProperty("name") + " v" + execWarProperties.getProperty("version") + " (" + execWarProperties.getProperty("uuid") + ") built on: " + execWarProperties.getProperty("timestamp"));
         }
 
         final CliArgs cliArgs = new CliArgs(args);
@@ -105,6 +115,45 @@ public final class EmbeddedJettyServer {
         context.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern", ".*/[^/]*taglibs.*\\.jar$");
         context.setThrowUnavailableOnStartupException(true);
 
+        // Define a static temp directory to extract the WAR file into.
+        // The directory name contains the host and port to accommodate
+        // for multiple instances running at the same time.
+        //
+        // Prevents Jetty from creating new directories with random
+        // names, which could lead to disk bloat if the server is
+        // not shut down gracefully: https://github.com/DependencyTrack/dependency-track/issues/4797
+        //
+        // Note that disabling WAR extraction entirely is not possible,
+        // because Java does not support loading nested JARs,
+        // which is needed to load dependencies from WEB-INF/lib/*.
+        Optional<String> applicationName;
+        try {
+            applicationName = getApplicationName(contextClassLoader);
+        } catch (IOException e) {
+            LOGGER.warn("Failed to determine application name", e);
+            applicationName = Optional.empty();
+        }
+
+        final File tempDirectory = new File(
+                System.getProperty("java.io.tmpdir"),
+                "%s-%s-%d".formatted(
+                        applicationName
+                                .orElse(execWarProperties.getProperty("name"))
+                                .replaceAll("[^a-zA-Z0-9\\-_]", "_"),
+                        host.replaceAll("[^a-zA-Z0-9\\-_]", "_"),
+                        port));
+        context.setTempDirectory(tempDirectory);
+
+        if (tempDirectory.exists()) {
+            LOGGER.warn("Deleting stale temp directory: {}", tempDirectory);
+            try {
+                deleteRecursively(tempDirectory.toPath());
+            } catch (IOException e) {
+                LOGGER.error("Failed to delete stale temp directory: {}", tempDirectory, e);
+                System.exit(-1);
+            }
+        }
+
         // Prevent loading of logging classes
         context.getProtectedClassMatcher().add("org.apache.log4j.");
         context.getProtectedClassMatcher().add("org.slf4j.");
@@ -119,7 +168,7 @@ public final class EmbeddedJettyServer {
         //
         // https://jetty.org/docs/jetty/12/operations-guide/xml/index.html
         // https://jetty.org/docs/jetty/12/operations-guide/annotations/index.html
-        final URL jettyContextUrl = Thread.currentThread().getContextClassLoader().getResource("WEB-INF/jetty-context.xml");
+        final URL jettyContextUrl = contextClassLoader.getResource("WEB-INF/jetty-context.xml");
         if (jettyContextUrl != null) {
             LOGGER.debug("Applying Jetty customization from {}", jettyContextUrl);
             final Resource jettyContextResource = new URLResourceFactory().newResource(jettyContextUrl);
@@ -175,4 +224,24 @@ public final class EmbeddedJettyServer {
             }
         });
     }
+
+    private static Optional<String> getApplicationName(ClassLoader classLoader) throws IOException {
+        try (final InputStream fis = classLoader.getResourceAsStream("WEB-INF/classes/application.version")) {
+            if (fis == null) {
+                return Optional.empty();
+            }
+
+            final var properties = new Properties();
+            properties.load(fis);
+
+            return Optional.ofNullable(properties.getProperty("name"));
+        }
+    }
+
+    private static void deleteRecursively(Path path) throws IOException {
+        try (final Stream<Path> paths = Files.walk(path)) {
+            paths.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+        }
+    }
+
 }
