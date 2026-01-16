@@ -19,32 +19,25 @@
 package alpine.server.servlets;
 
 import alpine.common.logging.Logger;
-import alpine.common.util.BooleanUtil;
-import org.apache.commons.lang3.StringUtils;
-
 import jakarta.servlet.ServletConfig;
-import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
-import java.io.File;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
 
 /**
  * The FileSystemResourceServlet serves {@link StaticResource}s from the file system
  * similar to a conventional web server.
- *
+ * <p>
  * Adapted from http://stackoverflow.com/questions/132052/servlet-for-serving-static-content
- *
- * The Servlet contains two parameters, directory and absolute. The directory specifies the
- * the absolute or relative directory in which to serve files from. If the absolute parameter
- * is false (or not specified), then the directory will be relative from the context of the
- * webapp.
- *
+ * <p>
  * Sample usage:
  * <pre>
  * &lt;servlet&gt;
@@ -53,10 +46,6 @@ import java.nio.file.Files;
  *     &lt;init-param&gt;
  *         &lt;param-name&gt;directory&lt;/param-name&gt;
  *         &lt;param-value&gt;/path/to/images&lt;/param-value&gt;
- *     &lt;/init-param&gt;
- *     &lt;init-param&gt;
- *         &lt;param-name&gt;absolute&lt;/param-name&gt;
- *         &lt;param-value&gt;true&lt;/param-value&gt;
  *     &lt;/init-param&gt;
  *     &lt;load-on-startup&gt;1&lt;/load-on-startup&gt;
  * &lt;/servlet&gt;
@@ -73,12 +62,12 @@ public class FileSystemResourceServlet extends StaticResourceServlet {
 
     private static final Logger LOGGER = Logger.getLogger(FileSystemResourceServlet.class);
 
-    private String directory;
-    private boolean absolute;
+    private Path directoryPath;
 
     /**
      * Overrides the servlet init method and loads sets the InputStream necessary
      * to load application.properties.
+     *
      * @throws ServletException a general error that occurs during initialization
      */
     @Override
@@ -88,58 +77,68 @@ public class FileSystemResourceServlet extends StaticResourceServlet {
 
         final String directory = config.getInitParameter("directory");
         if (StringUtils.isNotBlank(directory)) {
-            this.directory = directory;
-        }
-
-        final String absolute = config.getInitParameter("absolute");
-        if (StringUtils.isNotBlank(absolute)) {
-            this.absolute = BooleanUtil.valueOf(absolute);
+            setDirectoryPath(Path.of(directory).normalize());
         }
     }
 
     @Override
     protected StaticResource getStaticResource(HttpServletRequest request) throws IllegalArgumentException {
-        final String pathInfo = request.getPathInfo();
-
-        if (pathInfo == null || pathInfo.isEmpty() || "/".equals(pathInfo)) {
+        String pathInfo = request.getPathInfo();
+        if (pathInfo == null) {
+            throw new IllegalArgumentException();
+        }
+        if (pathInfo.startsWith(request.getServletPath())) {
+            // Workaround for ill behaviour in the Grizzly server used for testing,
+            // where it includes the servlet path itself in the path info,
+            // whereas the servlet spec defines it to be the path *after*
+            // the servlet path.
+            pathInfo = pathInfo.substring(request.getServletPath().length());
+        }
+        if (pathInfo.isEmpty() || "/".equals(pathInfo)) {
             throw new IllegalArgumentException();
         }
 
-        String name = "";
-        try {
-            name = URLDecoder.decode(pathInfo.substring(1), StandardCharsets.UTF_8.name());
-        } catch (UnsupportedEncodingException e) {
-            LOGGER.error(e.getMessage());
+        final String fileName = URLDecoder.decode(pathInfo.substring(1), StandardCharsets.UTF_8);
+        final Path filePath = directoryPath.resolve(fileName).normalize();
+
+        if (!filePath.startsWith(directoryPath)) {
+            throw new IllegalArgumentException("""
+                    The provided file path %s does not resolve to a path within the \
+                    configured base directory %s""".formatted(filePath, directoryPath));
+        }
+        if (!Files.exists(filePath, LinkOption.NOFOLLOW_LINKS)
+                || Files.isSymbolicLink(filePath)) {
+            return null;
         }
 
-        final ServletContext context = request.getServletContext();
-        final File file = absolute ? new File(directory, name) : new File(context.getRealPath("/"), name).getAbsoluteFile();
-
-        return !file.exists() ? null : new StaticResource() {
+        return new StaticResource() {
             @Override
             public long getLastModified() {
-                return file.lastModified();
+                return filePath.toFile().lastModified();
             }
+
             @Override
             public InputStream getInputStream() throws IOException {
-                return Files.newInputStream(file.toPath());
+                return Files.newInputStream(filePath, LinkOption.NOFOLLOW_LINKS);
             }
+
             @Override
             public String getFileName() {
-                return file.getName();
+                return filePath.toFile().getName();
             }
+
             @Override
             public long getContentLength() {
-                return file.length();
+                return filePath.toFile().length();
             }
         };
     }
 
-    public void setDirectory(String directory) {
-        this.directory = directory;
+    public void setDirectoryPath(Path directoryPath) {
+        if (!directoryPath.isAbsolute()) {
+            throw new IllegalArgumentException("directoryPath must be absolute");
+        }
+        this.directoryPath = directoryPath;
     }
 
-    public void setAbsolute(boolean absolute) {
-        this.absolute = absolute;
-    }
 }
