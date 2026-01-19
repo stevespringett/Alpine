@@ -165,7 +165,7 @@
         <lib.json-unit.version>5.1.0</lib.json-unit.version>
         <lib.jsonwebtoken.version>0.13.0</lib.jsonwebtoken.version>
         <lib.jsr305.version>3.0.2</lib.jsr305.version>
-        <lib.logback.version>1.5.24</lib.logback.version>
+        <lib.logback.version>1.5.25</lib.logback.version>
         <lib.logstash-logback-encoder.version>8.1</lib.logstash-logback-encoder.version>
         <lib.micrometer.version>1.16.2</lib.micrometer.version>
         <lib.microprofile-health-api.version>4.0.1</lib.microprofile-health-api.version>
