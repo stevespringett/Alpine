@@ -85,6 +85,10 @@ public class Permission implements Serializable {
     @JsonIgnore
     private List<ManagedUser> managedUsers;
 
+    @Persistent(mappedBy = "permissions")
+    @JsonIgnore
+    private List<ApiKey> apiKeys;
+
     public long getId() {
         return id;
     }
@@ -140,5 +144,12 @@ public class Permission implements Serializable {
     public void setManagedUsers(List<ManagedUser> managedUsers) {
         this.managedUsers = managedUsers;
     }
-}
 
+    public List<ApiKey> getApiKeys() {
+        return apiKeys;
+    }
+
+    public void setApiKeys(List<ApiKey> apiKeys) {
+        this.apiKeys = apiKeys;
+    }
+}
