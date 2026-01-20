@@ -19,6 +19,8 @@
 package alpine.notification;
 
 public enum NotificationLevel {
+    QUITE(4),
+    DEBUG(3),
     INFORMATIONAL(2),
     WARNING(1),
     ERROR(0);
