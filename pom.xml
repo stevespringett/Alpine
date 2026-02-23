@@ -157,7 +157,7 @@
         <lib.h2.version>2.4.240</lib.h2.version>
         <lib.hikaricp.version>7.0.2</lib.hikaricp.version>
         <lib.javassist.version>3.30.2-GA</lib.javassist.version>
-        <lib.jackson.version>2.21.0</lib.jackson.version>
+        <lib.jackson.version>2.21.1</lib.jackson.version>
         <lib.jakarta.version>11.0.0</lib.jakarta.version>
         <lib.jetty.version>12.1.6</lib.jetty.version>
         <lib.jdo.api.version>3.2.1</lib.jdo.api.version>
