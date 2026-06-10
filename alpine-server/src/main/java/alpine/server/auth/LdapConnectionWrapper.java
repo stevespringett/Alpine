@@ -118,8 +118,12 @@ public class LdapConnectionWrapper {
     public DirContext createDirContext() throws NamingException {
         LOGGER.debug("Creating directory service context (DirContext)");
         final Hashtable<String, String> env = new Hashtable<>();
-        env.put(Context.SECURITY_PRINCIPAL, BIND_USERNAME);
-        env.put(Context.SECURITY_CREDENTIALS, BIND_PASSWORD);
+        if (BIND_USERNAME != null && !BIND_USERNAME.isBlank()) {
+            env.put(Context.SECURITY_PRINCIPAL, BIND_USERNAME);
+            if (BIND_PASSWORD != null && !BIND_PASSWORD.isBlank()) {
+                env.put(Context.SECURITY_CREDENTIALS, BIND_PASSWORD);
+            }
+        }
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         env.put(Context.PROVIDER_URL, LDAP_URL);
         if (IS_LDAP_SSLTLS) {
