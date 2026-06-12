@@ -173,7 +173,7 @@
         <lib.owasp.encoder.version>1.4.0</lib.owasp.encoder.version>
         <lib.owasp.security-logging.version>1.1.7</lib.owasp.security-logging.version>
         <lib.parsson.version>1.1.7</lib.parsson.version>
-        <lib.slf4j.version>2.0.17</lib.slf4j.version>
+        <lib.slf4j.version>2.0.18</lib.slf4j.version>
         <lib.swagger.version>2.2.45</lib.swagger.version>
         <!-- Unit test libraries -->
         <lib.junit-jupiter.version>6.1.0</lib.junit-jupiter.version>
