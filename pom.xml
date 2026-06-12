@@ -159,7 +159,7 @@
         <lib.javassist.version>3.31.0-GA</lib.javassist.version>
         <lib.jackson.version>2.22.0</lib.jackson.version>
         <lib.jakarta.version>11.0.0</lib.jakarta.version>
-        <lib.jetty.version>12.1.7</lib.jetty.version>
+        <lib.jetty.version>12.1.10</lib.jetty.version>
         <lib.jdo.api.version>3.2.1</lib.jdo.api.version>
         <lib.jersey.version>4.0.2</lib.jersey.version>
         <lib.json-unit.version>5.1.1</lib.json-unit.version>
