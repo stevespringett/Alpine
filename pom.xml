@@ -180,7 +180,7 @@
         <lib.junit-pioneer.version>2.3.0</lib.junit-pioneer.version>
         <lib.mockito.version>5.23.0</lib.mockito.version>
         <lib.assertj.version>3.27.7</lib.assertj.version>
-        <lib.wiremock.version>2.35.2</lib.wiremock.version>
+        <lib.wiremock.version>3.0.1</lib.wiremock.version>
 
         <war-embedded-finalname>${project.build.finalName}</war-embedded-finalname>
 
