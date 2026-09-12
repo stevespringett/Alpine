@@ -153,7 +153,7 @@
         <lib.commons.lang3.version>3.20.0</lib.commons.lang3.version>
         <lib.datanucleus-api-jdo.version>6.0.5</lib.datanucleus-api-jdo.version>
         <lib.datanucleus.version>6.0.11</lib.datanucleus.version>
-        <lib.datanucleus-rdbms.version>6.0.10</lib.datanucleus-rdbms.version>
+        <lib.datanucleus-rdbms.version>6.0.11</lib.datanucleus-rdbms.version>
         <lib.h2.version>2.4.240</lib.h2.version>
         <lib.hikaricp.version>7.0.2</lib.hikaricp.version>
         <lib.javassist.version>3.31.0-GA</lib.javassist.version>
