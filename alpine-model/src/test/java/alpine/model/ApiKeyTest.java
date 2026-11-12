@@ -18,9 +18,13 @@
  */
 package alpine.model;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ApiKeyTest {
 
@@ -31,4 +35,23 @@ public class ApiKeyTest {
         assertThat(apiKey.getMaskedKey()).isEqualTo("alpine_TL1xa********************************");
     }
 
+    @Test
+    public void teamsTest() {
+        List<Team> teams = new ArrayList<>();
+        teams.add(new Team());
+        ApiKey key = new ApiKey();
+        key.setTeams(teams);
+        Assertions.assertEquals(teams, key.getTeams());
+        Assertions.assertEquals(1, key.getTeams().size());
+    }
+
+    @Test
+    public void permissionsTest() {
+        List<Permission> permissions = new ArrayList<>();
+        permissions.add(new Permission());
+        ApiKey user = new ApiKey();
+        user.setPermissions(permissions);
+        Assertions.assertEquals(permissions, user.getPermissions());
+        Assertions.assertEquals(1, user.getPermissions().size());
+    }
 }

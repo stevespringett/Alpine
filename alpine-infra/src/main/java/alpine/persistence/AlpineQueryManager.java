@@ -932,18 +932,11 @@ public class AlpineQueryManager extends AbstractAlpineQueryManager {
      * @since 1.1.1
      */
     public boolean hasPermission(final ApiKey apiKey, String permissionName) {
-        if (apiKey.getTeams() == null) {
-            return false;
-        }
-        for (final Team team: apiKey.getTeams()) {
-            final List<Permission> teamPermissions = getObjectById(Team.class, team.getId()).getPermissions();
-            for (final Permission permission: teamPermissions) {
-                if (permission.getName().equals(permissionName)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        final Query<Permission> query = pm.newQuery(Permission.class, "name == :permissionName && apiKey.contains(apiKey) && apiKey.id == :apiKeyId");
+        query.declareVariables("alpine.model.ApiKey apiKey");
+        query.setParameters(permissionName, apiKey.getId());
+        query.setResult("count(id)");
+        return executeAndCloseResultUnique(query, Long.class) > 0;
     }
 
     /**
