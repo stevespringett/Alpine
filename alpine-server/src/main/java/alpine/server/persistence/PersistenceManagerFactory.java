@@ -194,34 +194,34 @@ public class PersistenceManagerFactory implements IPersistenceManagerFactory, Se
         }
     }
 
-    private void registerDataNucleusMetrics(final JDOPersistenceManagerFactory pmf) {
+    void registerDataNucleusMetrics(final JDOPersistenceManagerFactory pmf) {
         FunctionCounter.builder(DATANUCLEUS_METRICS_PREFIX + "datastore_reads_total", pmf,
-                        p -> p.getNucleusContext().getStatistics().getNumberOfDatastoreReads())
+                        p -> unsignedCount(p.getNucleusContext().getStatistics().getNumberOfDatastoreReads()))
                 .description("Total number of read operations from the datastore")
                 .register(Metrics.getRegistry());
 
         FunctionCounter.builder(DATANUCLEUS_METRICS_PREFIX + "datastore_writes_total", pmf,
-                        p -> p.getNucleusContext().getStatistics().getNumberOfDatastoreWrites())
+                        p -> unsignedCount(p.getNucleusContext().getStatistics().getNumberOfDatastoreWrites()))
                 .description("Total number of write operations to the datastore")
                 .register(Metrics.getRegistry());
 
         FunctionCounter.builder(DATANUCLEUS_METRICS_PREFIX + "object_fetches_total", pmf,
-                        p -> p.getNucleusContext().getStatistics().getNumberOfObjectFetches())
+                        p -> unsignedCount(p.getNucleusContext().getStatistics().getNumberOfObjectFetches()))
                 .description("Total number of objects fetched from the datastore")
                 .register(Metrics.getRegistry());
 
         FunctionCounter.builder(DATANUCLEUS_METRICS_PREFIX + "object_inserts_total", pmf,
-                        p -> p.getNucleusContext().getStatistics().getNumberOfObjectInserts())
+                        p -> unsignedCount(p.getNucleusContext().getStatistics().getNumberOfObjectInserts()))
                 .description("Total number of objects inserted into the datastore")
                 .register(Metrics.getRegistry());
 
         FunctionCounter.builder(DATANUCLEUS_METRICS_PREFIX + "object_updates_total", pmf,
-                        p -> p.getNucleusContext().getStatistics().getNumberOfObjectUpdates())
+                        p -> unsignedCount(p.getNucleusContext().getStatistics().getNumberOfObjectUpdates()))
                 .description("Total number of objects updated in the datastore")
                 .register(Metrics.getRegistry());
 
         FunctionCounter.builder(DATANUCLEUS_METRICS_PREFIX + "object_deletes_total", pmf,
-                        p -> p.getNucleusContext().getStatistics().getNumberOfObjectDeletes())
+                        p -> unsignedCount(p.getNucleusContext().getStatistics().getNumberOfObjectDeletes()))
                 .description("Total number of objects deleted from the datastore")
                 .register(Metrics.getRegistry());
 
@@ -236,12 +236,12 @@ public class PersistenceManagerFactory implements IPersistenceManagerFactory, Se
                 .register(Metrics.getRegistry());
 
         FunctionCounter.builder(DATANUCLEUS_METRICS_PREFIX + "queries_executed_total", pmf,
-                        p -> p.getNucleusContext().getStatistics().getQueryExecutionTotalCount())
+                        p -> unsignedCount(p.getNucleusContext().getStatistics().getQueryExecutionTotalCount()))
                 .description("Total number of executed queries")
                 .register(Metrics.getRegistry());
 
         FunctionCounter.builder(DATANUCLEUS_METRICS_PREFIX + "queries_failed_total", pmf,
-                        p -> p.getNucleusContext().getStatistics().getQueryErrorTotalCount())
+                        p -> unsignedCount(p.getNucleusContext().getStatistics().getQueryErrorTotalCount()))
                 .description("Total number of queries that completed with an error")
                 .register(Metrics.getRegistry());
 
@@ -256,17 +256,17 @@ public class PersistenceManagerFactory implements IPersistenceManagerFactory, Se
                 .register(Metrics.getRegistry());
 
         FunctionCounter.builder(DATANUCLEUS_METRICS_PREFIX + "transactions_total", pmf,
-                        p -> p.getNucleusContext().getStatistics().getTransactionTotalCount())
+                        p -> unsignedCount(p.getNucleusContext().getStatistics().getTransactionTotalCount()))
                 .description("Total number of transactions")
                 .register(Metrics.getRegistry());
 
         FunctionCounter.builder(DATANUCLEUS_METRICS_PREFIX + "transactions_committed_total", pmf,
-                        p -> p.getNucleusContext().getStatistics().getTransactionCommittedTotalCount())
+                        p -> unsignedCount(p.getNucleusContext().getStatistics().getTransactionCommittedTotalCount()))
                 .description("Total number of committed transactions")
                 .register(Metrics.getRegistry());
 
         FunctionCounter.builder(DATANUCLEUS_METRICS_PREFIX + "transactions_rolledback_total", pmf,
-                        p -> p.getNucleusContext().getStatistics().getTransactionRolledBackTotalCount())
+                        p -> unsignedCount(p.getNucleusContext().getStatistics().getTransactionRolledBackTotalCount()))
                 .description("Total number of rolled-back transactions")
                 .register(Metrics.getRegistry());
 
@@ -298,6 +298,18 @@ public class PersistenceManagerFactory implements IPersistenceManagerFactory, Se
                         p -> p.getQueryCache().getQueryCache().size())
                 .description("Number of entries in the query result cache")
                 .register(Metrics.getRegistry());
+    }
+
+    /**
+     * DataNucleus tracks its statistics counters as {@code int}, which overflow after
+     * {@link Integer#MAX_VALUE} increments. Prometheus rejects negative counter values,
+     * causing the entire metrics scrape to fail. Interpreting the value as unsigned
+     * doubles the headroom, and the eventual wrap to zero is handled as a regular counter reset.
+     *
+     * @see <a href="https://github.com/stevespringett/Alpine/issues/909">Alpine #909</a>
+     */
+    private static double unsignedCount(final int count) {
+        return Integer.toUnsignedLong(count);
     }
 
     private DataSource createTxPooledDataSource() {
